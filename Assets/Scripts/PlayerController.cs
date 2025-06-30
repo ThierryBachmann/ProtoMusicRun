@@ -21,8 +21,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 velocity;
     private float gravity = 9.81f;
     private bool isGrounded;
-    public float turnSpeed = 90f; // vitesse d'interpolation de rotation
+    public float turnSpeed = 90f; // vitesse de rotation fluide en °/s
     public float maxAngle = 45f;
+    private float targetAngle = 0f; // angle actuel utilisé pour la rotation
     private float currentAngle = 0f;
 
     void Start()
@@ -46,24 +47,33 @@ public class PlayerController : MonoBehaviour
 
         //velocity.y += gravity * Time.deltaTime;
         //controller.Move(velocity * Time.deltaTime);
+        HandleInput();
         HandleRotation();
         HandleMovement();
     }
 
-    void HandleRotation()
+    void HandleInput()
     {
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            currentAngle -= turnSpeed * Time.deltaTime;
+            targetAngle -= turnSpeed * Time.deltaTime;
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
-            currentAngle += turnSpeed * Time.deltaTime;
+            targetAngle += turnSpeed * Time.deltaTime;
         }
 
-        currentAngle = Mathf.Clamp(currentAngle, -maxAngle, maxAngle);
+        // Clamp l'angle cible
+        targetAngle = Mathf.Clamp(targetAngle, -maxAngle, maxAngle);
+    }
 
-        // Tourne le joueur (et donc la caméra avec lui)
+
+    void HandleRotation()
+    {
+        // Interpolation douce entre l'angle actuel et l'angle cible
+        currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * 5f); // facteur de lissage ajustable
+
+        // Appliquer au transform
         transform.rotation = Quaternion.Euler(0, currentAngle, 0);
     }
     void HandleMovement()

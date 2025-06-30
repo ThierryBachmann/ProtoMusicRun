@@ -14,7 +14,7 @@ public class TerrainGenerator : MonoBehaviour
     {
         int playerIndex = Mathf.FloorToInt(player.position.z / chunkLength);
 
-        for (int i = -1; i <= chunksAhead; i++)
+        for (int i = 0; i <= chunksAhead; i++)
         {
             int index = playerIndex + i;
             if (!ChunkExists(index))
