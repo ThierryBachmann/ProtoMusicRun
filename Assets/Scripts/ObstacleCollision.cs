@@ -1,18 +1,41 @@
+using MidiPlayerTK;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public class ObstacleCollision : MonoBehaviour
 {
-    public PlayerController player;
-    public ScoreManager scoreManager;
-    public AudioSource collisionSound;
+    public PlayerController Player;
+    public ScoreManager ScoreManager;
+    public MidiFilePlayer MainMusic;
+    public SoundManager SoundManager;
 
+    void Start()
+    {
+    }
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.collider.CompareTag("Obstacle"))
+        {
+            Debug.Log("Le joueur a heurté un obstacle : " + hit.collider.name);
+            MainMusic.MPTK_Pause(1000);
+            Player.speedMultiplier = 0.5f;
+            ScoreManager.coefficient = 1f;
+            SoundManager.PlayCollisionSound();
+        }
+    }
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Obstacle"))
+        Debug.Log("OnTriggerEnter: " + other.gameObject.name);
+    }
+        void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("ObstacleCollision: " + collision.gameObject.name);
+        if (collision.gameObject.CompareTag("Obstacle"))
         {
-            player.speedMultiplier = 0.5f;
-            scoreManager.coefficient = 1f;
-            if (collisionSound) collisionSound.Play();
+            MainMusic.MPTK_Pause(1000);
+            Player.speedMultiplier = 0.5f;
+            ScoreManager.coefficient = 1f;
+            SoundManager.PlayCollisionSound();
         }
     }
 }

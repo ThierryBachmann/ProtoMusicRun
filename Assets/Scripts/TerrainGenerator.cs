@@ -1,47 +1,71 @@
-using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
+using System.Collections.Generic;
 
 public class TerrainGenerator : MonoBehaviour
 {
-    public GameObject[] forestChunks;
     public Transform player;
-    public float chunkLength = 20f;
-    public int chunksAhead = 5;
-    private List<GameObject> activeChunks = new();
+    public GameObject[] forestChunks; // tableau de prefabs
+    public int chunkSize = 20;
+    public int renderDistance = 2;
+
+    private Dictionary<Vector2Int, GameObject> spawnedChunks = new Dictionary<Vector2Int, GameObject>();
+    private Vector2Int currentPlayerChunk;
 
     void Update()
     {
-        int playerIndex = Mathf.FloorToInt(player.position.z / chunkLength);
-
-        for (int i = 0; i <= chunksAhead; i++)
+        Vector2 playerPos = new Vector2(player.position.x, player.position.z);
+        Vector2Int playerChunk = new Vector2Int(
+            Mathf.FloorToInt(playerPos.x / chunkSize),
+            Mathf.FloorToInt(playerPos.y / chunkSize)
+        );
+        //Debug.Log($"{playerPos.x} {playerPos.y} {playerChunk}");
+        if (playerChunk != currentPlayerChunk)
         {
-            int index = playerIndex + i;
-            if (!ChunkExists(index))
+            currentPlayerChunk = playerChunk;
+            UpdateChunks();
+        }
+    }
+
+    void UpdateChunks()
+    {
+        HashSet<Vector2Int> newChunks = new HashSet<Vector2Int>();
+
+        for (int x = -renderDistance; x <= renderDistance; x++)
+        {
+            for (int z = -renderDistance; z <= renderDistance; z++)
             {
-                Vector3 pos = new Vector3(0, 0, index * chunkLength);
-                GameObject chunk = Instantiate(forestChunks[Random.Range(0, forestChunks.Length)], pos, Quaternion.identity);
-                chunk.name = "Chunk_" + index;
-                activeChunks.Add(chunk);
+                Vector2Int chunkCoord = currentPlayerChunk + new Vector2Int(x, z);
+                newChunks.Add(chunkCoord);
+
+                if (!spawnedChunks.ContainsKey(chunkCoord))
+                {
+                    Vector3 spawnPos = new Vector3(
+                        chunkCoord.x * chunkSize,
+                        0,
+                        chunkCoord.y * chunkSize
+                    );
+
+                    GameObject randomPrefab = forestChunks[Random.Range(0, forestChunks.Length)];
+                    GameObject chunk = Instantiate(randomPrefab, spawnPos, Quaternion.identity);
+                    chunk.name = $"Chunk_{chunkCoord.x}_{chunkCoord.y}";
+                    spawnedChunks.Add(chunkCoord, chunk);
+                }
             }
         }
 
-        CleanupOldChunks(playerIndex);
-    }
-
-    bool ChunkExists(int index) => activeChunks.Any(c => c.name == "Chunk_" + index);
-
-    void CleanupOldChunks(int currentIndex)
-    {
-        for (int i = activeChunks.Count - 1; i >= 0; i--)
+        // Supprimer les chunks hors de portée
+        List<Vector2Int> chunksToRemove = new List<Vector2Int>();
+        foreach (var coord in spawnedChunks.Keys)
         {
-            GameObject chunk = activeChunks[i];
-            int chunkIndex = int.Parse(chunk.name.Split('_')[1]);
-            if (chunkIndex < currentIndex - 2)
+            if (!newChunks.Contains(coord))
             {
-                Destroy(chunk);
-                activeChunks.RemoveAt(i);
+                Destroy(spawnedChunks[coord]);
+                chunksToRemove.Add(coord);
             }
+        }
+        foreach (var coord in chunksToRemove)
+        {
+            spawnedChunks.Remove(coord);
         }
     }
 }

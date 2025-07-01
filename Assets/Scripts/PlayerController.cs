@@ -64,7 +64,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Clamp l'angle cible
-        targetAngle = Mathf.Clamp(targetAngle, -maxAngle, maxAngle);
+   //     targetAngle = Mathf.Clamp(targetAngle, -maxAngle, maxAngle);
     }
 
 
