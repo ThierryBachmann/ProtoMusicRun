@@ -8,6 +8,7 @@
  */
 
 // === PlayerController.cs ===
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -25,28 +26,32 @@ public class PlayerController : MonoBehaviour
     public float maxAngle = 45f;
     private float targetAngle = 0f; // angle actuel utilisé pour la rotation
     private float currentAngle = 0f;
+    private bool isBeingPushed = false;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
     }
+    public void ForceMove(Vector3 offset)
+    {
+        StartCoroutine(ApplyPush(offset));
+    }
+    private IEnumerator ApplyPush(Vector3 offset)
+    {
+        isBeingPushed = true;
+        controller.Move(offset);
+        yield return new WaitForSeconds(0.5f); // Délai avant de réactiver les collisions normales
+        isBeingPushed = false;
+    }
 
+    public bool IsBeingPushed()
+    {
+        return isBeingPushed;
+    }
     void Update()
     {
-        //isGrounded = controller.isGrounded;
-        //if (isGrounded && velocity.y < 0) velocity.y = -2f;
+        if (isBeingPushed) return;
 
-        //float moveX = Input.GetAxis("Horizontal") * directionSpeed;
-        //Vector3 move = transform.right * moveX + transform.forward * baseSpeed * speedMultiplier;
-        //controller.Move(move * Time.deltaTime);
-
-        //if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        //{
-        //    velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
-        //}
-
-        //velocity.y += gravity * Time.deltaTime;
-        //controller.Move(velocity * Time.deltaTime);
         HandleInput();
         HandleRotation();
         HandleMovement();
@@ -97,5 +102,6 @@ public class PlayerController : MonoBehaviour
         move.y = velocity.y;
         controller.Move(move * Time.deltaTime);
     }
+
     public float GetSpeed() => baseSpeed * speedMultiplier;
 }

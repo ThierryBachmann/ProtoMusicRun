@@ -4,7 +4,7 @@ using UnityEngine.InputSystem.XR;
 
 public class SoundManager : MonoBehaviour
 {
-    public MidiFilePlayer CollisionSound;
+    public MidiStreamPlayer MidiSound;
 
     public MPTKEvent SoundCollision1;
 
@@ -14,9 +14,9 @@ public class SoundManager : MonoBehaviour
     }
     public void PlayCollisionSound()
     {
-        if (CollisionSound)
+        if (MidiSound)
         {
-            CollisionSound.MPTK_PlayDirectEvent(SoundCollision1);
+            MidiSound.MPTK_PlayDirectEvent(SoundCollision1);
         }
     }
 }
