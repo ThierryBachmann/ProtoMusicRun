@@ -374,12 +374,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab9f0b5b98430294883870e2b31adac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSpeed: 5
   speedMultiplier: 1
-  directionSpeed: 3
-  jumpForce: 5
+  moveSpeed: 5
   turnSpeed: 90
   maxAngle: 45
+  jumpForce: 5
+  knockbackDecay: 4
 --- !u!143 &256923875
 CharacterController:
   m_ObjectHideFlags: 0
@@ -490,6 +490,9 @@ MonoBehaviour:
   ScoreManager: {fileID: 211374106}
   MainMusic: {fileID: 738411423}
   SoundManager: {fileID: 1870609031}
+  cameraShake: {fileID: 330585548}
+  cooldownDelay: 1.5
+  knockbackPower: 6
 --- !u!1 &283134987
 GameObject:
   m_ObjectHideFlags: 0
@@ -535,6 +538,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -660,6 +664,18 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59de8498704ea26479626a6602b51e03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &375641947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -882,6 +898,9 @@ MonoBehaviour:
   ScoreManager: {fileID: 211374106}
   MainMusic: {fileID: 738411423}
   SoundManager: {fileID: 1870609031}
+  cameraShake: {fileID: 330585548}
+  cooldownDelay: 1.5
+  knockbackPower: 6
 --- !u!4 &544780661
 Transform:
   m_ObjectHideFlags: 0

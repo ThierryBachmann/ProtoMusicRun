@@ -8,8 +8,10 @@
  */
 
 // === PlayerController.cs ===
+using Mono.Cecil.Cil;
 using System.Collections;
 using UnityEngine;
+using static Unity.Burst.Intrinsics.Arm;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
@@ -36,7 +38,6 @@ public class PlayerController : MonoBehaviour
     private Vector3 verticalVelocity;  // stocke la composante Y du saut/gravité
     private float targetAngle = 0f; // angle actuel utilisé pour la rotation
     private float currentAngle = 0f;
-    private bool isBeingPushed = false;
     private Vector3 knockback = Vector3.zero;
 
     void Start()
@@ -49,30 +50,16 @@ public class PlayerController : MonoBehaviour
         knockback = direction.normalized * strength;
     }
 
-    public void ForceMove(Vector3 offset)
-    {
-        StartCoroutine(ApplyPush(offset));
-    }
-    private IEnumerator ApplyPush(Vector3 offset)
-    {
-        Debug.Log($"Push {offset}");
-        isBeingPushed = true;
-        controller.Move(offset);
-        yield return new WaitForSeconds(0.5f); // Délai avant de réactiver les collisions normales
-        isBeingPushed = false;
-    }
-
-    public bool IsBeingPushed()
-    {
-        return isBeingPushed;
-    }
     void Update()
     {
-        if (isBeingPushed) return;
-
         HandleInput();
         HandleRotation();
         HandleMovement();
+
+        // Remontée progressive du multiplicateur de vitesse
+        // Il rapproche doucement speedMultiplier de 10f a une vitesse de 0.5 par seconde.
+        // Tu peux ajuster ce 0.5f selon la douceur voulue(par ex. 1f = plus rapide, 0.2f = plus lent)
+            speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);
     }
 
     void HandleInput()
@@ -87,7 +74,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Clamp l'angle cible
-   //     targetAngle = Mathf.Clamp(targetAngle, -maxAngle, maxAngle);
+        //     targetAngle = Mathf.Clamp(targetAngle, -maxAngle, maxAngle);
     }
 
 
@@ -101,6 +88,7 @@ public class PlayerController : MonoBehaviour
     }
     void HandleMovement()
     {
+
         // Avance “normale”
         Vector3 forwardMove = transform.forward * moveSpeed * speedMultiplier;
 
