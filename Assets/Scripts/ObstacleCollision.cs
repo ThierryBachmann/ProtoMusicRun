@@ -1,4 +1,4 @@
-using MidiPlayerTK;
+ï»¿using MidiPlayerTK;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 
@@ -10,35 +10,36 @@ public class ObstacleCollision : MonoBehaviour
     public SoundManager SoundManager;
 
     private bool hasCollided = false;
-    private float resetDelay = 2f; // Durée pendant laquelle la collision est ignorée
+    private float resetDelay = 2f; // DurÃ©e pendant laquelle la collision est ignorÃ©e
 
+    private bool onCooldown;
+    [SerializeField] private float cooldownDelay = 1.5f;
+    [SerializeField] private float knockbackPower = 6f;   // distance ressentie
     void Start()
     {
     }
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (hasCollided || Player.IsBeingPushed()) return;
+        if (onCooldown) return;
+        if (!hit.collider.CompareTag("Obstacle")) return;
+
 
         if (hit.collider.CompareTag("Obstacle"))
         {
-            Debug.Log($"Le joueur a heurté un obstacle : {hit.collider.name} {hit.collider.tag}");
+            Debug.Log($"Le joueur a heurtÃ© un obstacle : {hit.collider.name} {hit.collider.tag}");
             MainMusic.MPTK_Pause(1000);
             Player.speedMultiplier = 0.5f;
             ScoreManager.coefficient = 1f;
             SoundManager.PlayCollisionSound();
 
-            // Recul du player
-            Vector3 pushBack = -hit.normal * 2f; // Pousse en arrière selon la normale du contact
-            PlayerController controller = Player.GetComponent<PlayerController>();
-            controller.ForceMove(pushBack); // Crée cette méthode pour appliquer ce déplacement
+            // 2. knockâ€‘back
+            Vector3 pushDir = Vector3.ProjectOnPlane(hit.normal, Vector3.up); // horizontale
+            Player.ApplyKnockback(pushDir, knockbackPower);
 
-            hasCollided = true;
-            Invoke(nameof(ResetCollision), resetDelay);
+            // 3. antiâ€‘spam
+            onCooldown = true;
+            Invoke(nameof(ResetCooldown), cooldownDelay);
         }
     }
-
-    private void ResetCollision()
-    {
-        hasCollided = false;
-    }
+    void ResetCooldown() => onCooldown = false;
 }

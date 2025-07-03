@@ -1,10 +1,10 @@
-/*
- * Prototype Unity 3D : Sc�ne "for�t musicale"
+﻿/*
+ * Prototype Unity 3D : Scène "forêt musicale"
  * Objectifs :
- * - G�n�ration dynamique de terrain
+ * - Génération dynamique de terrain
  * - Joueur en vue subjective
  * - Synchronisation musique MIDI avec Maestro MPTK
- * - Obstacles + syst�me de score
+ * - Obstacles + système de score
  */
 
 // === PlayerController.cs ===
@@ -14,33 +14,51 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    public float baseSpeed = 5f;
+    [Header("Mouvement avant")]
     public float speedMultiplier = 1f;
-    public float directionSpeed = 3f;
+    public float moveSpeed = 5f;
+
+    [Header("Orientation")]
+    public float turnSpeed = 90f; // vitesse de rotation fluide en °/s
+    public float maxAngle = 45f;
+
+    [Header("Saut & gravité")]
+    private float gravity = 9.81f;
     public float jumpForce = 5f;
+
+    [Header("Knock‑back")]
+    public float knockbackDecay = 4f;  // plus grand = ralentit plus vite
+
+
     private CharacterController controller;
     private Vector3 velocity;
-    private float gravity = 9.81f;
     private bool isGrounded;
-    public float turnSpeed = 90f; // vitesse de rotation fluide en �/s
-    public float maxAngle = 45f;
-    private float targetAngle = 0f; // angle actuel utilis� pour la rotation
+    private Vector3 verticalVelocity;  // stocke la composante Y du saut/gravité
+    private float targetAngle = 0f; // angle actuel utilisé pour la rotation
     private float currentAngle = 0f;
     private bool isBeingPushed = false;
+    private Vector3 knockback = Vector3.zero;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
     }
+
+    public void ApplyKnockback(Vector3 direction, float strength)
+    {
+        knockback = direction.normalized * strength;
+    }
+
     public void ForceMove(Vector3 offset)
     {
         StartCoroutine(ApplyPush(offset));
     }
     private IEnumerator ApplyPush(Vector3 offset)
     {
+        Debug.Log($"Push {offset}");
         isBeingPushed = true;
         controller.Move(offset);
-        yield return new WaitForSeconds(0.5f); // D�lai avant de r�activer les collisions normales
+        yield return new WaitForSeconds(0.5f); // Délai avant de réactiver les collisions normales
         isBeingPushed = false;
     }
 
@@ -83,25 +101,36 @@ public class PlayerController : MonoBehaviour
     }
     void HandleMovement()
     {
-        Vector3 move = transform.forward * baseSpeed;
+        // Avance “normale”
+        Vector3 forwardMove = transform.forward * moveSpeed * speedMultiplier;
 
-        isGrounded = controller.isGrounded;
-        if (isGrounded)
+        // Applique le knock‑back et le fait décélérer progressivement
+        if (knockback.sqrMagnitude > 0.01f)
         {
-            velocity.y = -1f;
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                velocity.y = jumpForce;
-            }
+            forwardMove += knockback;
+            knockback = Vector3.Lerp(knockback, Vector3.zero, Time.deltaTime * knockbackDecay);
         }
         else
         {
-            velocity.y -= gravity * Time.deltaTime;
+            knockback = Vector3.zero; // sécurité
         }
 
-        move.y = velocity.y;
-        controller.Move(move * Time.deltaTime);
+        // Gestion saut / gravité
+        if (controller.isGrounded)
+        {
+            verticalVelocity.y = -1f;
+            if (Input.GetKeyDown(KeyCode.Space)) verticalVelocity.y = jumpForce;
+        }
+        else
+        {
+            verticalVelocity.y -= gravity * Time.deltaTime;
+        }
+
+        Vector3 finalMove = forwardMove;
+        finalMove.y = verticalVelocity.y;
+
+        controller.Move(finalMove * Time.deltaTime);
     }
 
-    public float GetSpeed() => baseSpeed * speedMultiplier;
+    public float GetSpeed() => moveSpeed * speedMultiplier;
 }
