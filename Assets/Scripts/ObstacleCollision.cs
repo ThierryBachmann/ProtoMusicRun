@@ -32,9 +32,9 @@ public class ObstacleCollision : MonoBehaviour
 
         if (hit.collider.CompareTag("Obstacle"))
         {
-            Debug.Log($"Le joueur a heurté un obstacle : {hit.collider.name} {hit.collider.tag}");
-            float applyShake =  Mathf.Clamp(Player.GetSpeed(), 0.5f, 3f);
-            cameraShake.TriggerShake(0.4f, 0.15f* applyShake, 2f); // durée, amplitude, amortissement
+            float applyShake = Mathf.Clamp(Player.GetSpeed() / 7f, 0.5f, 3f);
+            Debug.Log($"Le joueur a heurté un obstacle : {hit.collider.name} {hit.collider.tag} applyShake:{applyShake}");
+            cameraShake.TriggerShake(0.4f, 0.15f * applyShake, 2f); // durée, amplitude, amortissement
             MainMusic.MPTK_Pause(1000);
             Player.speedMultiplier = 0.5f;
             ScoreManager.coefficient = 1f;
@@ -42,7 +42,7 @@ public class ObstacleCollision : MonoBehaviour
 
             // 2. knock‑back
             Vector3 pushDir = Vector3.ProjectOnPlane(hit.normal, Vector3.up); // horizontale
-            Player.ApplyKnockback(pushDir, knockbackPower* applyShake);
+            Player.ApplyKnockback(pushDir, knockbackPower * applyShake);
 
             // 3. anti‑spam
             onCooldown = true;
