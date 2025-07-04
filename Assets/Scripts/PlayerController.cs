@@ -16,6 +16,8 @@ using static Unity.Burst.Intrinsics.Arm;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
+    public GoalHandler goalHandler;
+
     [Header("Mouvement avant")]
     public float speedMultiplier = 1f;
     public float moveSpeed = 5f;
@@ -52,14 +54,17 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        HandleInput();
-        HandleRotation();
-        HandleMovement();
+        if (!goalHandler.goalReached)
+        {
+            HandleInput();
+            HandleRotation();
+            HandleMovement();
 
-        // Remontée progressive du multiplicateur de vitesse
-        // Il rapproche doucement speedMultiplier de 10f a une vitesse de 0.5 par seconde.
-        // Tu peux ajuster ce 0.5f selon la douceur voulue(par ex. 1f = plus rapide, 0.2f = plus lent)
+            // Remontée progressive du multiplicateur de vitesse
+            // Il rapproche doucement speedMultiplier de 10f a une vitesse de 0.5 par seconde.
+            // Tu peux ajuster ce 0.5f selon la douceur voulue(par ex. 1f = plus rapide, 0.2f = plus lent)
             speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);
+        }
     }
 
     void HandleInput()
