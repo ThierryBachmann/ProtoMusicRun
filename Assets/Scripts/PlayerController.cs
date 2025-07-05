@@ -16,6 +16,7 @@ using static Unity.Burst.Intrinsics.Arm;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
+    public bool enableMovement = true;
     public GoalHandler goalHandler;
 
     [Header("Mouvement avant")]
@@ -54,7 +55,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (!goalHandler.goalReached)
+        if (!goalHandler.goalReached && enableMovement)
         {
             HandleInput();
             HandleRotation();
