@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 5603409985460955459}
   m_Layer: 0
   m_Name: CollisionObject0
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 141239559367279969}
   m_Layer: 0
   m_Name: CollisionObject1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647

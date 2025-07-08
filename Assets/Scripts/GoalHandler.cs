@@ -4,6 +4,7 @@ using UnityEngine;
 public class GoalHandler : MonoBehaviour
 {
     public PlayerController player;
+    public GoalSpotlightAnimator goalSpotlightAnimator;
     public float Distance;
     public GameObject sphere;
     public float distance;            // (debug) distance actuelle
@@ -46,6 +47,7 @@ public class GoalHandler : MonoBehaviour
             // ➜ ici, lance la fin de niveau, un son, etc.
             // …
             goalReached = true;
+            goalSpotlightAnimator.TriggerGoal();
         }
         lastPos = currentPos;
 

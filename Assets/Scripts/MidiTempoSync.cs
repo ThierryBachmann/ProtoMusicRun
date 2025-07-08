@@ -10,5 +10,6 @@ public class MidiTempoSync : MonoBehaviour
     {
         float tempo = Mathf.Clamp(player.GetSpeed() * 30f, 60f, 240f);
         midiPlayer.MPTK_Tempo = tempo;
+        // A TESTER - midiPlayer.ActiveVoices.ForEach(v => {if (v.channel.Channel==0) v.Release(); });
     }
 }

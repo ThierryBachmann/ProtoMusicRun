@@ -7,9 +7,13 @@ public class TerrainGenerator : MonoBehaviour
     public GameObject[] forestChunks; // tableau de prefabs
     public int chunkSize = 20;
     public int renderDistance = 2;
-
+    public bool disableObstacles = false;
     private Dictionary<Vector2Int, GameObject> spawnedChunks = new Dictionary<Vector2Int, GameObject>();
     private Vector2Int currentPlayerChunk;
+
+    void Start()
+    {
+    }
 
     void Update()
     {
@@ -48,6 +52,22 @@ public class TerrainGenerator : MonoBehaviour
                     GameObject randomPrefab = forestChunks[Random.Range(0, forestChunks.Length)];
                     GameObject chunk = Instantiate(randomPrefab, spawnPos, Quaternion.identity);
                     chunk.name = $"Chunk_{chunkCoord.x}_{chunkCoord.y}";
+                    if (disableObstacles)
+                    {
+                        foreach (Collider col in chunk.GetComponentsInChildren<Collider>())
+                        {
+                            // keeps the GameObject visible, but disables any physical interaction.
+                            if (col.CompareTag("Obstacle"))
+                                col.enabled = false;
+                        }
+                        //foreach (Transform child in chunk.transform)
+                        //{
+                        //    child.gameObject.SetActive(false);
+                        //    // Do something with childGO
+                        //}
+                        //GameObject[] go = chunk.GetComponentsInChildren<GameObject>();
+                        //foreach (GameObject t in go) t.SetActive(false);
+                    }
                     spawnedChunks.Add(chunkCoord, chunk);
                 }
             }
@@ -65,6 +85,7 @@ public class TerrainGenerator : MonoBehaviour
         }
         foreach (var coord in chunksToRemove)
         {
+            Debug.Log($"Remove {coord}");
             spawnedChunks.Remove(coord);
         }
     }
