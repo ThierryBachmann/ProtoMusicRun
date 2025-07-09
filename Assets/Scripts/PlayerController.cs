@@ -55,16 +55,25 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (!goalHandler.goalReached && enableMovement)
+        if (enableMovement)
         {
-            HandleInput();
-            HandleRotation();
-            HandleMovement();
+            if (!goalHandler.goalReached)
+            {
+                HandleInput();
+                HandleRotation();
+                HandleMovement();
 
-            // Remontée progressive du multiplicateur de vitesse
-            // Il rapproche doucement speedMultiplier de 10f a une vitesse de 0.5 par seconde.
-            // Selon la douceur voulue(par ex. 1f = plus rapide, 0.1f = plus lent)
-            speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);
+                // Remontée progressive du multiplicateur de vitesse
+                // Il rapproche doucement speedMultiplier de 10f a une vitesse de 0.5 par seconde.
+                // Selon la douceur voulue(par ex. 1f = plus rapide, 0.1f = plus lent)
+                speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);
+            }
+            else
+            {
+                speedMultiplier = Mathf.MoveTowards(speedMultiplier, 0f, Time.deltaTime * 15f);
+                HandleMovement(false);
+
+            }
         }
     }
 
@@ -92,9 +101,8 @@ public class PlayerController : MonoBehaviour
         // Appliquer au transform
         transform.rotation = Quaternion.Euler(0, currentAngle, 0);
     }
-    void HandleMovement()
+    void HandleMovement(bool stopDown =false)
     {
-
         // Avance “normale”
         Vector3 forwardMove = transform.forward * moveSpeed * speedMultiplier;
 

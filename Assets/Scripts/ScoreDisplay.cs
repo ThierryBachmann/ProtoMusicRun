@@ -9,13 +9,15 @@ public class ScoreDisplay : MonoBehaviour
     public GoalHandler goalHandler;
     private Color scoreGrowing;
     private Color scoreDecrease;
-    private float lastScore;
+    private Color scoreFinal;
     private Color currentTextColor;
+    private float lastScore;
 
     void Start()
     {
-        ColorUtility.TryParseHtmlString("#00F20B", out scoreGrowing);
+        ColorUtility.TryParseHtmlString("#00F20B", out scoreFinal);
         ColorUtility.TryParseHtmlString("#FF7D88", out scoreDecrease);
+        ColorUtility.TryParseHtmlString("#FFEF2E", out scoreGrowing);
     }
     void Update()
     {
@@ -24,8 +26,13 @@ public class ScoreDisplay : MonoBehaviour
 
         Color targetColor = scoreText.color; // couleur par défaut
 
-        if (scoreManager.score > lastScore) targetColor = scoreGrowing;
-        if (scoreManager.score < lastScore) targetColor = scoreDecrease;
+        if (player.goalHandler.goalReached)
+            targetColor = scoreFinal;
+        else
+        {
+            if (scoreManager.score > lastScore) targetColor = scoreGrowing;
+            if (scoreManager.score < lastScore) targetColor = scoreDecrease;
+        }
 
         if (currentTextColor != targetColor)
         {
