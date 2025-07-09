@@ -1,4 +1,5 @@
-﻿using Unity.VisualScripting;
+﻿using NUnit.Framework.Internal;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GoalHandler : MonoBehaviour
@@ -9,15 +10,16 @@ public class GoalHandler : MonoBehaviour
     public GameObject sphere;
     public float distance;            // (debug) distance actuelle
     public float goalRadius = 1.5f;   // rayon d’arrivée (en mètres)
-    public float forward;
-    private Vector3 lastPos;
+    public float goalDirection;
+    public float goalAngle;
+    //private Vector3 lastPos;
     public bool goalReached;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        lastPos = player.transform.position;
-        goalReached=false;
+        //lastPos = player.transform.position;
+        goalReached = false;
     }
 
     // Update is called once per frame
@@ -27,21 +29,18 @@ public class GoalHandler : MonoBehaviour
         distance = Vector3.Distance(player.transform.position,
                                     sphere.transform.position);
 
-        // Direction vers le goal
-        Vector3 currentPos = player.transform.position;
-        Vector3 toGoal = sphere.transform.position - currentPos;
-        Vector3 dirGoal = toGoal.normalized;
+        Vector3 toGoal = (sphere.transform.position - player.transform.position).normalized;
+        Vector3 playerDir = player.transform.forward;
 
-        // Déplacement depuis la frame précédente
-        Vector3 delta = currentPos - lastPos;
+        // Cosinus de l'angle entre les deux directions :
+        goalDirection = Vector3.Dot(playerDir, toGoal);
 
-        // Projection scalaire (dot product) 0.5 direction vers le goal, -0.5 s'éloigne du goal
-        //      Si le joueur avance vers le but : forwardMeters > 0
-        //      S’il zigzague ou repart en arrière : forwardMeters ≤ 0
-
-        forward = Vector3.Dot(delta, dirGoal); // mètres réellement gagnés
-        // 2) le joueur est‑il arrivé ?
-        if (distance <= goalRadius)
+        // Angle signé autour de l'axe vertical (Y)
+        goalAngle = Vector3.SignedAngle(playerDir, toGoal, Vector3.up);
+        // 0	Le joueur regarde directement vers le goal
+        // > 0 Le goal est vers la droite du joueur
+        // < 0 Le goal est vers la gauche du joueur
+        if (distance <= goalRadius && !goalReached)
         {
             Debug.Log("But atteint !");
             // ➜ ici, lance la fin de niveau, un son, etc.
@@ -49,7 +48,7 @@ public class GoalHandler : MonoBehaviour
             goalReached = true;
             goalSpotlightAnimator.TriggerGoal();
         }
-        lastPos = currentPos;
+        //lastPos = currentPos;
 
     }
 }

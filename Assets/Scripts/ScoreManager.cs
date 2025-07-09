@@ -14,12 +14,11 @@ public class ScoreManager : MonoBehaviour
 
     void Update()
     {
-     
-        if (player.goalHandler.forward > 0)
-            score += player.goalHandler.forward * player.speedMultiplier * coefficient;
-        else
-            score += Time.deltaTime * player.goalHandler.forward;
-
+        if (!player.goalHandler.goalReached)
+        {
+            float bonusDirection = player.goalHandler.goalAngle >= -15f && player.goalHandler.goalAngle <= 15f ? 1f : -1f;
+            score += bonusDirection * player.speedMultiplier * coefficient;
+        }
     }
 
     public int GetDisplayedScore() => Mathf.FloorToInt(score);
