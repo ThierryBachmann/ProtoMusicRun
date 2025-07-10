@@ -53,6 +53,17 @@ public class PlayerController : MonoBehaviour
         knockback = direction.normalized * strength;
     }
 
+    public void ResetPosition(Transform startPosition)
+    {
+        CharacterController cc = GetComponent<CharacterController>();
+        cc.enabled = false;
+        transform.position = startPosition.position;
+        transform.rotation = startPosition.rotation;
+        currentAngle=0;
+        targetAngle=0;
+        cc.enabled = true;
+    }
+
     void Update()
     {
         if (enableMovement)
