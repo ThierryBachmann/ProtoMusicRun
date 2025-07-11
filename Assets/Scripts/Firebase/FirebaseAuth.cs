@@ -18,34 +18,9 @@ public class AuthRequest
 {
     public bool returnSecureToken = true;
 }
-/*
- * // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyADsdund2yX2Cco3v2fWquqGxtgmKWSt5w",
-  authDomain: "protorunmusic.firebaseapp.com",
-  databaseURL: "https://protorunmusic-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "protorunmusic",
-  storageBucket: "protorunmusic.firebasestorage.app",
-  messagingSenderId: "345599935208",
-  appId: "1:345599935208:web:502073f449d057872a7f5d",
-  measurementId: "G-ZFE7BQJEYW"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-*/
 public class FirebaseAuth : MonoBehaviour
 {
-
-
     [Header("Player Info")]
     public string playerDisplayName = "";
     public bool isAuthenticated = false;
@@ -55,10 +30,9 @@ public class FirebaseAuth : MonoBehaviour
 
     public System.Action<bool> OnAuthenticationComplete;
 
-    private FirebaseKey key;
+
     void Start()
     {
-        key=new FirebaseKey();
 
         // Try to load saved auth data
         LoadSavedAuth();
@@ -72,6 +46,8 @@ public class FirebaseAuth : MonoBehaviour
 
     public IEnumerator AuthenticateAnonymously()
     {
+        FirebaseKey key = new FirebaseKey();
+
         string url = $"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={key.firebaseApiKey}";
 
         AuthRequest authRequest = new AuthRequest();

@@ -12,18 +12,20 @@ public class PlayerScore
     public float completionTime;
     public float pathEfficiency;
     public float maxSpeed;
+    public int maxLevel;
     public long timestamp;
-    public List<Vector3> keyWaypoints; // Simplified path data
+    //public List<Vector3> keyWaypoints; // Simplified path data
 
-    public PlayerScore(string name, long score, float time, float efficiency, float speed, List<Vector3> waypoints)
+    public PlayerScore(string name, long score, float time, float efficiency, float speed,int level)
     {
         playerName = name;
         this.score = score;
         completionTime = time;
         pathEfficiency = efficiency;
         maxSpeed = speed;
+        maxLevel=level;
         timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        keyWaypoints = waypoints;
+        //keyWaypoints = waypoints;
     }
 }
 

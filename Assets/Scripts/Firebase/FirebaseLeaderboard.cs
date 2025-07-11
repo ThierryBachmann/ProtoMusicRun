@@ -34,10 +34,10 @@ public class FirebaseLeaderboard : MonoBehaviour
             return;
         }
 
-        StartCoroutine(SubmitScoreCoroutine(score, time, efficiency, maxSpeed, path));
+        StartCoroutine(SubmitScoreCoroutine(score, time, efficiency, maxSpeed, level:1));
     }
 
-    private IEnumerator SubmitScoreCoroutine(long score, float time, float efficiency, float maxSpeed, List<Vector3> path)
+    private IEnumerator SubmitScoreCoroutine(long score, float time, float efficiency, float maxSpeed, int level)
     {
         // Refresh token if needed
         yield return firebaseAuth.RefreshTokenIfNeeded();
@@ -48,7 +48,7 @@ public class FirebaseLeaderboard : MonoBehaviour
             time,
             efficiency,
             maxSpeed,
-            path
+            level
         );
 
         // Add user ID to the score data
