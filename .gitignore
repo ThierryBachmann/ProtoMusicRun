@@ -77,3 +77,4 @@ crashlytics-build.properties
 /BuildWebGL/
 /Assets/ResonanceAudio
 /Assets/ResonanceAudio.meta
+/Assets/Scripts/Firebase/FirebaseKeyGitIgnore.cs
