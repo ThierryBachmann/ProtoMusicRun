@@ -22,6 +22,8 @@ public class FirebaseLeaderboard : MonoBehaviour
     }
     void Start()
     {
+        // Load leaderboard on start
+        StartCoroutine(LoadLeaderboard());
     }
 
     private void OnAuthComplete(bool success)
@@ -29,17 +31,16 @@ public class FirebaseLeaderboard : MonoBehaviour
         if (success)
         {
             Debug.Log("Ready to submit scores!");
-            // Load leaderboard on start
-            StartCoroutine(LoadLeaderboard());
+            //// Load leaderboard on start
+            //StartCoroutine(LoadLeaderboard());
             // Now you can safely submit scores
         }
     }
     public IEnumerator LoadLeaderboard()
     {
-        // Use Firebase's built-in ordering 
-        // "https://protorunmusic-default-rtdb.europe-west1.firebasedatabase.app/leaderboard.json?orderBy=\"score\"&limitToLast=100"
-        string url = $"{firebaseURL}{leaderboardNode}.json?auth={firebaseAuth.GetIdToken()}&orderBy=\"score\"&limitToLast={maxLeaderboardEntries}";
-        Debug.Log(url);
+        // Use Firebase's built-in ordering, no auth needed, score are readable for anonymous
+        string orderBy = Uri.EscapeDataString("\"score\"");
+        string url = $"{firebaseURL}{leaderboardNode}.json?&orderBy={orderBy}&limitToLast={maxLeaderboardEntries}";
         UnityWebRequest request = UnityWebRequest.Get(url);
         yield return request.SendWebRequest();
 
@@ -85,12 +86,15 @@ public class FirebaseLeaderboard : MonoBehaviour
         try
         {
             // Remove outer braces
-            string content = jsonResponse.Trim().Trim('{', '}');
-
+            string content = jsonResponse.Trim();
+            if (content.StartsWith("{") && content.EndsWith("}"))
+            {
+                content = content.Substring(1, content.Length - 2);
+            }
             if (string.IsNullOrEmpty(content))
                 return scores;
 
-            // Split by entries and parse each one
+            // Split by entries and parse each one  
             string[] entries = SplitJsonEntries(content);
 
             foreach (string entry in entries)

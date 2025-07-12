@@ -19,6 +19,18 @@ public class AuthRequest
     public bool returnSecureToken = true;
 }
 
+/*
+ {
+  "rules": {
+    ".read": "now < 1754776800000",  // 2025-8-10
+    ".write": "now < 1754776800000",  // 2025-8-10
+    "leaderboard": {
+      ".indexOn": "score"
+    }
+  }
+}
+ */
+
 public class FirebaseAuth : MonoBehaviour
 {
     [Header("Player Info")]

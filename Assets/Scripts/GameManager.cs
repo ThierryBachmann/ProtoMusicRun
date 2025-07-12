@@ -32,11 +32,11 @@ public class GameManager : MonoBehaviour
 
     private void DisplayLeaderboard(List<PlayerScore> scores)
     {
-        Debug.Log("=== LEADERBOARD ===");
+        Debug.Log($"=== LEADERBOARD {scores.Count} entries === ");
         for (int i = 0; i < scores.Count; i++)
         {
             var score = scores[i];
-            Debug.Log($"{i + 1}. {score.playerName}: {score.score} pts " +
+            Debug.Log($"{i + 1}. {score.playerName:20}: {score.score} pts " +
                      $"(Time: {score.completionTime:F1}s, Efficiency: {score.pathEfficiency:F2})");
         }
     }
