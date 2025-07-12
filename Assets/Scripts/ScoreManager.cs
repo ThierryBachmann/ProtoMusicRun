@@ -10,14 +10,15 @@ public class ScoreManager : MonoBehaviour
     public PlayerController player;
     public float coefficient = 1f;
 
-    public float score;
+    public long score;
 
     void Update()
     {
         if (!player.goalHandler.goalReached)
         {
             float bonusDirection = player.goalHandler.goalAngle >= -15f && player.goalHandler.goalAngle <= 15f ? 1f : -1f;
-            score += bonusDirection * player.speedMultiplier * coefficient;
+            score += (long)(bonusDirection * player.speedMultiplier * coefficient);
+            if (score < 0) score = 0;
         }
     }
 

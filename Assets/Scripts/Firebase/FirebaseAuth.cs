@@ -42,10 +42,15 @@ public class FirebaseAuth : MonoBehaviour
         {
             StartCoroutine(AuthenticateAnonymously());
         }
+        else
+            OnAuthenticationComplete?.Invoke(true);
+
     }
 
     public IEnumerator AuthenticateAnonymously()
     {
+        Debug.Log($"AuthenticateAnonymously");
+
         FirebaseKey key = new FirebaseKey();
 
         string url = $"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={key.firebaseApiKey}";
@@ -76,7 +81,7 @@ public class FirebaseAuth : MonoBehaviour
                     SavePlayerName();
                 }
 
-                Debug.Log($"Anonymous authentication successful! User ID: {userId}");
+                Debug.Log($"Anonymous authentication successful! User ID: {userId} {playerDisplayName}");
                 OnAuthenticationComplete?.Invoke(true);
             }
             catch (Exception e)
@@ -118,10 +123,12 @@ public class FirebaseAuth : MonoBehaviour
                 {
                     isAuthenticated = true;
                     playerDisplayName = PlayerPrefs.GetString("player_name", "");
-                    Debug.Log("Loaded saved authentication");
+                    Debug.Log($"Loaded saved authentication {playerDisplayName}");
                 }
             }
         }
+        Debug.Log($"LoadSavedAuth User ID: {userId} {isAuthenticated}");
+
     }
 
     private string GeneratePlayerName()

@@ -85,7 +85,7 @@ public class TerrainGenerator : MonoBehaviour
         }
         foreach (var coord in chunksToRemove)
         {
-            Debug.Log($"Remove {coord}");
+            //Debug.Log($"Remove {coord}");
             spawnedChunks.Remove(coord);
         }
     }

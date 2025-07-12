@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
 {
     public bool enableMovement = true;
     public GoalHandler goalHandler;
+    public FirebaseLeaderboard leaderboard;
+    public ScoreManager scoreManager;
 
     [Header("Mouvement avant")]
     public float speedMultiplier = 1f;
@@ -46,9 +48,23 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        goalHandler.OnLevelCompleted += OnLevelCompleted;
     }
-
-    public void ApplyKnockback(Vector3 direction, float strength)
+    private void OnLevelCompleted(bool success)
+    {
+        speedMultiplier = Mathf.MoveTowards(speedMultiplier, 0f, Time.deltaTime * 15f);
+        HandleMovement(false);
+        PlayerScore playerScore = new PlayerScore(
+                     leaderboard.firebaseAuth.GetPlayerName(),
+                     scoreManager.score,
+                     999,
+                     999,
+                     999,
+                     1
+                      );
+        leaderboard.SubmitScore(playerScore);
+    }
+        public void ApplyKnockback(Vector3 direction, float strength)
     {
         knockback = direction.normalized * strength;
     }
@@ -78,13 +94,9 @@ public class PlayerController : MonoBehaviour
                 // Il rapproche doucement speedMultiplier de 10f a une vitesse de 0.5 par seconde.
                 // Selon la douceur voulue(par ex. 1f = plus rapide, 0.1f = plus lent)
                 speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);
+               
             }
-            else
-            {
-                speedMultiplier = Mathf.MoveTowards(speedMultiplier, 0f, Time.deltaTime * 15f);
-                HandleMovement(false);
-
-            }
+           
         }
     }
 

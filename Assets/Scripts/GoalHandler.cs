@@ -1,6 +1,5 @@
-﻿using NUnit.Framework.Internal;
-using Unity.VisualScripting;
-using UnityEngine;
+﻿using UnityEngine;
+using System;
 
 public class GoalHandler : MonoBehaviour
 {
@@ -14,6 +13,7 @@ public class GoalHandler : MonoBehaviour
     public float goalAngle;
     //private Vector3 lastPos;
     public bool goalReached;
+    public Action<bool> OnLevelCompleted;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -43,10 +43,9 @@ public class GoalHandler : MonoBehaviour
         if (distance <= goalRadius && !goalReached)
         {
             Debug.Log("But atteint !");
-            // ➜ ici, lance la fin de niveau, un son, etc.
-            // …
             goalReached = true;
             goalSpotlightAnimator.TriggerGoal();
+            OnLevelCompleted?.Invoke(true);
         }
         //lastPos = currentPos;
 
