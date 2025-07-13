@@ -7,6 +7,7 @@ public class GoalHandler : MonoBehaviour
     public GoalSpotlightAnimator goalSpotlightAnimator;
     public float Distance;
     public GameObject sphere;
+    public GameObject Goal;
     public float distance;            // (debug) distance actuelle
     public float goalRadius = 1.5f;   // rayon d’arrivée (en mètres)
     public float goalDirection;
@@ -27,9 +28,9 @@ public class GoalHandler : MonoBehaviour
     {
         // 1) calcul de la distance
         distance = Vector3.Distance(player.transform.position,
-                                    sphere.transform.position);
+                                    Goal.transform.position);
 
-        Vector3 toGoal = (sphere.transform.position - player.transform.position).normalized;
+        Vector3 toGoal = (Goal.transform.position - player.transform.position).normalized;
         Vector3 playerDir = player.transform.forward;
 
         // Cosinus de l'angle entre les deux directions :
