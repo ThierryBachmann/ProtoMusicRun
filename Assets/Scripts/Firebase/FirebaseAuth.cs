@@ -215,6 +215,7 @@ public class FirebaseAuth : MonoBehaviour
     {
         // Implement token refresh logic if needed
         // For anonymous auth, it's often easier to just re-authenticate
+        Debug.Log("RefreshToken");
         yield return AuthenticateAnonymously();
     }
 }

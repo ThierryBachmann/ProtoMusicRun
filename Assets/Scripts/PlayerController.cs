@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnLeaderboardLoaded(List<PlayerScore> scores)
     {
-        Debug.Log($"=== PLAYERRANK {leaderboard.GetPlayerName()} === ");
+        Debug.Log($"=== PLAYER RANK {leaderboard.GetPlayerName()} === ");
         PlayerScore playerRank = scores.Find(s => s.playerName == leaderboard.GetPlayerName());
         if (playerRank != null)
             Debug.Log($"Player Rank {playerRank.playerName:20}: {playerRank.score} pts " +

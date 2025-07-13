@@ -10,29 +10,16 @@ public class GameManager : MonoBehaviour
     public Transform startPosition;
     public FirebaseLeaderboard leaderboard;
 
-    void Start()
+    void Awake()
     {
         // Subscribe to events
         leaderboard.OnLeaderboardLoaded += DisplayLeaderboard;
         leaderboard.OnScoreSubmitted += OnScoreSubmissionResult;
     }
 
-    public void OnGameComplete(long score, float time, float efficiency, float maxSpeed, int level)
-    {
-        PlayerScore playerScore = new PlayerScore(
-           leaderboard.firebaseAuth.GetPlayerName(),
-           score,
-           time,
-           efficiency,
-           maxSpeed,
-           level
-            );
-        leaderboard.SubmitScore(playerScore);
-    }
-
     private void DisplayLeaderboard(List<PlayerScore> scores)
     {
-        Debug.Log($"=== LEADERBOARD {scores.Count} entries === ");
+        Debug.Log($"=== LEADERBOARD {scores.Count} entries ===");
         for (int i = 0; i < scores.Count; i++)
         {
             var score = scores[i];
