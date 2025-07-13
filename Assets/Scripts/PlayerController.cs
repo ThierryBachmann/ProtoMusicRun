@@ -10,6 +10,7 @@
 // === PlayerController.cs ===
 using Mono.Cecil.Cil;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using static Unity.Burst.Intrinsics.Arm;
 
@@ -45,17 +46,33 @@ public class PlayerController : MonoBehaviour
     private float currentAngle = 0f;
     private Vector3 knockback = Vector3.zero;
 
+    void Awake()
+    {
+        goalHandler.OnLevelCompleted += OnLevelCompleted;
+        leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
+    }
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        goalHandler.OnLevelCompleted += OnLevelCompleted;
+    }
+
+    private void OnLeaderboardLoaded(List<PlayerScore> scores)
+    {
+        Debug.Log($"=== PLAYERRANK {leaderboard.GetPlayerName()} === ");
+        PlayerScore playerRank = scores.Find(s => s.playerName == leaderboard.GetPlayerName());
+        if (playerRank != null)
+            Debug.Log($"Player Rank {playerRank.playerName:20}: {playerRank.score} pts " +
+                 $"(Time: {playerRank.completionTime:F1}s, Efficiency: {playerRank.pathEfficiency:F2})");
+        else
+            Debug.Log($"Player Rank not found");
+        
     }
     private void OnLevelCompleted(bool success)
     {
         speedMultiplier = Mathf.MoveTowards(speedMultiplier, 0f, Time.deltaTime * 15f);
         HandleMovement(false);
         PlayerScore playerScore = new PlayerScore(
-                     leaderboard.firebaseAuth.GetPlayerName(),
+                     leaderboard.GetPlayerName(),
                      scoreManager.score,
                      999,
                      999,
@@ -64,7 +81,7 @@ public class PlayerController : MonoBehaviour
                       );
         leaderboard.SubmitScore(playerScore);
     }
-        public void ApplyKnockback(Vector3 direction, float strength)
+    public void ApplyKnockback(Vector3 direction, float strength)
     {
         knockback = direction.normalized * strength;
     }
@@ -75,8 +92,8 @@ public class PlayerController : MonoBehaviour
         cc.enabled = false;
         transform.position = startPosition.position;
         transform.rotation = startPosition.rotation;
-        currentAngle=0;
-        targetAngle=0;
+        currentAngle = 0;
+        targetAngle = 0;
         cc.enabled = true;
     }
 
@@ -94,9 +111,9 @@ public class PlayerController : MonoBehaviour
                 // Il rapproche doucement speedMultiplier de 10f a une vitesse de 0.5 par seconde.
                 // Selon la douceur voulue(par ex. 1f = plus rapide, 0.1f = plus lent)
                 speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);
-               
+
             }
-           
+
         }
     }
 
@@ -124,7 +141,7 @@ public class PlayerController : MonoBehaviour
         // Appliquer au transform
         transform.rotation = Quaternion.Euler(0, currentAngle, 0);
     }
-    void HandleMovement(bool stopDown =false)
+    void HandleMovement(bool stopDown = false)
     {
         // Avance “normale”
         Vector3 forwardMove = transform.forward * moveSpeed * speedMultiplier;

@@ -250,6 +250,11 @@ public class FirebaseLeaderboard : MonoBehaviour
         }
     }
 
+    public string GetPlayerName()
+    {
+        return firebaseAuth.playerDisplayName;
+    }
+
     public void GetPlayerRank(string playerName, System.Action<int> onRankFound)
     {
         StartCoroutine(GetPlayerRankCoroutine(playerName, onRankFound));
