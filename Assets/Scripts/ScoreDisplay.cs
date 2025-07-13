@@ -6,6 +6,7 @@ public class ScoreDisplay : MonoBehaviour
     public ScoreManager scoreManager;
     public PlayerController player;
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI infoText;
     public GoalHandler goalHandler;
     private Color scoreGrowing;
     private Color scoreDecrease;
@@ -22,8 +23,8 @@ public class ScoreDisplay : MonoBehaviour
     void Update()
     {
         if (scoreManager)
-            scoreText.text = $"{player.leaderboard.GetPlayerName()} Distance:{goalHandler.distance:N0} Score:{scoreManager.score:N0} Speed:{player.GetSpeed() * 10f:N0} Multiplier:{player.speedMultiplier * 10f:N0} {player.goalHandler.goalDirection:F2} {player.goalHandler.goalAngle:F2}";
-
+            scoreText.text = $"{player.leaderboard.GetPlayerName()} Distance:{goalHandler.distance:N0} Score:{scoreManager.score:N0} Speed:{player.GetSpeed() * 10f:N0} Multiplier:{player.speedMultiplier * 10f:N0}";
+        infoText.text = $"dir:{player.goalHandler.goalDirection:F2} angle:{player.goalHandler.goalAngle:F2}";
         Color targetColor = scoreText.color; // couleur par défaut
 
         if (player.goalHandler.goalReached)
