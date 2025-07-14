@@ -37,26 +37,32 @@ public class GoalHandler : MonoBehaviour
         Vector3 planarDirection = localToGoal.normalized;
 
         // Angle signé autour de l'axe vertical (Y)
-        goalAngle = Mathf.Atan2(localToGoal.x, localToGoal.z) * Mathf.Rad2Deg; 
+        goalAngle = Mathf.Atan2(localToGoal.x, localToGoal.z) * Mathf.Rad2Deg;
 
-        /*
+        ////  dans l’espace global mais projeté (just for fun)
+        //// -------------------------------------------------
+        //// Vecteur direction du joueur vers le but
+        //Vector3 toGoal = Goal.transform.position - player.transform.position;
 
-        // 1) calcul de la distance
-        distance = Vector3.Distance(player.transform.position,
-                                    Goal.transform.position);
+        //// Projeter dans le plan horizontal (XZ)
+        //Vector3 flatToGoal = toGoal;
+        //flatToGoal.y = 0f;
 
-        Vector3 toGoal = (Goal.transform.position - player.transform.position).normalized;
-        Vector3 playerDir = player.transform.forward;
+        //// Distance horizontale
+        //distance = flatToGoal.magnitude;
 
-        // Cosinus de l'angle entre les deux directions :
-        goalDirection = Vector3.Dot(playerDir, toGoal);
+        //// Direction du joueur, projetée aussi
+        //Vector3 playerForward = player.transform.forward;
+        //playerForward.y = 0f;
+        //playerForward.Normalize();
+        //flatToGoal.Normalize();
 
-        // Angle signé autour de l'axe vertical (Y)
-        goalAngle = Vector3.SignedAngle(playerDir, toGoal, Vector3.up);
-        // 0	Le joueur regarde directement vers le goal
-        // > 0 Le goal est vers la droite du joueur
-        // < 0 Le goal est vers la gauche du joueur
-     */
+        //// Angle signé dans le plan horizontal
+        //goalAngle = Vector3.SignedAngle(playerForward, flatToGoal, Vector3.up);
+
+
+        // Player reach the goal ?
+        // -----------------------
         if (distance <= goalRadius && !goalReached)
         {
             Debug.Log("But atteint !");

@@ -474,11 +474,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 256923874}
   goalSpotlightAnimator: {fileID: 1773429422}
-  Distance: 0
   sphere: {fileID: 476692016}
   Goal: {fileID: 300067085}
   distance: 0
-  goalRadius: 10
+  goalRadius: 1.5
   goalDirection: 0
   goalAngle: 0
   goalReached: 0
@@ -510,7 +509,7 @@ Transform:
   m_GameObject: {fileID: 300067085}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.31, z: 0}
+  m_LocalPosition: {x: 0, y: 1.89, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1759,8 +1758,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 45
+  m_fontSizeBase: 45
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1897,8 +1896,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 64
-  m_fontSizeBase: 64
+  m_fontSize: 58
+  m_fontSizeBase: 58
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
