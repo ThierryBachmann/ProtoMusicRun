@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using System;
+using System.Globalization;
 
 public class LeaderboardDisplay : MonoBehaviour
 {
@@ -57,8 +58,19 @@ public class LeaderboardDisplay : MonoBehaviour
             var texts = row.GetComponentsInChildren<TMP_Text>();
             texts[0].text = entry.playerName;
             texts[1].text = entry.score.ToString();
-            //texts[2].text = DateTimeOffset.FromUnixTimeMilliseconds(entry.timestamp).ToString();
-            //texts[3].text = entry.maxLevel.ToString();
+            texts[2].text = entry.maxLevel.ToString();
+            // Convert timestamp to DateTime in local time
+            DateTime dateTime = DateTimeOffset.FromUnixTimeSeconds(entry.timestamp).LocalDateTime;
+            // Get current culture (or specify one)
+            CultureInfo culture = CultureInfo.CurrentCulture;
+            // Get short date pattern and adjust to 2-digit year
+            string shortDate = culture.DateTimeFormat.ShortDatePattern
+                .Replace("yyyy", "yy")      // Replace long year with short
+                .Replace("MMMM", "MM")      // Replace full month name with numeric
+                .Replace("MMM", "MM");      // Replace short month name with numeric if needed
+
+            // Format: short date with numeric month and 2-digit year, and hour:minute
+            texts[3].text = dateTime.ToString($"{shortDate} HH:mm", culture);
         }
     }
 
