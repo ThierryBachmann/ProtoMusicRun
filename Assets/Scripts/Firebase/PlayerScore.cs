@@ -8,6 +8,7 @@ using System;
 public class PlayerScore
 {
     public string playerName;
+    public int playerPosition;
     public long score;
     public float completionTime;
     public float pathEfficiency;

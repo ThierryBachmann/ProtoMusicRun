@@ -47,8 +47,11 @@ public class GameManager : MonoBehaviour
         // Exemple : touche R pour redémarrer la partie
         if (Input.GetKeyDown(KeyCode.R))
             RestartGame();
-        if (Input.GetKeyDown(KeyCode.H))
-            leaderboardDisplay.Show(scoreManager.score);
+        if (Input.GetKeyDown(KeyCode.L))
+            if (leaderboardDisplay.Visible > 0.5f)
+                leaderboardDisplay.Hide();
+            else
+                leaderboardDisplay.Show(player);
 
     }
 

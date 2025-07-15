@@ -13,8 +13,9 @@ public class FirebaseLeaderboard : MonoBehaviour
     public int maxLeaderboardEntries = 100;
 
     [Header("Events")]
-    public System.Action<List<PlayerScore>> OnLeaderboardLoaded;
-    public System.Action<bool> OnScoreSubmitted;
+    public Action<List<PlayerScore>> OnLeaderboardLoaded;
+    public Action<bool> OnScoreSubmitted;
+    private List<PlayerScore> scores;
 
     void Awake()
     {
@@ -55,11 +56,12 @@ public class FirebaseLeaderboard : MonoBehaviour
             }
 
             // Simple approach: Parse as individual entries
-            List<PlayerScore> scores = ParseFirebaseResponse(jsonResponse);
+            scores = ParseFirebaseResponse(jsonResponse);
 
             // Since Firebase returns in ascending order, reverse for descending
-            scores.Reverse();
-
+            //scores.Sort();
+            int position = 1;
+            scores.ForEach(s => s.playerPosition = position++);
             OnLeaderboardLoaded?.Invoke(scores);
             Debug.Log($"Loaded {scores.Count} leaderboard entries");
         }
@@ -168,25 +170,24 @@ public class FirebaseLeaderboard : MonoBehaviour
     }
     private bool ValidateScore(PlayerScore score)
     {
-        return true;
         // Basic validation - customize based on your game mechanics
 
-        // Check reasonable time bounds
-        if (score.completionTime < 5f || score.completionTime > 300f)
-            return false;
+        //// Check reasonable time bounds
+        //if (score.completionTime < 5f || score.completionTime > 300f)
+        //    return false;
 
-        // Check path efficiency is within bounds
-        if (score.pathEfficiency < 0f || score.pathEfficiency > 1f)
-            return false;
+        //// Check path efficiency is within bounds
+        //if (score.pathEfficiency < 0f || score.pathEfficiency > 1f)
+        //    return false;
 
-        // Check max speed is reasonable
-        if (score.maxSpeed < 0f || score.maxSpeed > 50f) // Adjust based on your game
-            return false;
+        //// Check max speed is reasonable
+        //if (score.maxSpeed < 0f || score.maxSpeed > 50f) // Adjust based on your game
+        //    return false;
 
-        // Check that score correlates somewhat with other metrics
-        float expectedScore = (score.pathEfficiency * 1000f) + (score.maxSpeed * 10f) - (score.completionTime * 5f);
-        if (Mathf.Abs(score.score - expectedScore) > expectedScore * 0.5f) // 50% tolerance
-            return false;
+        //// Check that score correlates somewhat with other metrics
+        //float expectedScore = (score.pathEfficiency * 1000f) + (score.maxSpeed * 10f) - (score.completionTime * 5f);
+        //if (Mathf.Abs(score.score - expectedScore) > expectedScore * 0.5f) // 50% tolerance
+        //    return false;
 
         return true;
     }
@@ -255,18 +256,26 @@ public class FirebaseLeaderboard : MonoBehaviour
         return firebaseAuth.playerDisplayName;
     }
 
-    public void GetPlayerRank(string playerName, System.Action<int> onRankFound)
+    public void GetPlayerRank(Action<PlayerScore> onRankFound)
     {
-        StartCoroutine(GetPlayerRankCoroutine(playerName, onRankFound));
+        StartCoroutine(GetPlayerRankCoroutine(onRankFound));
     }
 
-    private IEnumerator GetPlayerRankCoroutine(string playerName, System.Action<int> onRankFound)
+    private IEnumerator GetPlayerRankCoroutine(Action<PlayerScore> onRankFound)
     {
         yield return LoadLeaderboard();
-
-        // Find player's best score and rank
-        // This would be called after OnLeaderboardLoaded event
-        int rank = -1; // -1 means not found
-        onRankFound?.Invoke(rank);
+        if (scores != null)
+        {
+            PlayerScore score = scores.Find(p => p.playerName == firebaseAuth.playerDisplayName);
+            if (score != null)
+            {
+                Debug.Log($"GetPlayerRankCoroutine {score}");
+                onRankFound?.Invoke(score);
+            }
+            else
+                onRankFound?.Invoke(null);
+        }
+        else
+            onRankFound?.Invoke(null);
     }
 }

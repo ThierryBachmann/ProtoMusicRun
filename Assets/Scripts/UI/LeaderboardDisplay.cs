@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using System;
 using System.Globalization;
+using System.Collections;
 
 public class LeaderboardDisplay : MonoBehaviour
 {
@@ -17,34 +18,103 @@ public class LeaderboardDisplay : MonoBehaviour
     public GameObject leaderboardEntryPrefab;
     public FirebaseLeaderboard leaderboard;
 
+    public float animationDuration = 0.4f;
+    public Vector3 startScale = new Vector3(0.5f, 0.5f, 0.5f);
+    public Vector3 endScale = Vector3.one;
+
+    private CanvasGroup canvasGroup;
+    private RectTransform rectTransform;
+
     void Awake()
     {
         // Subscribe to events
         leaderboard.OnLeaderboardLoaded += DisplayLeaderboard;
+        rectTransform = GetComponent<RectTransform>();
+        canvasGroup = GetComponent<CanvasGroup>();
+
+        // Start hidden and small
+        canvasGroup.alpha = 0;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
+        rectTransform.localScale = startScale;
     }
 
     public void Start()
     {
-        //rerunButton.onClick.AddListener(OnRerun);
-        //continueButton.onClick.AddListener(OnContinue);
-        //stopButton.onClick.AddListener(OnStop);
-
-        Hide(); // hide initially
+        Hide();
     }
 
-    public void Show(long bestScore)
+    public void Show(PlayerController player)
     {
-        Debug.Log("Showing panel: " + leaderboardPanel.name);
-        CanvasGroup group = leaderboardPanel.GetComponent<CanvasGroup>();
-        if (group != null)
+        if (Visible < 0.5f)
         {
-            group.alpha = 1;
-            group.interactable = true;
-            group.blocksRaycasts = true;
+            Debug.Log("Showing panel: " + leaderboardPanel.name);
+            //CanvasGroup group = leaderboardPanel.GetComponent<CanvasGroup>();
+            //if (group != null)
+            //{
+            //    group.alpha = 1;
+            //    group.interactable = true;
+            //    group.blocksRaycasts = true;
+            //}
+            leaderboardPanel.SetActive(true);
+            StartCoroutine(leaderboard.LoadLeaderboard());
+            bestScoreText.text = $"Your Score {player.playerLastScore} Your Best Score: {player.playerBestScore} Your Position: {player.playerPosition}";
+            StartCoroutine(AnimateIn());
         }
-        leaderboardPanel.SetActive(true);
-        StartCoroutine(leaderboard.LoadLeaderboard());
-        bestScoreText.text = $"Your Best Score: {bestScore}";
+    }
+    public void Hide()
+    {
+        if (Visible >= 0.5f)
+            StartCoroutine(AnimateOut());
+    }
+
+    public float Visible => canvasGroup.alpha;
+
+    private IEnumerator AnimateIn()
+    {
+        float timer = 0f;
+
+        // Initial state
+        rectTransform.localScale = startScale;
+        canvasGroup.alpha = 0;
+
+        while (timer < animationDuration)
+        {
+            float t = timer / animationDuration;
+            rectTransform.localScale = Vector3.Lerp(startScale, endScale, t);
+            canvasGroup.alpha = t;
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        // Final state
+        rectTransform.localScale = endScale;
+        canvasGroup.alpha = 1;
+        canvasGroup.interactable = true;
+        canvasGroup.blocksRaycasts = true;
+    }
+
+    private IEnumerator AnimateOut()
+    {
+        float timer = 0f;
+
+        // Initial state
+        rectTransform.localScale = endScale;
+        float animateOut = animationDuration / 3f;
+        while (timer < animateOut)
+        {
+            float t = 1f - timer / animateOut;
+            rectTransform.localScale = Vector3.Lerp(startScale,endScale , t);
+            canvasGroup.alpha = t;
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        // Final state
+        rectTransform.localScale = startScale;
+        canvasGroup.alpha = 0;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
     }
 
     private void DisplayLeaderboard(List<PlayerScore> scores)
@@ -80,7 +150,7 @@ public class LeaderboardDisplay : MonoBehaviour
             Destroy(child.gameObject);
     }
 
-    public void Hide() => leaderboardPanel.SetActive(false);
+
 
     void OnRerun()
     {

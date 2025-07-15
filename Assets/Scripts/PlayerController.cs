@@ -46,12 +46,16 @@ public class PlayerController : MonoBehaviour
     private float targetAngle = 0f; // angle actuel utilisé pour la rotation
     private float currentAngle = 0f;
     private Vector3 knockback = Vector3.zero;
+    public int playerPosition = 99999;
+    public long playerBestScore = 0;
+    public long playerLastScore = 0;
 
     void Awake()
     {
         goalHandler.OnLevelCompleted += OnLevelCompleted;
         leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
     }
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -67,12 +71,13 @@ public class PlayerController : MonoBehaviour
                  $"(Time: {playerRank.completionTime:F1}s, Efficiency: {playerRank.pathEfficiency:F2})");
         else
             Debug.Log($"Player Rank not found");
-        
+
     }
     private void OnLevelCompleted(bool success)
     {
         speedMultiplier = Mathf.MoveTowards(speedMultiplier, 0f, Time.deltaTime * 15f);
         HandleMovement(false);
+        playerLastScore = scoreManager.score;
         PlayerScore playerScore = new PlayerScore(
                      leaderboard.GetPlayerName(),
                      scoreManager.score,
@@ -82,7 +87,15 @@ public class PlayerController : MonoBehaviour
                      1
                       );
         leaderboard.SubmitScore(playerScore);
-        leaderboardDisplay.Show(scoreManager.score);
+        leaderboard.GetPlayerRank((s) =>
+        {
+            if (s != null)
+            {
+                playerPosition = s.playerPosition;
+                playerBestScore = s.score;
+            }
+        });
+        leaderboardDisplay.Show(this);
     }
     public void ApplyKnockback(Vector3 direction, float strength)
     {

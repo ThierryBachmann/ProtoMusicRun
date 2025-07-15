@@ -58,7 +58,7 @@ public class FirebaseAuth : MonoBehaviour
             OnAuthenticationComplete?.Invoke(true);
 
     }
-
+    
     public IEnumerator AuthenticateAnonymously()
     {
         Debug.Log($"AuthenticateAnonymously");
@@ -140,7 +140,6 @@ public class FirebaseAuth : MonoBehaviour
             }
         }
         Debug.Log($"LoadSavedAuth User ID: {userId} {isAuthenticated}");
-
     }
 
     private string GeneratePlayerName()
