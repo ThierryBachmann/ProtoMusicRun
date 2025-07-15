@@ -406,7 +406,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.61255044, g: 0.8867924, b: 0.6006764, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -612,7 +612,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab9f0b5b98430294883870e2b31adac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableMovement: 0
+  enableMovement: 1
   goalHandler: {fileID: 283134993}
   leaderboard: {fileID: 1489650625}
   scoreManager: {fileID: 211374106}
