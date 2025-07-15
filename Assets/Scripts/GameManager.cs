@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public MidiFilePlayer midiPlayer; // optionnel
     public Transform startPosition;
     public FirebaseLeaderboard leaderboard;
+    public LeaderboardDisplay leaderboardDisplay;
 
     void Awake()
     {
@@ -46,10 +47,14 @@ public class GameManager : MonoBehaviour
         // Exemple : touche R pour redémarrer la partie
         if (Input.GetKeyDown(KeyCode.R))
             RestartGame();
+        if (Input.GetKeyDown(KeyCode.H))
+            leaderboardDisplay.Show(scoreManager.score);
+
     }
 
     public void RestartGame()
     {
+        leaderboardDisplay.Hide();
         // Reset du joueur
         player.ResetPosition(startPosition);
         player.speedMultiplier = 1f;

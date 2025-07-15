@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     public GoalHandler goalHandler;
     public FirebaseLeaderboard leaderboard;
     public ScoreManager scoreManager;
+    public LeaderboardDisplay leaderboardDisplay;
 
     [Header("Mouvement avant")]
     public float speedMultiplier = 1f;
@@ -54,6 +55,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        leaderboardDisplay.Hide();
     }
 
     private void OnLeaderboardLoaded(List<PlayerScore> scores)
@@ -80,6 +82,7 @@ public class PlayerController : MonoBehaviour
                      1
                       );
         leaderboard.SubmitScore(playerScore);
+        leaderboardDisplay.Show(scoreManager.score);
     }
     public void ApplyKnockback(Vector3 direction, float strength)
     {
