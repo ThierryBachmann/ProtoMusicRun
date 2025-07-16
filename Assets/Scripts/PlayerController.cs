@@ -54,6 +54,7 @@ public class PlayerController : MonoBehaviour
     {
         goalHandler.OnLevelCompleted += OnLevelCompleted;
         leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
+        leaderboard.OnScoreSubmitted += OnScoreSubmitted;
     }
 
     void Start()
@@ -87,16 +88,23 @@ public class PlayerController : MonoBehaviour
                      1
                       );
         leaderboard.SubmitScore(playerScore);
+
+        leaderboardDisplay.Show(this);
+    }
+
+    private void OnScoreSubmitted(bool success)
+    {
         leaderboard.GetPlayerRank((s) =>
         {
             if (s != null)
             {
                 playerPosition = s.playerPosition;
                 playerBestScore = s.score;
+                leaderboardDisplay.RefreshPlayerScore(this);
             }
         });
-        leaderboardDisplay.Show(this);
     }
+
     public void ApplyKnockback(Vector3 direction, float strength)
     {
         knockback = direction.normalized * strength;

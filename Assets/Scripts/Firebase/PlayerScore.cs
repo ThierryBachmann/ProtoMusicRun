@@ -28,6 +28,7 @@ public class PlayerScore
         timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         //keyWaypoints = waypoints;
     }
+    public override string ToString() {return $"{playerName} {score} {playerPosition}";}
 }
 
 [System.Serializable]

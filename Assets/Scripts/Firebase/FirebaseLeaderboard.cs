@@ -51,6 +51,7 @@ public class FirebaseLeaderboard : MonoBehaviour
 
             if (string.IsNullOrEmpty(jsonResponse) || jsonResponse == "null")
             {
+                Debug.LogError($"Failed to load leaderboard: json empty");
                 OnLeaderboardLoaded?.Invoke(new List<PlayerScore>());
                 yield break;
             }
@@ -58,12 +59,15 @@ public class FirebaseLeaderboard : MonoBehaviour
             // Simple approach: Parse as individual entries
             scores = ParseFirebaseResponse(jsonResponse);
 
-            // Since Firebase returns in ascending order, reverse for descending
-            //scores.Sort();
+            // Since Firebase seems not sorting...
+            scores.Sort((a, b) => b.score.CompareTo(a.score));
+
+            // Add position in the leader board
             int position = 1;
             scores.ForEach(s => s.playerPosition = position++);
-            OnLeaderboardLoaded?.Invoke(scores);
             Debug.Log($"Loaded {scores.Count} leaderboard entries");
+
+            OnLeaderboardLoaded?.Invoke(scores);
         }
         else
         {
@@ -228,10 +232,12 @@ public class FirebaseLeaderboard : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             Debug.Log("Score submitted successfully!");
+            OnScoreSubmitted?.Invoke(true);
         }
         else
         {
             Debug.LogError($"Failed to submit score: {request.error}");
+            OnScoreSubmitted?.Invoke(false);
         }
     }
     private IEnumerator CleanupOldEntries()
@@ -263,13 +269,17 @@ public class FirebaseLeaderboard : MonoBehaviour
 
     private IEnumerator GetPlayerRankCoroutine(Action<PlayerScore> onRankFound)
     {
+        Debug.Log($"GetPlayerRankCoroutine >>>");
+
         yield return LoadLeaderboard();
+        Debug.Log($"GetPlayerRankCoroutine ...");
+
         if (scores != null)
         {
             PlayerScore score = scores.Find(p => p.playerName == firebaseAuth.playerDisplayName);
             if (score != null)
             {
-                Debug.Log($"GetPlayerRankCoroutine {score}");
+                Debug.Log($"GetPlayerRankCoroutine score found {score}");
                 onRankFound?.Invoke(score);
             }
             else

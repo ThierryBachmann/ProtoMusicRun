@@ -58,10 +58,15 @@ public class LeaderboardDisplay : MonoBehaviour
             //}
             leaderboardPanel.SetActive(true);
             StartCoroutine(leaderboard.LoadLeaderboard());
-            bestScoreText.text = $"Your Score {player.playerLastScore} Your Best Score: {player.playerBestScore} Your Position: {player.playerPosition}";
             StartCoroutine(AnimateIn());
+            RefreshPlayerScore(player);
         }
     }
+    public void RefreshPlayerScore(PlayerController player)
+    {
+        bestScoreText.text = $"Your Score {player.playerLastScore} - Your Best Score: {player.playerBestScore} - Your Position: {player.playerPosition}";
+    }
+
     public void Hide()
     {
         if (Visible >= 0.5f)
@@ -126,9 +131,10 @@ public class LeaderboardDisplay : MonoBehaviour
         {
             var row = Instantiate(leaderboardEntryPrefab, leaderboardContentParent);
             var texts = row.GetComponentsInChildren<TMP_Text>();
-            texts[0].text = entry.playerName;
-            texts[1].text = entry.score.ToString();
-            texts[2].text = entry.maxLevel.ToString();
+            texts[0].text = entry.playerPosition.ToString();
+            texts[1].text = entry.playerName;
+            texts[2].text = entry.score.ToString();
+            texts[3].text = entry.maxLevel.ToString();
             // Convert timestamp to DateTime in local time
             DateTime dateTime = DateTimeOffset.FromUnixTimeSeconds(entry.timestamp).LocalDateTime;
             // Get current culture (or specify one)
@@ -140,7 +146,7 @@ public class LeaderboardDisplay : MonoBehaviour
                 .Replace("MMM", "MM");      // Replace short month name with numeric if needed
 
             // Format: short date with numeric month and 2-digit year, and hour:minute
-            texts[3].text = dateTime.ToString($"{shortDate} HH:mm", culture);
+            texts[4].text = dateTime.ToString($"{shortDate} HH:mm", culture);
         }
     }
 
@@ -149,8 +155,6 @@ public class LeaderboardDisplay : MonoBehaviour
         foreach (Transform child in leaderboardContentParent)
             Destroy(child.gameObject);
     }
-
-
 
     void OnRerun()
     {
