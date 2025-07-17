@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     public Transform startPosition;
     public FirebaseLeaderboard leaderboard;
     public LeaderboardDisplay leaderboardDisplay;
+    public bool gameRunning;
+    public bool levelRunning;
 
     void Awake()
     {
@@ -17,7 +19,11 @@ public class GameManager : MonoBehaviour
         leaderboard.OnLeaderboardLoaded += DisplayLeaderboard;
         leaderboard.OnScoreSubmitted += OnScoreSubmissionResult;
     }
-
+    void Start()
+    {
+        gameRunning = true;
+        levelRunning=true;;
+    }
     private void DisplayLeaderboard(List<PlayerScore> scores)
     {
         Debug.Log($"=== LEADERBOARD {scores.Count} entries ===");
@@ -71,7 +77,8 @@ public class GameManager : MonoBehaviour
             midiPlayer.MPTK_Stop();
             midiPlayer.MPTK_RePlay(); // ou MPTK_Play() si tu préfères
         }
-
+        gameRunning=true;
+        levelRunning=true;
         // Autres reset possibles ici
     }
 }

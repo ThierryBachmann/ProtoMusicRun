@@ -8,17 +8,23 @@ public class GoalHandler : MonoBehaviour
     public GameObject sphere;
     public GameObject Goal;
     public float distance;            // (debug) distance actuelle
+    public float distanceAtStart;            // (debug) distance actuelle
     public float goalRadius = 1.5f;   // rayon d’arrivée (en mètres)
     public float goalDirection;
     public float goalAngle;
     public bool goalReached;
     public Action<bool> OnLevelCompleted;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         //lastPos = player.transform.position;
         goalReached = false;
+        distanceAtStart = -1;
+    }
+    void Reset()
+    {
+        goalReached = false;
+        distanceAtStart = -1;
     }
 
     // Update is called once per frame
@@ -32,6 +38,7 @@ public class GoalHandler : MonoBehaviour
 
         // Get planar distance (ignores height difference)
         distance = localToGoal.magnitude;
+        if (distanceAtStart<0) distanceAtStart = distance;
 
         // Get the direction in the player's plane (normalized)
         Vector3 planarDirection = localToGoal.normalized;

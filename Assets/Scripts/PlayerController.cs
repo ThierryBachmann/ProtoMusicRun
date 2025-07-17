@@ -8,11 +8,8 @@
  */
 
 // === PlayerController.cs ===
-using Mono.Cecil.Cil;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Unity.Burst.Intrinsics.Arm;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour

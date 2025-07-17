@@ -42,6 +42,9 @@ public class FirebaseLeaderboard : MonoBehaviour
         // Use Firebase's built-in ordering, no auth needed, score are readable for anonymous
         string orderBy = Uri.EscapeDataString("\"score\"");
         string url = $"{firebaseURL}{leaderboardNode}.json?&orderBy={orderBy}&limitToLast={maxLeaderboardEntries}";
+        // https://protorunmusic-default-rtdb.europe-west1.firebasedatabase.app/leaderboard.json?&orderBy=%22score%22&limitToLast=100   
+       
+        //Debug.Log(url);
         UnityWebRequest request = UnityWebRequest.Get(url);
         yield return request.SendWebRequest();
 
