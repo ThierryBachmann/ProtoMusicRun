@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public Transform startPosition;
     public FirebaseLeaderboard leaderboard;
     public LeaderboardDisplay leaderboardDisplay;
+    public ActionDisplay actionDisplay;
     public bool gameRunning;
     public bool levelRunning;
 
@@ -22,7 +23,8 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         gameRunning = true;
-        levelRunning=true;;
+        levelRunning=true;
+        actionDisplay.Show();
     }
     private void DisplayLeaderboard(List<PlayerScore> scores)
     {
@@ -53,6 +55,8 @@ public class GameManager : MonoBehaviour
         // Exemple : touche R pour redémarrer la partie
         if (Input.GetKeyDown(KeyCode.R))
             RestartGame();
+        if (Input.GetKeyDown(KeyCode.A))
+            actionDisplay.Show();
         if (Input.GetKeyDown(KeyCode.L))
             if (leaderboardDisplay.Visible > 0.5f)
                 leaderboardDisplay.Hide();
