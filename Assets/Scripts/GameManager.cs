@@ -70,7 +70,7 @@ public class GameManager : MonoBehaviour
         leaderboardDisplay.Hide();
         // Reset du joueur
         player.ResetPosition(startPosition);
-        player.speedMultiplier = 1f;
+        player.speedMultiplier = 0.5f;
         player.goalHandler.goalReached = false;
         // Réinitialisation du score
         scoreManager.score = 0;

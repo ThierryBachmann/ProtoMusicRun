@@ -21,8 +21,8 @@ public class PlayerController : MonoBehaviour
     public LeaderboardDisplay leaderboardDisplay;
 
     [Header("Mouvement avant")]
-    public float speedMultiplier = 1f;
-    public float moveSpeed = 5f;
+    public float speedMultiplier;
+    public float initialSpeed;
 
     [Header("Orientation")]
     public float turnSpeed = 90f; // vitesse de rotation fluide en °/s
@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Saut & gravité")]
     private float gravity = 9.81f;
-    public float jumpForce = 5f;
+    public float jumpForce;
 
     [Header("Knock‑back")]
     public float knockbackDecay = 4f;  // plus grand = ralentit plus vite
@@ -165,7 +165,7 @@ public class PlayerController : MonoBehaviour
     void HandleMovement(bool stopDown = false)
     {
         // Avance “normale”
-        Vector3 forwardMove = transform.forward * moveSpeed * speedMultiplier;
+        Vector3 forwardMove = transform.forward * initialSpeed * speedMultiplier;
 
         // Applique le knock‑back et le fait décélérer progressivement
         if (knockback.sqrMagnitude > 0.01f)
@@ -195,5 +195,5 @@ public class PlayerController : MonoBehaviour
         controller.Move(finalMove * Time.deltaTime);
     }
 
-    public float GetSpeed() => moveSpeed * speedMultiplier;
+    public float GetSpeed() => initialSpeed * speedMultiplier;
 }

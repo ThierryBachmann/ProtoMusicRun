@@ -1,15 +1,20 @@
 using UnityEngine;
-using MidiPlayerTK; // Assure-toi d'avoir installé Maestro MPTK
+using MidiPlayerTK;
 
 public class MidiTempoSync : MonoBehaviour
 {
     public MidiFilePlayer midiPlayer;
     public PlayerController player;
+    private float previousSpeed = -1;
 
     void Update()
     {
-        float tempo = Mathf.Clamp(player.GetSpeed() * 30f, 60f, 240f);
-        midiPlayer.MPTK_Tempo = tempo;
-        // A TESTER - midiPlayer.ActiveVoices.ForEach(v => {if (v.channel.Channel==0) v.Release(); });
+        float speed = Mathf.Clamp(player.GetSpeed() / (player.initialSpeed * 1f), 0.1f, 3.5f);
+        if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speed) > 0.1f)
+        {
+            Debug.Log($"music speed {speed}");
+            midiPlayer.MPTK_Speed = speed;
+            previousSpeed=speed;
+        }
     }
 }
