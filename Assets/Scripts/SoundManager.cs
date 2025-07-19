@@ -22,29 +22,27 @@ public class SoundManager : MonoBehaviour
     }
     public void PlayCollisionSound()
     {
-        if (MidiSound)
-        {
-            List<SoundEvent> ev;
-            if (jingleDict.TryGetValue("Collision", out ev))
-                StartCoroutine(PlaySoundCoroutine(ev));
-            else
-                Debug.LogError("Collision not found");
-        }
+        StartCoroutine(PlaySoundCoroutine("Collision"));
     }
-    public IEnumerator PlaySoundCoroutine(List<SoundEvent> sounds)
+    public IEnumerator PlaySoundCoroutine(string name)
     {
-        foreach (SoundEvent sound in sounds)
-        {
-            switch (sound.action)
+        List<SoundEvent> sounds;
+        if (!jingleDict.TryGetValue(name, out sounds))
+            Debug.LogWarning($"Sound {name} not found");
+        else
+            foreach (SoundEvent sound in sounds)
             {
-                case SoundEvent.Action.WAIT:
-                    yield return new WaitForSeconds(sound.duration / 1000f);
-                    break;
-                case SoundEvent.Action.NOTEON:
-                    MidiSound.MPTK_PlayDirectEvent(sound.mptkEvent);
-                    break;
+                switch (sound.action)
+                {
+                    case SoundEvent.Action.WAIT:
+                        yield return new WaitForSeconds(sound.duration / 1000f);
+                        break;
+                    case SoundEvent.Action.NOTEON:
+                    case SoundEvent.Action.PRESET:
+                        MidiSound.MPTK_PlayDirectEvent(sound.mptkEvent);
+                        break;
+                }
             }
-        }
     }
 }
 

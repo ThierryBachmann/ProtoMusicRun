@@ -4625,22 +4625,34 @@ MonoBehaviour:
   Jingles:
   - name: Collision
     soundEvents:
-    - action: 1
-      value: 49
-      channel: 9
-      duration: 1000
-    - action: 0
-      value: 0
-      channel: 0
-      duration: 200
     - action: 2
       value: 10
       channel: 0
       duration: 0
     - action: 1
-      value: 10
-      channel: 0
+      value: 49
+      channel: 9
       duration: 1000
+    - action: 1
+      value: 50
+      channel: 0
+      duration: 2000
+    - action: 0
+      value: 0
+      channel: 0
+      duration: 200
+    - action: 1
+      value: 48
+      channel: 0
+      duration: 2000
+    - action: 0
+      value: 0
+      channel: 0
+      duration: 200
+    - action: 1
+      value: 46
+      channel: 0
+      duration: 2000
 --- !u!4 &1870609032
 Transform:
   m_ObjectHideFlags: 0
