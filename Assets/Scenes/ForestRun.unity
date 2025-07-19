@@ -4622,37 +4622,119 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MidiSound: {fileID: 609628727}
+  RebuildJingles: 0
   Jingles:
   - name: Collision
+    soundEvents:
+    - action: 2
+      value: 110
+      channel: 0
+      duration: 0
+      velocity: 0
+    - action: 1
+      value: 49
+      channel: 9
+      duration: 2400
+      velocity: 127
+    - action: 1
+      value: 50
+      channel: 0
+      duration: 2400
+      velocity: 127
+    - action: 0
+      value: 0
+      channel: 0
+      duration: 200
+      velocity: 127
+    - action: 1
+      value: 48
+      channel: 0
+      duration: 2200
+      velocity: 127
+    - action: 0
+      value: 0
+      channel: 0
+      duration: 200
+      velocity: 0
+    - action: 1
+      value: 46
+      channel: 0
+      duration: 2000
+      velocity: 127
+  - name: Collision1
     soundEvents:
     - action: 2
       value: 10
       channel: 0
       duration: 0
+      velocity: 0
     - action: 1
       value: 49
       channel: 9
       duration: 1000
+      velocity: 127
     - action: 1
       value: 50
       channel: 0
       duration: 2000
+      velocity: 127
     - action: 0
       value: 0
       channel: 0
       duration: 200
+      velocity: 0
     - action: 1
       value: 48
       channel: 0
       duration: 2000
+      velocity: 127
     - action: 0
       value: 0
       channel: 0
       duration: 200
+      velocity: 0
     - action: 1
       value: 46
       channel: 0
       duration: 2000
+      velocity: 127
+  - name: Empty
+    soundEvents:
+    - action: 2
+      value: 10
+      channel: 0
+      duration: 0
+      velocity: 0
+    - action: 1
+      value: 49
+      channel: 9
+      duration: 1000
+      velocity: 0
+    - action: 1
+      value: 50
+      channel: 0
+      duration: 2000
+      velocity: 0
+    - action: 0
+      value: 0
+      channel: 0
+      duration: 200
+      velocity: 0
+    - action: 1
+      value: 48
+      channel: 0
+      duration: 2000
+      velocity: 0
+    - action: 0
+      value: 0
+      channel: 0
+      duration: 200
+      velocity: 0
+    - action: 1
+      value: 46
+      channel: 0
+      duration: 2000
+      velocity: 0
 --- !u!4 &1870609032
 Transform:
   m_ObjectHideFlags: 0
