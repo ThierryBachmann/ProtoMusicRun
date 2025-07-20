@@ -13,20 +13,25 @@ public class GameManager : MonoBehaviour
     public ActionDisplay actionDisplay;
     public bool gameRunning;
     public bool levelRunning;
+    public bool startAuto;
 
     void Awake()
     {
         // Subscribe to events
-        leaderboard.OnLeaderboardLoaded += DisplayLeaderboard;
+        leaderboard.OnLeaderboardLoaded += OnDisplayLeaderboard;
         leaderboard.OnScoreSubmitted += OnScoreSubmissionResult;
     }
     void Start()
     {
         gameRunning = false;
         levelRunning = false;
-        actionDisplay.Show();
+        if (startAuto)
+            RestartGame();
+        else
+            actionDisplay.Show();
     }
-    private void DisplayLeaderboard(List<PlayerScore> scores)
+
+    private void OnDisplayLeaderboard(List<PlayerScore> scores)
     {
         Debug.Log($"=== LEADERBOARD {scores.Count} entries ===");
         for (int i = 0; i < scores.Count; i++)
@@ -56,13 +61,15 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.C)) NextLevel();
         if (Input.GetKeyDown(KeyCode.S)) Stop();
         if (Input.GetKeyDown(KeyCode.R)) RestartGame();
-        if (Input.GetKeyDown(KeyCode.A)) actionDisplay.Show();
-        if (Input.GetKeyDown(KeyCode.L))
-            if (leaderboardDisplay.Visible > 0.5f)
-                leaderboardDisplay.Hide();
-            else
-                leaderboardDisplay.Show(player);
+        if (Input.GetKeyDown(KeyCode.A)) actionDisplay.SwitchVisible();
+        if (Input.GetKeyDown(KeyCode.L)) LeaderboardSwitchDisplay();
     }
+
+    public void LeaderboardSwitchDisplay()
+    {
+        leaderboardDisplay.SwitchVisible(player);
+    }
+
     public void LevelCompleted()
     {
         levelRunning = false;
@@ -72,6 +79,8 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
+
+        actionDisplay.Hide();
         leaderboardDisplay.Hide();
         // Reset du joueur
         player.ResetPosition(startPosition);
@@ -92,6 +101,7 @@ public class GameManager : MonoBehaviour
     }
     public void NextLevel()
     {
+        actionDisplay.Hide();
         leaderboardDisplay.Hide();
         // Reset du joueur
         player.ResetPosition(startPosition);
@@ -112,8 +122,10 @@ public class GameManager : MonoBehaviour
     }
     public void Stop()
     {
+        actionDisplay.Show();
         leaderboardDisplay.Hide();
         gameRunning = false;
         levelRunning = false;
+        actionDisplay.Show();
     }
 }

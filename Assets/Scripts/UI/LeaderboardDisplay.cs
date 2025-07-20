@@ -34,12 +34,21 @@ public class LeaderboardDisplay : PanelDisplay
         if (Visible < 0.5f)
         {
             //Debug.Log("Showing panel: " + leaderboardPanel.name);
-            leaderboardPanel.SetActive(true);
+            //leaderboardPanel.SetActive(true);
             StartCoroutine(leaderboard.LoadLeaderboard());
             RefreshPlayerScore(player);
             Show();
         }
     }
+
+    public void SwitchVisible(PlayerController player)
+    {
+        if (Visible > 0.5f)
+            Hide();
+        else
+            Show(player);
+    }
+
     public void RefreshPlayerScore(PlayerController player)
     {
         bestScoreText.text = $"Your Score {player.playerLastScore} - Your Best Score: {player.playerBestScore} - Your Position: {player.playerPosition}";

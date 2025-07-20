@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PanelDisplay : MonoBehaviour
 {
-       public float animationDuration = 0.4f;
+    public float animationDuration = 0.4f;
     public Vector3 startScale = new Vector3(0.5f, 0.5f, 0.5f);
     public Vector3 endScale = Vector3.one;
 
@@ -39,6 +39,13 @@ public class PanelDisplay : MonoBehaviour
     {
         if (Visible >= 0.5f)
             StartCoroutine(AnimateOut());
+    }
+    public void SwitchVisible()
+    {
+        if (Visible > 0.5f)
+            Hide();
+        else
+            Show();
     }
 
     public float Visible => canvasGroup.alpha;
@@ -77,7 +84,7 @@ public class PanelDisplay : MonoBehaviour
         while (timer < animateOut)
         {
             float t = 1f - timer / animateOut;
-            rectTransform.localScale = Vector3.Lerp(startScale,endScale , t);
+            rectTransform.localScale = Vector3.Lerp(startScale, endScale, t);
             canvasGroup.alpha = t;
             timer += Time.deltaTime;
             yield return null;
