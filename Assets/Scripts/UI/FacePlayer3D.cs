@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class FacePlayer3D : MonoBehaviour
 {
+    public GameObject gameObject;
     private Transform cam;
 
     void Start()
@@ -13,9 +14,9 @@ public class FacePlayer3D : MonoBehaviour
     {
         if (cam != null)
         {
-            Vector3 direction = transform.position - cam.position;
+            Vector3 direction = gameObject.transform.position - cam.position;
             direction.y = 0; // optional: only rotate on Y-axis
-            transform.rotation = Quaternion.LookRotation(direction);
+            gameObject.transform.rotation = Quaternion.LookRotation(direction);
         }
     }
 }

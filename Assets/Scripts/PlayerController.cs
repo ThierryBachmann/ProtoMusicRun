@@ -121,21 +121,21 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (enableMovement && gameManager.levelRunning)
+        if (enableMovement && gameManager.levelRunning && !goalHandler.goalReached)
         {
-            if (!goalHandler.goalReached)
-            {
-                HandleInput();
-                HandleRotation();
-                HandleMovement();
+            HandleInput();
+            HandleRotation();
+            HandleMovement();
 
-                // Remontée progressive du multiplicateur de vitesse
-                // Il rapproche doucement speedMultiplier de 10f a une vitesse de 0.5 par seconde.
-                // Selon la douceur voulue(par ex. 1f = plus rapide, 0.1f = plus lent)
-                speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);
-
-            }
-
+            // Remontée progressive du multiplicateur de vitesse
+            // Il rapproche doucement speedMultiplier de 10f a une vitesse de 0.5 par seconde.
+            // Selon la douceur voulue(par ex. 1f = plus rapide, 0.1f = plus lent)
+            speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);
+        }
+        else
+        {
+            HandleInput();
+            HandleRotation();
         }
     }
 
