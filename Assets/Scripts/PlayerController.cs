@@ -15,6 +15,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public bool enableMovement = true;
+    public GameManager gameManager;
     public GoalHandler goalHandler;
     public FirebaseLeaderboard leaderboard;
     public ScoreManager scoreManager;
@@ -73,6 +74,7 @@ public class PlayerController : MonoBehaviour
     }
     private void OnLevelCompleted(bool success)
     {
+        gameManager.LevelCompleted();
         speedMultiplier = Mathf.MoveTowards(speedMultiplier, 0f, Time.deltaTime * 15f);
         HandleMovement(false);
         playerLastScore = scoreManager.score;
@@ -85,7 +87,6 @@ public class PlayerController : MonoBehaviour
                      1
                       );
         leaderboard.SubmitScore(playerScore);
-
         leaderboardDisplay.Show(this);
     }
 
@@ -120,7 +121,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (enableMovement)
+        if (enableMovement && gameManager.levelRunning)
         {
             if (!goalHandler.goalReached)
             {

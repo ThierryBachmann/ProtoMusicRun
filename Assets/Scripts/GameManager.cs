@@ -22,8 +22,8 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-        gameRunning = true;
-        levelRunning=true;
+        gameRunning = false;
+        levelRunning = false;
         actionDisplay.Show();
     }
     private void DisplayLeaderboard(List<PlayerScore> scores)
@@ -53,17 +53,22 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         // Exemple : touche R pour redémarrer la partie
-        if (Input.GetKeyDown(KeyCode.R))
-            RestartGame();
-        if (Input.GetKeyDown(KeyCode.A))
-            actionDisplay.Show();
+        if (Input.GetKeyDown(KeyCode.C)) NextLevel();
+        if (Input.GetKeyDown(KeyCode.S)) Stop();
+        if (Input.GetKeyDown(KeyCode.R)) RestartGame();
+        if (Input.GetKeyDown(KeyCode.A)) actionDisplay.Show();
         if (Input.GetKeyDown(KeyCode.L))
             if (leaderboardDisplay.Visible > 0.5f)
                 leaderboardDisplay.Hide();
             else
                 leaderboardDisplay.Show(player);
-
     }
+    public void LevelCompleted()
+    {
+        levelRunning = false;
+        actionDisplay.Show();
+    }
+
 
     public void RestartGame()
     {
@@ -81,8 +86,34 @@ public class GameManager : MonoBehaviour
             midiPlayer.MPTK_Stop();
             midiPlayer.MPTK_RePlay(); // ou MPTK_Play() si tu préfères
         }
-        gameRunning=true;
-        levelRunning=true;
+        gameRunning = true;
+        levelRunning = true;
         // Autres reset possibles ici
+    }
+    public void NextLevel()
+    {
+        leaderboardDisplay.Hide();
+        // Reset du joueur
+        player.ResetPosition(startPosition);
+        player.speedMultiplier = 0.5f;
+        player.goalHandler.goalReached = false;
+        // Réinitialisation du score
+        scoreManager.score = 0;
+
+        // Réinitialisation de la musique
+        if (midiPlayer != null)
+        {
+            midiPlayer.MPTK_Stop();
+            midiPlayer.MPTK_RePlay(); // ou MPTK_Play() si tu préfères
+        }
+        gameRunning = true;
+        levelRunning = true;
+        // Autres reset possibles ici
+    }
+    public void Stop()
+    {
+        leaderboardDisplay.Hide();
+        gameRunning = false;
+        levelRunning = false;
     }
 }
