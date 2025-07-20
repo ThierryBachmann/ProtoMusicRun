@@ -4,7 +4,9 @@ using System.Collections.Generic;
 public class TerrainGenerator : MonoBehaviour
 {
     public Transform player;
+    public GameObject goalChunk;
     public GameObject[] forestChunks; // tableau de prefabs
+    public Transform goal;
     public int chunkSize = 20;
     public int renderDistance = 2;
     public bool disableObstacles = false;
@@ -13,18 +15,32 @@ public class TerrainGenerator : MonoBehaviour
 
     void Start()
     {
+        Vector2 playerPos = new Vector2(goal.position.x, goal.position.z);
+        Vector2Int chunkCoord = PositionToChunkPosition(playerPos);
+        GameObject chunk = Instantiate(goalChunk, goal.position, Quaternion.identity);
+        chunk.name = $"Chunk_goal_{chunkCoord.x}_{chunkCoord.y}";
+        chunk.tag = "goal";
+        Debug.Log($"Add goal chunk: {playerPos.x} {playerPos.y} --> playerChunk: {chunk}");
+        spawnedChunks.Add(chunkCoord, chunk);
     }
 
+    Vector2Int PositionToChunkPosition(Vector2 position)
+    {
+        return new Vector2Int(Mathf.FloorToInt(position.x / chunkSize), Mathf.FloorToInt(position.y / chunkSize));
+    }
+    Vector3 ChunkPositionToPosition(Vector2Int chunkCoord)
+    {
+        return new Vector3(chunkCoord.x * chunkSize, 0, chunkCoord.y * chunkSize);
+    }
     void Update()
     {
         Vector2 playerPos = new Vector2(player.position.x, player.position.z);
-        Vector2Int playerChunk = new Vector2Int(
-            Mathf.FloorToInt(playerPos.x / chunkSize),
-            Mathf.FloorToInt(playerPos.y / chunkSize)
-        );
-        //Debug.Log($"{playerPos.x} {playerPos.y} {playerChunk}");
+        Vector2Int playerChunk = PositionToChunkPosition(playerPos);
+
         if (playerChunk != currentPlayerChunk)
         {
+            Debug.Log($"Player: {playerPos.x} {playerPos.y} --> playerChunk: {playerChunk}");
+
             currentPlayerChunk = playerChunk;
             UpdateChunks();
         }
@@ -43,13 +59,9 @@ public class TerrainGenerator : MonoBehaviour
 
                 if (!spawnedChunks.ContainsKey(chunkCoord))
                 {
-                    Vector3 spawnPos = new Vector3(
-                        chunkCoord.x * chunkSize,
-                        0,
-                        chunkCoord.y * chunkSize
-                    );
+                    Vector3 spawnPos = ChunkPositionToPosition(chunkCoord);
 
-                    GameObject randomPrefab = forestChunks[Random.Range(0, forestChunks.Length)];
+                    GameObject randomPrefab = forestChunks[Random.Range(1, forestChunks.Length)];
                     GameObject chunk = Instantiate(randomPrefab, spawnPos, Quaternion.identity);
                     chunk.name = $"Chunk_{chunkCoord.x}_{chunkCoord.y}";
                     if (disableObstacles)
@@ -79,8 +91,13 @@ public class TerrainGenerator : MonoBehaviour
         {
             if (!newChunks.Contains(coord))
             {
-                Destroy(spawnedChunks[coord]);
-                chunksToRemove.Add(coord);
+                if (spawnedChunks[coord].tag != "goal")
+                {
+                    Destroy(spawnedChunks[coord]);
+                    chunksToRemove.Add(coord);
+                }
+                else
+                    Debug.Log("Don't destroy goal chunk");
             }
         }
         foreach (var coord in chunksToRemove)
