@@ -87,7 +87,7 @@ public class PlayerController : MonoBehaviour
                      1
                       );
         leaderboard.SubmitScore(playerScore);
-        leaderboardDisplay.Show(this);
+        //leaderboardDisplay.Show(this);
     }
 
     private void OnScoreSubmitted(bool success)

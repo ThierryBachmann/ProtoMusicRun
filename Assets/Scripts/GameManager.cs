@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
     {
         // Exemple : touche R pour redémarrer la partie
         if (Input.GetKeyDown(KeyCode.C)) NextLevel();
-        if (Input.GetKeyDown(KeyCode.S)) Stop();
+        if (Input.GetKeyDown(KeyCode.S)) StopGame();
         if (Input.GetKeyDown(KeyCode.R)) RestartGame();
         if (Input.GetKeyDown(KeyCode.A)) actionDisplay.SwitchVisible();
         if (Input.GetKeyDown(KeyCode.L)) LeaderboardSwitchDisplay();
@@ -75,7 +75,6 @@ public class GameManager : MonoBehaviour
         levelRunning = false;
         actionDisplay.Show();
     }
-
 
     public void RestartGame()
     {
@@ -120,7 +119,7 @@ public class GameManager : MonoBehaviour
         levelRunning = true;
         // Autres reset possibles ici
     }
-    public void Stop()
+    public void StopGame()
     {
         actionDisplay.Show();
         leaderboardDisplay.Hide();

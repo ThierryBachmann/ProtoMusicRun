@@ -20,7 +20,7 @@ public class ActionDisplay : PanelDisplay
     {
         rerunButton.onClick.AddListener(() => gameManager.RestartGame());
         continueButton.onClick.AddListener(() => gameManager.NextLevel());
-        stopButton.onClick.AddListener(() => gameManager.Stop());
+        stopButton.onClick.AddListener(() => gameManager.StopGame());
         leaderBoardButton.onClick.AddListener(() => gameManager.LeaderboardSwitchDisplay());
         base.Start();
     }
