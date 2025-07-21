@@ -81,14 +81,9 @@ public class GameManager : MonoBehaviour
 
         actionDisplay.Hide();
         leaderboardDisplay.Hide();
-        // Reset du joueur
-        player.ResetPosition(startPosition);
-        player.speedMultiplier = 0.5f;
-        player.goalHandler.goalReached = false;
-        // Réinitialisation du score
+        player.ResetPlayer(startPosition);
         scoreManager.score = 0;
 
-        // Réinitialisation de la musique
         if (midiPlayer != null)
         {
             midiPlayer.MPTK_Stop();

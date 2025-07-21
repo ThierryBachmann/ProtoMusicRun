@@ -7,6 +7,7 @@ public class TerrainGenerator : MonoBehaviour
     public GameObject goalChunk;
     public GameObject[] forestChunks; // tableau de prefabs
     public Transform goal;
+    public Transform start;
     public int chunkSize = 20;
     public int renderDistance = 2;
     public bool disableObstacles = false;
@@ -20,12 +21,25 @@ public class TerrainGenerator : MonoBehaviour
 
     private void CreateGoalChunk()
     {
-        Vector2Int chunkCoord = PositionToChunk(goal.position);
-        GameObject chunk = Instantiate(goalChunk, goal.position, Quaternion.identity);
-        chunk.name = $"Chunk_goal_{chunkCoord.x}_{chunkCoord.y}";
-        chunk.tag = "Goal";
-        Debug.Log($"Add goal chunk: {goal.position.x} {goal.position.y} --> playerChunk: {chunk}");
-        spawnedChunks.Add(chunkCoord, chunk);
+        if (goal != null)
+        {
+            Vector2Int chunkCoord = PositionToChunk(goal.position);
+            GameObject chunk = Instantiate(goalChunk, goal.position, Quaternion.identity);
+            chunk.name = $"Chunk_goal_{chunkCoord.x}_{chunkCoord.y}";
+            chunk.tag = "Goal";
+            Debug.Log($"Add goal chunk: {goal.position.x} {goal.position.y} --> playerChunk: {chunk}");
+            spawnedChunks.Add(chunkCoord, chunk);
+        }
+
+        if (start != null)
+        {
+            Vector2Int chunkCoord = PositionToChunk(start.position);
+            GameObject chunk = Instantiate(goalChunk, start.position, Quaternion.identity);
+            chunk.name = $"Chunk_start_{chunkCoord.x}_{chunkCoord.y}";
+            chunk.tag = "Goal";
+            Debug.Log($"Add start chunk: {start.position.x} {start.position.y} --> playerChunk: {chunk}");
+            spawnedChunks.Add(chunkCoord, chunk);
+        }
     }
 
     Vector2Int PositionToChunk(Vector3 position)
@@ -96,7 +110,7 @@ public class TerrainGenerator : MonoBehaviour
                     chunksToRemove.Add(coord);
                 }
                 else
-                    Debug.Log("Don't destroy goal chunk");
+                    Debug.Log("Don't destroy chunk");
             }
         }
         foreach (var coord in chunksToRemove)

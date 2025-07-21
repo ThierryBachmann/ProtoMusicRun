@@ -6,6 +6,7 @@ using System;
 
 public class FirebaseLeaderboard : MonoBehaviour
 {
+    public bool disableLeaderBoard;
     public FirebaseAuth firebaseAuth;
     [Header("Firebase Configuration")]
     public string firebaseURL = "https://protorunmusic-default-rtdb.europe-west1.firebasedatabase.app/";
@@ -24,7 +25,8 @@ public class FirebaseLeaderboard : MonoBehaviour
     void Start()
     {
         // Load leaderboard on start
-        StartCoroutine(LoadLeaderboard());
+        if (!disableLeaderBoard)
+            StartCoroutine(LoadLeaderboard());
     }
 
     private void OnAuthComplete(bool success)
@@ -43,7 +45,7 @@ public class FirebaseLeaderboard : MonoBehaviour
         string orderBy = Uri.EscapeDataString("\"score\"");
         string url = $"{firebaseURL}{leaderboardNode}.json?&orderBy={orderBy}&limitToLast={maxLeaderboardEntries}";
         // https://protorunmusic-default-rtdb.europe-west1.firebasedatabase.app/leaderboard.json?&orderBy=%22score%22&limitToLast=100   
-       
+
         //Debug.Log(url);
         UnityWebRequest request = UnityWebRequest.Get(url);
         yield return request.SendWebRequest();
@@ -205,7 +207,8 @@ public class FirebaseLeaderboard : MonoBehaviour
             Debug.LogWarning("Not authenticated, cannot submit score");
             return;
         }
-        StartCoroutine(SubmitScoreCoroutine(score));
+        if (!disableLeaderBoard)
+            StartCoroutine(SubmitScoreCoroutine(score));
     }
 
     private IEnumerator SubmitScoreCoroutine(PlayerScore score)
@@ -267,7 +270,8 @@ public class FirebaseLeaderboard : MonoBehaviour
 
     public void GetPlayerRank(Action<PlayerScore> onRankFound)
     {
-        StartCoroutine(GetPlayerRankCoroutine(onRankFound));
+        if (!disableLeaderBoard)
+            StartCoroutine(GetPlayerRankCoroutine(onRankFound));
     }
 
     private IEnumerator GetPlayerRankCoroutine(Action<PlayerScore> onRankFound)

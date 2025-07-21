@@ -7,6 +7,7 @@ using System.Globalization;
 
 public class LeaderboardDisplay : PanelDisplay
 {
+
     [Header("Main UI")]
     public GameObject leaderboardPanel;
     public TMP_Text bestScoreText;

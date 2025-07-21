@@ -14,14 +14,15 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
+    [Header("Debug")]
     public bool enableMovement = true;
-    public GameManager gameManager;
-    public GoalHandler goalHandler;
-    public FirebaseLeaderboard leaderboard;
-    public ScoreManager scoreManager;
-    public LeaderboardDisplay leaderboardDisplay;
+    public bool isJumping;
+    public Vector3 verticalVelocity;  // stocke la composante Y du saut/gravité
+    public float targetAngle = 0f; // angle actuel utilisé pour la rotation
+    public float currentAngle = 0f;
+    public Vector3 knockback = Vector3.zero;
 
-    [Header("Mouvement avant")]
+    [Header("Movement")]
     public float speedMultiplier;
     public float initialSpeed;
 
@@ -29,24 +30,26 @@ public class PlayerController : MonoBehaviour
     public float turnSpeed = 90f; // vitesse de rotation fluide en °/s
     public float maxAngle = 45f;
 
-    [Header("Saut & gravité")]
+    [Header("Jump")]
     private float gravity = 9.81f;
     public float jumpForce;
 
     [Header("Knock‑back")]
     public float knockbackDecay = 4f;  // plus grand = ralentit plus vite
 
-
-    private CharacterController controller;
-    private Vector3 velocity;
-    private bool isGrounded;
-    private Vector3 verticalVelocity;  // stocke la composante Y du saut/gravité
-    private float targetAngle = 0f; // angle actuel utilisé pour la rotation
-    private float currentAngle = 0f;
-    private Vector3 knockback = Vector3.zero;
+    [Header("Score")]
     public int playerPosition = 99999;
     public long playerBestScore = 0;
     public long playerLastScore = 0;
+
+
+    [Header("GameObject")]
+    private CharacterController controller;
+    public GameManager gameManager;
+    public GoalHandler goalHandler;
+    public FirebaseLeaderboard leaderboard;
+    public ScoreManager scoreManager;
+    public LeaderboardDisplay leaderboardDisplay;
 
     void Awake()
     {
@@ -59,6 +62,13 @@ public class PlayerController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         leaderboardDisplay.Hide();
+    }
+
+    public void ResetPlayer(Transform startPosition)
+    {
+        ResetPosition(startPosition);
+        speedMultiplier = 0.5f;
+        goalHandler.goalReached = false;
     }
 
     private void OnLeaderboardLoaded(List<PlayerScore> scores)
@@ -76,7 +86,8 @@ public class PlayerController : MonoBehaviour
     {
         gameManager.LevelCompleted();
         speedMultiplier = Mathf.MoveTowards(speedMultiplier, 0f, Time.deltaTime * 15f);
-        HandleMovement(false);
+
+        HandleMovement(Vector3.zero);
         playerLastScore = scoreManager.score;
         PlayerScore playerScore = new PlayerScore(
                      leaderboard.GetPlayerName(),
@@ -121,22 +132,16 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        Vector3 forwardMove = Vector3.zero;
         if (enableMovement && gameManager.levelRunning && !goalHandler.goalReached)
         {
-            HandleInput();
-            HandleRotation();
-            HandleMovement();
-
-            // Remontée progressive du multiplicateur de vitesse
-            // Il rapproche doucement speedMultiplier de 10f a une vitesse de 0.5 par seconde.
-            // Selon la douceur voulue(par ex. 1f = plus rapide, 0.1f = plus lent)
+            // Slowly increase speed multiplier until 10 at 0.1 per second
             speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);
+            forwardMove = transform.forward * initialSpeed * speedMultiplier;
         }
-        else
-        {
-            HandleInput();
-            HandleRotation();
-        }
+        HandleInput();
+        HandleRotation();
+        HandleMovement(forwardMove);
     }
 
     void HandleInput()
@@ -149,24 +154,26 @@ public class PlayerController : MonoBehaviour
         {
             targetAngle += turnSpeed * Time.deltaTime;
         }
-
+        if (!isJumping && Input.GetKeyDown(KeyCode.Space))
+        {
+            verticalVelocity.y = jumpForce;
+            isJumping = true;
+        }
         // Clamp l'angle cible
         //     targetAngle = Mathf.Clamp(targetAngle, -maxAngle, maxAngle);
     }
 
-
     void HandleRotation()
     {
-        // Interpolation douce entre l'angle actuel et l'angle cible
-        currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * 5f); // facteur de lissage ajustable
-
-        // Appliquer au transform
+        //Smooth interpolation between the current angle and the target angle, with an adjustable smoothing factor.
+        currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * 5f); 
         transform.rotation = Quaternion.Euler(0, currentAngle, 0);
     }
-    void HandleMovement(bool stopDown = false)
+
+    void HandleMovement(Vector3 forwardMove)
     {
         // Avance “normale”
-        Vector3 forwardMove = transform.forward * initialSpeed * speedMultiplier;
+        //Vector3 forwardMove = transform.forward * initialSpeed * speedMultiplier;
 
         // Applique le knock‑back et le fait décélérer progressivement
         if (knockback.sqrMagnitude > 0.01f)
@@ -179,21 +186,29 @@ public class PlayerController : MonoBehaviour
             knockback = Vector3.zero; // sécurité
         }
 
-        // Gestion saut / gravité
-        if (controller.isGrounded)
+        // Update vertical velocity
+        if (!isJumping)
         {
-            verticalVelocity.y = -1f;
-            if (Input.GetKeyDown(KeyCode.Space)) verticalVelocity.y = jumpForce;
+            verticalVelocity.y = -1f; // Very small downward move to set the player on the ground
         }
         else
         {
             verticalVelocity.y -= gravity * Time.deltaTime;
         }
 
+        // Combine movement
         Vector3 finalMove = forwardMove;
         finalMove.y = verticalVelocity.y;
-
+        
+        //bool grounded = controller.isGrounded;
+        // Before you call controller.Move(...), isGrounded contains the value from the previous frame.
+        // After Move(...), Unity recalculates collisions, so the new value of isGrounded depends on the result of the Move.
         controller.Move(finalMove * Time.deltaTime);
+        
+        // Debug.Log($"isGrounded avant:{grounded} apres:{controller.isGrounded} finalMove:{finalMove} isJumping:{isJumping}");
+        
+        if (controller.isGrounded)
+            isJumping = false;
     }
 
     public float GetSpeed() => initialSpeed * speedMultiplier;
