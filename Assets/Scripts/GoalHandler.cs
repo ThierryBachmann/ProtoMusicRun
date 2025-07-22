@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using TMPro;
 
 public class GoalHandler : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class GoalHandler : MonoBehaviour
     public float goalAngle;
     public bool goalReached;
     public Action<bool> OnLevelCompleted;
+
 
     void Start()
     {
@@ -38,7 +40,7 @@ public class GoalHandler : MonoBehaviour
 
         // Get planar distance (ignores height difference)
         distance = localToGoal.magnitude;
-        if (distanceAtStart<0) distanceAtStart = distance;
+        if (distanceAtStart < 0) distanceAtStart = distance;
 
         // Get the direction in the player's plane (normalized)
         Vector3 planarDirection = localToGoal.normalized;

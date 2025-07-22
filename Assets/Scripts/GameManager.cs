@@ -6,11 +6,12 @@ public class GameManager : MonoBehaviour
 {
     public PlayerController player;
     public ScoreManager scoreManager;
-    public MidiFilePlayer midiPlayer; // optionnel
+    public MidiFilePlayer midiPlayer; 
     public Transform startPosition;
     public FirebaseLeaderboard leaderboard;
     public LeaderboardDisplay leaderboardDisplay;
     public ActionDisplay actionDisplay;
+
     public bool gameRunning;
     public bool levelRunning;
     public bool startAuto;
