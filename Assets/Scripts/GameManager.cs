@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     public FirebaseLeaderboard leaderboard;
     public LeaderboardDisplay leaderboardDisplay;
     public ActionDisplay actionDisplay;
-
+    public GoalReachedDisplay goalReachedDisplay;
     public bool gameRunning;
     public bool levelRunning;
     public bool startAuto;
@@ -83,6 +83,7 @@ public class GameManager : MonoBehaviour
         actionDisplay.Hide();
         leaderboardDisplay.Hide();
         player.ResetPlayer(startPosition);
+        goalReachedDisplay.Reset();
         scoreManager.score = 0;
 
         if (midiPlayer != null)
@@ -102,6 +103,7 @@ public class GameManager : MonoBehaviour
         player.ResetPosition(startPosition);
         player.speedMultiplier = 0.5f;
         player.goalHandler.goalReached = false;
+        goalReachedDisplay.Reset();
         // Réinitialisation du score
         scoreManager.score = 0;
 
