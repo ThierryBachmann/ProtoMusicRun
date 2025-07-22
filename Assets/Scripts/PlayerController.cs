@@ -17,8 +17,8 @@ public class PlayerController : MonoBehaviour
     [Header("Debug")]
     public bool enableMovement = true;
     public bool isJumping;
-    public Vector3 verticalVelocity;  // stocke la composante Y du saut/gravité
-    public float targetAngle = 0f; // angle actuel utilisé pour la rotation
+    public Vector3 verticalVelocity;  
+    public float targetAngle = 0f; 
     public float currentAngle = 0f;
     public Vector3 knockback = Vector3.zero;
 
@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
     public float initialSpeed;
 
     [Header("Orientation")]
-    public float turnSpeed = 90f; // vitesse de rotation fluide en °/s
+    public float turnSpeed = 90f; 
     public float maxAngle = 45f;
 
     [Header("Jump")]
@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
     public float jumpForce;
 
     [Header("Knock‑back")]
-    public float knockbackDecay = 4f;  // plus grand = ralentit plus vite
+    public float knockbackDecay = 4f;  
 
     [Header("Score")]
     public int playerPosition = 99999;
@@ -43,75 +43,32 @@ public class PlayerController : MonoBehaviour
     public long playerLastScore = 0;
 
 
-    [Header("GameObject")]
     private CharacterController controller;
+    [Header("GameObject")]
     public GameManager gameManager;
-    public GoalHandler goalHandler;
-    public FirebaseLeaderboard leaderboard;
-    public ScoreManager scoreManager;
-    public LeaderboardDisplay leaderboardDisplay;
+    
 
     void Awake()
     {
-        goalHandler.OnLevelCompleted += OnLevelCompleted;
-        leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
-        leaderboard.OnScoreSubmitted += OnScoreSubmitted;
+
     }
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        leaderboardDisplay.Hide();
     }
 
     public void ResetPlayer(Transform startPosition)
     {
         ResetPosition(startPosition);
         speedMultiplier = 0.5f;
-        goalHandler.goalReached = false;
     }
 
-    private void OnLeaderboardLoaded(List<PlayerScore> scores)
+    public void LevelCompleted()
     {
-        Debug.Log($"=== PLAYER RANK {leaderboard.GetPlayerName()} === ");
-        PlayerScore playerRank = scores.Find(s => s.playerName == leaderboard.GetPlayerName());
-        if (playerRank != null)
-            Debug.Log($"Player Rank {playerRank.playerName:20}: {playerRank.score} pts " +
-                 $"(Time: {playerRank.completionTime:F1}s, Efficiency: {playerRank.pathEfficiency:F2})");
-        else
-            Debug.Log($"Player Rank not found");
-
-    }
-    private void OnLevelCompleted(bool success)
-    {
-        gameManager.LevelCompleted();
         speedMultiplier = Mathf.MoveTowards(speedMultiplier, 0f, Time.deltaTime * 15f);
 
         HandleMovement(Vector3.zero);
-        playerLastScore = scoreManager.score;
-        PlayerScore playerScore = new PlayerScore(
-                     leaderboard.GetPlayerName(),
-                     scoreManager.score,
-                     999,
-                     999,
-                     999,
-                     1
-                      );
-        leaderboard.SubmitScore(playerScore);
-        //leaderboardDisplay.Show(this);
-    }
-
-    private void OnScoreSubmitted(bool success)
-    {
-        leaderboard.GetPlayerRank((s) =>
-        {
-            if (s != null)
-            {
-                playerPosition = s.playerPosition;
-                playerBestScore = s.score;
-                leaderboardDisplay.RefreshPlayerScore(this);
-            }
-        });
     }
 
     public void ApplyKnockback(Vector3 direction, float strength)
@@ -121,6 +78,8 @@ public class PlayerController : MonoBehaviour
 
     public void ResetPosition(Transform startPosition)
     {
+        speedMultiplier = 0.5f;
+
         CharacterController cc = GetComponent<CharacterController>();
         cc.enabled = false;
         transform.position = startPosition.position;
@@ -133,7 +92,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Vector3 forwardMove = Vector3.zero;
-        if (enableMovement && gameManager.levelRunning && !goalHandler.goalReached)
+        if (enableMovement && gameManager.levelRunning && !gameManager.goalHandler.goalReached)
         {
             // Slowly increase speed multiplier until 10 at 0.1 per second
             speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);

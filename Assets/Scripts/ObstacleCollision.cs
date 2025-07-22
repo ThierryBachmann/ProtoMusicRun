@@ -12,7 +12,7 @@ public class ObstacleCollision : MonoBehaviour
 
     private bool onCooldown;
     [SerializeField] private float cooldownDelay = 1.5f;
-    [SerializeField] private float knockbackPower = 6f;   // distance ressentie
+    [SerializeField] private float knockbackPower = 6f;   
 
     void Awake()
     {
@@ -37,7 +37,6 @@ public class ObstacleCollision : MonoBehaviour
             cameraShake.TriggerShake(0.4f, 0.15f * applyShake, 2f); // durée, amplitude, amortissement
             MainMusic.MPTK_Pause(1000);
             Player.speedMultiplier = 0.5f;
-            ScoreManager.coefficient = 1f;
             SoundManager.PlayCollisionSound();
 
             // 2. knock‑back

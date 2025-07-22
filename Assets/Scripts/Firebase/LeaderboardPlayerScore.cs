@@ -1,7 +1,7 @@
 using System;
 
 [System.Serializable]
-public class PlayerScore
+public class LeaderboardPlayerScore
 {
     public string playerName;
     public int playerPosition;
@@ -11,9 +11,8 @@ public class PlayerScore
     public float maxSpeed;
     public int maxLevel;
     public long timestamp;
-    //public List<Vector3> keyWaypoints; // Simplified path data
 
-    public PlayerScore(string name, long score, float time, float efficiency, float speed,int level)
+    public LeaderboardPlayerScore(string name, long score, float time, float efficiency, float speed,int level)
     {
         playerName = name;
         this.score = score;
@@ -22,7 +21,6 @@ public class PlayerScore
         maxSpeed = speed;
         maxLevel=level;
         timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        //keyWaypoints = waypoints;
     }
     public override string ToString() {return $"{playerName} {score} {playerPosition}";}
 }
@@ -30,6 +28,6 @@ public class PlayerScore
 [System.Serializable]
 public class LeaderboardEntry
 {
-    public PlayerScore data;
+    public LeaderboardPlayerScore data;
     public string key;
 }

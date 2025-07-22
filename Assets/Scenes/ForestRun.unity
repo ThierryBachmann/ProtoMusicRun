@@ -201,7 +201,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -535,17 +535,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7984a7d9b0fbd554490f98eb83490b02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 256923874}
-  scoreManager: {fileID: 211374106}
-  midiPlayer: {fileID: 738411423}
-  startPosition: {fileID: 600426535}
-  leaderboard: {fileID: 1489650625}
-  leaderboardDisplay: {fileID: 973761168}
-  actionDisplay: {fileID: 1397310887}
-  goalReachedDisplay: {fileID: 283134996}
   gameRunning: 0
   levelRunning: 0
   startAuto: 0
+  goalHandler: {fileID: 283134993}
+  leaderboard: {fileID: 1489650625}
+  scoreManager: {fileID: 211374106}
+  leaderboardDisplay: {fileID: 973761168}
+  player: {fileID: 256923874}
+  midiPlayer: {fileID: 738411423}
+  startPosition: {fileID: 600426535}
+  actionDisplay: {fileID: 1397310887}
+  goalReachedDisplay: {fileID: 283134996}
 --- !u!4 &152116609
 Transform:
   m_ObjectHideFlags: 0
@@ -591,7 +592,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 256923874}
-  coefficient: 1
   score: 0
 --- !u!4 &211374107
 Transform:
@@ -724,10 +724,6 @@ MonoBehaviour:
   playerBestScore: 0
   playerLastScore: 0
   gameManager: {fileID: 152116608}
-  goalHandler: {fileID: 283134993}
-  leaderboard: {fileID: 1489650625}
-  scoreManager: {fileID: 211374106}
-  leaderboardDisplay: {fileID: 973761168}
 --- !u!143 &256923875
 CharacterController:
   m_ObjectHideFlags: 0
@@ -4156,7 +4152,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.000061, y: -435.95}
+  m_AnchoredPosition: {x: 1, y: -435.95}
   m_SizeDelta: {x: -19.600159, y: -925.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1397310887
@@ -4836,10 +4832,10 @@ RectTransform:
   - {fileID: 1770975909}
   m_Father: {fileID: 1820376250}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -59.27}
-  m_SizeDelta: {x: 1920, y: 120}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 1387, y: -59.27}
+  m_SizeDelta: {x: 1070.84, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1611664820
 MonoBehaviour:
@@ -5288,7 +5284,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Player xxxx Distance: 1 000 Score: 2 000 Speed: 123 Multiplier:10'
+  m_text: 'Player xxxx Distance: 1 000 Speed: 123'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5547,7 +5543,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -128.09}
+  m_AnchoredPosition: {x: 0, y: -5.69}
   m_SizeDelta: {x: 588.4, y: 120}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1777382778

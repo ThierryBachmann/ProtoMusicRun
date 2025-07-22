@@ -14,9 +14,9 @@ public class FirebaseLeaderboard : MonoBehaviour
     public int maxLeaderboardEntries = 100;
 
     [Header("Events")]
-    public Action<List<PlayerScore>> OnLeaderboardLoaded;
+    public Action<List<LeaderboardPlayerScore>> OnLeaderboardLoaded;
     public Action<bool> OnScoreSubmitted;
-    private List<PlayerScore> scores;
+    private List<LeaderboardPlayerScore> scores;
 
     void Awake()
     {
@@ -57,7 +57,7 @@ public class FirebaseLeaderboard : MonoBehaviour
             if (string.IsNullOrEmpty(jsonResponse) || jsonResponse == "null")
             {
                 Debug.LogError($"Failed to load leaderboard: json empty");
-                OnLeaderboardLoaded?.Invoke(new List<PlayerScore>());
+                OnLeaderboardLoaded?.Invoke(new List<LeaderboardPlayerScore>());
                 yield break;
             }
 
@@ -77,7 +77,7 @@ public class FirebaseLeaderboard : MonoBehaviour
         else
         {
             Debug.LogError($"Failed to load leaderboard: {request.error}");
-            OnLeaderboardLoaded?.Invoke(new List<PlayerScore>());
+            OnLeaderboardLoaded?.Invoke(new List<LeaderboardPlayerScore>());
         }
     }
     /// <summary>
@@ -90,9 +90,9 @@ public class FirebaseLeaderboard : MonoBehaviour
     /// </summary>
     /// <param name="json"></param>
     /// <returns></returns>
-    private List<PlayerScore> ParseFirebaseResponse(string jsonResponse)
+    private List<LeaderboardPlayerScore> ParseFirebaseResponse(string jsonResponse)
     {
-        List<PlayerScore> scores = new List<PlayerScore>();
+        List<LeaderboardPlayerScore> scores = new List<LeaderboardPlayerScore>();
 
         try
         {
@@ -117,7 +117,7 @@ public class FirebaseLeaderboard : MonoBehaviour
                     if (colonIndex > 0)
                     {
                         string valueJson = entry.Substring(colonIndex + 1).Trim();
-                        PlayerScore score = JsonUtility.FromJson<PlayerScore>(valueJson);
+                        LeaderboardPlayerScore score = JsonUtility.FromJson<LeaderboardPlayerScore>(valueJson);
                         scores.Add(score);
                     }
                 }
@@ -177,7 +177,7 @@ public class FirebaseLeaderboard : MonoBehaviour
 
         return entries.ToArray();
     }
-    private bool ValidateScore(PlayerScore score)
+    private bool ValidateScore(LeaderboardPlayerScore score)
     {
         // Basic validation - customize based on your game mechanics
 
@@ -200,7 +200,7 @@ public class FirebaseLeaderboard : MonoBehaviour
 
         return true;
     }
-    public void SubmitScore(PlayerScore score)
+    public void SubmitScore(LeaderboardPlayerScore score)
     {
         if (!firebaseAuth.IsAuthenticated())
         {
@@ -211,7 +211,7 @@ public class FirebaseLeaderboard : MonoBehaviour
             StartCoroutine(SubmitScoreCoroutine(score));
     }
 
-    private IEnumerator SubmitScoreCoroutine(PlayerScore score)
+    private IEnumerator SubmitScoreCoroutine(LeaderboardPlayerScore score)
     {
         // Refresh token if needed
         yield return firebaseAuth.RefreshTokenIfNeeded();
@@ -268,13 +268,13 @@ public class FirebaseLeaderboard : MonoBehaviour
         return firebaseAuth.playerDisplayName;
     }
 
-    public void GetPlayerRank(Action<PlayerScore> onRankFound)
+    public void GetPlayerRank(Action<LeaderboardPlayerScore> onRankFound)
     {
         if (!disableLeaderBoard)
             StartCoroutine(GetPlayerRankCoroutine(onRankFound));
     }
 
-    private IEnumerator GetPlayerRankCoroutine(Action<PlayerScore> onRankFound)
+    private IEnumerator GetPlayerRankCoroutine(Action<LeaderboardPlayerScore> onRankFound)
     {
         Debug.Log($"GetPlayerRankCoroutine >>>");
 
@@ -283,7 +283,7 @@ public class FirebaseLeaderboard : MonoBehaviour
 
         if (scores != null)
         {
-            PlayerScore score = scores.Find(p => p.playerName == firebaseAuth.playerDisplayName);
+            LeaderboardPlayerScore score = scores.Find(p => p.playerName == firebaseAuth.playerDisplayName);
             if (score != null)
             {
                 Debug.Log($"GetPlayerRankCoroutine score found {score}");

@@ -54,7 +54,7 @@ public class LeaderboardDisplay : PanelDisplay
         bestScoreText.text = $"Your Score {player.playerLastScore} - Your Best Score: {player.playerBestScore} - Your Position: {player.playerPosition}";
     }
 
-    private void DisplayLeaderboard(List<PlayerScore> scores)
+    private void DisplayLeaderboard(List<LeaderboardPlayerScore> scores)
     {
         Debug.Log($"=== LEADERBOARD {scores.Count} entries ===");
         ClearLeaderboard();
