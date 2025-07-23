@@ -8,6 +8,7 @@
  */
 
 // === PlayerController.cs ===
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,8 +18,8 @@ public class PlayerController : MonoBehaviour
     [Header("Debug")]
     public bool enableMovement = true;
     public bool isJumping;
-    public Vector3 verticalVelocity;  
-    public float targetAngle = 0f; 
+    public Vector3 verticalVelocity;
+    public float targetAngle = 0f;
     public float currentAngle = 0f;
     public Vector3 knockback = Vector3.zero;
 
@@ -27,7 +28,7 @@ public class PlayerController : MonoBehaviour
     public float initialSpeed;
 
     [Header("Orientation")]
-    public float turnSpeed = 90f; 
+    public float turnSpeed = 90f;
     public float maxAngle = 45f;
 
     [Header("Jump")]
@@ -35,7 +36,7 @@ public class PlayerController : MonoBehaviour
     public float jumpForce;
 
     [Header("Knock‑back")]
-    public float knockbackDecay = 4f;  
+    public float knockbackDecay = 4f;
 
     [Header("Score")]
     public int playerPosition = 99999;
@@ -46,7 +47,8 @@ public class PlayerController : MonoBehaviour
     private CharacterController controller;
     [Header("GameObject")]
     public GameManager gameManager;
-    
+    public DateTime timeStartLevel;
+
 
     void Awake()
     {
@@ -62,6 +64,11 @@ public class PlayerController : MonoBehaviour
     {
         ResetPosition(startPosition);
         speedMultiplier = 0.5f;
+    }
+    public void LevelStarted()
+    {
+        ResetPosition(startPosition);
+        timeStartLevel = DateTime.Now;
     }
 
     public void LevelCompleted()
@@ -125,7 +132,7 @@ public class PlayerController : MonoBehaviour
     void HandleRotation()
     {
         //Smooth interpolation between the current angle and the target angle, with an adjustable smoothing factor.
-        currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * 5f); 
+        currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * 5f);
         transform.rotation = Quaternion.Euler(0, currentAngle, 0);
     }
 
@@ -158,14 +165,14 @@ public class PlayerController : MonoBehaviour
         // Combine movement
         Vector3 finalMove = forwardMove;
         finalMove.y = verticalVelocity.y;
-        
+
         //bool grounded = controller.isGrounded;
         // Before you call controller.Move(...), isGrounded contains the value from the previous frame.
         // After Move(...), Unity recalculates collisions, so the new value of isGrounded depends on the result of the Move.
         controller.Move(finalMove * Time.deltaTime);
-        
+
         // Debug.Log($"isGrounded avant:{grounded} apres:{controller.isGrounded} finalMove:{finalMove} isJumping:{isJumping}");
-        
+
         if (controller.isGrounded)
             isJumping = false;
     }

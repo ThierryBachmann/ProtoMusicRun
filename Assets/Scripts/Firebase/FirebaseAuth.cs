@@ -29,6 +29,21 @@ public class AuthRequest
     }
   }
 }
+// 23/07/2025
+{
+  "rules": {
+    "leaderboard": {
+      ".read": true,  // Lecture publique
+      ".write": "auth != null && (!root.child('lastSubmission/' + auth.uid).exists() || now - root.child('lastSubmission/' + auth.uid).val() > 60000)",
+      ".indexOn": "score"
+    },
+    "lastSubmission": {
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    }
+  }
+}
  */
 
 public class FirebaseAuth : MonoBehaviour

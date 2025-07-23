@@ -121,7 +121,6 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
-
         actionDisplay.Hide();
         leaderboardDisplay.Hide();
         player.ResetPlayer(startPosition);
@@ -141,7 +140,7 @@ public class GameManager : MonoBehaviour
     {
         actionDisplay.Hide();
         leaderboardDisplay.Hide();
-        player.ResetPosition(startPosition);
+        player.LevelStarted();
         goalHandler.goalReached = false;
         goalReachedDisplay.Reset();
         scoreManager.score = 0;
