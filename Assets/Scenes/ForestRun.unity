@@ -4359,7 +4359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0a5b561c4ffe0d43b9eaf17221a889d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  disableLeaderBoard: 1
+  disableLeaderBoard: 0
   firebaseAuth: {fileID: 1489650624}
   firebaseURL: https://protorunmusic-default-rtdb.europe-west1.firebasedatabase.app/
   leaderboardNode: leaderboard
