@@ -1,67 +1,131 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MusicRun
 {
     public class TerrainGenerator : MonoBehaviour
     {
-        public Transform player;
-        public GameObject goalChunk;
-        public GameObject[] forestChunks; // tableau de prefabs
-        public Transform goal;
-        public Transform start;
         public int chunkSize = 20;
         public int renderDistance = 2;
         public bool disableObstacles = false;
+        public Level[] levels;
+        public Transform player;
+        private Level currentLevel;
+
+        public GameObject startGO;
+        public Vector2Int startChunkCoord;
+
+        public GameObject goalGO;
+        public Vector2Int goalChunkCoord;
+
+        //public Transform currentStartPosition;
+        //public GameObject goalTransform;
+
+
+        private GameObject[] forestChunks; // tableau de prefabs
+        //private Transform goal;
+        //private Transform start;
         private Dictionary<Vector2Int, GameObject> spawnedChunks = new Dictionary<Vector2Int, GameObject>();
         private Vector2Int currentPlayerChunk;
 
         void Start()
         {
+            //CreateStartAndGoalChunk();
+        }
+
+        public void CreateLevel(int levelIndex)
+        {
+            if (levelIndex < 0 || levelIndex >= levels.Length)
+            {
+                Debug.LogError("Invalid level index");
+                return;
+            }
+            currentLevel = levels[levelIndex];
+            forestChunks = currentLevel.runChunks;
+            Debug.Log($"Start Level: {currentLevel.name} - {currentLevel.description}");
             CreateStartAndGoalChunk();
+            // Force to update chunks with real position of the player
+            currentPlayerChunk = new Vector2Int(-9999, -9999);
+            // UpdateChunks();
         }
 
         private void CreateStartAndGoalChunk()
         {
-            Debug.Log($"Create Start and Goal Chunk: {start} {goal}");
+            Debug.Log($"Create Start and Goal Chunk Delta={currentLevel.deltaCurrentChunk}");
 
-            if (goal != null)
-            {
-                Vector2Int chunkCoord = PositionToChunk(goal.position);
-                GameObject chunk = Instantiate(goalChunk, goal.position, Quaternion.identity);
-                chunk.name = $"Chunk_goal_{chunkCoord.x}_{chunkCoord.y}";
-                chunk.tag = "Goal";
-                Debug.Log($"Add goal chunk: {goal.position.x} {goal.position.y} --> playerChunk: {chunk}");
-                spawnedChunks.Add(chunkCoord, chunk);
-            }
 
-            if (start != null)
+            // Create the start chunk
+            // ----------------------
+
+            //if (startGO == null)
+            //{
+            //    Debug.LogError("Start game object from the last goal object.");
+            //    startGO =Instantiate( goalGO);
+            //}
+            startGO = currentLevel.startGO;
+            startChunkCoord = currentPlayerChunk;
+            Vector3 position = ChunkToPosition(startChunkCoord);
+            startGO.name = $"Chunk_start_{startChunkCoord.x}_{startChunkCoord.y}";
+
+            //if (spawnedChunks.ContainsKey(startChunkCoord))
+            //{
+            //    Debug.Log($"Destroy existing start chunk: {startChunkCoord} --> playerChunk: {spawnedChunks[startChunkCoord].name}");
+            //    Destroy(spawnedChunks[startChunkCoord]);
+            //    spawnedChunks.Remove(startChunkCoord);
+            //}
+            // spawnedChunks.Add(chunkCoord, startGO);
+            startGO.transform.position = position;
+            startGO.transform.rotation = Quaternion.identity;
+            Debug.Log($"Add start chunk coord: {startChunkCoord} --> GO: {startGO.name} {startGO.transform.position}");
+
+
+            // Create the goal chunk
+            // ----------------------
+            goalGO = currentLevel.goalGO;
+            if (goalGO == null)
             {
-                Vector2Int chunkCoord = PositionToChunk(start.position);
-                GameObject chunk = Instantiate(goalChunk, start.position, Quaternion.identity);
-                chunk.name = $"Chunk_start_{chunkCoord.x}_{chunkCoord.y}";
-                chunk.tag = "Goal";
-                Debug.Log($"Add start chunk: {start.position.x} {start.position.y} --> playerChunk: {chunk}");
-                spawnedChunks.Add(chunkCoord, chunk);
+                Debug.LogError("Goal game object is not set in the level configuration.");
+                return;
             }
+            goalChunkCoord = currentPlayerChunk + currentLevel.deltaCurrentChunk; // PositionToChunk(goal.position);
+            position = ChunkToPosition(goalChunkCoord);
+            //GameObject chunk = Instantiate(goalChunk, position, Quaternion.identity);
+            //GameObject chunk = goalChunk;
+            //currentStartPosition = chunk.transform;
+            goalGO.name = $"Chunk_goal_{goalChunkCoord.x}_{goalChunkCoord.y}";
+            // goalGO.tag = "Goal";
+            //if (spawnedChunks.ContainsKey(goalChunkCoord))
+            //{
+            //    Debug.Log($"Destroy existing goal chunk: {goalChunkCoord} --> playerChunk: {spawnedChunks[goalChunkCoord].name}");
+            //    Destroy(spawnedChunks[goalChunkCoord]);
+            //    spawnedChunks.Remove(goalChunkCoord);
+            //}
+            //spawnedChunks.Add(chunkCoord, goalGO);
+            goalGO.transform.position = position;
+            goalGO.transform.rotation = Quaternion.identity;
+            Debug.Log($"Add goal chunk coord: {goalChunkCoord} --> GO: {goalGO.name} {goalGO.transform.position}");
         }
 
         Vector2Int PositionToChunk(Vector3 position)
         {
             return new Vector2Int(Mathf.FloorToInt(position.x / chunkSize), Mathf.FloorToInt(position.z / chunkSize));
         }
+
         Vector3 ChunkToPosition(Vector2Int chunkCoord)
         {
             return new Vector3(chunkCoord.x * chunkSize, 0, chunkCoord.y * chunkSize);
         }
+
         void Update()
         {
             Vector2Int playerChunk = PositionToChunk(player.position);
 
             if (playerChunk != currentPlayerChunk)
             {
-                Debug.Log($"Player: {player.position.x} {player.position.y} --> playerChunk: {playerChunk}");
+                Debug.Log($"Player: x={player.position.x} z={player.position.z} --> playerChunk: {playerChunk}");
 
                 currentPlayerChunk = playerChunk;
                 UpdateChunks();
@@ -81,7 +145,7 @@ namespace MusicRun
                     newChunks.Add(chunkCoord);
 
                     // Does the chunk dictionary already contains this chunk?
-                    if (!spawnedChunks.ContainsKey(chunkCoord))
+                    if (!spawnedChunks.ContainsKey(chunkCoord) && chunkCoord != goalChunkCoord && chunkCoord != startChunkCoord)
                     {
                         // No, add it
                         Vector3 spawnPos = ChunkToPosition(chunkCoord);
@@ -109,18 +173,17 @@ namespace MusicRun
             {
                 if (!newChunks.Contains(coord))
                 {
-                    if (spawnedChunks[coord].tag != "Goal")
+                    //if (spawnedChunks[coord].tag != "Goal")
                     {
                         Destroy(spawnedChunks[coord]);
                         chunksToRemove.Add(coord);
                     }
-                    else
-                        Debug.Log("Don't destroy chunk");
+                    //else Debug.Log("Don't destroy chunk");
                 }
             }
             foreach (var coord in chunksToRemove)
             {
-                //Debug.Log($"Remove {coord}");
+                Debug.Log($"Remove {coord}");
                 spawnedChunks.Remove(coord);
             }
         }
@@ -131,7 +194,12 @@ namespace MusicRun
     public class Level
     {
         public string name;
-        public GameObject goalChunk;
+        public string description;
+        [Header("Delta with current chunks")]
+        public Vector2Int deltaCurrentChunk;
+        [Header("Defined prefab game object")]
+        public GameObject startGO;
+        public GameObject goalGO;
         public GameObject[] runChunks;
     }
 }

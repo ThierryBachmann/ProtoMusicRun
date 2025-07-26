@@ -63,9 +63,9 @@ namespace MusicRun
         }
 
 
-        public void LevelStarted(Transform startPosition)
+        public void LevelStarted()
         {
-            ResetPosition(startPosition);
+            ResetPosition();
             timeStartLevel = DateTime.Now;
             speedMultiplier = 0.5f;
         }
@@ -82,14 +82,16 @@ namespace MusicRun
             knockback = direction.normalized * strength;
         }
 
-        public void ResetPosition(Transform startPosition)
+        public void ResetPosition()
         {
             speedMultiplier = 0.5f;
 
             CharacterController cc = GetComponent<CharacterController>();
             cc.enabled = false;
-            transform.position = startPosition.position;
-            transform.rotation = startPosition.rotation;
+            Transform start = gameManager.terrainGenerator.startGO.transform;
+            Debug.Log($"Player ResetPosition {start.position}");
+            transform.position = start.position;
+            transform.rotation = start.rotation;
             currentAngle = 0;
             targetAngle = 0;
             cc.enabled = true;

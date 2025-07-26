@@ -1,6 +1,6 @@
 using UnityEngine;
 using MidiPlayerTK;
-using System.Collections.Generic; // si tu veux redémarrer la musique
+using System.Collections.Generic;
 
 namespace MusicRun
 {
@@ -9,18 +9,20 @@ namespace MusicRun
     {
         public bool gameRunning;
         public bool levelRunning;
+        public int currentLeveIndex;
         public bool startAuto;
 
-        [Header("GameObject")]
+        [Header("GameObject reference")]
         public GoalHandler goalHandler;
         public FirebaseLeaderboard leaderboard;
         public ScoreManager scoreManager;
         public LeaderboardDisplay leaderboardDisplay;
         public PlayerController player;
         public MidiFilePlayer midiPlayer;
-        public Transform startPosition;
+        //public Transform startPosition;
         public ActionDisplay actionDisplay;
         public GoalReachedDisplay goalReachedDisplay;
+        public TerrainGenerator terrainGenerator;
 
         void Awake()
         {
@@ -40,8 +42,8 @@ namespace MusicRun
             else
                 actionDisplay.Show();
             leaderboardDisplay.Hide();
+            terrainGenerator.CreateLevel(0);
         }
-
 
         private void OnLeaderboardLoaded(List<LeaderboardPlayerScore> scores)
         {
@@ -54,6 +56,7 @@ namespace MusicRun
                 Debug.Log($"Player Rank not found");
 
         }
+
         private void OnLevelCompleted(bool success)
         {
             LeaderboardPlayerScore playerScore = new LeaderboardPlayerScore(
@@ -126,7 +129,8 @@ namespace MusicRun
         {
             actionDisplay.Hide();
             leaderboardDisplay.Hide();
-            player.LevelStarted(startPosition);
+            terrainGenerator.CreateLevel(currentLeveIndex);
+            player.LevelStarted();
             goalHandler.goalReached = false;
             goalReachedDisplay.Reset();
             scoreManager.score = 0;
@@ -143,7 +147,7 @@ namespace MusicRun
         {
             actionDisplay.Hide();
             leaderboardDisplay.Hide();
-            player.LevelStarted(startPosition);
+            player.LevelStarted();
             goalHandler.goalReached = false;
             goalReachedDisplay.Reset();
             scoreManager.score = 0;
@@ -166,5 +170,4 @@ namespace MusicRun
             actionDisplay.Show();
         }
     }
-
 }
