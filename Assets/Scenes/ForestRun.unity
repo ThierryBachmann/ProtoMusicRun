@@ -201,7 +201,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -781,7 +781,7 @@ MonoBehaviour:
   ScoreManager: {fileID: 211374106}
   MainMusic: {fileID: 738411423}
   SoundManager: {fileID: 1870609031}
-  cameraShake: {fileID: 330585548}
+  cameraShake: {fileID: 0}
   cooldownDelay: 1.5
   knockbackPower: 6
 --- !u!1 &267365870
@@ -6093,118 +6093,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MidiSound: {fileID: 609628727}
   RebuildJingles: 0
-  Jingles:
-  - name: Collision
-    soundEvents:
-    - action: 2
-      value: 110
-      channel: 0
-      duration: 0
-      velocity: 0
-    - action: 1
-      value: 49
-      channel: 9
-      duration: 2400
-      velocity: 127
-    - action: 1
-      value: 50
-      channel: 0
-      duration: 2400
-      velocity: 127
-    - action: 0
-      value: 0
-      channel: 0
-      duration: 200
-      velocity: 127
-    - action: 1
-      value: 48
-      channel: 0
-      duration: 2200
-      velocity: 127
-    - action: 0
-      value: 0
-      channel: 0
-      duration: 200
-      velocity: 0
-    - action: 1
-      value: 46
-      channel: 0
-      duration: 2000
-      velocity: 127
-  - name: Collision1
-    soundEvents:
-    - action: 2
-      value: 10
-      channel: 0
-      duration: 0
-      velocity: 0
-    - action: 1
-      value: 49
-      channel: 9
-      duration: 1000
-      velocity: 127
-    - action: 1
-      value: 50
-      channel: 0
-      duration: 2000
-      velocity: 127
-    - action: 0
-      value: 0
-      channel: 0
-      duration: 200
-      velocity: 0
-    - action: 1
-      value: 48
-      channel: 0
-      duration: 2000
-      velocity: 127
-    - action: 0
-      value: 0
-      channel: 0
-      duration: 200
-      velocity: 0
-    - action: 1
-      value: 46
-      channel: 0
-      duration: 2000
-      velocity: 127
-  - name: Empty
-    soundEvents:
-    - action: 2
-      value: 10
-      channel: 0
-      duration: 0
-      velocity: 0
-    - action: 1
-      value: 49
-      channel: 9
-      duration: 1000
-      velocity: 0
-    - action: 1
-      value: 50
-      channel: 0
-      duration: 2000
-      velocity: 0
-    - action: 0
-      value: 0
-      channel: 0
-      duration: 200
-      velocity: 0
-    - action: 1
-      value: 48
-      channel: 0
-      duration: 2000
-      velocity: 0
-    - action: 0
-      value: 0
-      channel: 0
-      duration: 200
-      velocity: 0
-    - action: 1
-      value: 46
-      channel: 0
-      duration: 2000
-      velocity: 0
+  Jingles: []
 --- !u!4 &1870609032
 Transform:
   m_ObjectHideFlags: 0

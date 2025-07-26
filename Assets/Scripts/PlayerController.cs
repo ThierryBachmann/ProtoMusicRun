@@ -60,15 +60,12 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
     }
 
-    public void ResetPlayer(Transform startPosition)
-    {
-        ResetPosition(startPosition);
-        speedMultiplier = 0.5f;
-    }
-    public void LevelStarted()
+    
+    public void LevelStarted(Transform startPosition)
     {
         ResetPosition(startPosition);
         timeStartLevel = DateTime.Now;
+        speedMultiplier = 0.5f;
     }
 
     public void LevelCompleted()

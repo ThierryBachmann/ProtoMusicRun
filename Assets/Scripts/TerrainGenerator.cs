@@ -1,5 +1,6 @@
-using UnityEngine;
+using MidiPlayerTK;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class TerrainGenerator : MonoBehaviour
 {
@@ -16,11 +17,13 @@ public class TerrainGenerator : MonoBehaviour
 
     void Start()
     {
-        CreateGoalChunk();
+        CreateStartAndGoalChunk();
     }
 
-    private void CreateGoalChunk()
+    private void CreateStartAndGoalChunk()
     {
+        Debug.Log($"Create Start and Goal Chunk: {start} {goal}");
+
         if (goal != null)
         {
             Vector2Int chunkCoord = PositionToChunk(goal.position);
@@ -75,13 +78,13 @@ public class TerrainGenerator : MonoBehaviour
                 Vector2Int chunkCoord = currentPlayerChunk + new Vector2Int(x, z);
                 newChunks.Add(chunkCoord);
 
-                // Does the chunk dictionnary already contains this chunk?
+                // Does the chunk dictionary already contains this chunk?
                 if (!spawnedChunks.ContainsKey(chunkCoord))
                 {
                     // No, add it
                     Vector3 spawnPos = ChunkToPosition(chunkCoord);
 
-                    GameObject randomPrefab = forestChunks[Random.Range(1, forestChunks.Length)];
+                    GameObject randomPrefab = forestChunks[Random.Range(0, forestChunks.Length)];
                     GameObject chunk = Instantiate(randomPrefab, spawnPos, Quaternion.identity);
                     chunk.name = $"Chunk_{chunkCoord.x}_{chunkCoord.y}";
                     if (disableObstacles) // useful for test mode
@@ -98,7 +101,7 @@ public class TerrainGenerator : MonoBehaviour
             }
         }
 
-        // Remove from chunk dictionnary, chunk out of view
+        // Remove from chunk dictionary, chunk out of view which are not in newChunks but keep the goal chunk
         List<Vector2Int> chunksToRemove = new List<Vector2Int>();
         foreach (var coord in spawnedChunks.Keys)
         {

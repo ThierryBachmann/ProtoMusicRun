@@ -123,7 +123,7 @@ public class GameManager : MonoBehaviour
     {
         actionDisplay.Hide();
         leaderboardDisplay.Hide();
-        player.ResetPlayer(startPosition);
+        player.LevelStarted(startPosition);
         goalHandler.goalReached = false;
         goalReachedDisplay.Reset();
         scoreManager.score = 0;
@@ -140,7 +140,7 @@ public class GameManager : MonoBehaviour
     {
         actionDisplay.Hide();
         leaderboardDisplay.Hide();
-        player.LevelStarted();
+        player.LevelStarted(startPosition);
         goalHandler.goalReached = false;
         goalReachedDisplay.Reset();
         scoreManager.score = 0;
