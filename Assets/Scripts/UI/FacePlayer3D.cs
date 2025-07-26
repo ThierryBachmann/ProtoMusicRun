@@ -1,22 +1,25 @@
 using UnityEngine;
 
-public class FacePlayer3D : MonoBehaviour
+namespace MusicRun
 {
-    public GameObject gameObject;
-    private Transform cam;
-
-    void Start()
+    public class FacePlayer3D : MonoBehaviour
     {
-        cam = Camera.main.transform;
-    }
+        public GameObject gameObjectToFace;
+        private Transform cam;
 
-    void LateUpdate()
-    {
-        if (cam != null)
+        void Start()
         {
-            Vector3 direction = gameObject.transform.position - cam.position;
-            direction.y = 0; // optional: only rotate on Y-axis
-            gameObject.transform.rotation = Quaternion.LookRotation(direction);
+            cam = Camera.main.transform;
+        }
+
+        void LateUpdate()
+        {
+            if (cam != null)
+            {
+                Vector3 direction = gameObjectToFace.transform.position - cam.position;
+                direction.y = 0; // optional: only rotate on Y-axis
+                gameObjectToFace.transform.rotation = Quaternion.LookRotation(direction);
+            }
         }
     }
 }

@@ -1,7 +1,9 @@
 using UnityEngine;
-
-public partial class FirebaseKey
+namespace MusicRun
 {
-    public string firebaseApiKey = "";
-    public string firebaseProjectId = "";
+    public partial class FirebaseKey
+    {
+        public string firebaseApiKey = "";
+        public string firebaseProjectId = "";
+    }
 }

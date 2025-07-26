@@ -3,233 +3,237 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System;
 
-[System.Serializable]
-public class AuthResponse
+namespace MusicRun
 {
-    public string kind;
-    public string idToken;
-    public string refreshToken;
-    public string expiresIn;
-    public string localId; // This is the user ID we'll use
-}
 
-[System.Serializable]
-public class AuthRequest
-{
-    public bool returnSecureToken = true;
-}
-
-/*
- {
-  "rules": {
-    ".read": "now < 1754776800000",  // 2025-8-10
-    ".write": "now < 1754776800000",  // 2025-8-10
-    "leaderboard": {
-      ".indexOn": "score"
+    [System.Serializable]
+    public class AuthResponse
+    {
+        public string kind;
+        public string idToken;
+        public string refreshToken;
+        public string expiresIn;
+        public string localId; // This is the user ID we'll use
     }
-  }
-}
-// 23/07/2025
-{
-  "rules": {
-    "leaderboard": {
-      ".read": true,  // Lecture publique
-      ".write": "auth != null && (!root.child('lastSubmission/' + auth.uid).exists() || now - root.child('lastSubmission/' + auth.uid).val() > 60000)",
-      ".indexOn": "score"
-    },
-    "lastSubmission": {
-      "$uid": {
-        ".write": "auth != null && auth.uid == $uid"
+
+    [System.Serializable]
+    public class AuthRequest
+    {
+        public bool returnSecureToken = true;
+    }
+
+    /*
+     {
+      "rules": {
+        ".read": "now < 1754776800000",  // 2025-8-10
+        ".write": "now < 1754776800000",  // 2025-8-10
+        "leaderboard": {
+          ".indexOn": "score"
+        }
       }
     }
-  }
-}
- */
-
-public class FirebaseAuth : MonoBehaviour
-{
-    [Header("Player Info")]
-    public string playerDisplayName = "";
-    public bool isAuthenticated = false;
-
-    private string userId = "";
-    private string idToken = "";
-
-    public System.Action<bool> OnAuthenticationComplete;
-
-
-    void Start()
+    // 23/07/2025
     {
-
-        // Try to load saved auth data
-        LoadSavedAuth();
-
-        // If no saved auth, authenticate anonymously
-        if (!isAuthenticated)
-        {
-            StartCoroutine(AuthenticateAnonymously());
+      "rules": {
+        "leaderboard": {
+          ".read": true,  // Lecture publique
+          ".write": "auth != null && (!root.child('lastSubmission/' + auth.uid).exists() || now - root.child('lastSubmission/' + auth.uid).val() > 60000)",
+          ".indexOn": "score"
+        },
+        "lastSubmission": {
+          "$uid": {
+            ".write": "auth != null && auth.uid == $uid"
+          }
         }
-        else
-            OnAuthenticationComplete?.Invoke(true);
-
+      }
     }
-    
-    public IEnumerator AuthenticateAnonymously()
+     */
+
+    public class FirebaseAuth : MonoBehaviour
     {
-        Debug.Log($"AuthenticateAnonymously");
+        [Header("Player Info")]
+        public string playerDisplayName = "";
+        public bool isAuthenticated = false;
 
-        FirebaseKey key = new FirebaseKey();
+        private string userId = "";
+        private string idToken = "";
 
-        string url = $"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={key.firebaseApiKey}";
+        public System.Action<bool> OnAuthenticationComplete;
 
-        AuthRequest authRequest = new AuthRequest();
-        string json = JsonUtility.ToJson(authRequest);
 
-        UnityWebRequest request = UnityWebRequest.Post(url, json, "application/json");
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
+        void Start()
         {
-            try
+
+            // Try to load saved auth data
+            LoadSavedAuth();
+
+            // If no saved auth, authenticate anonymously
+            if (!isAuthenticated)
             {
-                AuthResponse response = JsonUtility.FromJson<AuthResponse>(request.downloadHandler.text);
-
-                userId = response.localId;
-                idToken = response.idToken;
-                isAuthenticated = true;
-
-                // Save auth data locally (survives browser sessions)
-                SaveAuthData();
-
-                // Generate or load player display name
-                if (string.IsNullOrEmpty(playerDisplayName))
-                {
-                    playerDisplayName = GeneratePlayerName();
-                    SavePlayerName();
-                }
-
-                Debug.Log($"Anonymous authentication successful! User ID: {userId} {playerDisplayName}");
-                OnAuthenticationComplete?.Invoke(true);
+                StartCoroutine(AuthenticateAnonymously());
             }
-            catch (Exception e)
+            else
+                OnAuthenticationComplete?.Invoke(true);
+
+        }
+
+        public IEnumerator AuthenticateAnonymously()
+        {
+            Debug.Log($"AuthenticateAnonymously");
+
+            FirebaseKey key = new FirebaseKey();
+
+            string url = $"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={key.firebaseApiKey}";
+
+            AuthRequest authRequest = new AuthRequest();
+            string json = JsonUtility.ToJson(authRequest);
+
+            UnityWebRequest request = UnityWebRequest.Post(url, json, "application/json");
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"Failed to parse auth response: {e.Message}");
+                try
+                {
+                    AuthResponse response = JsonUtility.FromJson<AuthResponse>(request.downloadHandler.text);
+
+                    userId = response.localId;
+                    idToken = response.idToken;
+                    isAuthenticated = true;
+
+                    // Save auth data locally (survives browser sessions)
+                    SaveAuthData();
+
+                    // Generate or load player display name
+                    if (string.IsNullOrEmpty(playerDisplayName))
+                    {
+                        playerDisplayName = GeneratePlayerName();
+                        SavePlayerName();
+                    }
+
+                    Debug.Log($"Anonymous authentication successful! User ID: {userId} {playerDisplayName}");
+                    OnAuthenticationComplete?.Invoke(true);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to parse auth response: {e.Message}");
+                    OnAuthenticationComplete?.Invoke(false);
+                }
+            }
+            else
+            {
+                Debug.LogError($"Authentication failed: {request.error}");
                 OnAuthenticationComplete?.Invoke(false);
             }
         }
-        else
+
+        private void SaveAuthData()
         {
-            Debug.LogError($"Authentication failed: {request.error}");
-            OnAuthenticationComplete?.Invoke(false);
+            // Save to PlayerPrefs (persists across browser sessions in WebGL)
+            PlayerPrefs.SetString("firebase_user_id", userId);
+            PlayerPrefs.SetString("firebase_id_token", idToken);
+            PlayerPrefs.SetString("auth_timestamp", DateTime.Now.ToBinary().ToString());
+            PlayerPrefs.Save();
         }
-    }
 
-    private void SaveAuthData()
-    {
-        // Save to PlayerPrefs (persists across browser sessions in WebGL)
-        PlayerPrefs.SetString("firebase_user_id", userId);
-        PlayerPrefs.SetString("firebase_id_token", idToken);
-        PlayerPrefs.SetString("auth_timestamp", DateTime.Now.ToBinary().ToString());
-        PlayerPrefs.Save();
-    }
-
-    private void LoadSavedAuth()
-    {
-        if (PlayerPrefs.HasKey("firebase_user_id"))
+        private void LoadSavedAuth()
         {
-            userId = PlayerPrefs.GetString("firebase_user_id");
-            idToken = PlayerPrefs.GetString("firebase_id_token");
+            if (PlayerPrefs.HasKey("firebase_user_id"))
+            {
+                userId = PlayerPrefs.GetString("firebase_user_id");
+                idToken = PlayerPrefs.GetString("firebase_id_token");
 
-            // Check if token is still valid (tokens expire after 1 hour)
+                // Check if token is still valid (tokens expire after 1 hour)
+                if (PlayerPrefs.HasKey("auth_timestamp"))
+                {
+                    long timestamp = Convert.ToInt64(PlayerPrefs.GetString("auth_timestamp"));
+                    DateTime authTime = DateTime.FromBinary(timestamp);
+
+                    if (DateTime.Now - authTime < TimeSpan.FromMinutes(50)) // Refresh before expiry
+                    {
+                        isAuthenticated = true;
+                        playerDisplayName = PlayerPrefs.GetString("player_name", "");
+                        Debug.Log($"Loaded saved authentication {playerDisplayName}");
+                    }
+                }
+            }
+            Debug.Log($"LoadSavedAuth User ID: {userId} {isAuthenticated}");
+        }
+
+        private string GeneratePlayerName()
+        {
+            // Generate a fun, music-themed name
+            string[] adjectives = { "Melodic", "Rhythmic", "Sonic", "Harmonic", "Beat", "Bass", "Treble", "Echo", "Tempo", "Groove" };
+            string[] nouns = { "Runner", "Dasher", "Sprinter", "Racer", "Seeker", "Explorer", "Navigator", "Traveler", "Wanderer", "Pathfinder" };
+
+            string adjective = adjectives[UnityEngine.Random.Range(0, adjectives.Length)];
+            string noun = nouns[UnityEngine.Random.Range(0, nouns.Length)];
+            int number = UnityEngine.Random.Range(100, 999);
+
+            return $"{adjective}{noun}{number}";
+        }
+
+        private void SavePlayerName()
+        {
+            PlayerPrefs.SetString("player_name", playerDisplayName);
+            PlayerPrefs.Save();
+        }
+
+        public void SetPlayerName(string newName)
+        {
+            if (!string.IsNullOrEmpty(newName) && newName.Length <= 20)
+            {
+                playerDisplayName = newName;
+                SavePlayerName();
+            }
+        }
+
+        public string GetUserId()
+        {
+            return userId;
+        }
+
+        public string GetIdToken()
+        {
+            return idToken;
+        }
+
+        public string GetPlayerName()
+        {
+            return playerDisplayName;
+        }
+
+        public bool IsAuthenticated()
+        {
+            return isAuthenticated;
+        }
+
+        // Call this before making authenticated requests to Firebase
+        public IEnumerator RefreshTokenIfNeeded()
+        {
+            if (!isAuthenticated)
+                yield break;
+
+            // Check if token needs refresh
             if (PlayerPrefs.HasKey("auth_timestamp"))
             {
                 long timestamp = Convert.ToInt64(PlayerPrefs.GetString("auth_timestamp"));
                 DateTime authTime = DateTime.FromBinary(timestamp);
 
-                if (DateTime.Now - authTime < TimeSpan.FromMinutes(50)) // Refresh before expiry
+                if (DateTime.Now - authTime > TimeSpan.FromMinutes(50))
                 {
-                    isAuthenticated = true;
-                    playerDisplayName = PlayerPrefs.GetString("player_name", "");
-                    Debug.Log($"Loaded saved authentication {playerDisplayName}");
+                    // Token is about to expire, refresh it
+                    yield return RefreshToken();
                 }
             }
         }
-        Debug.Log($"LoadSavedAuth User ID: {userId} {isAuthenticated}");
-    }
 
-    private string GeneratePlayerName()
-    {
-        // Generate a fun, music-themed name
-        string[] adjectives = { "Melodic", "Rhythmic", "Sonic", "Harmonic", "Beat", "Bass", "Treble", "Echo", "Tempo", "Groove" };
-        string[] nouns = { "Runner", "Dasher", "Sprinter", "Racer", "Seeker", "Explorer", "Navigator", "Traveler", "Wanderer", "Pathfinder" };
-
-        string adjective = adjectives[UnityEngine.Random.Range(0, adjectives.Length)];
-        string noun = nouns[UnityEngine.Random.Range(0, nouns.Length)];
-        int number = UnityEngine.Random.Range(100, 999);
-
-        return $"{adjective}{noun}{number}";
-    }
-
-    private void SavePlayerName()
-    {
-        PlayerPrefs.SetString("player_name", playerDisplayName);
-        PlayerPrefs.Save();
-    }
-
-    public void SetPlayerName(string newName)
-    {
-        if (!string.IsNullOrEmpty(newName) && newName.Length <= 20)
+        private IEnumerator RefreshToken()
         {
-            playerDisplayName = newName;
-            SavePlayerName();
+            // Implement token refresh logic if needed
+            // For anonymous auth, it's often easier to just re-authenticate
+            Debug.Log("RefreshToken");
+            yield return AuthenticateAnonymously();
         }
-    }
-
-    public string GetUserId()
-    {
-        return userId;
-    }
-
-    public string GetIdToken()
-    {
-        return idToken;
-    }
-
-    public string GetPlayerName()
-    {
-        return playerDisplayName;
-    }
-
-    public bool IsAuthenticated()
-    {
-        return isAuthenticated;
-    }
-
-    // Call this before making authenticated requests to Firebase
-    public IEnumerator RefreshTokenIfNeeded()
-    {
-        if (!isAuthenticated)
-            yield break;
-
-        // Check if token needs refresh
-        if (PlayerPrefs.HasKey("auth_timestamp"))
-        {
-            long timestamp = Convert.ToInt64(PlayerPrefs.GetString("auth_timestamp"));
-            DateTime authTime = DateTime.FromBinary(timestamp);
-
-            if (DateTime.Now - authTime > TimeSpan.FromMinutes(50))
-            {
-                // Token is about to expire, refresh it
-                yield return RefreshToken();
-            }
-        }
-    }
-
-    private IEnumerator RefreshToken()
-    {
-        // Implement token refresh logic if needed
-        // For anonymous auth, it's often easier to just re-authenticate
-        Debug.Log("RefreshToken");
-        yield return AuthenticateAnonymously();
     }
 }
