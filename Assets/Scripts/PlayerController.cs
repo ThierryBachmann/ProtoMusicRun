@@ -121,7 +121,7 @@ namespace MusicRun
             {
                 targetAngle += turnSpeed * Time.deltaTime;
             }
-            if (!isJumping && Input.GetKeyDown(KeyCode.Space))
+            if (!isJumping && Input.GetKeyDown(KeyCode.Space) || transform.position.y < 0f)
             {
                 verticalVelocity.y = jumpForce;
                 isJumping = true;

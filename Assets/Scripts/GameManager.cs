@@ -11,6 +11,7 @@ namespace MusicRun
         public bool levelRunning;
         public int currentLeveIndex;
         public bool startAuto;
+        public bool nextLevelAuto;
 
         [Header("GameObject reference")]
         public GoalHandler goalHandler;
@@ -69,8 +70,10 @@ namespace MusicRun
                           );
             leaderboard.SubmitScore(playerScore);
             levelRunning = false;
-            actionDisplay.Show();
-            // debug NextLevel();
+            if (nextLevelAuto)
+                StartCoroutine(Utilities.WaitAndCall(2.5f, NextLevel));
+            else
+                actionDisplay.Show();
             //leaderboardDisplay.Show(this);
         }
 

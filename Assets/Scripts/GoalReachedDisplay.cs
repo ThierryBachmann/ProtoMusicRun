@@ -75,8 +75,11 @@ namespace MusicRun
         private IEnumerator RiseCoroutine()
         {
             float elapsed = 0f;
+            // Reminder,
+            // for child GameObjects, the "Position" field in the Unity Inspector shows the value of transform.localPosition, not transform.position.
+            // But World position (absolute in the scene) by script.
             Vector3 pos = panel.position;
-
+            //Debug.Log($"RiseCoroutine {pos}");
             while (elapsed < duration)
             {
                 float t = elapsed / duration;

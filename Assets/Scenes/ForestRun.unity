@@ -595,7 +595,8 @@ MonoBehaviour:
   gameRunning: 0
   levelRunning: 0
   currentLeveIndex: 0
-  startAuto: 0
+  startAuto: 1
+  nextLevelAuto: 1
   goalHandler: {fileID: 283134993}
   leaderboard: {fileID: 1489650625}
   scoreManager: {fileID: 211374106}
