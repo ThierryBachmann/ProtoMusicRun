@@ -1,9 +1,10 @@
-using UnityEngine;
-using TMPro;
-using System.Collections.Generic;
 using System;
-using System.Globalization;
 using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using TMPro;
+using Unity.VisualScripting;
+using UnityEngine;
 
 namespace MusicRun
 {
@@ -27,9 +28,6 @@ namespace MusicRun
         public GoalHandler goalHandler;
         public PlayerController player;
 
-        private Vector3 startPos;
-        private Vector3 endPos;
-
         public void Awake()
         {
             goalHandler.OnLevelCompleted += OnLevelCompleted;
@@ -37,19 +35,14 @@ namespace MusicRun
 
         public void Start()
         {
-            // Starting position below the ground
-            startPos = new Vector3(panel.position.x, startY, panel.position.z);
-
-            // Final visible position
-            endPos = new Vector3(panel.position.x, endY, panel.position.z);
-
-            // Set panel to starting position
-            panel.position = startPos;
+            Reset();
         }
 
         public void Reset()
         {
-            panel.position = startPos;
+            Vector3 pos = panel.position;
+            pos.y = startY;
+            panel.position = pos;
         }
 
         private void OnLevelCompleted(bool success)
@@ -82,17 +75,22 @@ namespace MusicRun
         private IEnumerator RiseCoroutine()
         {
             float elapsed = 0f;
+            Vector3 pos = panel.position;
 
             while (elapsed < duration)
             {
                 float t = elapsed / duration;
                 float easedT = riseCurve.Evaluate(t);
-                panel.position = Vector3.Lerp(startPos, endPos, easedT);
+
+                pos.y = startY + (endY - startY) * easedT;
+                panel.position = pos;
+
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
-            panel.position = endPos;
+            pos.y = endY;
+            panel.position = pos;
         }
     }
 }

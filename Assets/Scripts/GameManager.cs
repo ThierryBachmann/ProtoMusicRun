@@ -70,6 +70,7 @@ namespace MusicRun
             leaderboard.SubmitScore(playerScore);
             levelRunning = false;
             actionDisplay.Show();
+            // debug NextLevel();
             //leaderboardDisplay.Show(this);
         }
 
@@ -129,7 +130,7 @@ namespace MusicRun
         {
             actionDisplay.Hide();
             leaderboardDisplay.Hide();
-            terrainGenerator.CreateLevel(currentLeveIndex);
+            terrainGenerator.CreateLevel(0);
             player.LevelStarted();
             goalHandler.goalReached = false;
             goalReachedDisplay.Reset();
@@ -147,10 +148,11 @@ namespace MusicRun
         {
             actionDisplay.Hide();
             leaderboardDisplay.Hide();
+            terrainGenerator.CreateLevel(++currentLeveIndex);
             player.LevelStarted();
             goalHandler.goalReached = false;
             goalReachedDisplay.Reset();
-            scoreManager.score = 0;
+            //scoreManager.score = 0;
 
             if (midiPlayer != null)
             {

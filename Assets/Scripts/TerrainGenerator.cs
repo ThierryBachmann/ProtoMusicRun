@@ -38,18 +38,23 @@ namespace MusicRun
 
         public void CreateLevel(int levelIndex)
         {
-            if (levelIndex < 0 || levelIndex >= levels.Length)
+            if (levelIndex < 0)
             {
                 Debug.LogError("Invalid level index");
                 return;
+            }
+            if (levelIndex >= levels.Length)
+            {
+                levelIndex = 0;
+                Debug.LogError("Back to first level");
             }
             currentLevel = levels[levelIndex];
             forestChunks = currentLevel.runChunks;
             Debug.Log($"Start Level: {currentLevel.name} - {currentLevel.description}");
             CreateStartAndGoalChunk();
             // Force to update chunks with real position of the player
-            currentPlayerChunk = new Vector2Int(-9999, -9999);
-            // UpdateChunks();
+            //currentPlayerChunk = new Vector2Int(-9999, -9999);
+            UpdateChunks();
         }
 
         private void CreateStartAndGoalChunk()
@@ -70,12 +75,12 @@ namespace MusicRun
             Vector3 position = ChunkToPosition(startChunkCoord);
             startGO.name = $"Chunk_start_{startChunkCoord.x}_{startChunkCoord.y}";
 
-            //if (spawnedChunks.ContainsKey(startChunkCoord))
-            //{
-            //    Debug.Log($"Destroy existing start chunk: {startChunkCoord} --> playerChunk: {spawnedChunks[startChunkCoord].name}");
-            //    Destroy(spawnedChunks[startChunkCoord]);
-            //    spawnedChunks.Remove(startChunkCoord);
-            //}
+            if (spawnedChunks.ContainsKey(startChunkCoord))
+            {
+                Debug.Log($"Destroy existing start chunk: {startChunkCoord} --> playerChunk: {spawnedChunks[startChunkCoord].name}");
+                Destroy(spawnedChunks[startChunkCoord]);
+                spawnedChunks.Remove(startChunkCoord);
+            }
             // spawnedChunks.Add(chunkCoord, startGO);
             startGO.transform.position = position;
             startGO.transform.rotation = Quaternion.identity;
@@ -97,12 +102,12 @@ namespace MusicRun
             //currentStartPosition = chunk.transform;
             goalGO.name = $"Chunk_goal_{goalChunkCoord.x}_{goalChunkCoord.y}";
             // goalGO.tag = "Goal";
-            //if (spawnedChunks.ContainsKey(goalChunkCoord))
-            //{
-            //    Debug.Log($"Destroy existing goal chunk: {goalChunkCoord} --> playerChunk: {spawnedChunks[goalChunkCoord].name}");
-            //    Destroy(spawnedChunks[goalChunkCoord]);
-            //    spawnedChunks.Remove(goalChunkCoord);
-            //}
+            if (spawnedChunks.ContainsKey(goalChunkCoord))
+            {
+                Debug.Log($"Destroy existing goal chunk: {goalChunkCoord} --> playerChunk: {spawnedChunks[goalChunkCoord].name}");
+                Destroy(spawnedChunks[goalChunkCoord]);
+                spawnedChunks.Remove(goalChunkCoord);
+            }
             //spawnedChunks.Add(chunkCoord, goalGO);
             goalGO.transform.position = position;
             goalGO.transform.rotation = Quaternion.identity;
@@ -111,7 +116,7 @@ namespace MusicRun
 
         Vector2Int PositionToChunk(Vector3 position)
         {
-            return new Vector2Int(Mathf.FloorToInt(position.x / chunkSize), Mathf.FloorToInt(position.z / chunkSize));
+            return new Vector2Int((int)Mathf.Round(position.x / chunkSize) , (int)Mathf.Round(position.z / chunkSize));
         }
 
         Vector3 ChunkToPosition(Vector2Int chunkCoord)
@@ -125,7 +130,7 @@ namespace MusicRun
 
             if (playerChunk != currentPlayerChunk)
             {
-                Debug.Log($"Player: x={player.position.x} z={player.position.z} --> playerChunk: {playerChunk}");
+                Debug.Log($"Player enters in a chunk: x={player.position.x} z={player.position.z} --> playerChunk: {playerChunk}");
 
                 currentPlayerChunk = playerChunk;
                 UpdateChunks();
