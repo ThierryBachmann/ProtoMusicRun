@@ -34,8 +34,9 @@ namespace MusicRun
         void Start()
         {
             //CreateStartAndGoalChunk();
-        }
 
+
+        }
         public void CreateLevel(int levelIndex)
         {
             if (levelIndex < 0)
@@ -46,7 +47,7 @@ namespace MusicRun
             if (levelIndex >= levels.Length)
             {
                 levelIndex = 0;
-                Debug.LogError("Back to first level");
+                Debug.LogWarning("Back to first level");
             }
             currentLevel = levels[levelIndex];
             forestChunks = currentLevel.runChunks;
@@ -116,7 +117,7 @@ namespace MusicRun
 
         Vector2Int PositionToChunk(Vector3 position)
         {
-            return new Vector2Int((int)Mathf.Round(position.x / chunkSize) , (int)Mathf.Round(position.z / chunkSize));
+            return new Vector2Int((int)Mathf.Round(position.x / chunkSize), (int)Mathf.Round(position.z / chunkSize));
         }
 
         Vector3 ChunkToPosition(Vector2Int chunkCoord)

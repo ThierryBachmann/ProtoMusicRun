@@ -7,6 +7,13 @@ namespace MusicRun
         public GameObject gameObjectToFace;
         private Transform cam;
 
+        void Awake()
+        {
+            if (gameObjectToFace == null)
+            {
+                gameObjectToFace= gameObject;
+            }
+        }
         void Start()
         {
             cam = Camera.main.transform;

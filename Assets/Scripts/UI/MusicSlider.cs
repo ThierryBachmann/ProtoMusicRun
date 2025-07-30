@@ -12,8 +12,27 @@ namespace MusicRun
         public MidiFilePlayer midiPlayer;
         public Transform player;
 
-        private float midiLength;
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        void Awake()
+        {
+            midiPlayer.MPTK_StartPlayAtFirstNote = true;
+            midiPlayer.MPTK_MidiAutoRestart = false;
+            midiPlayer.OnEventStartPlayMidi.AddListener((string info) =>
+            {
+                if (info != null)
+                {
+                    Debug.Log($"Music started: {info}");
+                }
+            });
+            midiPlayer.OnEventEndPlayMidi.AddListener((string info, EventEndMidiEnum endMidi) =>
+            {
+                if (info != null)
+                {
+                    Debug.Log($"Music ended: {endMidi} {info}");
+                }
+            });
+        }
+
+
         void Start()
         {
 
@@ -24,8 +43,7 @@ namespace MusicRun
         {
             if (midiPlayer.MPTK_IsPlaying)
             {
-                musicSlider.maxValue = midiPlayer.MPTK_TickLastNote;
-                musicSlider.value = (float)midiPlayer.MPTK_TickCurrent;
+                musicSlider.value = ((float)midiPlayer.MPTK_TickCurrent / (float)midiPlayer.MPTK_TickLastNote) * 100f;
             }
         }
     }
