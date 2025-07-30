@@ -88,7 +88,7 @@ namespace MusicRun
 
             CharacterController cc = GetComponent<CharacterController>();
             cc.enabled = false;
-            Transform start = gameManager.terrainGenerator.startGO.transform;
+            Transform start = gameManager.terrainGenerator.StartGO.transform;
             Debug.Log($"Player ResetPosition {start.position}");
             transform.position = start.position;
             transform.rotation = start.rotation;
