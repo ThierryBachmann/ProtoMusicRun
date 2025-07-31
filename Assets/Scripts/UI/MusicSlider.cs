@@ -9,11 +9,16 @@ namespace MusicRun
         public Slider musicSlider;
         public TextMeshProUGUI musicText;
 
-        public MidiFilePlayer midiPlayer;
-        public Transform player;
+        private GameManager gameManager;
+        private MidiFilePlayer midiPlayer;
 
         void Awake()
         {
+            gameManager = Utilities.FindGameManager();
+            if (gameManager == null)
+                return;
+            midiPlayer = gameManager.MidiPlayer;
+
             midiPlayer.MPTK_StartPlayAtFirstNote = true;
             midiPlayer.MPTK_MidiAutoRestart = false;
             midiPlayer.OnEventStartPlayMidi.AddListener((string info) =>

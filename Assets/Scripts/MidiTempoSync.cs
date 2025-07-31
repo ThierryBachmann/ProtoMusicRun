@@ -5,14 +5,24 @@ namespace MusicRun
 {
     public class MidiTempoSync : MonoBehaviour
     {
-        public MidiFilePlayer midiPlayer;
-        public PlayerController player;
-
         [Header("Ration Speed player vs Speed Music")]
         public float RatioSpeedMusic = 0.4f;
         public float MaxSpeedMusic = 3f;
 
         private float previousSpeed = -1;
+
+        private GameManager gameManager;
+        private PlayerController player;
+        private MidiFilePlayer midiPlayer;
+
+        void Awake()
+        {
+            gameManager = Utilities.FindGameManager();
+            if (gameManager == null)
+                return;
+            player = gameManager.Player;
+            midiPlayer = gameManager.MidiPlayer;
+        }
 
         void Update()
         {

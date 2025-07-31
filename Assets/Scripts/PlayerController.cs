@@ -47,14 +47,15 @@ namespace MusicRun
 
 
         private CharacterController controller;
-        [Header("GameObject")]
-        public GameManager gameManager;
+        private GameManager gameManager;
         public DateTime timeStartLevel;
 
 
         void Awake()
         {
-
+            gameManager = Utilities.FindGameManager();
+            if (gameManager == null)
+                return;
         }
 
         void Start()
@@ -88,7 +89,7 @@ namespace MusicRun
 
             CharacterController cc = GetComponent<CharacterController>();
             cc.enabled = false;
-            Transform start = gameManager.terrainGenerator.StartGO.transform;
+            Transform start = gameManager.TerrainGenerator.StartGO.transform;
             Debug.Log($"Player ResetPosition {start.position}");
             transform.position = start.position;
             transform.rotation = start.rotation;
@@ -100,7 +101,7 @@ namespace MusicRun
         void Update()
         {
             Vector3 forwardMove = Vector3.zero;
-            if (enableMovement && gameManager.levelRunning && !gameManager.goalHandler.goalReached)
+            if (enableMovement && gameManager.levelRunning && !gameManager.GoalHandler.goalReached)
             {
                 // Slowly increase speed multiplier until 10 at 0.1 per second
                 speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);

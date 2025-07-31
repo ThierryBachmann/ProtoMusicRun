@@ -6,7 +6,6 @@ namespace MusicRun
 
     public class GoalHandler : MonoBehaviour
     {
-        public PlayerController player;
         public GoalSpotlightAnimator goalSpotlightAnimator;
         public GameObject sphere;
         public GameObject Goal;
@@ -18,6 +17,15 @@ namespace MusicRun
         public bool goalReached;
         public Action<bool> OnLevelCompleted;
 
+        private GameManager gameManager;
+        private PlayerController player;
+        private void Awake()
+        {
+            gameManager = Utilities.FindGameManager();
+            if (gameManager == null)
+                return;
+            player = gameManager.Player;
+        }
 
         void Start()
         {

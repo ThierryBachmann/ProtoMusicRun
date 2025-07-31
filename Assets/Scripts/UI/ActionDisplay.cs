@@ -6,7 +6,6 @@ namespace MusicRun
 
     public class ActionDisplay : PanelDisplay
     {
-        public GameManager gameManager;
         public Button rerunButton, continueButton, stopButton, leaderBoardButton;
 
         public new void Awake()

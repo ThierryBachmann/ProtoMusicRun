@@ -15,8 +15,6 @@ namespace MusicRun
         public Color defaultColor = Color.red;
         public Color goalReachedColor = Color.green;
 
-        public bool goalReached = false;
-
         void Start()
         {
             spotLight.color = defaultColor;

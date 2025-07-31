@@ -597,15 +597,16 @@ MonoBehaviour:
   currentLeveIndex: 0
   startAuto: 1
   nextLevelAuto: 1
-  goalHandler: {fileID: 283134993}
-  leaderboard: {fileID: 1489650625}
-  scoreManager: {fileID: 211374106}
-  leaderboardDisplay: {fileID: 973761168}
-  player: {fileID: 256923874}
-  midiPlayer: {fileID: 738411423}
-  actionDisplay: {fileID: 1397310887}
-  goalReachedDisplay: {fileID: 283134996}
-  terrainGenerator: {fileID: 240111797}
+  GoalHandler: {fileID: 283134993}
+  Leaderboard: {fileID: 1489650625}
+  ScoreManager: {fileID: 211374106}
+  LeaderboardDisplay: {fileID: 973761168}
+  Player: {fileID: 256923874}
+  MidiPlayer: {fileID: 738411423}
+  SoundManager: {fileID: 1870609031}
+  ActionDisplay: {fileID: 1397310887}
+  GoalReachedDisplay: {fileID: 283134996}
+  TerrainGenerator: {fileID: 240111797}
 --- !u!4 &152116609
 Transform:
   m_ObjectHideFlags: 0
@@ -655,8 +656,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d2f66e51ada3a646ab97e2a228955b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 256923874}
-  score: 0
+  ScoreLevel: 0
+  ScoreGoal: 0
+  ScoreOverhall: 0
 --- !u!4 &211374107
 Transform:
   m_ObjectHideFlags: 0
@@ -718,7 +720,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkSize: 20
   renderDistance: 2
-  disableObstacles: 1
+  disableObstacles: 0
   levels:
   - name: test
     description: ttt ttttt
@@ -736,7 +738,6 @@ MonoBehaviour:
     runChunks:
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
     - {fileID: 3245006867922576827, guid: 0786c1c0621985c4ea5ee25aab74599a, type: 3}
-  player: {fileID: 256923878}
 --- !u!4 &240111798
 Transform:
   m_ObjectHideFlags: 0
@@ -798,7 +799,6 @@ MonoBehaviour:
   playerPosition: 99999
   playerBestScore: 0
   playerLastScore: 0
-  gameManager: {fileID: 152116608}
 --- !u!143 &256923875
 CharacterController:
   m_ObjectHideFlags: 0
@@ -852,10 +852,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f89f43601640084bb8e7550257c6bb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: {fileID: 256923874}
-  ScoreManager: {fileID: 211374106}
-  MainMusic: {fileID: 738411423}
-  SoundManager: {fileID: 1870609031}
   cameraShake: {fileID: 330585548}
   cooldownDelay: 1.5
   knockbackPower: 6
@@ -985,7 +981,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8757a7801e40c5f42b2786a9ed74d1bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 256923874}
   goalSpotlightAnimator: {fileID: 1773429422}
   sphere: {fileID: 476692016}
   Goal: {fileID: 561529854}
@@ -1007,8 +1002,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 331e1e0b1624ab840b286f0aa3aaa6e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  midiPlayer: {fileID: 738411423}
-  player: {fileID: 256923874}
   RatioSpeedMusic: 0.4
   MaxSpeedMusic: 3
 --- !u!114 &283134996
@@ -1053,9 +1046,6 @@ MonoBehaviour:
     m_RotationOrder: 4
   bestScoreText: {fileID: 338306001}
   midiInfoDisplayed: {fileID: 1851700645}
-  gameManager: {fileID: 152116608}
-  goalHandler: {fileID: 283134993}
-  player: {fileID: 256923874}
 --- !u!1 &284146615
 GameObject:
   m_ObjectHideFlags: 0
@@ -4348,7 +4338,6 @@ MonoBehaviour:
   animationDuration: 0.4
   startScale: {x: 0.5, y: 0.5, z: 0.5}
   endScale: {x: 1, y: 1, z: 1}
-  gameManager: {fileID: 152116608}
   rerunButton: {fileID: 1953770001}
   continueButton: {fileID: 866844669}
   stopButton: {fileID: 331547791}
@@ -5066,11 +5055,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6975b78f313e2424ba66744e37db415c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreManager: {fileID: 211374106}
-  player: {fileID: 256923874}
   scoreText: {fileID: 1771018100}
   infoText: {fileID: 1770975910}
-  goalHandler: {fileID: 283134993}
 --- !u!1 &1714945103
 GameObject:
   m_ObjectHideFlags: 0
@@ -5683,7 +5669,6 @@ MonoBehaviour:
   pulseAmplitude: 50
   defaultColor: {r: 1, g: 0, b: 0.099488735, a: 1}
   goalReachedColor: {r: 0, g: 1, b: 0, a: 1}
-  goalReached: 0
 --- !u!1 &1777382776
 GameObject:
   m_ObjectHideFlags: 0
@@ -5777,8 +5762,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   musicSlider: {fileID: 1485877570}
   musicText: {fileID: 0}
-  midiPlayer: {fileID: 738411423}
-  player: {fileID: 0}
 --- !u!114 &1777382781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5793,8 +5776,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   distanceSlider: {fileID: 1839525038}
   distanceText: {fileID: 0}
-  goal: {fileID: 283134993}
-  gameManager: {fileID: 152116608}
 --- !u!1 &1820376246
 GameObject:
   m_ObjectHideFlags: 0

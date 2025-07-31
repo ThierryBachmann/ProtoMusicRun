@@ -14,25 +14,25 @@ namespace MusicRun
         public bool nextLevelAuto;
 
         [Header("GameObject reference")]
-        public GoalHandler goalHandler;
-        public FirebaseLeaderboard leaderboard;
-        public ScoreManager scoreManager;
-        public LeaderboardDisplay leaderboardDisplay;
-        public PlayerController player;
-        public MidiFilePlayer midiPlayer;
-        //public Transform startPosition;
-        public ActionDisplay actionDisplay;
-        public GoalReachedDisplay goalReachedDisplay;
-        public TerrainGenerator terrainGenerator;
+        public GoalHandler GoalHandler;
+        public FirebaseLeaderboard Leaderboard;
+        public ScoreManager ScoreManager;
+        public LeaderboardDisplay LeaderboardDisplay;
+        public PlayerController Player;
+        public MidiFilePlayer MidiPlayer;
+        public SoundManager SoundManager;
+        public ActionDisplay ActionDisplay;
+        public GoalReachedDisplay GoalReachedDisplay;
+        public TerrainGenerator TerrainGenerator;
 
         void Awake()
         {
             // Subscribe to events
-            leaderboard.OnLeaderboardLoaded += OnDisplayLeaderboard;
-            leaderboard.OnScoreSubmitted += OnScoreSubmissionResult;
-            goalHandler.OnLevelCompleted += OnLevelCompleted;
-            leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
-            leaderboard.OnScoreSubmitted += OnScoreSubmitted;
+            Leaderboard.OnLeaderboardLoaded += OnDisplayLeaderboard;
+            Leaderboard.OnScoreSubmitted += OnScoreSubmissionResult;
+            GoalHandler.OnLevelCompleted += OnLevelCompleted;
+            Leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
+            Leaderboard.OnScoreSubmitted += OnScoreSubmitted;
         }
         void Start()
         {
@@ -41,15 +41,15 @@ namespace MusicRun
             if (startAuto)
                 RestartGame();
             else
-                actionDisplay.Show();
-            leaderboardDisplay.Hide();
-            terrainGenerator.CreateLevel(0);
+                ActionDisplay.Show();
+            LeaderboardDisplay.Hide();
+            TerrainGenerator.CreateLevel(0);
         }
 
         private void OnLeaderboardLoaded(List<LeaderboardPlayerScore> scores)
         {
-            Debug.Log($"=== PLAYER RANK {leaderboard.GetPlayerName()} === ");
-            LeaderboardPlayerScore playerRank = scores.Find(s => s.playerName == leaderboard.GetPlayerName());
+            Debug.Log($"=== PLAYER RANK {Leaderboard.GetPlayerName()} === ");
+            LeaderboardPlayerScore playerRank = scores.Find(s => s.playerName == Leaderboard.GetPlayerName());
             if (playerRank != null)
                 Debug.Log($"Player Rank {playerRank.playerName:20}: {playerRank.score} pts " +
                      $"(Time: {playerRank.completionTime:F1}s, Efficiency: {playerRank.pathEfficiency:F2})");
@@ -61,31 +61,31 @@ namespace MusicRun
         private void OnLevelCompleted(bool success)
         {
             LeaderboardPlayerScore playerScore = new LeaderboardPlayerScore(
-                         leaderboard.GetPlayerName(),
-                         scoreManager.score,
+                         Leaderboard.GetPlayerName(),
+                         ScoreManager.ScoreLevel,
                          999,
                          999,
                          999,
                          1
                           );
-            leaderboard.SubmitScore(playerScore);
+            Leaderboard.SubmitScore(playerScore);
             levelRunning = false;
             if (nextLevelAuto)
                 StartCoroutine(Utilities.WaitAndCall(2.5f, NextLevel));
             else
-                actionDisplay.Show();
+                ActionDisplay.Show();
             //leaderboardDisplay.Show(this);
         }
 
         private void OnScoreSubmitted(bool success)
         {
-            leaderboard.GetPlayerRank((s) =>
+            Leaderboard.GetPlayerRank((s) =>
             {
                 if (s != null)
                 {
-                    player.playerPosition = s.playerPosition;
-                    player.playerBestScore = s.score;
-                    leaderboardDisplay.RefreshPlayerScore(player);
+                    Player.playerPosition = s.playerPosition;
+                    Player.playerBestScore = s.score;
+                    LeaderboardDisplay.RefreshPlayerScore(Player);
                 }
             });
         }
@@ -120,47 +120,49 @@ namespace MusicRun
             if (Input.GetKeyDown(KeyCode.C)) NextLevel();
             if (Input.GetKeyDown(KeyCode.S)) StopGame();
             if (Input.GetKeyDown(KeyCode.R)) RestartGame();
-            if (Input.GetKeyDown(KeyCode.A)) actionDisplay.SwitchVisible();
+            if (Input.GetKeyDown(KeyCode.A)) ActionDisplay.SwitchVisible();
             if (Input.GetKeyDown(KeyCode.L)) LeaderboardSwitchDisplay();
         }
 
         public void LeaderboardSwitchDisplay()
         {
-            leaderboardDisplay.SwitchVisible(player);
+            LeaderboardDisplay.SwitchVisible(Player);
         }
 
         public void RestartGame()
         {
-            actionDisplay.Hide();
-            leaderboardDisplay.Hide();
-            terrainGenerator.CreateLevel(0);
-            player.LevelStarted();
-            goalHandler.goalReached = false;
-            goalReachedDisplay.Reset();
-            scoreManager.score = 0;
+            ActionDisplay.Hide();
+            LeaderboardDisplay.Hide();
+            TerrainGenerator.CreateLevel(0);
+            Player.LevelStarted();
+            GoalHandler.goalReached = false;
+            GoalReachedDisplay.Reset();
+            ScoreManager.ScoreLevel = 0;
+            ScoreManager.ScoreOverhall = 0;
 
-            if (midiPlayer != null)
+            if (MidiPlayer != null)
             {
-                midiPlayer.MPTK_Stop();
-                midiPlayer.MPTK_RePlay();
+                MidiPlayer.MPTK_Stop();
+                MidiPlayer.MPTK_RePlay();
             }
             gameRunning = true;
             levelRunning = true;
         }
+
         public void NextLevel()
         {
-            actionDisplay.Hide();
-            leaderboardDisplay.Hide();
-            terrainGenerator.CreateLevel(++currentLeveIndex);
-            player.LevelStarted();
-            goalHandler.goalReached = false;
-            goalReachedDisplay.Reset();
-            //scoreManager.score = 0;
+            ActionDisplay.Hide();
+            LeaderboardDisplay.Hide();
+            TerrainGenerator.CreateLevel(++currentLeveIndex);
+            Player.LevelStarted();
+            GoalHandler.goalReached = false;
+            GoalReachedDisplay.Reset();
+            ScoreManager.ScoreLevel = 0;
 
-            if (midiPlayer != null)
+            if (MidiPlayer != null)
             {
-                midiPlayer.MPTK_Stop();
-                midiPlayer.MPTK_RePlay();
+                MidiPlayer.MPTK_Stop();
+                MidiPlayer.MPTK_RePlay();
             }
             gameRunning = true;
             levelRunning = true;
@@ -168,11 +170,11 @@ namespace MusicRun
 
         public void StopGame()
         {
-            actionDisplay.Show();
-            leaderboardDisplay.Hide();
+            ActionDisplay.Show();
+            LeaderboardDisplay.Hide();
             gameRunning = false;
             levelRunning = false;
-            actionDisplay.Show();
+            ActionDisplay.Show();
         }
     }
 }

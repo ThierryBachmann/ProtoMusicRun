@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MusicRun
 {
@@ -12,8 +13,7 @@ namespace MusicRun
         public int renderDistance = 2;
         public bool disableObstacles = false;
         public Level[] levels;
-        public Transform player;
-        
+
         private Level currentLevel;
         private GameObject currentStart;
         private Vector2Int startChunkCoord;
@@ -23,7 +23,19 @@ namespace MusicRun
         private Dictionary<Vector2Int, GameObject> spawnedChunks = new Dictionary<Vector2Int, GameObject>();
         private Vector2Int currentPlayerChunk;
 
-        public GameObject StartGO { get => currentStart;}
+        private GameManager gameManager;
+        private PlayerController player;
+
+        public GameObject StartGO { get => currentStart; }
+
+        private void Awake()
+        {
+            gameManager = Utilities.FindGameManager();
+            if (gameManager == null)
+                return;
+            player = gameManager.Player;
+        }
+
 
         void Start()
         {
@@ -111,11 +123,11 @@ namespace MusicRun
 
         void Update()
         {
-            Vector2Int playerChunk = PositionToChunk(player.position);
+            Vector2Int playerChunk = PositionToChunk(player.transform.position);
 
             if (playerChunk != currentPlayerChunk)
             {
-                Debug.Log($"Player enters in a chunk: x={player.position.x} z={player.position.z} --> playerChunk: {playerChunk}");
+                Debug.Log($"Player enters in a chunk: x={player.transform.position.x} z={player.transform.position.z} --> playerChunk: {playerChunk}");
 
                 currentPlayerChunk = playerChunk;
                 UpdateChunks();

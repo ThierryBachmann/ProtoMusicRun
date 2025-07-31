@@ -12,8 +12,16 @@ namespace MusicRun
         private CanvasGroup canvasGroup;
         private RectTransform rectTransform;
 
+        protected GameManager gameManager;
+        protected PlayerController player;
+
         public void Awake()
         {
+            gameManager = Utilities.FindGameManager();
+            if (gameManager == null)
+                return;
+            player = gameManager.Player;
+
             rectTransform = GetComponent<RectTransform>();
             canvasGroup = GetComponent<CanvasGroup>();
 

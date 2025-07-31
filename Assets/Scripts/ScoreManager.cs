@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MusicRun
 {
@@ -9,9 +10,21 @@ namespace MusicRun
     /// </summary>
     public class ScoreManager : MonoBehaviour
     {
-        public PlayerController player;
 
-        public long score;
+        public int ScoreLevel;
+        public int ScoreGoal;
+        public int ScoreOverhall;
+        
+        private GameManager gameManager;
+        private PlayerController player;
+
+        private void Awake()
+        {
+            gameManager = Utilities.FindGameManager();
+            if (gameManager == null)
+                return;
+            player = gameManager.Player;
+        }
 
         void Update()
         {
@@ -47,6 +60,17 @@ namespace MusicRun
             //}
         }
 
-        public int GetDisplayedScore() => Mathf.FloorToInt(score);
+        public void CalculateLevelScore(float musicProgress, float distanceProgress)
+        {
+            if (distanceProgress <= 0)
+            {
+                Debug.LogWarning("Distance progress is zero or negative, cannot calculate score.");
+                return;
+            }
+            ScoreGoal = Mathf.FloorToInt(musicProgress / distanceProgress * 100);
+            ScoreLevel += ScoreGoal;
+            ScoreOverhall += ScoreGoal;
+        }
+
     }
 }

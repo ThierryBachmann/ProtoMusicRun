@@ -5,16 +5,28 @@ namespace MusicRun
 {
     public class ScoreDisplay : MonoBehaviour
     {
-        public ScoreManager scoreManager;
-        public PlayerController player;
         public TextMeshProUGUI scoreText;
         public TextMeshProUGUI infoText;
-        public GoalHandler goalHandler;
         private Color scoreGrowing;
         private Color scoreDecrease;
         private Color scoreFinal;
         private Color currentTextColor;
-        private float lastScore;
+        private int lastScore;
+        private GameManager gameManager;
+        private ScoreManager scoreManager;
+        private PlayerController player;
+        private GoalHandler goalHandler;
+
+        private void Awake()
+        {
+            gameManager = Utilities.FindGameManager();
+            if (gameManager==null)
+                return;
+            scoreManager = gameManager.ScoreManager;
+            player = gameManager.Player;
+            goalHandler = gameManager.GoalHandler;
+        }
+
 
         void Start()
         {
@@ -24,17 +36,16 @@ namespace MusicRun
         }
         void Update()
         {
-            //if (scoreManager)
-            //    scoreText.text = $"{player.leaderboard.GetPlayerName()} Distance:{goalHandler.distance:N0} Score:{scoreManager.score:N0} Speed:{player.GetSpeed():N1} Multiplier:{player.speedMultiplier:N1}";
+            scoreText.text = $"{gameManager.Leaderboard.GetPlayerName()} Distance:{goalHandler.distance:N0} Score:{scoreManager.ScoreLevel:N0} Speed:{player.GetSpeed():N1} Multiplier:{player.speedMultiplier:N1}";
             //infoText.text = $"dir:{player.goalHandler.goalDirection:F2} angle:{player.goalHandler.goalAngle:F2}";
             Color targetColor = scoreText.color; // couleur par défaut
 
-            //if (player.goalHandler.goalReached)
-            //    targetColor = scoreFinal;
-            //else
+            if (goalHandler.goalReached)
+                targetColor = scoreFinal;
+            else
             {
-                if (scoreManager.score > lastScore) targetColor = scoreGrowing;
-                if (scoreManager.score < lastScore) targetColor = scoreDecrease;
+                if (scoreManager.ScoreLevel > lastScore) targetColor = scoreGrowing;
+                if (scoreManager.ScoreLevel < lastScore) targetColor = scoreDecrease;
             }
 
             if (currentTextColor != targetColor)
@@ -42,7 +53,7 @@ namespace MusicRun
                 currentTextColor = targetColor;
                 scoreText.color = currentTextColor;
             }
-            lastScore = scoreManager.score;
+            lastScore = scoreManager.ScoreLevel;
         }
     }
 }

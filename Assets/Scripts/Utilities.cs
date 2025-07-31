@@ -7,7 +7,7 @@ namespace MusicRun
     /// <summary>
     /// Provides utility methods for common operations.
     /// </summary>
-    public class Utilities
+    public class Utilities : MonoBehaviour
     {
 
         /// <summary>
@@ -24,5 +24,18 @@ namespace MusicRun
             yield return new WaitForSeconds(delay);
             action?.Invoke();
         }
+
+        static public GameManager FindGameManager()
+        {
+            object[] gos = FindObjectsByType(typeof(GameManager), FindObjectsSortMode.None);
+
+            if (gos == null || gos.Length == 0)
+            {
+                Debug.LogError("GameManager not found in the scene.");
+                return null;
+            }
+            return (GameManager)FindObjectsByType(typeof(GameManager), FindObjectsSortMode.None)[0];
+        }
+
     }
 }
