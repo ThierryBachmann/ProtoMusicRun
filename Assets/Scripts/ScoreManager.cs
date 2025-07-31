@@ -16,16 +16,28 @@ namespace MusicRun
         void Update()
         {
             // Idée pour le calcul du score:
-            //  bonus si arrivée a la fin du MIDI avec tolerance
-            //  Si arrivée apres la fin du MIDI : level failed
-            //  score plus elevé si temps de trajet plus court (utilisation de speedMultiplier qui agit aussi sur la vitesse MIDI?)
+            //  Score maxi si le joueur atteind l'objectif en meme temps que la fin du MIDI.
+            //      Example calcul ratio: pourcentage avancement du slide bar MIDI (0 a 100) / pourcentage avancement du slide bar distance (0 a 100) 
+            //          = 1 : score  100
+            //          < 1 : bonus ratio * 100
+            //          exemple : si objectif atteint à 80% du MIDI, 80 / 100 = 0.8, score = 0.8 * 100 = 80
+            //      Aspect tactique : le player peut essayer d'optimiser son score en atteignant l'objectif en provoquant des collisions
+            //      ou en evitant les collisions pour sécuriser un score en dessous de 100.
+            //  Mais si le player arrive apres la fin du MIDI : level failed (tolerance de quelques secondes?) et doit recommencer le niveau. 
+            //  Les obstacles et bonus ne sont régénérés, le player peut donc apprendre à optimiser son trajet.
+            //
+            //  Les bonus :
+            //      - transposition de la musique d'une octave pendant 10 secondes vers le haut. Si pas de collision pendant cette période, le bonus
+            //        est calculé en fonction du pourcentage de la musique jouée pendant cette période.
+            //        max : 20 points pour 10 secondes de musique jouée sans collision. Le joueur va donc éviter une collision pour obtenir du bonus.
+            //      - bonus speed multiplicateur pendant 10 secondes. 
+            //  Les malus :
+            //      - transposition de la musique d'une octave pendant 10 secondes vers le bas. Si pas de collision pendant cette période, le malus
+            //        est calculé en fonction du pourcentage de la musique jouée pendant cette période.
+            //        max : -20 points pour 10 secondes de musique jouée sans collision. Le joueur va donc provoquer une collision pour éviter le malus.
+
+            //  Non, Score plus élevé si temps de trajet plus court (utilisation de speedMultiplier qui agit aussi sur la vitesse MIDI?)
             //      cela favorise l'évitement des colisions et le chemin le plus direct
-            //      Example calcul: temps théorique du MIDI (donc avec speed=1) / temps dans le level
-            //          < 1 : failed
-            //          =1  : bonus 100
-            //          >1  : bonus ratio * 100
-            //      score de base si goal atteind : 100, variable par level ?
-            //  
 
             //if (!player.goalHandler.goalReached)
             //{

@@ -185,11 +185,12 @@ namespace MusicRun
     {
         public string name;
         public string description;
-        [Header("Delta with current chunks")]
+        [Header("Delta chunk position with last goal")]
         public Vector2Int deltaCurrentChunk;
-        [Header("Defined prefab game object")]
+        [Header("Defined game object sor start end goal level")]
         public GameObject startGO;
         public GameObject goalGO;
+        [Header("Defined levels")]
         public GameObject[] runChunks;
     }
 }
