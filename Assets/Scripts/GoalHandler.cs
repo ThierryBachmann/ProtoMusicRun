@@ -33,9 +33,11 @@ namespace MusicRun
             goalReached = false;
             distanceAtStart = -1;
         }
-        void Reset()
+
+        public void NewLevel()
         {
             goalReached = false;
+            // Force calculation at next update
             distanceAtStart = -1;
         }
 

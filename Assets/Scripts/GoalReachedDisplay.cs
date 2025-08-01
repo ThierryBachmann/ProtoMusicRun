@@ -38,10 +38,10 @@ namespace MusicRun
 
         public void Start()
         {
-            Reset();
+            NewLevel();
         }
 
-        public void Reset()
+        public void NewLevel()
         {
             Vector3 pos = panel.position;
             pos.y = startY;

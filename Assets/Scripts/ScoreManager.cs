@@ -13,7 +13,7 @@ namespace MusicRun
 
         public int ScoreLevel;
         public int ScoreGoal;
-        public int ScoreOverhall;
+        public int ScoreOverall;
         
         private GameManager gameManager;
         private PlayerController player;
@@ -69,7 +69,7 @@ namespace MusicRun
             }
             ScoreGoal = Mathf.FloorToInt(musicProgress / distanceProgress * 100);
             ScoreLevel += ScoreGoal;
-            ScoreOverhall += ScoreGoal;
+            ScoreOverall += ScoreGoal;
         }
 
     }

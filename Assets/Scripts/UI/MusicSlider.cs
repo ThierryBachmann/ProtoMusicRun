@@ -18,6 +18,13 @@ namespace MusicRun
             if (gameManager == null)
                 return;
             midiPlayer = gameManager.MidiPlayer;
+           
+            Transform bgTransform = musicSlider.transform.Find("Fill Area").transform.Find("Fill");
+            if (bgTransform != null)
+            {
+                Image sliderBackground = bgTransform.GetComponent<Image>();
+                sliderBackground.color = Utilities.ColorBase;
+            }
 
             midiPlayer.MPTK_StartPlayAtFirstNote = true;
             midiPlayer.MPTK_MidiAutoRestart = false;
@@ -37,7 +44,6 @@ namespace MusicRun
             });
         }
 
-
         void Start()
         {
 
@@ -48,7 +54,8 @@ namespace MusicRun
         {
             if (midiPlayer.MPTK_IsPlaying)
             {
-                musicSlider.value = ((float)midiPlayer.MPTK_TickCurrent / (float)midiPlayer.MPTK_TickLastNote) * 100f;
+                musicSlider.value = gameManager.MusicPercentage;
+                musicText.text = $"Music {gameManager.MusicPercentage:F0} %";
             }
         }
     }

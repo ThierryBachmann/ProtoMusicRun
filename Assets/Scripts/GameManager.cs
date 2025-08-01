@@ -12,6 +12,8 @@ namespace MusicRun
         public int currentLeveIndex;
         public bool startAuto;
         public bool nextLevelAuto;
+        public float MusicPercentage;
+        public float GoalPercentage;
 
         [Header("GameObject reference")]
         public GoalHandler GoalHandler;
@@ -24,6 +26,7 @@ namespace MusicRun
         public ActionDisplay ActionDisplay;
         public GoalReachedDisplay GoalReachedDisplay;
         public TerrainGenerator TerrainGenerator;
+        public MidiTempoSync MidiTempoSync;
 
         void Awake()
         {
@@ -33,6 +36,7 @@ namespace MusicRun
             GoalHandler.OnLevelCompleted += OnLevelCompleted;
             Leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
             Leaderboard.OnScoreSubmitted += OnScoreSubmitted;
+            Utilities.Init();
         }
         void Start()
         {
@@ -122,6 +126,15 @@ namespace MusicRun
             if (Input.GetKeyDown(KeyCode.R)) RestartGame();
             if (Input.GetKeyDown(KeyCode.A)) ActionDisplay.SwitchVisible();
             if (Input.GetKeyDown(KeyCode.L)) LeaderboardSwitchDisplay();
+
+            if (gameRunning && levelRunning)
+            {
+                if (GoalHandler.distanceAtStart > 0)
+                    GoalPercentage = 100f - (GoalHandler.distance / GoalHandler.distanceAtStart * 100f);
+                else
+                    GoalPercentage = 0f;
+                MusicPercentage = ((float)MidiPlayer.MPTK_TickCurrent / (float)MidiPlayer.MPTK_TickLastNote) * 100f;
+            }
         }
 
         public void LeaderboardSwitchDisplay()
@@ -131,34 +144,27 @@ namespace MusicRun
 
         public void RestartGame()
         {
-            ActionDisplay.Hide();
-            LeaderboardDisplay.Hide();
-            TerrainGenerator.CreateLevel(0);
-            Player.LevelStarted();
-            GoalHandler.goalReached = false;
-            GoalReachedDisplay.Reset();
-            ScoreManager.ScoreLevel = 0;
-            ScoreManager.ScoreOverhall = 0;
-
-            if (MidiPlayer != null)
-            {
-                MidiPlayer.MPTK_Stop();
-                MidiPlayer.MPTK_RePlay();
-            }
-            gameRunning = true;
-            levelRunning = true;
+            currentLeveIndex = 0;
+            ScoreManager.ScoreOverall = 0;
+            StartLevel();
         }
-
         public void NextLevel()
         {
+            currentLeveIndex++;
+            StartLevel();
+        }
+
+        private void StartLevel()
+        {
+            ScoreManager.ScoreLevel = 0;
             ActionDisplay.Hide();
             LeaderboardDisplay.Hide();
-            TerrainGenerator.CreateLevel(++currentLeveIndex);
+            TerrainGenerator.CreateLevel(currentLeveIndex);
             Player.LevelStarted();
-            GoalHandler.goalReached = false;
-            GoalReachedDisplay.Reset();
-            ScoreManager.ScoreLevel = 0;
-
+            GoalHandler.NewLevel();
+            GoalReachedDisplay.NewLevel();
+            GoalHandler.NewLevel();
+            MidiTempoSync.Reset();
             if (MidiPlayer != null)
             {
                 MidiPlayer.MPTK_Stop();

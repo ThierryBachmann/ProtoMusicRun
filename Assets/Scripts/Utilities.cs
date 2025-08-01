@@ -9,6 +9,18 @@ namespace MusicRun
     /// </summary>
     public class Utilities : MonoBehaviour
     {
+        static public Color ColorGreen;
+        static public Color ColorBase;
+        static public Color ColorWarning;
+        static public Color ColorAlert;
+
+        static public void Init()
+        {
+            ColorUtility.TryParseHtmlString("#00F20B", out ColorGreen);
+            ColorUtility.TryParseHtmlString("#ECBB00", out ColorBase); // gold color
+            ColorUtility.TryParseHtmlString("#FB6400", out ColorWarning);
+            ColorUtility.TryParseHtmlString("#BF2C2C", out ColorAlert);
+        }
 
         /// <summary>
         /// Executes the specified action after a delay.

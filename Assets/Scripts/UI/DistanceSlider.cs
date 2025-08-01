@@ -1,4 +1,5 @@
 using MidiPlayerTK;
+using System.Drawing;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,6 +13,7 @@ namespace MusicRun
 
         private GameManager gameManager;
         private GoalHandler goalHandler;
+        private Image sliderBackground;
 
         private void Awake()
         {
@@ -19,6 +21,14 @@ namespace MusicRun
             if (gameManager == null)
                 return;
             goalHandler = gameManager.GoalHandler;
+            if (distanceSlider != null)
+            {
+                Transform bgTransform = distanceSlider.transform.Find("Fill Area").transform.Find("Fill");
+                if (bgTransform != null)
+                {
+                    sliderBackground = bgTransform.GetComponent<Image>();
+                }
+            }
         }
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -32,8 +42,13 @@ namespace MusicRun
         {
             if (gameManager.gameRunning && gameManager.levelRunning)
             {
-                if (goalHandler.distanceAtStart > 0)
-                    distanceSlider.value = 100f - (goalHandler.distance / goalHandler.distanceAtStart * 100f);
+                distanceSlider.value = gameManager.GoalPercentage;
+                distanceText.text = $"Distance {goalHandler.distance:F0} m";
+                if (gameManager.GoalPercentage > gameManager.MusicPercentage)
+                    sliderBackground.color = Utilities.ColorWarning;
+                else
+                    sliderBackground.color = Utilities.ColorBase;
+
             }
         }
     }

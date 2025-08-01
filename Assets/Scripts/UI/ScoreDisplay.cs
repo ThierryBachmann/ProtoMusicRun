@@ -7,9 +7,7 @@ namespace MusicRun
     {
         public TextMeshProUGUI scoreText;
         public TextMeshProUGUI infoText;
-        private Color scoreGrowing;
-        private Color scoreDecrease;
-        private Color scoreFinal;
+
         private Color currentTextColor;
         private int lastScore;
         private GameManager gameManager;
@@ -20,20 +18,17 @@ namespace MusicRun
         private void Awake()
         {
             gameManager = Utilities.FindGameManager();
-            if (gameManager==null)
+            if (gameManager == null)
                 return;
             scoreManager = gameManager.ScoreManager;
             player = gameManager.Player;
             goalHandler = gameManager.GoalHandler;
         }
 
-
         void Start()
         {
-            ColorUtility.TryParseHtmlString("#00F20B", out scoreFinal);
-            ColorUtility.TryParseHtmlString("#FF7D88", out scoreDecrease);
-            ColorUtility.TryParseHtmlString("#FFEF2E", out scoreGrowing);
         }
+
         void Update()
         {
             scoreText.text = $"{gameManager.Leaderboard.GetPlayerName()} Distance:{goalHandler.distance:N0} Score:{scoreManager.ScoreLevel:N0} Speed:{player.GetSpeed():N1} Multiplier:{player.speedMultiplier:N1}";
@@ -41,11 +36,11 @@ namespace MusicRun
             Color targetColor = scoreText.color; // couleur par défaut
 
             if (goalHandler.goalReached)
-                targetColor = scoreFinal;
+                targetColor = Utilities.ColorGreen;
             else
             {
-                if (scoreManager.ScoreLevel > lastScore) targetColor = scoreGrowing;
-                if (scoreManager.ScoreLevel < lastScore) targetColor = scoreDecrease;
+                if (scoreManager.ScoreLevel > lastScore) targetColor = Utilities.ColorBase;
+                if (scoreManager.ScoreLevel < lastScore) targetColor = Utilities.ColorWarning;
             }
 
             if (currentTextColor != targetColor)
