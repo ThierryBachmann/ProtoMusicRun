@@ -1,5 +1,3 @@
-using MidiPlayerTK;
-using System.Drawing;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,7 +11,9 @@ namespace MusicRun
 
         private GameManager gameManager;
         private GoalHandler goalHandler;
+        private ScoreManager scoreManager;
         private Image sliderBackground;
+        private Color currentBackgroundColor;
 
         private void Awake()
         {
@@ -21,6 +21,7 @@ namespace MusicRun
             if (gameManager == null)
                 return;
             goalHandler = gameManager.GoalHandler;
+            scoreManager = gameManager.ScoreManager;
             if (distanceSlider != null)
             {
                 Transform bgTransform = distanceSlider.transform.Find("Fill Area").transform.Find("Fill");
@@ -40,14 +41,18 @@ namespace MusicRun
         // Update is called once per frame
         void Update()
         {
+            Color targetColor = Utilities.ColorBase; 
             if (gameManager.gameRunning && gameManager.levelRunning)
             {
                 distanceSlider.value = gameManager.GoalPercentage;
                 distanceText.text = $"Distance {goalHandler.distance:F0} m";
-                if (gameManager.GoalPercentage > gameManager.MusicPercentage)
-                    sliderBackground.color = Utilities.ColorWarning;
-                else
-                    sliderBackground.color = Utilities.ColorBase;
+
+                targetColor= scoreManager.CalculateColor();
+                if (currentBackgroundColor != targetColor)
+                {
+                    sliderBackground.color =targetColor;
+                    currentBackgroundColor = targetColor;
+                }
 
             }
         }

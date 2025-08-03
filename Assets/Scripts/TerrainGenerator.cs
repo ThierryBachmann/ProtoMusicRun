@@ -127,7 +127,7 @@ namespace MusicRun
 
             if (playerChunk != currentPlayerChunk)
             {
-                Debug.Log($"Player enters in a chunk: x={player.transform.position.x} z={player.transform.position.z} --> playerChunk: {playerChunk}");
+                //Debug.Log($"Player enters in a chunk: x={player.transform.position.x} z={player.transform.position.z} --> playerChunk: {playerChunk}");
 
                 currentPlayerChunk = playerChunk;
                 UpdateChunks();
@@ -185,7 +185,7 @@ namespace MusicRun
             }
             foreach (var coord in chunksToRemove)
             {
-                Debug.Log($"Remove {coord}");
+                //Debug.Log($"Remove {coord}");
                 spawnedChunks.Remove(coord);
             }
         }

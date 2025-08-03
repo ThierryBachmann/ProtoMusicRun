@@ -1,6 +1,7 @@
-using UnityEngine;
 using MidiPlayerTK;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MusicRun
 {
@@ -64,7 +65,7 @@ namespace MusicRun
 
         private void OnLevelCompleted(bool success)
         {
-            ScoreManager.CalculateLevelScore(MusicPercentage, GoalPercentage);
+            ScoreManager.CalculateScoreLevel(MusicPercentage, GoalPercentage);
             LeaderboardPlayerScore playerScore = new LeaderboardPlayerScore(
                          Leaderboard.GetPlayerName(),
                          ScoreManager.ScoreLevel,
@@ -135,6 +136,7 @@ namespace MusicRun
                 else
                     GoalPercentage = 0f;
                 MusicPercentage = ((float)MidiPlayer.MPTK_TickCurrent / (float)MidiPlayer.MPTK_TickLastNote) * 100f;
+                ScoreManager.ScoreGoal = ScoreManager.CalculateScoreGoal(MusicPercentage, GoalPercentage);
             }
         }
 

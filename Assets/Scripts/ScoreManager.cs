@@ -61,28 +61,52 @@ namespace MusicRun
             //}
         }
 
-        public void CalculateLevelScore(float musicProgress, float distanceProgress)
+        public void CalculateScoreLevel(float musicProgress, float distanceProgress)
         {
-            if (distanceProgress <= 0)
-            {
-                Debug.LogWarning("Distance progress is zero or negative, cannot calculate score.");
-                return;
-            }
-            if (Mathf.Abs(musicProgress - distanceProgress) < 2f)
-            {
-                // If the music and distance progress are very close, we assume the level is completed successfully.
-                ScoreGoal = 100;
-            }
-            else
-            {
-                // Calculate score based on the ratio of music progress to distance progress
-                ScoreGoal = Mathf.FloorToInt(musicProgress / distanceProgress * 100);
-            }
-            ScoreGoal = Mathf.Clamp(ScoreGoal, 10, 100);
+            ScoreGoal = CalculateScoreGoal(musicProgress, distanceProgress);
             ScoreLevel = ScoreGoal + ScoreBonus;
             ScoreOverall += ScoreGoal;
             Debug.Log($"CalculateLevelScore ScoreGoal: {ScoreGoal} ScoreBonus: {ScoreBonus} ScoreLevel: {ScoreLevel} ScoreOverall:{ScoreOverall}");
         }
 
+        public int CalculateScoreGoal(float musicProgress, float distanceProgress)
+        {
+            int score = 0;
+            if (distanceProgress <= 0)
+            {
+                //Debug.Log("CalculateScoreGoal - Distance progress is zero or negative, cannot calculate score.");
+            }
+            else if (Mathf.Abs(musicProgress - distanceProgress) < 2f)
+            {
+                // If the music and distance progress are very close, we assume the level is completed successfully.
+                //Debug.Log($"CalculateScoreGoal Close to goal:{score} musicProgress:{musicProgress:N1} distanceProgress:{distanceProgress:N1} Delta:{Mathf.Abs(musicProgress - distanceProgress):N1}");
+                score = 100;
+            }
+            else if (distanceProgress > musicProgress * 1.2f)
+            {
+                //Debug.Log($"CalculateScoreGoal far away to goal:{score} musicProgress:{musicProgress:N1} distanceProgress:{distanceProgress:N1}");
+                score = 0;
+            }
+            else
+            {
+                // Calculate score based on the ratio of music progress to distance progress
+                float ratio = distanceProgress/musicProgress;
+                score = Mathf.RoundToInt(100f * ratio);
+                score = Mathf.Clamp(score, 10, 100);
+                //Debug.Log($"CalculateScoreGoal ScoreGoal:{score} musicProgress:{musicProgress:N1} distanceProgress:{distanceProgress:N1} Ratio:{ratio:N1}");
+            }
+            return score;
+        }
+
+        public Color CalculateColor()
+        {
+            Color targetColor;
+            if (ScoreGoal >= 100) targetColor = Utilities.ColorGreen;
+            else if (ScoreGoal >= 50) targetColor = Utilities.ColorWarning;
+            else if (ScoreGoal >= 20) targetColor = Utilities.ColorWarning;
+            else if (ScoreGoal >= 0) targetColor = Utilities.ColorAlert;
+            else targetColor = Utilities.ColorWarning;
+            return targetColor;
+        }
     }
 }

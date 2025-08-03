@@ -9,7 +9,6 @@ namespace MusicRun
         public TextMeshProUGUI infoText;
 
         private Color currentTextColor;
-        private int lastScore;
         private GameManager gameManager;
         private ScoreManager scoreManager;
         private PlayerController player;
@@ -31,7 +30,7 @@ namespace MusicRun
 
         void Update()
         {
-            scoreText.text = $"{gameManager.Leaderboard.GetPlayerName()} Distance:{goalHandler.distance:N0} Score:{scoreManager.ScoreLevel:N0} Speed:{player.GetSpeed():N1} Multiplier:{player.speedMultiplier:N1}";
+            scoreText.text = $"{gameManager.Leaderboard.GetPlayerName()} Score:{scoreManager.ScoreOverall:N0} Bonus: {scoreManager.ScoreBonus} Speed:{player.GetSpeed():N1}";
             //infoText.text = $"dir:{player.goalHandler.goalDirection:F2} angle:{player.goalHandler.goalAngle:F2}";
             Color targetColor = scoreText.color; // couleur par défaut
 
@@ -39,8 +38,7 @@ namespace MusicRun
                 targetColor = Utilities.ColorGreen;
             else
             {
-                if (scoreManager.ScoreLevel > lastScore) targetColor = Utilities.ColorBase;
-                if (scoreManager.ScoreLevel < lastScore) targetColor = Utilities.ColorWarning;
+                targetColor = scoreManager.CalculateColor();
             }
 
             if (currentTextColor != targetColor)
@@ -48,7 +46,8 @@ namespace MusicRun
                 currentTextColor = targetColor;
                 scoreText.color = currentTextColor;
             }
-            lastScore = scoreManager.ScoreLevel;
         }
+
+
     }
 }
