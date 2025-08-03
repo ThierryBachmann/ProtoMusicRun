@@ -9,6 +9,7 @@
 
 // === PlayerController.cs ===
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -98,6 +99,15 @@ namespace MusicRun
             cc.enabled = true;
         }
 
+        public IEnumerator TeleportPlayer(Vector3 targetPosition)
+        {
+            controller.enabled = false;
+            yield return null; // Attendre une frame
+            transform.position = targetPosition;
+            yield return null; // Attendre une autre frame
+            controller.enabled = true;
+        }
+
         void Update()
         {
             Vector3 forwardMove = Vector3.zero;
@@ -122,10 +132,17 @@ namespace MusicRun
             {
                 targetAngle += turnSpeed * Time.deltaTime;
             }
-            if (!isJumping && Input.GetKeyDown(KeyCode.Space) || transform.position.y < 0f)
+            if (!isJumping && Input.GetKeyDown(KeyCode.Space))
             {
                 verticalVelocity.y = jumpForce;
                 isJumping = true;
+            }
+            if (transform.position.y < 0f)
+                StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, 4, transform.position.z)));
+            
+            if (Input.GetKeyDown(KeyCode.Delete))
+            {
+                StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, 4, transform.position.z)));
             }
             // Clamp l'angle cible
             //     targetAngle = Mathf.Clamp(targetAngle, -maxAngle, maxAngle);
