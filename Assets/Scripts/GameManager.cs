@@ -64,6 +64,7 @@ namespace MusicRun
 
         private void OnLevelCompleted(bool success)
         {
+            ScoreManager.CalculateLevelScore(MusicPercentage, GoalPercentage);
             LeaderboardPlayerScore playerScore = new LeaderboardPlayerScore(
                          Leaderboard.GetPlayerName(),
                          ScoreManager.ScoreLevel,

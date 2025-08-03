@@ -647,6 +647,10 @@
       <HintPath>Library\PackageCache\com.unity.collab-proxy@c854d1f7d97f\Lib\Editor\Unity.Plastic.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="P2T">
+      <HintPath>Assets\PrimitivesPro\Scripts\Triangulation\P2T.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="log4netPlastic">
       <HintPath>Library\PackageCache\com.unity.collab-proxy@c854d1f7d97f\Lib\Editor\log4netPlastic.dll</HintPath>
       <Private>False</Private>
@@ -665,10 +669,6 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@d6f9955a5d5f\Mono.Cecil.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="P2T">
-      <HintPath>Assets\PrimitivesPro\Scripts\Triangulation\P2T.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

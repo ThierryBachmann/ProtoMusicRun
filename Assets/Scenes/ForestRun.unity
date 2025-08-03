@@ -295,7 +295,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7509433, g: 0.17427546, b: 0.17427546, a: 1}
+  m_Color: {r: 0.9254902, g: 0.73192173, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -597,6 +597,8 @@ MonoBehaviour:
   currentLeveIndex: 0
   startAuto: 1
   nextLevelAuto: 1
+  MusicPercentage: 0
+  GoalPercentage: 0
   GoalHandler: {fileID: 283134993}
   Leaderboard: {fileID: 1489650625}
   ScoreManager: {fileID: 211374106}
@@ -659,7 +661,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ScoreLevel: 0
   ScoreGoal: 0
-  ScoreOverhall: 0
+  ScoreOverall: 0
+  ScoreBonus: 0
 --- !u!4 &211374107
 Transform:
   m_ObjectHideFlags: 0
@@ -3582,7 +3585,7 @@ PrefabInstance:
     - target: {fileID: 2163061155770630284, guid: 8dac39f39d5b84e1d8f329cc59565290, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: -876546973899608171, guid: d5cea734b4177a84ba80f51c533e29f6, type: 3}
+      objectReference: {fileID: 2100000, guid: 6b0838ec010362845ba13d5b55d1c8cb, type: 2}
     - target: {fileID: 8226210868169737390, guid: 8dac39f39d5b84e1d8f329cc59565290, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -4757,7 +4760,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 100
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 45.9
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -6247,7 +6250,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 100
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 61.1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -6858,7 +6861,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1179939235}
   m_HandleRect: {fileID: 1179939234}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -7073,7 +7076,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7509433, g: 0.17427546, b: 0.17427546, a: 1}
+  m_Color: {r: 0.9811321, g: 0.38888866, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

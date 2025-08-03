@@ -14,7 +14,8 @@ namespace MusicRun
         public int ScoreLevel;
         public int ScoreGoal;
         public int ScoreOverall;
-        
+        public int ScoreBonus;
+
         private GameManager gameManager;
         private PlayerController player;
 
@@ -67,9 +68,20 @@ namespace MusicRun
                 Debug.LogWarning("Distance progress is zero or negative, cannot calculate score.");
                 return;
             }
-            ScoreGoal = Mathf.FloorToInt(musicProgress / distanceProgress * 100);
-            ScoreLevel += ScoreGoal;
+            if (Mathf.Abs(musicProgress - distanceProgress) < 2f)
+            {
+                // If the music and distance progress are very close, we assume the level is completed successfully.
+                ScoreGoal = 100;
+            }
+            else
+            {
+                // Calculate score based on the ratio of music progress to distance progress
+                ScoreGoal = Mathf.FloorToInt(musicProgress / distanceProgress * 100);
+            }
+            ScoreGoal = Mathf.Clamp(ScoreGoal, 10, 100);
+            ScoreLevel = ScoreGoal + ScoreBonus;
             ScoreOverall += ScoreGoal;
+            Debug.Log($"CalculateLevelScore ScoreGoal: {ScoreGoal} ScoreBonus: {ScoreBonus} ScoreLevel: {ScoreLevel} ScoreOverall:{ScoreOverall}");
         }
 
     }
