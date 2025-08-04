@@ -64,7 +64,10 @@ namespace MusicRun
             if (startAuto)
                 RestartGame();
             else
+            { 
                 actionDisplay.Show();
+                actionDisplay.SelectActionsToShow();
+            }
             leaderboardDisplay.Hide();
             terrainGenerator.CreateLevel(0);
         }
@@ -97,7 +100,10 @@ namespace MusicRun
             if (nextLevelAuto)
                 StartCoroutine(Utilities.WaitAndCall(2.5f, NextLevel));
             else
+            {
                 actionDisplay.Show();
+                actionDisplay.SelectActionsToShow();
+            }
             //leaderboardDisplay.Show(this);
         }
 

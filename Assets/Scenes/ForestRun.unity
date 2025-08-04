@@ -201,7 +201,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -595,21 +595,21 @@ MonoBehaviour:
   gameRunning: 0
   levelRunning: 0
   currentLeveIndex: 0
-  startAuto: 1
+  startAuto: 0
   nextLevelAuto: 0
   MusicPercentage: 0
   GoalPercentage: 0
-  GoalHandler: {fileID: 283134993}
-  Leaderboard: {fileID: 1489650625}
-  ScoreManager: {fileID: 211374106}
-  LeaderboardDisplay: {fileID: 973761168}
-  Player: {fileID: 256923874}
-  MidiPlayer: {fileID: 738411423}
-  SoundManager: {fileID: 1870609031}
-  ActionDisplay: {fileID: 1397310887}
-  GoalReachedDisplay: {fileID: 283134996}
-  TerrainGenerator: {fileID: 240111797}
-  MidiTempoSync: {fileID: 283134994}
+  goalHandler: {fileID: 283134993}
+  leaderboard: {fileID: 1489650625}
+  scoreManager: {fileID: 211374106}
+  leaderboardDisplay: {fileID: 973761168}
+  playerController: {fileID: 256923874}
+  midiPlayer: {fileID: 738411423}
+  soundManager: {fileID: 1870609031}
+  actionDisplay: {fileID: 1397310887}
+  goalReachedDisplay: {fileID: 283134996}
+  terrainGenerator: {fileID: 240111797}
+  midiTempoSync: {fileID: 283134994}
 --- !u!4 &152116609
 Transform:
   m_ObjectHideFlags: 0
@@ -726,9 +726,13 @@ MonoBehaviour:
   renderDistance: 3
   disableObstacles: 0
   levels:
-  - name: test
-    description: ttt ttttt
-    deltaCurrentChunk: {x: 0, y: 20}
+  - name: StartLevel
+    description: PErfect for starting the level
+    indexMIDI: 80
+    RatioSpeedMusic: 0.25
+    MinSpeedMusic: 0.2
+    MaxSpeedMusic: 1.99
+    deltaCurrentChunk: {x: 0, y: 5}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     runChunks:
@@ -737,7 +741,11 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 9017a3995fcc81049952ec486ec63b50, type: 3}
   - name: test1
     description: ttt ttttt
-    deltaCurrentChunk: {x: 0, y: 2}
+    indexMIDI: 50
+    RatioSpeedMusic: 0.2
+    MinSpeedMusic: 0.31
+    MaxSpeedMusic: 2.98
+    deltaCurrentChunk: {x: -2, y: 5}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     runChunks:
@@ -800,6 +808,7 @@ MonoBehaviour:
   initialSpeed: 5
   turnSpeed: 90
   maxAngle: 45
+  gravity: 9.81
   jumpForce: 10
   knockbackDecay: 4
   playerPosition: 99999
@@ -1008,9 +1017,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 331e1e0b1624ab840b286f0aa3aaa6e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RatioSpeedMusic: 0.4
-  MinSpeedMusic: 0.1
-  MaxSpeedMusic: 3
 --- !u!114 &283134996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1090,7 +1096,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 320.73, y: 60}
+  m_SizeDelta: {x: 281.5, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &284146617
 MonoBehaviour:
@@ -1361,7 +1367,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 320.73, y: 60}
+  m_SizeDelta: {x: 281.5, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &331547791
 MonoBehaviour:
@@ -2878,7 +2884,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114662785300262660, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: volumeGlobal
-      value: 0
+      value: 0.49
       objectReference: {fileID: 0}
     - target: {fileID: 114662785300262660, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: midiNameToPlay
@@ -3188,7 +3194,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 320.73, y: 60}
+  m_SizeDelta: {x: 281.5, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &866844669
 MonoBehaviour:
@@ -3423,7 +3429,7 @@ GameObject:
   - component: {fileID: 973761168}
   - component: {fileID: 973761169}
   m_Layer: 5
-  m_Name: LeaderboardPanel&Script
+  m_Name: Leaderboard&Script
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4581,7 +4587,7 @@ GameObject:
   - component: {fileID: 1397310888}
   - component: {fileID: 1397310887}
   m_Layer: 5
-  m_Name: ActionPanel&Script
+  m_Name: Action&Script
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4605,8 +4611,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1, y: -435.95}
-  m_SizeDelta: {x: -19.600159, y: -925.1}
+  m_AnchoredPosition: {x: 69.94004, y: -432.55002}
+  m_SizeDelta: {x: -621.11993, y: -881.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1397310887
 MonoBehaviour:
@@ -4635,7 +4641,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1397310885}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -4652,7 +4658,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.054378804, g: 0.8867924, b: 0.2962221, a: 0.392}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5264,7 +5270,7 @@ GameObject:
   - component: {fileID: 1611664820}
   - component: {fileID: 1611664822}
   m_Layer: 5
-  m_Name: TitlePanel&Script
+  m_Name: Title&Script
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5969,7 +5975,7 @@ GameObject:
   - component: {fileID: 1777382780}
   - component: {fileID: 1777382781}
   m_Layer: 5
-  m_Name: SliderPanel&Script
+  m_Name: Slider&Script
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6946,7 +6952,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 320.73, y: 60}
+  m_SizeDelta: {x: 281.5, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1953770001
 MonoBehaviour:
