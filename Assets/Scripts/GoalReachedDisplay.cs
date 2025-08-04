@@ -31,8 +31,8 @@ namespace MusicRun
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            player = gameManager.Player;
-            goalHandler = gameManager.GoalHandler;
+            player = gameManager.playerController;
+            goalHandler = gameManager.goalHandler;
             goalHandler.OnLevelCompleted += OnLevelCompleted;
         }
 
@@ -59,13 +59,13 @@ namespace MusicRun
             // "   9999         9999            999"
             // "  9999       9999         9999
             bestScoreText.text = $" {player.playerLastScore,4}       {player.playerBestScore,4}            {player.playerPosition,4}";
-            string midiInfo = $"{gameManager.MidiPlayer?.MPTK_MidiName}";
-            if (gameManager.MidiPlayer.MPTK_MidiLoaded != null)
+            string midiInfo = $"{gameManager.midiPlayer?.MPTK_MidiName}";
+            if (gameManager.midiPlayer.MPTK_MidiLoaded != null)
             {
-                if (!string.IsNullOrEmpty(gameManager.MidiPlayer.MPTK_MidiLoaded.TrackInstrumentName))
-                    midiInfo += "\n" + gameManager.MidiPlayer.MPTK_MidiLoaded.TrackInstrumentName;
-                if (!string.IsNullOrEmpty(gameManager.MidiPlayer.MPTK_MidiLoaded.Copyright))
-                    midiInfo += "\n" + gameManager.MidiPlayer.MPTK_MidiLoaded.Copyright;
+                if (!string.IsNullOrEmpty(gameManager.midiPlayer.MPTK_MidiLoaded.TrackInstrumentName))
+                    midiInfo += "\n" + gameManager.midiPlayer.MPTK_MidiLoaded.TrackInstrumentName;
+                if (!string.IsNullOrEmpty(gameManager.midiPlayer.MPTK_MidiLoaded.Copyright))
+                    midiInfo += "\n" + gameManager.midiPlayer.MPTK_MidiLoaded.Copyright;
                 // SequenceTrackName ProgramName    TrackInstrumentName
             }
             midiInfoDisplayed.text = midiInfo;

@@ -24,7 +24,7 @@ namespace MusicRun
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            player = gameManager.Player;
+            player = gameManager.playerController;
         }
 
         void Start()

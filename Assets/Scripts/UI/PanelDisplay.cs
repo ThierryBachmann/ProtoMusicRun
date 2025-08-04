@@ -20,7 +20,7 @@ namespace MusicRun
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            player = gameManager.Player;
+            player = gameManager.playerController;
 
             rectTransform = GetComponent<RectTransform>();
             canvasGroup = GetComponent<CanvasGroup>();

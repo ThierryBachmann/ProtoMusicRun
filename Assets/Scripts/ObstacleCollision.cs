@@ -22,9 +22,9 @@ namespace MusicRun
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            player = gameManager.Player;
-            midiPlayer= gameManager.MidiPlayer;
-            SoundManager= gameManager.SoundManager;
+            player = gameManager.playerController;
+            midiPlayer= gameManager.midiPlayer;
+            SoundManager= gameManager.soundManager;
 
             if (cameraShake == null && Camera.main != null)
             {

@@ -20,8 +20,8 @@ namespace MusicRun
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            goalHandler = gameManager.GoalHandler;
-            scoreManager = gameManager.ScoreManager;
+            goalHandler = gameManager.goalHandler;
+            scoreManager = gameManager.scoreManager;
             if (distanceSlider != null)
             {
                 Transform bgTransform = distanceSlider.transform.Find("Fill Area").transform.Find("Fill");

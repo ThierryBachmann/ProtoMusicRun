@@ -17,7 +17,7 @@ namespace MusicRun
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            midiPlayer = gameManager.MidiPlayer;
+            midiPlayer = gameManager.midiPlayer;
            
             Transform bgTransform = musicSlider.transform.Find("Fill Area").transform.Find("Fill");
             if (bgTransform != null)

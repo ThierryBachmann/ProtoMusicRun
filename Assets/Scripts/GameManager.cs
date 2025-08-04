@@ -18,43 +18,43 @@ namespace MusicRun
         public float GoalPercentage;
 
         [Header("GameObject reference")]
-        public GoalHandler GoalHandler;
-        public FirebaseLeaderboard Leaderboard;
-        public ScoreManager ScoreManager;
-        public LeaderboardDisplay LeaderboardDisplay;
-        public PlayerController Player;
-        public MidiFilePlayer MidiPlayer;
-        public SoundManager SoundManager;
-        public ActionDisplay ActionDisplay;
-        public GoalReachedDisplay GoalReachedDisplay;
-        public TerrainGenerator TerrainGenerator;
-        public MidiTempoSync MidiTempoSync;
+        public GoalHandler goalHandler;
+        public FirebaseLeaderboard leaderboard;
+        public ScoreManager scoreManager;
+        public LeaderboardDisplay leaderboardDisplay;
+        public PlayerController playerController;
+        public MidiFilePlayer midiPlayer;
+        public SoundManager soundManager;
+        public ActionDisplay actionDisplay;
+        public GoalReachedDisplay goalReachedDisplay;
+        public TerrainGenerator terrainGenerator;
+        public MidiTempoSync midiTempoSync;
 
         void Awake()
         {
             // Subscribe to events
-            Leaderboard.OnLeaderboardLoaded += OnDisplayLeaderboard;
-            Leaderboard.OnScoreSubmitted += OnScoreSubmissionResult;
-            GoalHandler.OnLevelCompleted += OnLevelCompleted;
-            Leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
-            Leaderboard.OnScoreSubmitted += OnScoreSubmitted;
+            leaderboard.OnLeaderboardLoaded += OnDisplayLeaderboard;
+            leaderboard.OnScoreSubmitted += OnScoreSubmissionResult;
+            goalHandler.OnLevelCompleted += OnLevelCompleted;
+            leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
+            leaderboard.OnScoreSubmitted += OnScoreSubmitted;
             Utilities.Init();
-            MidiPlayer.OnEventStartPlayMidi.AddListener((name) =>
+            midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
             {
-                Debug.Log($"MidiPlayer Play MIDI '{name}' {GoalHandler.distanceAtStart}");
-                MidiTempoSync.Reset();
+                Debug.Log($"MidiPlayer Play MIDI '{name}' {goalHandler.distanceAtStart}");
+                midiTempoSync.Reset();
                 StartCoroutine(UpdateMaxDistanceMPTK());
-                MidiPlayer.MPTK_Transpose = 0;
-                MidiPlayer.MPTK_MidiAutoRestart = false;
+                midiPlayer.MPTK_Transpose = 0;
+                midiPlayer.MPTK_MidiAutoRestart = false;
             });
         }
 
         private IEnumerator UpdateMaxDistanceMPTK()
         {
-            while (GoalHandler.distanceAtStart < 0)
+            while (goalHandler.distanceAtStart < 0)
                 yield return new WaitForSeconds(0.1f);
-            MidiPlayer.MPTK_MaxDistance = GoalHandler.distanceAtStart * 0.8f;
-            Debug.Log($"MaxDistance set {MidiPlayer.MPTK_MaxDistance}");
+            midiPlayer.MPTK_MaxDistance = goalHandler.distanceAtStart * 0.8f;
+            Debug.Log($"MaxDistance set {midiPlayer.MPTK_MaxDistance}");
         }
 
         void Start()
@@ -64,15 +64,15 @@ namespace MusicRun
             if (startAuto)
                 RestartGame();
             else
-                ActionDisplay.Show();
-            LeaderboardDisplay.Hide();
-            TerrainGenerator.CreateLevel(0);
+                actionDisplay.Show();
+            leaderboardDisplay.Hide();
+            terrainGenerator.CreateLevel(0);
         }
 
         private void OnLeaderboardLoaded(List<LeaderboardPlayerScore> scores)
         {
-            Debug.Log($"=== PLAYER RANK {Leaderboard.GetPlayerName()} === ");
-            LeaderboardPlayerScore playerRank = scores.Find(s => s.playerName == Leaderboard.GetPlayerName());
+            Debug.Log($"=== PLAYER RANK {leaderboard.GetPlayerName()} === ");
+            LeaderboardPlayerScore playerRank = scores.Find(s => s.playerName == leaderboard.GetPlayerName());
             if (playerRank != null)
                 Debug.Log($"Player Rank {playerRank.playerName:20}: {playerRank.score} pts " +
                      $"(Time: {playerRank.completionTime:F1}s, Efficiency: {playerRank.pathEfficiency:F2})");
@@ -83,33 +83,33 @@ namespace MusicRun
 
         private void OnLevelCompleted(bool success)
         {
-            ScoreManager.CalculateScoreLevel(MusicPercentage, GoalPercentage);
+            scoreManager.CalculateScoreLevel(MusicPercentage, GoalPercentage);
             LeaderboardPlayerScore playerScore = new LeaderboardPlayerScore(
-                         Leaderboard.GetPlayerName(),
-                         ScoreManager.ScoreLevel,
+                         leaderboard.GetPlayerName(),
+                         scoreManager.ScoreLevel,
                          999,
                          999,
                          999,
                          1
                           );
-            Leaderboard.SubmitScore(playerScore);
+            leaderboard.SubmitScore(playerScore);
             levelRunning = false;
             if (nextLevelAuto)
                 StartCoroutine(Utilities.WaitAndCall(2.5f, NextLevel));
             else
-                ActionDisplay.Show();
+                actionDisplay.Show();
             //leaderboardDisplay.Show(this);
         }
 
         private void OnScoreSubmitted(bool success)
         {
-            Leaderboard.GetPlayerRank((s) =>
+            leaderboard.GetPlayerRank((s) =>
             {
                 if (s != null)
                 {
-                    Player.playerPosition = s.playerPosition;
-                    Player.playerBestScore = s.score;
-                    LeaderboardDisplay.RefreshPlayerScore(Player);
+                    playerController.playerPosition = s.playerPosition;
+                    playerController.playerBestScore = s.score;
+                    leaderboardDisplay.RefreshPlayerScore(playerController);
                 }
             });
         }
@@ -144,29 +144,29 @@ namespace MusicRun
             if (Input.GetKeyDown(KeyCode.C)) NextLevel();
             if (Input.GetKeyDown(KeyCode.S)) StopGame();
             if (Input.GetKeyDown(KeyCode.R)) RestartGame();
-            if (Input.GetKeyDown(KeyCode.A)) ActionDisplay.SwitchVisible();
+            if (Input.GetKeyDown(KeyCode.A)) actionDisplay.SwitchVisible();
             if (Input.GetKeyDown(KeyCode.L)) LeaderboardSwitchDisplay();
 
             if (gameRunning && levelRunning)
             {
-                if (GoalHandler.distanceAtStart > 0)
-                    GoalPercentage = 100f - (GoalHandler.distance / GoalHandler.distanceAtStart * 100f);
+                if (goalHandler.distanceAtStart > 0)
+                    GoalPercentage = 100f - (goalHandler.distance / goalHandler.distanceAtStart * 100f);
                 else
                     GoalPercentage = 0f;
-                MusicPercentage = ((float)MidiPlayer.MPTK_TickCurrent / (float)MidiPlayer.MPTK_TickLastNote) * 100f;
-                ScoreManager.ScoreGoal = ScoreManager.CalculateScoreGoal(MusicPercentage, GoalPercentage);
+                MusicPercentage = ((float)midiPlayer.MPTK_TickCurrent / (float)midiPlayer.MPTK_TickLastNote) * 100f;
+                scoreManager.ScoreGoal = scoreManager.CalculateScoreGoal(MusicPercentage, GoalPercentage);
             }
         }
 
         public void LeaderboardSwitchDisplay()
         {
-            LeaderboardDisplay.SwitchVisible(Player);
+            leaderboardDisplay.SwitchVisible(playerController);
         }
 
         public void RestartGame()
         {
             currentLeveIndex = 0;
-            ScoreManager.ScoreOverall = 0;
+            scoreManager.ScoreOverall = 0;
             StartLevel();
         }
         public void NextLevel()
@@ -177,18 +177,18 @@ namespace MusicRun
 
         private void StartLevel()
         {
-            ScoreManager.ScoreLevel = 0;
-            ActionDisplay.Hide();
-            LeaderboardDisplay.Hide();
-            TerrainGenerator.CreateLevel(currentLeveIndex);
-            Player.LevelStarted();
-            GoalHandler.NewLevel();
-            GoalReachedDisplay.NewLevel();
-            MidiPlayer.MPTK_MidiIndex = TerrainGenerator.CurrentLevel.indexMIDI;
-            if (MidiPlayer != null)
+            scoreManager.ScoreLevel = 0;
+            actionDisplay.Hide();
+            leaderboardDisplay.Hide();
+            terrainGenerator.CreateLevel(currentLeveIndex);
+            playerController.LevelStarted();
+            goalHandler.NewLevel();
+            goalReachedDisplay.NewLevel();
+            midiPlayer.MPTK_MidiIndex = terrainGenerator.CurrentLevel.indexMIDI;
+            if (midiPlayer != null)
             {
-                MidiPlayer.MPTK_Stop();
-                MidiPlayer.MPTK_Play();
+                midiPlayer.MPTK_Stop();
+                midiPlayer.MPTK_Play();
             }
             gameRunning = true;
             levelRunning = true;
@@ -196,11 +196,11 @@ namespace MusicRun
 
         public void StopGame()
         {
-            ActionDisplay.Show();
-            LeaderboardDisplay.Hide();
+            actionDisplay.Show();
+            leaderboardDisplay.Hide();
             gameRunning = false;
             levelRunning = false;
-            ActionDisplay.Show();
+            actionDisplay.Show();
         }
     }
 }

@@ -21,8 +21,8 @@ namespace MusicRun
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            player = gameManager.Player;
-            midiPlayer = gameManager.MidiPlayer;
+            player = gameManager.playerController;
+            midiPlayer = gameManager.midiPlayer;
         }
 
         public void Reset()
@@ -51,7 +51,7 @@ namespace MusicRun
                 float speedClamp = 1f;
                 if (gameManager.levelRunning)
                 {
-                    Level current = gameManager.TerrainGenerator.CurrentLevel;
+                    Level current = gameManager.terrainGenerator.CurrentLevel;
                     float speed = player.speedMultiplier * current.RatioSpeedMusic;
                     speedClamp = Mathf.Clamp(speed, current.MinSpeedMusic, current.MaxSpeedMusic);
                 }
