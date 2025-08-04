@@ -5,11 +5,6 @@ namespace MusicRun
 {
     public class MidiTempoSync : MonoBehaviour
     {
-        [Header("Ratio Speed player vs Speed Music")]
-        public float RatioSpeedMusic = 0.4f;
-        public float MinSpeedMusic = 0.1f;
-        public float MaxSpeedMusic = 3f;
-
         // If true, speed will change with tempo changes. Disabled by default (finally, not useful)
         private bool SpeedAsTempoChange = false;
         private float RatioTempoMusic = 0.4f;
@@ -53,9 +48,14 @@ namespace MusicRun
             }
             else
             {
-                float speed = player.speedMultiplier * RatioSpeedMusic;
-                float speedClamp = Mathf.Clamp(speed, MinSpeedMusic, MaxSpeedMusic);
-                if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speedClamp) > 0.2f)
+                float speedClamp = 1f;
+                if (gameManager.levelRunning)
+                {
+                    Level current = gameManager.TerrainGenerator.CurrentLevel;
+                    float speed = player.speedMultiplier * current.RatioSpeedMusic;
+                    speedClamp = Mathf.Clamp(speed, current.MinSpeedMusic, current.MaxSpeedMusic);
+                }
+                if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speedClamp) > 0.1f)
                 {
                     Debug.Log($"player.speedMultiplier: {player.speedMultiplier} music speed {speedClamp}");
                     midiPlayer.MPTK_Speed = speedClamp;

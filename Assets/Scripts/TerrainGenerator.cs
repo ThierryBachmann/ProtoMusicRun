@@ -27,7 +27,7 @@ namespace MusicRun
         private PlayerController player;
 
         public GameObject StartGO { get => currentStart; }
-        public Level CurrentLevel { get => currentLevel;  }
+        public Level CurrentLevel { get => currentLevel; }
 
         private void Awake()
         {
@@ -198,7 +198,14 @@ namespace MusicRun
     {
         public string name;
         public string description;
+        [Header("Defined MIDI  associated to the level")]
         public int indexMIDI;
+        [Range(0.1f, 5f)]
+        public float RatioSpeedMusic = 0.3f;
+        [Range(0.1f, 5f)]
+        public float MinSpeedMusic = 0.1f;
+        [Range(0.1f, 5f)]
+        public float MaxSpeedMusic = 5f;
         [Header("Delta chunk position with last goal")]
         public Vector2Int deltaCurrentChunk;
         [Header("Defined game object sor start end goal level")]
