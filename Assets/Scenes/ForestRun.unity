@@ -732,7 +732,7 @@ MonoBehaviour:
     RatioSpeedMusic: 0.25
     MinSpeedMusic: 0.2
     MaxSpeedMusic: 1.99
-    deltaCurrentChunk: {x: 0, y: 5}
+    deltaCurrentChunk: {x: 0, y: 20}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     runChunks:
@@ -745,7 +745,7 @@ MonoBehaviour:
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
-    deltaCurrentChunk: {x: -2, y: 5}
+    deltaCurrentChunk: {x: 0, y: 20}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     runChunks:
@@ -4641,7 +4641,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1397310885}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -6871,7 +6871,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1179939235}
   m_HandleRect: {fileID: 1179939234}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

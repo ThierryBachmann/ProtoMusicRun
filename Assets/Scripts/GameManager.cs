@@ -53,7 +53,7 @@ namespace MusicRun
         {
             while (goalHandler.distanceAtStart < 0)
                 yield return new WaitForSeconds(0.1f);
-            midiPlayer.MPTK_MaxDistance = goalHandler.distanceAtStart * 0.8f;
+            midiPlayer.MPTK_MaxDistance = goalHandler.distanceAtStart * 1.1f;
             Debug.Log($"MaxDistance set {midiPlayer.MPTK_MaxDistance}");
         }
 
@@ -64,7 +64,7 @@ namespace MusicRun
             if (startAuto)
                 RestartGame();
             else
-            { 
+            {
                 actionDisplay.Show();
                 actionDisplay.SelectActionsToShow();
             }

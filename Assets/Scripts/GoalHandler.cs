@@ -44,15 +44,19 @@ namespace MusicRun
         // Update is called once per frame
         void Update()
         {
+
+            // Get planar distance (ignores height difference)
+            Vector3 delta = Goal.transform.position - player.transform.position;
+            delta.y = 0f; // Ignore height difference
+            distance = delta.magnitude;
+            if (distanceAtStart < 0) 
+                distanceAtStart = distance;
+
             // Convert goal world position to player's local space
             Vector3 localToGoal = player.transform.InverseTransformPoint(Goal.transform.position);
 
             // Flatten to horizontal plane by zeroing the Y axis
             localToGoal.y = 0f;
-
-            // Get planar distance (ignores height difference)
-            distance = localToGoal.magnitude;
-            if (distanceAtStart < 0) distanceAtStart = distance;
 
             // Get the direction in the player's plane (normalized)
             Vector3 planarDirection = localToGoal.normalized;
