@@ -35,7 +35,7 @@ namespace MusicRun
         public float maxAngle = 45f;
 
         [Header("Jump")]
-        private float gravity = 9.81f;
+        public float gravity = 12.81f;
         public float jumpForce;
 
         [Header("Knock‑back")]
@@ -139,13 +139,10 @@ namespace MusicRun
             }
             if (transform.position.y < 0f)
                 StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, 4, transform.position.z)));
-            
+
+            // Pour tester 
             if (Input.GetKeyDown(KeyCode.Delete))
-            {
-                StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, 4, transform.position.z)));
-            }
-            // Clamp l'angle cible
-            //     targetAngle = Mathf.Clamp(targetAngle, -maxAngle, maxAngle);
+                StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, -1, transform.position.z)));
         }
 
         void HandleRotation()

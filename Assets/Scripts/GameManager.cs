@@ -1,4 +1,5 @@
 using MidiPlayerTK;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -38,7 +39,24 @@ namespace MusicRun
             Leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
             Leaderboard.OnScoreSubmitted += OnScoreSubmitted;
             Utilities.Init();
+            MidiPlayer.OnEventStartPlayMidi.AddListener((name) =>
+            {
+                Debug.Log($"MidiPlayer Play MIDI '{name}' {GoalHandler.distanceAtStart}");
+                MidiTempoSync.Reset();
+                StartCoroutine(UpdateMaxDistanceMPTK());
+                MidiPlayer.MPTK_Transpose = 0;
+                MidiPlayer.MPTK_MidiAutoRestart = false;
+            });
         }
+
+        private IEnumerator UpdateMaxDistanceMPTK()
+        {
+            while (GoalHandler.distanceAtStart < 0)
+                yield return new WaitForSeconds(0.1f);
+            MidiPlayer.MPTK_MaxDistance = GoalHandler.distanceAtStart * 0.8f;
+            Debug.Log($"MaxDistance set {MidiPlayer.MPTK_MaxDistance}");
+        }
+
         void Start()
         {
             gameRunning = false;
@@ -166,12 +184,11 @@ namespace MusicRun
             Player.LevelStarted();
             GoalHandler.NewLevel();
             GoalReachedDisplay.NewLevel();
-            GoalHandler.NewLevel();
-            MidiTempoSync.Reset();
+            MidiPlayer.MPTK_MidiIndex = TerrainGenerator.CurrentLevel.indexMIDI;
             if (MidiPlayer != null)
             {
                 MidiPlayer.MPTK_Stop();
-                MidiPlayer.MPTK_RePlay();
+                MidiPlayer.MPTK_Play();
             }
             gameRunning = true;
             levelRunning = true;
