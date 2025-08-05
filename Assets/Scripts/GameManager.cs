@@ -41,7 +41,9 @@ namespace MusicRun
             Utilities.Init();
             midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
             {
+                // Start of the MIDI playback has been triggered.
                 Debug.Log($"MidiPlayer Play MIDI '{name}' {goalHandler.distanceAtStart}");
+                // Reset some MIDI properties which can be done only when MIDI playback is started.
                 midiTempoSync.Reset();
                 StartCoroutine(UpdateMaxDistanceMPTK());
                 midiPlayer.MPTK_Transpose = 0;
@@ -51,9 +53,12 @@ namespace MusicRun
 
         private IEnumerator UpdateMaxDistanceMPTK()
         {
+            // Wait for the goalHandler to have a valid distanceAtStart.
             while (goalHandler.distanceAtStart < 0)
                 yield return new WaitForSeconds(0.1f);
-            midiPlayer.MPTK_MaxDistance = goalHandler.distanceAtStart * 1.1f;
+            // Attenuation of volume with the distance from the player and the goal.
+            // When the player is at the start, the volume is 5% of the volume max at the goal.
+            midiPlayer.MPTK_MaxDistance = goalHandler.distanceAtStart * 1.05f;
             Debug.Log($"MaxDistance set {midiPlayer.MPTK_MaxDistance}");
         }
 

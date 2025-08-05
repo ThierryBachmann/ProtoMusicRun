@@ -37,16 +37,26 @@ namespace MusicRun
             action?.Invoke();
         }
 
+        /// <summary>
+        /// Typically used to find the GameManager in the scene when Awake() is called.
+        /// The GamaManager give access to all the game objects and components.
+        /// </summary>
+        /// <returns></returns>
         static public GameManager FindGameManager()
         {
-            object[] gos = FindObjectsByType(typeof(GameManager), FindObjectsSortMode.None);
+            GameManager[] gos = (GameManager[])FindObjectsByType(typeof(GameManager), FindObjectsSortMode.None);
 
             if (gos == null || gos.Length == 0)
             {
                 Debug.LogError("GameManager not found in the scene.");
                 return null;
             }
-            return (GameManager)FindObjectsByType(typeof(GameManager), FindObjectsSortMode.None)[0];
+            if (gos.Length > 1)
+            {
+                Debug.LogError("Only one GameManager must exist in the scene.");
+                return null;
+            }
+            return gos[0];
         }
 
     }
