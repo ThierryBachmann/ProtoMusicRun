@@ -26,9 +26,11 @@ namespace MusicRun
         public MidiFilePlayer midiPlayer;
         public SoundManager soundManager;
         public ActionDisplay actionDisplay;
+        public PanelDisplay actionPlay;
         public GoalReachedDisplay goalReachedDisplay;
         public TerrainGenerator terrainGenerator;
         public MidiTempoSync midiTempoSync;
+        public SwitchButton pauseButton;
 
         void Awake()
         {
@@ -70,6 +72,7 @@ namespace MusicRun
                 RestartGame();
             else
             {
+                actionPlay.Hide();
                 actionDisplay.Show();
                 actionDisplay.SelectActionsToShow();
             }
@@ -106,6 +109,7 @@ namespace MusicRun
                 StartCoroutine(Utilities.WaitAndCall(2.5f, NextLevel));
             else
             {
+                actionPlay.Hide();
                 actionDisplay.Show();
                 actionDisplay.SelectActionsToShow();
             }
@@ -158,6 +162,25 @@ namespace MusicRun
             if (Input.GetKeyDown(KeyCode.A)) actionDisplay.SwitchVisible();
             if (Input.GetKeyDown(KeyCode.L)) LeaderboardSwitchDisplay();
 
+            if (pauseButton.IsOn && gameRunning)
+            {
+                if (levelRunning)
+                {
+                    midiPlayer.MPTK_Pause();
+                    levelRunning = false;
+                    //    actionDisplay.Show();
+                }
+            }
+            if (!pauseButton.IsOn && gameRunning)
+            {
+                if (!levelRunning)
+                {
+                    midiPlayer.MPTK_UnPause();
+                    levelRunning = true;
+                    //    actionDisplay.Hide();
+                }
+            }
+
             if (gameRunning && levelRunning)
             {
                 if (goalHandler.distanceAtStart > 0)
@@ -190,6 +213,7 @@ namespace MusicRun
         {
             scoreManager.ScoreLevel = 0;
             actionDisplay.Hide();
+            actionPlay.Show();
             leaderboardDisplay.Hide();
             terrainGenerator.CreateLevel(currentLeveIndex);
             playerController.LevelStarted();
@@ -207,6 +231,7 @@ namespace MusicRun
 
         public void StopGame()
         {
+            actionPlay.Hide();
             actionDisplay.Show();
             leaderboardDisplay.Hide();
             gameRunning = false;
