@@ -201,21 +201,25 @@ namespace MusicRun
         {
             currentLeveIndex = 0;
             scoreManager.ScoreOverall = 0;
-            StartLevel();
+            CreateAndStartLevel(currentLeveIndex);
         }
         public void NextLevel()
         {
-            currentLeveIndex++;
-            StartLevel();
+            currentLeveIndex = terrainGenerator.SelectNextLevel(currentLeveIndex);
+            CreateAndStartLevel(currentLeveIndex);
+        }
+        public void RestartLevel()
+        {
+            CreateAndStartLevel(currentLeveIndex);
         }
 
-        private void StartLevel()
+        private void CreateAndStartLevel(int level)
         {
             scoreManager.ScoreLevel = 0;
             actionDisplay.Hide();
             actionPlay.Show();
             leaderboardDisplay.Hide();
-            terrainGenerator.CreateLevel(currentLeveIndex);
+            terrainGenerator.CreateLevel(level);
             playerController.LevelStarted();
             goalHandler.NewLevel();
             goalReachedDisplay.NewLevel();

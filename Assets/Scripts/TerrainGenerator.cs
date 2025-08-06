@@ -42,18 +42,18 @@ namespace MusicRun
         {
         }
 
-        public void CreateLevel(int levelIndex)
+        public int SelectNextLevel(int levelIndex)
         {
-            if (levelIndex < 0)
-            {
-                Debug.LogError("Invalid level index");
-                return;
-            }
-            if (levelIndex >= levels.Length)
+            levelIndex++;
+            if (levelIndex < 0 || levelIndex >= levels.Length)
             {
                 levelIndex = 0;
                 Debug.LogWarning("Back to first level");
             }
+            return levelIndex;
+        }
+        public void CreateLevel(int levelIndex)
+        {
             currentLevel = levels[levelIndex];
             forestChunks = currentLevel.runChunks;
             Debug.Log($"Start Level: {currentLevel.name} - {currentLevel.description}");

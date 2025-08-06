@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 namespace MusicRun
 {
@@ -7,7 +8,8 @@ namespace MusicRun
     {
         public TextMeshProUGUI scoreText;
         public TextMeshProUGUI infoText;
-
+        public Button quitButton;
+        public Button helpButton;
         private Color currentTextColor;
         private GameManager gameManager;
         private ScoreManager scoreManager;
@@ -26,11 +28,21 @@ namespace MusicRun
 
         void Start()
         {
+            quitButton.onClick.AddListener(() =>
+            {
+                Debug.Log("quitButton");
+                Application.Quit();
+            });
+            helpButton.onClick.AddListener(() =>
+            {
+                Debug.Log("helpButton");
+                Application.OpenURL("https://https://paxstellar.fr/news/");
+            });
         }
 
         void Update()
         {
-            scoreText.text = $"{gameManager.leaderboard.GetPlayerName()} Score:{scoreManager.ScoreOverall:N0} Bonus: {scoreManager.ScoreBonus} Speed:{player.GetSpeed():N1}";
+            scoreText.text = $"{gameManager.leaderboard.GetPlayerName()} Level: {gameManager.currentLeveIndex+1} Score:{scoreManager.ScoreOverall:N0} Bonus: {scoreManager.ScoreBonus} Speed:{player.GetSpeed():N1}";
             //infoText.text = $"dir:{player.goalHandler.goalDirection:F2} angle:{player.goalHandler.goalAngle:F2}";
             Color targetColor = scoreText.color; // couleur par défaut
 
