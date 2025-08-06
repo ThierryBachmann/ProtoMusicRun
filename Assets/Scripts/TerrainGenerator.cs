@@ -19,7 +19,6 @@ namespace MusicRun
         private Vector2Int startChunkCoord;
         private GameObject currentGoal;
         private Vector2Int goalChunkCoord;
-        private GameObject[] forestChunks; // tableau de prefabs
         private Dictionary<Vector2Int, GameObject> spawnedChunks = new Dictionary<Vector2Int, GameObject>();
         private Vector2Int currentPlayerChunk;
 
@@ -55,7 +54,6 @@ namespace MusicRun
         public void CreateLevel(int levelIndex)
         {
             currentLevel = levels[levelIndex];
-            forestChunks = currentLevel.runChunks;
             Debug.Log($"Start Level: {currentLevel.name} - {currentLevel.description}");
             CreateStartAndGoalChunk();
             // Force to update chunks with real position of the player
@@ -74,18 +72,21 @@ namespace MusicRun
                 Debug.LogError("Start game object is not set in the level configuration.");
                 return;
             }
+
+            // Move the start chunk to the current player position (which is the current goal)
             currentStart = currentLevel.startGO;
             startChunkCoord = currentPlayerChunk;
-            Vector3 position = ChunkToPosition(startChunkCoord);
             currentStart.name = $"start_{startChunkCoord.x}_{startChunkCoord.y}";
 
+            // Remove existing chunk in the spawnedChunks dictionary if it exists
             if (spawnedChunks.ContainsKey(startChunkCoord))
             {
                 Debug.Log($"Destroy existing start chunk: {startChunkCoord} --> playerChunk: {spawnedChunks[startChunkCoord].name}");
                 Destroy(spawnedChunks[startChunkCoord]);
                 spawnedChunks.Remove(startChunkCoord);
             }
-            currentStart.transform.position = position;
+            
+            currentStart.transform.position = ChunkToPosition(startChunkCoord);
             currentStart.transform.rotation = Quaternion.identity;
             Debug.Log($"Add start chunk coord: {startChunkCoord} --> GO: {currentStart.name} {currentStart.transform.position}");
 
@@ -98,8 +99,7 @@ namespace MusicRun
                 return;
             }
             currentGoal = currentLevel.goalGO;
-            goalChunkCoord = currentPlayerChunk + currentLevel.deltaCurrentChunk; // PositionToChunk(goal.position);
-            position = ChunkToPosition(goalChunkCoord);
+            goalChunkCoord = currentPlayerChunk + currentLevel.deltaCurrentChunk; 
             currentGoal.name = $"goal_{goalChunkCoord.x}_{goalChunkCoord.y}";
             if (spawnedChunks.ContainsKey(goalChunkCoord))
             {
@@ -107,7 +107,7 @@ namespace MusicRun
                 Destroy(spawnedChunks[goalChunkCoord]);
                 spawnedChunks.Remove(goalChunkCoord);
             }
-            currentGoal.transform.position = position;
+            currentGoal.transform.position = ChunkToPosition(goalChunkCoord);
             currentGoal.transform.rotation = Quaternion.identity;
             Debug.Log($"Add goal chunk coord: {goalChunkCoord} --> GO: {currentGoal.name} {currentGoal.transform.position}");
         }
@@ -147,13 +147,14 @@ namespace MusicRun
                     Vector2Int chunkCoord = currentPlayerChunk + new Vector2Int(x, z);
                     newChunks.Add(chunkCoord);
 
-                    // Does the chunk dictionary already contains this chunk?
+                    // Does the chunk dictionary already contains this chunk? Don't instantiate for start and goal chunks.
                     if (!spawnedChunks.ContainsKey(chunkCoord) && chunkCoord != goalChunkCoord && chunkCoord != startChunkCoord)
                     {
                         // No, add it
                         Vector3 spawnPos = ChunkToPosition(chunkCoord);
 
-                        GameObject randomPrefab = forestChunks[UnityEngine.Random.Range(0, forestChunks.Length)];
+                        // Instantiate a random prefab from the current level's runChunks
+                        GameObject randomPrefab = currentLevel.runChunks[UnityEngine.Random.Range(0, currentLevel.runChunks.Length)];
                         GameObject chunk = Instantiate(randomPrefab, spawnPos, Quaternion.identity);
                         chunk.name = $"Chunk_{chunkCoord.x}_{chunkCoord.y}";
                         if (disableObstacles) // useful for test mode

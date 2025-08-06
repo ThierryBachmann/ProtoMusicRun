@@ -1,4 +1,5 @@
 using MidiPlayerTK;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,6 +33,7 @@ namespace MusicRun
         public MidiTempoSync midiTempoSync;
         public SwitchButton pauseButton;
 
+        public int[] channelPlayed = new int[16]; // Array to track which channels are currently playing
         void Awake()
         {
             // Subscribe to events
@@ -50,6 +52,14 @@ namespace MusicRun
                 StartCoroutine(UpdateMaxDistanceMPTK());
                 midiPlayer.MPTK_Transpose = 0;
                 midiPlayer.MPTK_MidiAutoRestart = false;
+                Array.Clear(channelPlayed,0,16);
+            });
+            midiPlayer.OnEventNotesMidi.AddListener((midiEvents) =>
+            {
+                // Handle MIDI events if needed
+                // Debug.Log($"MidiPlayer Notes: {midiEvents.Count}");
+                foreach (var midiEvent in midiEvents)
+                    channelPlayed[midiEvent.Channel]++;
             });
         }
 

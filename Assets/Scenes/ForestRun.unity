@@ -973,6 +973,7 @@ MonoBehaviour:
   terrainGenerator: {fileID: 240111797}
   midiTempoSync: {fileID: 283134994}
   pauseButton: {fileID: 1518020440}
+  channelPlayed: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!4 &152116609
 Transform:
   m_ObjectHideFlags: 0
@@ -1168,7 +1169,7 @@ MonoBehaviour:
   initialSpeed: 5
   turnSpeed: 90
   maxAngle: 45
-  gravity: 9.81
+  gravity: 20
   jumpForce: 10
   knockbackDecay: 4
   playerPosition: 99999
