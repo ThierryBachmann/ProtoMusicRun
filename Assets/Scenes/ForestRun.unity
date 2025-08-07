@@ -1087,7 +1087,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chunkSize: 20
-  renderDistance: 3
+  renderDistance: 5
   disableObstacles: 0
   levels:
   - name: Flat desert
@@ -1096,7 +1096,7 @@ MonoBehaviour:
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
-    deltaCurrentChunk: {x: 0, y: 20}
+    deltaCurrentChunk: {x: 0, y: 5}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     runChunks:
@@ -1107,7 +1107,7 @@ MonoBehaviour:
     RatioSpeedMusic: 0.25
     MinSpeedMusic: 0.2
     MaxSpeedMusic: 1.99
-    deltaCurrentChunk: {x: 0, y: 20}
+    deltaCurrentChunk: {x: 0, y: 5}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     runChunks:

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.ProBuilder.Shapes;
 using UnityEngine.SceneManagement;
 
 namespace MusicRun
@@ -41,6 +42,11 @@ namespace MusicRun
         {
         }
 
+        /// <summary>
+        /// Calculates the next level index to be selected.
+        /// </summary>
+        /// <param name="levelIndex"></param>
+        /// <returns></returns>
         public int SelectNextLevel(int levelIndex)
         {
             levelIndex++;
@@ -51,6 +57,11 @@ namespace MusicRun
             }
             return levelIndex;
         }
+
+        /// <summary>
+        /// Creates a level based on the specified index.
+        /// </summary>
+        /// <param name="levelIndex"></param>
         public void CreateLevel(int levelIndex)
         {
             currentLevel = levels[levelIndex];
@@ -61,9 +72,14 @@ namespace MusicRun
             UpdateChunks();
         }
 
+        /// <summary>
+        /// Creates the start and goal chunks based on the current level configuration.
+        /// </summary>
         private void CreateStartAndGoalChunk()
         {
             Debug.Log($"Create Start and Goal Chunk Delta={currentLevel.deltaCurrentChunk}");
+
+            ClearChunks(1);
 
             // Create the start chunk
             // ----------------------
@@ -85,7 +101,7 @@ namespace MusicRun
                 Destroy(spawnedChunks[startChunkCoord]);
                 spawnedChunks.Remove(startChunkCoord);
             }
-            
+
             currentStart.transform.position = ChunkToPosition(startChunkCoord);
             currentStart.transform.rotation = Quaternion.identity;
             Debug.Log($"Add start chunk coord: {startChunkCoord} --> GO: {currentStart.name} {currentStart.transform.position}");
@@ -99,7 +115,7 @@ namespace MusicRun
                 return;
             }
             currentGoal = currentLevel.goalGO;
-            goalChunkCoord = currentPlayerChunk + currentLevel.deltaCurrentChunk; 
+            goalChunkCoord = currentPlayerChunk + currentLevel.deltaCurrentChunk;
             currentGoal.name = $"goal_{goalChunkCoord.x}_{goalChunkCoord.y}";
             if (spawnedChunks.ContainsKey(goalChunkCoord))
             {
@@ -112,11 +128,21 @@ namespace MusicRun
             Debug.Log($"Add goal chunk coord: {goalChunkCoord} --> GO: {currentGoal.name} {currentGoal.transform.position}");
         }
 
+        /// <summary>
+        /// converts the specified world position to the corresponding chunk coordinates.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         Vector2Int PositionToChunk(Vector3 position)
         {
             return new Vector2Int((int)Mathf.Round(position.x / chunkSize), (int)Mathf.Round(position.z / chunkSize));
         }
 
+        /// <summary>
+        /// Converts the specified chunk coordinates to the corresponding world position.
+        /// </summary>
+        /// <param name="chunkCoord">The chunk coordinates to convert. The X and Y components represent the chunk's position in the grid.</param>
+        /// <returns>A <see cref="Vector3"/> representing the world-space position of the origin of the specified chunk.</returns>
         Vector3 ChunkToPosition(Vector2Int chunkCoord)
         {
             return new Vector3(chunkCoord.x * chunkSize, 0, chunkCoord.y * chunkSize);
@@ -191,6 +217,32 @@ namespace MusicRun
                 spawnedChunks.Remove(coord);
             }
         }
+
+        /// <summary>
+        /// Clear chunks which are at a distance greater than the specified distance from the player.
+        /// </summary>
+        /// <param name="atDistance"></param>
+        void ClearChunks(int atDistance)
+        {
+            for (int x = -renderDistance; x <= renderDistance; x++)
+            {
+                for (int z = -renderDistance; z <= renderDistance; z++)
+                {
+                    Vector2Int chunkCoord = currentPlayerChunk + new Vector2Int(x, z);
+                    if ((chunkCoord - currentPlayerChunk).magnitude > atDistance)
+                    {
+                        // Does the chunk dictionary contains this chunk? Don't remove for start and goal chunks (in case of ...)).
+                        if (spawnedChunks.ContainsKey(chunkCoord) && chunkCoord != goalChunkCoord && chunkCoord != startChunkCoord)
+                        {
+                            //Debug.Log($"ClearChunks {chunkCoord}");
+                            Destroy(spawnedChunks[chunkCoord]);
+                            spawnedChunks.Remove(chunkCoord);
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
 
