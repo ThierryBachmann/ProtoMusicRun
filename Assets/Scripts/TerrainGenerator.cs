@@ -183,6 +183,18 @@ namespace MusicRun
                         GameObject randomPrefab = currentLevel.runChunks[UnityEngine.Random.Range(0, currentLevel.runChunks.Length)];
                         GameObject chunk = Instantiate(randomPrefab, spawnPos, Quaternion.identity);
                         chunk.name = $"Chunk_{chunkCoord.x}_{chunkCoord.y}";
+
+                        foreach (Transform child in chunk.transform)
+                        {
+                            if (child.name.StartsWith("DatePalm") || child.name.StartsWith("Sago") || child.name.StartsWith("Grass")|| child.name.StartsWith("Fountain"))
+                            {
+                                Debug.Log($"Chunk {chunkCoord} randomize child: {child.name} {child.tag}");
+                                child.SetLocalPositionAndRotation(new Vector3(
+                                    child.localPosition.x + UnityEngine.Random.Range(-2f, 2f),
+                                    child.localPosition.y,
+                                    child.localPosition.z + UnityEngine.Random.Range(-2f, 2f)), Quaternion.identity);
+                            }
+                        }
                         if (disableObstacles) // useful for test mode
                         {
                             foreach (Collider col in chunk.GetComponentsInChildren<Collider>())
