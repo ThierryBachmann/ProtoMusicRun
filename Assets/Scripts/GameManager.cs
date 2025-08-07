@@ -230,7 +230,7 @@ namespace MusicRun
         }
 
         /// <summary>
-        /// Create and start a new level.
+        /// Create and start a new level or restart the same level (preserve generated chunks).
         /// </summary>
         /// <param name="level"></param>
         /// <param name="restartSame"></param>
