@@ -52,7 +52,7 @@ namespace MusicRun
                 StartCoroutine(UpdateMaxDistanceMPTK());
                 midiPlayer.MPTK_Transpose = 0;
                 midiPlayer.MPTK_MidiAutoRestart = false;
-                Array.Clear(channelPlayed,0,16);
+                Array.Clear(channelPlayed, 0, 16);
             });
             midiPlayer.OnEventNotesMidi.AddListener((midiEvents) =>
             {
@@ -181,6 +181,7 @@ namespace MusicRun
                     //    actionDisplay.Show();
                 }
             }
+
             if (!pauseButton.IsOn && gameRunning)
             {
                 if (!levelRunning)
@@ -213,22 +214,40 @@ namespace MusicRun
             scoreManager.ScoreOverall = 0;
             CreateAndStartLevel(currentLeveIndex);
         }
+
+        /// <summary>
+        /// Restart the current level.
+        /// </summary>
+        public void RestartLevel()
+        {
+            CreateAndStartLevel(currentLeveIndex, restartSame : true);
+        }
+
         public void NextLevel()
         {
             currentLeveIndex = terrainGenerator.SelectNextLevel(currentLeveIndex);
             CreateAndStartLevel(currentLeveIndex);
         }
-        public void RestartLevel()
-        {
-            CreateAndStartLevel(currentLeveIndex);
-        }
 
-        private void CreateAndStartLevel(int level)
+        /// <summary>
+        /// Create and start a new level.
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="restartSame"></param>
+        private void CreateAndStartLevel(int level, bool restartSame = false)
         {
             scoreManager.ScoreLevel = 0;
             actionDisplay.Hide();
             actionPlay.Show();
             leaderboardDisplay.Hide();
+            if (restartSame)
+            {
+                playerController.ResetPosition();
+            }
+            else
+            {
+                terrainGenerator.CreateLevel(level);
+            }
             terrainGenerator.CreateLevel(level);
             playerController.LevelStarted();
             goalHandler.NewLevel();
