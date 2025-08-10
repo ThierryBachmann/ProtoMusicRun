@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4757536846812030867}
   m_Layer: 0
   m_Name: CollisionObject1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -66,7 +66,7 @@ GameObject:
   - component: {fileID: 3810448335277979733}
   m_Layer: 0
   m_Name: SagoPalm_01_Prefab
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 6277618725343348239}
   m_Layer: 0
   m_Name: CollisionObject0
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647

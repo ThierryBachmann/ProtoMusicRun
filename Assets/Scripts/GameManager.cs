@@ -12,7 +12,7 @@ namespace MusicRun
     {
         public bool gameRunning;
         public bool levelRunning;
-        public int currentLeveIndex;
+        public int currentLevelIndex;
         public bool startAuto;
         public bool nextLevelAuto;
         public float MusicPercentage;
@@ -87,7 +87,10 @@ namespace MusicRun
                 actionDisplay.SelectActionsToShow();
             }
             leaderboardDisplay.Hide();
-            terrainGenerator.CreateLevel(0);
+
+            ////// Create first level, just to have a view, will be recreated when game starts.
+            ////currentLevelIndex = terrainGenerator.SelectNextLevel(-1);
+            ////terrainGenerator.CreateLevel(0);
         }
 
         private void OnLeaderboardLoaded(List<LeaderboardPlayerScore> scores)
@@ -210,9 +213,9 @@ namespace MusicRun
 
         public void RestartGame()
         {
-            currentLeveIndex = 0;
+            currentLevelIndex = terrainGenerator.SelectNextLevel(-1);
             scoreManager.ScoreOverall = 0;
-            CreateAndStartLevel(currentLeveIndex);
+            CreateAndStartLevel(currentLevelIndex);
         }
 
         /// <summary>
@@ -220,13 +223,13 @@ namespace MusicRun
         /// </summary>
         public void RestartLevel()
         {
-            CreateAndStartLevel(currentLeveIndex, restartSame : true);
+            CreateAndStartLevel(currentLevelIndex, restartSame : true);
         }
 
         public void NextLevel()
         {
-            currentLeveIndex = terrainGenerator.SelectNextLevel(currentLeveIndex);
-            CreateAndStartLevel(currentLeveIndex);
+            currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
+            CreateAndStartLevel(currentLevelIndex);
         }
 
         /// <summary>

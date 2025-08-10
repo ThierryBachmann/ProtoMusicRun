@@ -57,7 +57,7 @@ namespace MusicRun
                 }
                 if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speedClamp) > 0.1f)
                 {
-                    Debug.Log($"player.speedMultiplier: {player.speedMultiplier} music speed {speedClamp}");
+                    //Debug.Log($"player.speedMultiplier: {player.speedMultiplier} music speed {speedClamp}");
                     midiPlayer.MPTK_Speed = speedClamp;
                     previousSpeed = speedClamp;
                 }

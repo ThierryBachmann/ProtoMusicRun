@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
 using UnityEngine.ProBuilder.Shapes;
 using UnityEngine.SceneManagement;
 
@@ -22,7 +24,8 @@ namespace MusicRun
         private Vector2Int goalChunkCoord;
         private Dictionary<Vector2Int, GameObject> spawnedChunks = new Dictionary<Vector2Int, GameObject>();
         private Vector2Int currentPlayerChunk;
-
+        public float perlinScale = 0.3f;
+        public float perlinAmplitude = 100f;
         private GameManager gameManager;
         private PlayerController player;
 
@@ -49,11 +52,22 @@ namespace MusicRun
         /// <returns></returns>
         public int SelectNextLevel(int levelIndex)
         {
-            levelIndex++;
-            if (levelIndex < 0 || levelIndex >= levels.Length)
+            bool oneLevelEnabledAtLeast = false;
+            foreach (Level level in levels) if (level.enabled) { oneLevelEnabledAtLeast = true; break; }
+
+            if (!oneLevelEnabledAtLeast)
+                return 0;
+
+            while (true)
             {
-                levelIndex = 0;
-                Debug.LogWarning("Back to first level");
+                levelIndex++;
+                if (levelIndex < 0 || levelIndex >= levels.Length)
+                {
+                    levelIndex = 0;
+                    Debug.LogWarning("Back to first level");
+                }
+                if (levels[levelIndex].enabled)
+                    break;
             }
             return levelIndex;
         }
@@ -186,20 +200,43 @@ namespace MusicRun
 
                         foreach (Transform child in chunk.transform)
                         {
-                            if (child.name.StartsWith("DatePalm") || child.name.StartsWith("Sago") || child.name.StartsWith("Grass")|| child.name.StartsWith("Fountain"))
+                            if (child.name.StartsWith("DatePalm") || child.name.StartsWith("Sago") || child.name.StartsWith("Grass") || child.name.StartsWith("Fountain"))
                             {
-                                Debug.Log($"Chunk {chunkCoord} randomize child: {child.name} {child.tag}");
-                                child.SetLocalPositionAndRotation(new Vector3(
-                                    child.localPosition.x + UnityEngine.Random.Range(-2f, 2f),
-                                    child.localPosition.y,
-                                    child.localPosition.z + UnityEngine.Random.Range(-2f, 2f)), Quaternion.identity);
+                                Vector3 basePosition = child.localPosition;
+
+                                float offsetX = Mathf.PerlinNoise((basePosition.x + chunkCoord.x * 100f) * perlinScale, (basePosition.z + chunkCoord.y * 100f) * perlinScale);
+                                float offsetZ = Mathf.PerlinNoise((basePosition.z + chunkCoord.x * 100f) * perlinScale, (basePosition.x + chunkCoord.y * 100f) * perlinScale);
+
+                                // Centrer autour de 0 et amplifier
+                                offsetX = (offsetX - 0.5f) * perlinAmplitude;
+                                offsetZ = (offsetZ - 0.5f) * perlinAmplitude;
+
+                                Vector3 hitPoint = Vector3.zero;
+
+                                //    Debug.Log($"Chunk: {chunkCoord} Child: {child.name} world: {child.position} local:{basePosition} --> no hit");
+                                // Avoid vegetable on the borders (-10, 10)
+                                float clamp = UnityEngine.Random.Range(7, 9);
+                                Vector3 newPosition = new Vector3(
+                                    Mathf.Clamp(basePosition.x + offsetX, -clamp, clamp), 
+                                    basePosition.y, 
+                                    Mathf.Clamp(basePosition.z + offsetZ, -clamp, clamp));
+
+                                Debug.Log($"Chunk: {chunkCoord} Child: {child.name} world: {child.position} local:{basePosition} --> new: {newPosition} offset: {offsetX},  {offsetZ}");
+                                //if (heightY > -1f) Debug.Log($"    Found Height - localPosition:{basePosition.y} --> {heightY:0.00}");
+
+                                child.SetLocalPositionAndRotation(newPosition, Quaternion.identity);
+                                PlaceOnHighestTerrain(child, 100f);
+
                             }
                         }
+
                         if (disableObstacles) // useful for test mode
                         {
                             foreach (Collider col in chunk.GetComponentsInChildren<Collider>())
                             {
                                 // keeps the GameObject visible, but disables any physical interaction.
+                                // To disable collision detection, we can disable the collider component.
+                                // But add tag "Obstacle" to the collision object associated to the gameobject.
                                 if (col.CompareTag("Obstacle"))
                                     col.enabled = false;
                             }
@@ -229,7 +266,46 @@ namespace MusicRun
                 spawnedChunks.Remove(coord);
             }
         }
+        /// <summary>
+        /// Place un objet sur le terrain le plus haut sous sa position actuelle.
+        /// </summary>
+        /// <param name="obj">Objet à placer</param>
+        /// <param name="maxRayHeight">Hauteur max du rayon pour détecter le sol</param>
+        public static bool PlaceOnHighestTerrain(Transform obj, float maxRayHeight = 100f)
+        {
+            Vector3 startPos = obj.position + Vector3.up * maxRayHeight;
+            Ray ray = new Ray(startPos, Vector3.down);
 
+            RaycastHit[] hits = Physics.RaycastAll(ray, maxRayHeight * 2f);
+
+            if (hits.Length == 0)
+                return false; // Rien touché
+
+            // On garde uniquement les collisions avec un terrain
+            var terrainHits = hits
+                .Where(h => h.collider.CompareTag("Terrain")) // à adapter selon ton tag
+                .OrderByDescending(h => h.point.y) // plus haut en premier
+                .ToArray();
+
+            if (terrainHits.Length == 0)
+            {
+                Debug.Log($"    --> no hit");
+                return false;
+            }
+
+            // Premier = terrain le plus haut
+            RaycastHit topHit = terrainHits[0];
+
+            // On convertit la position du point de contact en local du Chunk
+            Transform chunk = obj.parent; // ici on suppose que Obj1 est déjà enfant du Chunk
+            Vector3 localPos = chunk.InverseTransformPoint(topHit.point);
+
+            // On applique la position avec un léger offset si besoin
+            obj.localPosition = new Vector3(localPos.x, localPos.y, localPos.z);
+            Debug.Log($"    --> hit {terrainHits[0].transform.name} world: {topHit.point} local:{obj.localPosition} --> parent: {chunk.name}");
+
+            return true;
+        }
         /// <summary>
         /// Clear chunks which are at a distance greater than the specified distance from the player.
         /// </summary>
@@ -261,6 +337,7 @@ namespace MusicRun
     [Serializable]
     public class Level
     {
+        public bool enabled;
         public string name;
         public string description;
         [Header("Defined MIDI  associated to the level")]

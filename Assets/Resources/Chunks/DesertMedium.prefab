@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7969010532264824609}
+  - component: {fileID: 5072022667283193099}
   m_Layer: 0
   m_Name: DesertMedium
   m_TagString: Untagged
@@ -37,6 +38,23 @@ Transform:
   - {fileID: 9111683543869137334}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5072022667283193099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3245006867922576827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 737a3177049dcdf4b95e4e03bbf9e135, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldOrigin: {x: 0, y: 0}
+  cellSize: 0.5
+  width: 20
+  height: 20
+  rayHeight: 100
 --- !u!1 &7762111252373186686
 GameObject:
   m_ObjectHideFlags: 0
@@ -51,7 +69,7 @@ GameObject:
   - component: {fileID: 908878956962569554}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -393,7 +411,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4493489561980387476, guid: a96fe3b502c283d43a00b406db68c805, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.49
+      value: 3.82
       objectReference: {fileID: 0}
     - target: {fileID: 4493489561980387476, guid: a96fe3b502c283d43a00b406db68c805, type: 3}
       propertyPath: m_LocalPosition.z
