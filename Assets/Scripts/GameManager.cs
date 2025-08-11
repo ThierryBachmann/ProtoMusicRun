@@ -118,8 +118,13 @@ namespace MusicRun
                           );
             leaderboard.SubmitScore(playerScore);
             levelRunning = false;
+
+            // Clear chunk as sooner as posible to avoid collision meshes stay when building next level
+            terrainGenerator.ClearChunks(1);
             if (nextLevelAuto)
+            {
                 StartCoroutine(Utilities.WaitAndCall(2.5f, NextLevel));
+            }
             else
             {
                 actionPlay.Hide();

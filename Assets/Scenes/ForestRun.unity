@@ -956,8 +956,8 @@ MonoBehaviour:
   gameRunning: 0
   levelRunning: 0
   currentLevelIndex: 0
-  startAuto: 0
-  nextLevelAuto: 0
+  startAuto: 1
+  nextLevelAuto: 1
   MusicPercentage: 0
   GoalPercentage: 0
   goalHandler: {fileID: 283134993}
@@ -1103,18 +1103,6 @@ MonoBehaviour:
     runChunks:
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
     - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
-  - enabled: 0
-    name: TEST
-    description: WITH LOW VEGETALS
-    indexMIDI: 50
-    RatioSpeedMusic: 0.2
-    MinSpeedMusic: 0.31
-    MaxSpeedMusic: 2.98
-    deltaCurrentChunk: {x: 0, y: 5}
-    startGO: {fileID: 182037368}
-    goalGO: {fileID: 283134987}
-    runChunks:
-    - {fileID: 3245006867922576827, guid: 073d80ae2c5c30840ae81cbd3b6be993, type: 3}
   - enabled: 1
     name: 'Desert Medium '
     description: More dune ...
@@ -1128,6 +1116,30 @@ MonoBehaviour:
     runChunks:
     - {fileID: 3245006867922576827, guid: 0786c1c0621985c4ea5ee25aab74599a, type: 3}
     - {fileID: 3245006867922576827, guid: 9017a3995fcc81049952ec486ec63b50, type: 3}
+  - enabled: 0
+    name: TEST
+    description: WITH LOW VEGETALS
+    indexMIDI: 50
+    RatioSpeedMusic: 0.2
+    MinSpeedMusic: 0.31
+    MaxSpeedMusic: 2.98
+    deltaCurrentChunk: {x: 0, y: 5}
+    startGO: {fileID: 182037368}
+    goalGO: {fileID: 283134987}
+    runChunks:
+    - {fileID: 3245006867922576827, guid: 073d80ae2c5c30840ae81cbd3b6be993, type: 3}
+  - enabled: 0
+    name: 'Desert Medium '
+    description: More dune ...
+    indexMIDI: 80
+    RatioSpeedMusic: 0.25
+    MinSpeedMusic: 0.2
+    MaxSpeedMusic: 1.99
+    deltaCurrentChunk: {x: 0, y: 5}
+    startGO: {fileID: 182037368}
+    goalGO: {fileID: 283134987}
+    runChunks:
+    - {fileID: 3245006867922576827, guid: 15611db54f497d749a1f68fe6934e026, type: 3}
   perlinScale: 0.1
   perlinAmplitude: 100
 --- !u!4 &240111798

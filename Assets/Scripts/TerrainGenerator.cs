@@ -18,6 +18,7 @@ namespace MusicRun
         public Level[] levels;
 
         private Level currentLevel;
+        private int currentIndexLevel;
         private GameObject currentStart;
         private Vector2Int startChunkCoord;
         private GameObject currentGoal;
@@ -56,7 +57,10 @@ namespace MusicRun
             foreach (Level level in levels) if (level.enabled) { oneLevelEnabledAtLeast = true; break; }
 
             if (!oneLevelEnabledAtLeast)
-                return 0;
+            {
+                currentIndexLevel = 0;
+                return currentIndexLevel;
+            }
 
             while (true)
             {
@@ -69,7 +73,8 @@ namespace MusicRun
                 if (levels[levelIndex].enabled)
                     break;
             }
-            return levelIndex;
+            currentIndexLevel = levelIndex;
+            return currentIndexLevel;
         }
 
         /// <summary>
@@ -93,7 +98,9 @@ namespace MusicRun
         {
             Debug.Log($"Create Start and Goal Chunk Delta={currentLevel.deltaCurrentChunk}");
 
-            ClearChunks(1);
+            // Better to clear chunks before creating new ones (in a prvious Unity frame) 
+            // To be sure to remove all previous chunks when the level is changed (collider seems remained).
+            //ClearChunks(1);
 
             // Create the start chunk
             // ----------------------
@@ -106,7 +113,7 @@ namespace MusicRun
             // Move the start chunk to the current player position (which is the current goal)
             currentStart = currentLevel.startGO;
             startChunkCoord = currentPlayerChunk;
-            currentStart.name = $"start_{startChunkCoord.x}_{startChunkCoord.y}";
+            currentStart.name = $"start_{currentIndexLevel}_{startChunkCoord.x}_{startChunkCoord.y}";
 
             // Remove existing chunk in the spawnedChunks dictionary if it exists
             if (spawnedChunks.ContainsKey(startChunkCoord))
@@ -130,7 +137,7 @@ namespace MusicRun
             }
             currentGoal = currentLevel.goalGO;
             goalChunkCoord = currentPlayerChunk + currentLevel.deltaCurrentChunk;
-            currentGoal.name = $"goal_{goalChunkCoord.x}_{goalChunkCoord.y}";
+            currentGoal.name = $"goal_{currentIndexLevel}_{goalChunkCoord.x}_{goalChunkCoord.y}";
             if (spawnedChunks.ContainsKey(goalChunkCoord))
             {
                 Debug.Log($"Destroy existing goal chunk: {goalChunkCoord} --> playerChunk: {spawnedChunks[goalChunkCoord].name}");
@@ -140,6 +147,7 @@ namespace MusicRun
             currentGoal.transform.position = ChunkToPosition(goalChunkCoord);
             currentGoal.transform.rotation = Quaternion.identity;
             Debug.Log($"Add goal chunk coord: {goalChunkCoord} --> GO: {currentGoal.name} {currentGoal.transform.position}");
+            // currentPlayerChunk=new Vector2Int(9999,9999);
         }
 
         /// <summary>
@@ -196,7 +204,8 @@ namespace MusicRun
                         // Instantiate a random prefab from the current level's runChunks
                         GameObject randomPrefab = currentLevel.runChunks[UnityEngine.Random.Range(0, currentLevel.runChunks.Length)];
                         GameObject chunk = Instantiate(randomPrefab, spawnPos, Quaternion.identity);
-                        chunk.name = $"Chunk_{chunkCoord.x}_{chunkCoord.y}";
+                        chunk.name = $"Chunk_{currentIndexLevel}_{chunkCoord.x}_{chunkCoord.y}";
+                        Debug.Log($"Create level: {currentIndexLevel} chunk: {chunk.name} prefab: {randomPrefab.name}");
 
                         foreach (Transform child in chunk.transform)
                         {
@@ -217,13 +226,12 @@ namespace MusicRun
                                 // Avoid vegetable on the borders (-10, 10)
                                 float clamp = UnityEngine.Random.Range(7, 9);
                                 Vector3 newPosition = new Vector3(
-                                    Mathf.Clamp(basePosition.x + offsetX, -clamp, clamp), 
-                                    basePosition.y, 
+                                    Mathf.Clamp(basePosition.x + offsetX, -clamp, clamp),
+                                    basePosition.y,
                                     Mathf.Clamp(basePosition.z + offsetZ, -clamp, clamp));
 
-                                Debug.Log($"Chunk: {chunkCoord} Child: {child.name} world: {child.position} local:{basePosition} --> new: {newPosition} offset: {offsetX},  {offsetZ}");
+                                //Debug.Log($"Chunk: {chunkCoord} Child: {child.name} world: {child.position} local:{basePosition} --> new: {newPosition} offset: {offsetX},  {offsetZ}");
                                 //if (heightY > -1f) Debug.Log($"    Found Height - localPosition:{basePosition.y} --> {heightY:0.00}");
-
                                 child.SetLocalPositionAndRotation(newPosition, Quaternion.identity);
                                 PlaceOnHighestTerrain(child, 100f);
 
@@ -302,7 +310,11 @@ namespace MusicRun
 
             // On applique la position avec un léger offset si besoin
             obj.localPosition = new Vector3(localPos.x, localPos.y, localPos.z);
-            Debug.Log($"    --> hit {terrainHits[0].transform.name} world: {topHit.point} local:{obj.localPosition} --> parent: {chunk.name}");
+
+            // Debug purpose ....
+            obj.name = obj.name.Substring(0, 6) + "_" + chunk.name + "_" + topHit.transform.name;
+
+            //Debug.Log($"    --> {terrainHits.Length} hit {terrainHits[0].transform.name} world: {topHit.point} local:{obj.localPosition} --> parent: {chunk.name}");
 
             return true;
         }
@@ -310,7 +322,7 @@ namespace MusicRun
         /// Clear chunks which are at a distance greater than the specified distance from the player.
         /// </summary>
         /// <param name="atDistance"></param>
-        void ClearChunks(int atDistance)
+        public void ClearChunks(int atDistance)
         {
             for (int x = -renderDistance; x <= renderDistance; x++)
             {

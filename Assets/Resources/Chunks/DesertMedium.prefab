@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7969010532264824609}
-  - component: {fileID: 5072022667283193099}
   m_Layer: 0
   m_Name: DesertMedium
   m_TagString: Untagged
@@ -38,23 +37,6 @@ Transform:
   - {fileID: 9111683543869137334}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5072022667283193099
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3245006867922576827}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 737a3177049dcdf4b95e4e03bbf9e135, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  worldOrigin: {x: 0, y: 0}
-  cellSize: 0.5
-  width: 20
-  height: 20
-  rayHeight: 100
 --- !u!1 &7762111252373186686
 GameObject:
   m_ObjectHideFlags: 0
@@ -171,6 +153,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7969010532264824609}
     m_Modifications:
+    - target: {fileID: 2409896739302076528, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_Name
+      value: Mountain_01_Mesh_DM
+      objectReference: {fileID: 0}
     - target: {fileID: 3191527604157978316, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.25
@@ -229,7 +215,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_Name
-      value: Mountain_01_Prefab (2)
+      value: Mountain_01_Prefab (2)_DM
+      objectReference: {fileID: 0}
+    - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6192882257131800624, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
@@ -280,6 +270,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7969010532264824609}
     m_Modifications:
+    - target: {fileID: 2409896739302076528, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_Name
+      value: Mountain_01_Mesh_DM
+      objectReference: {fileID: 0}
     - target: {fileID: 3191527604157978316, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.25
@@ -338,7 +332,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_Name
-      value: Mountain_01_Prefab (1)
+      value: Mountain_01_Prefab (1)_DM
+      objectReference: {fileID: 0}
+    - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6192882257131800624, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
@@ -467,6 +465,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7969010532264824609}
     m_Modifications:
+    - target: {fileID: 2409896739302076528, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_Name
+      value: Mountain_01_Mesh_DM
+      objectReference: {fileID: 0}
     - target: {fileID: 3191527604157978316, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.25
@@ -525,7 +527,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_Name
-      value: Mountain_01_Prefab (3)
+      value: Mountain_01_Prefab (3)_DM
+      objectReference: {fileID: 0}
+    - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6192882257131800624, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
@@ -576,6 +582,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7969010532264824609}
     m_Modifications:
+    - target: {fileID: 2409896739302076528, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_Name
+      value: Mountain_01_Mesh_DM
+      objectReference: {fileID: 0}
     - target: {fileID: 3191527604157978316, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.25
@@ -634,7 +644,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_Name
-      value: Mountain_01_Prefab
+      value: Mountain_01_Prefab_DM
+      objectReference: {fileID: 0}
+    - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6192882257131800624, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
