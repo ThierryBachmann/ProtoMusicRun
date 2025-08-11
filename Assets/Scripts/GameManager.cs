@@ -13,6 +13,7 @@ namespace MusicRun
         public bool gameRunning;
         public bool levelRunning;
         public int currentLevelIndex;
+        public int currentLevelNumber;
         public bool startAuto;
         public bool nextLevelAuto;
         public float MusicPercentage;
@@ -218,6 +219,7 @@ namespace MusicRun
 
         public void RestartGame()
         {
+            currentLevelNumber = 1;
             currentLevelIndex = terrainGenerator.SelectNextLevel(-1);
             scoreManager.ScoreOverall = 0;
             CreateAndStartLevel(currentLevelIndex);
@@ -233,6 +235,7 @@ namespace MusicRun
 
         public void NextLevel()
         {
+            currentLevelNumber++;
             currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
             CreateAndStartLevel(currentLevelIndex);
         }

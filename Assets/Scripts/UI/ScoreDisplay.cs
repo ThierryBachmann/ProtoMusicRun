@@ -42,7 +42,7 @@ namespace MusicRun
 
         void Update()
         {
-            scoreText.text = $"{gameManager.leaderboard.GetPlayerName()} Level: {gameManager.currentLevelIndex+1} Score:{scoreManager.ScoreOverall:N0} Bonus: {scoreManager.ScoreBonus} Speed:{player.GetSpeed():N1}";
+            scoreText.text = $"{gameManager.leaderboard.GetPlayerName()} Level: {gameManager.currentLevelNumber} Score:{scoreManager.ScoreOverall:N0} Bonus: {scoreManager.ScoreBonus} Speed:{player.GetSpeed():N1}";
             //infoText.text = $"dir:{player.goalHandler.goalDirection:F2} angle:{player.goalHandler.goalAngle:F2}";
             Color targetColor = scoreText.color; // couleur par défaut
 

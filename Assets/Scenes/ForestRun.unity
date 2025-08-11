@@ -1097,7 +1097,7 @@ MonoBehaviour:
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
-    deltaCurrentChunk: {x: 0, y: 5}
+    deltaCurrentChunk: {x: 0, y: 20}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     runChunks:
@@ -1110,12 +1110,13 @@ MonoBehaviour:
     RatioSpeedMusic: 0.25
     MinSpeedMusic: 0.2
     MaxSpeedMusic: 1.99
-    deltaCurrentChunk: {x: 0, y: 5}
+    deltaCurrentChunk: {x: 0, y: 20}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     runChunks:
     - {fileID: 3245006867922576827, guid: 0786c1c0621985c4ea5ee25aab74599a, type: 3}
     - {fileID: 3245006867922576827, guid: 9017a3995fcc81049952ec486ec63b50, type: 3}
+    - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
   - enabled: 0
     name: TEST
     description: WITH LOW VEGETALS
