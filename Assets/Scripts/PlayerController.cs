@@ -67,7 +67,6 @@ namespace MusicRun
             controller = GetComponent<CharacterController>();
         }
 
-
         public void LevelStarted()
         {
             ResetPosition();
@@ -91,23 +90,24 @@ namespace MusicRun
         {
             speedMultiplier = 0.5f;
 
-            CharacterController cc = GetComponent<CharacterController>();
-            cc.enabled = false;
+            controller.enabled = false;
+            Vector3 previous = transform.position;
             Transform start = gameManager.terrainGenerator.StartGO.transform;
-            Debug.Log($"Player ResetPosition {start.position}");
             transform.position = start.position;
             transform.rotation = start.rotation;
             currentAngle = 0;
             targetAngle = 0;
-            cc.enabled = true;
+            TerrainGenerator.PlaceOnHighestTerrain(transform);
+            Debug.Log($"Player ResetPosition from {previous} to {transform.position}");
+            controller.enabled = true;
         }
 
         public IEnumerator TeleportPlayer(Vector3 targetPosition)
         {
             controller.enabled = false;
-            yield return null; // Attendre une frame
+            yield return null; // Wait one frame
             transform.position = targetPosition;
-            yield return null; // Attendre une autre frame
+            yield return null; // Wait one frame
             controller.enabled = true;
         }
 
@@ -157,10 +157,10 @@ namespace MusicRun
 
         void HandleMovement(Vector3 forwardMove)
         {
-            // Avance “normale”
-            //Vector3 forwardMove = transform.forward * initialSpeed * speedMultiplier;
+            if (!controller.enabled)
+                return;
 
-            // Applique le knock‑back et le fait décélérer progressivement
+            // knock‑back, slowdown
             if (knockback.sqrMagnitude > 0.01f)
             {
                 forwardMove += knockback;

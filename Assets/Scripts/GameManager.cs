@@ -270,7 +270,6 @@ namespace MusicRun
                 terrainGenerator.CreateLevel(level);
             }
             terrainGenerator.CreateLevel(level);
-            playerController.LevelStarted();
             goalHandler.NewLevel();
             goalReachedDisplay.NewLevel();
             midiPlayer.MPTK_MidiIndex = terrainGenerator.CurrentLevel.indexMIDI;
@@ -281,6 +280,7 @@ namespace MusicRun
             }
             gameRunning = true;
             levelRunning = true;
+            playerController.LevelStarted();
         }
 
         public void StopGame()

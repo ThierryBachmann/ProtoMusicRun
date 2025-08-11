@@ -287,12 +287,11 @@ namespace MusicRun
             RaycastHit[] hits = Physics.RaycastAll(ray, maxRayHeight * 2f);
 
             if (hits.Length == 0)
-                return false; // Rien touché
+                return false; 
 
-            // On garde uniquement les collisions avec un terrain
             var terrainHits = hits
-                .Where(h => h.collider.CompareTag("Terrain")) // à adapter selon ton tag
-                .OrderByDescending(h => h.point.y) // plus haut en premier
+                .Where(h => h.collider.CompareTag("Terrain")) 
+                .OrderByDescending(h => h.point.y) 
                 .ToArray();
 
             if (terrainHits.Length == 0)
@@ -301,14 +300,14 @@ namespace MusicRun
                 return false;
             }
 
-            // Premier = terrain le plus haut
             RaycastHit topHit = terrainHits[0];
 
-            // On convertit la position du point de contact en local du Chunk
-            Transform chunk = obj.parent; // ici on suppose que Obj1 est déjà enfant du Chunk
+            // Convert contact wold position to local Chunk
+            Transform chunk = obj;
+            if (obj.parent != null)
+                chunk = obj.parent; 
             Vector3 localPos = chunk.InverseTransformPoint(topHit.point);
 
-            // On applique la position avec un léger offset si besoin
             obj.localPosition = new Vector3(localPos.x, localPos.y, localPos.z);
 
             // Debug purpose ....
