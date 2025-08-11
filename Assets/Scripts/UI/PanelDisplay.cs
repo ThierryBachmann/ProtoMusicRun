@@ -90,7 +90,7 @@ namespace MusicRun
 
             // Initial state
             rectTransform.localScale = endScale;
-            float animateOut = animationDuration / 3f;
+            float animateOut = animationDuration / 2f;
             while (timer < animateOut)
             {
                 float t = 1f - timer / animateOut;

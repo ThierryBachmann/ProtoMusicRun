@@ -33,6 +33,7 @@ namespace MusicRun
         public TerrainGenerator terrainGenerator;
         public MidiTempoSync midiTempoSync;
         public SwitchButton pauseButton;
+        public SplashScreen splashScreen;
 
         public int[] channelPlayed = new int[16]; // Array to track which channels are currently playing
         void Awake()
@@ -83,6 +84,7 @@ namespace MusicRun
                 RestartGame();
             else
             {
+                splashScreen.Show();
                 actionPlay.Hide();
                 actionDisplay.Show();
                 actionDisplay.SelectActionsToShow();
@@ -219,6 +221,7 @@ namespace MusicRun
 
         public void RestartGame()
         {
+            splashScreen.Hide();
             currentLevelNumber = 1;
             currentLevelIndex = terrainGenerator.SelectNextLevel(-1);
             scoreManager.ScoreOverall = 0;
@@ -230,11 +233,13 @@ namespace MusicRun
         /// </summary>
         public void RestartLevel()
         {
-            CreateAndStartLevel(currentLevelIndex, restartSame : true);
+            splashScreen.Hide();
+            CreateAndStartLevel(currentLevelIndex, restartSame: true);
         }
 
         public void NextLevel()
         {
+            splashScreen.Hide();
             currentLevelNumber++;
             currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
             CreateAndStartLevel(currentLevelIndex);
