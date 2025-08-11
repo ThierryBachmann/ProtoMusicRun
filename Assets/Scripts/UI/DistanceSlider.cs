@@ -12,6 +12,7 @@ namespace MusicRun
         private GameManager gameManager;
         private GoalHandler goalHandler;
         private ScoreManager scoreManager;
+        private PlayerController playerController;
         private Image sliderBackground;
         private Color currentBackgroundColor;
 
@@ -22,6 +23,8 @@ namespace MusicRun
                 return;
             goalHandler = gameManager.goalHandler;
             scoreManager = gameManager.scoreManager;
+            playerController= gameManager.playerController;
+
             if (distanceSlider != null)
             {
                 Transform bgTransform = distanceSlider.transform.Find("Fill Area").transform.Find("Fill");
@@ -45,7 +48,7 @@ namespace MusicRun
             if (gameManager.gameRunning && gameManager.levelRunning)
             {
                 distanceSlider.value = gameManager.GoalPercentage;
-                distanceText.text = $"Distance {goalHandler.distance:F0} m";
+                distanceText.text = $"{goalHandler.distance:F0} m   {playerController.GetSpeed():N1} m/s";
 
                 targetColor= scoreManager.CalculateColor();
                 if (currentBackgroundColor != targetColor)
