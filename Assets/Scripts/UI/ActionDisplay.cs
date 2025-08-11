@@ -7,7 +7,7 @@ namespace MusicRun
 
     public class ActionDisplay : PanelDisplay
     {
-        public Button rerunButton, continueButton, stopButton, leaderBoardButton, restartLevel;
+        public Button rerunButton, continueButton, stopButton, leaderBoardButton, restartLevel, helper;
 
         public new void Awake()
         {
@@ -21,6 +21,7 @@ namespace MusicRun
             continueButton.onClick.AddListener(() => gameManager.NextLevel());
             stopButton.onClick.AddListener(() => gameManager.StopGame());
             leaderBoardButton.onClick.AddListener(() => gameManager.LeaderboardSwitchDisplay());
+            helper.onClick.AddListener(() => gameManager.HelperScreenDisplay());
             base.Start();
         }
 

@@ -34,6 +34,7 @@ namespace MusicRun
         public MidiTempoSync midiTempoSync;
         public SwitchButton pauseButton;
         public SplashScreen splashScreen;
+        public HelperScreen helperScreen;
 
         public int[] channelPlayed = new int[16]; // Array to track which channels are currently playing
         void Awake()
@@ -177,6 +178,7 @@ namespace MusicRun
         void Update()
         {
             // Exemple : touche R pour redémarrer la partie
+            if (Input.GetKeyDown(KeyCode.H)) HelperScreenDisplay();
             if (Input.GetKeyDown(KeyCode.C)) NextLevel();
             if (Input.GetKeyDown(KeyCode.S)) StopGame();
             if (Input.GetKeyDown(KeyCode.R)) RestartGame();
@@ -222,6 +224,7 @@ namespace MusicRun
         public void RestartGame()
         {
             splashScreen.Hide();
+            helperScreen.Hide();
             currentLevelNumber = 1;
             currentLevelIndex = terrainGenerator.SelectNextLevel(-1);
             scoreManager.ScoreOverall = 0;
@@ -234,12 +237,14 @@ namespace MusicRun
         public void RestartLevel()
         {
             splashScreen.Hide();
+            helperScreen.Hide();
             CreateAndStartLevel(currentLevelIndex, restartSame: true);
         }
 
         public void NextLevel()
         {
             splashScreen.Hide();
+            helperScreen.Hide();
             currentLevelNumber++;
             currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
             CreateAndStartLevel(currentLevelIndex);
@@ -283,9 +288,17 @@ namespace MusicRun
             actionPlay.Hide();
             actionDisplay.Show();
             leaderboardDisplay.Hide();
+            helperScreen.Hide();
             gameRunning = false;
             levelRunning = false;
             actionDisplay.Show();
+        }
+
+        public void HelperScreenDisplay()
+        {
+            leaderboardDisplay.Hide();
+            splashScreen.Hide();
+            helperScreen.SwitchVisible();
         }
     }
 }
