@@ -60,13 +60,16 @@ namespace MusicRun
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
+            controller = GetComponent<CharacterController>();
         }
 
         void Start()
         {
-            controller = GetComponent<CharacterController>();
         }
-
+        void OnTriggerEnter(Collider other)
+        {
+            Debug.Log($"PlayerController trigger {other.tag}");
+        }
         public void LevelStarted()
         {
             ResetPosition();
