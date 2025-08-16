@@ -8,7 +8,9 @@ TagManager:
   - Goal
   - Terrain
   - Bonus
-  - Scallable
+  - TreeScallable
+  - Grass
+  - TreeScalable
   layers:
   - Default
   - TransparentFX

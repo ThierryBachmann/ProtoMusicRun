@@ -205,9 +205,10 @@ namespace MusicRun
                         chunk.name = $"Chunk - Level: {currentIndexLevel} - coord: {chunkCoord.x} {chunkCoord.y}";
                         //Debug.Log($"Create chunk: {currentIndexLevel} {chunkCoord}  chunk: {chunk.name} prefab: {chunkPrefabRandom.name}");
 
+                        // Build vegetable. Get list of gameobject exiting in the prefab chunk and apply random or perlin change
                         foreach (Transform childTransform in chunk.transform)
                         {
-                            if (childTransform.name.StartsWith("DatePalm") || childTransform.name.StartsWith("Sago") || childTransform.name.StartsWith("Grass") || childTransform.name.StartsWith("Fountain"))
+                            if (childTransform.CompareTag("TreeScalable") || childTransform.CompareTag("Grass"))
                             {
                                 Vector3 childPosition = childTransform.localPosition;
 
@@ -227,7 +228,7 @@ namespace MusicRun
                                     childPosition.z * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
                                     childPosition.x * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk);
 
-                                //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} offset:{offsetX} {offsetZ} ");
+                                Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
 
                                 // Position between -chunkSize and chunkSize
                                 offsetX = offsetX * chunkSize - chunkSize / 2f;
@@ -236,21 +237,20 @@ namespace MusicRun
                                 // Define position and place to the terrain
                                 Vector3 newPosition = new Vector3(offsetX, 5f, offsetZ);
                                 //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} local:{basePosition} --> new: {newPosition} ");
-                                //childTransform.SetLocalPositionAndRotation(newPosition, Quaternion.identity);
+                                if (childTransform.CompareTag("TreeScalable "))
+                                {
+                                    currentLevel.maxScaleVegetable = Mathf.Clamp(currentLevel.maxScaleVegetable, 0.1f, 15f);
+                                    currentLevel.minScaleVegetable = Mathf.Clamp(currentLevel.minScaleVegetable, 0.1f, 15f);
+                                    if (currentLevel.minScaleVegetable >= currentLevel.maxScaleVegetable)
+                                        currentLevel.minScaleVegetable = currentLevel.maxScaleVegetable - 0.1f;
+                                    // Random scale variation (e.g. between 0.8x and 1.2x original size)
+                                    float randomScale = UnityEngine.Random.Range(currentLevel.minScaleVegetable, currentLevel.maxScaleVegetable);
+                                    childTransform.localScale = childTransform.localScale * randomScale;
+                                }
 
                                 // Random Y rotation (0–360 degrees)
                                 float randomY = UnityEngine.Random.Range(0f, 360f);
-
-                                currentLevel.maxScaleVegetable = Mathf.Clamp(currentLevel.maxScaleVegetable, 0.1f, 15f);
-                                currentLevel.minScaleVegetable = Mathf.Clamp(currentLevel.minScaleVegetable, 0.1f, 15f);
-                                if (currentLevel.minScaleVegetable >= currentLevel.maxScaleVegetable)
-                                    currentLevel.minScaleVegetable = currentLevel.maxScaleVegetable - 0.1f;
-                                // Random scale variation (e.g. between 0.8x and 1.2x original size)
-                                float randomScale = UnityEngine.Random.Range(currentLevel.minScaleVegetable, currentLevel.maxScaleVegetable);
-
-                                // Apply to transform
                                 childTransform.localRotation = Quaternion.Euler(0f, randomY, 0f);
-                                childTransform.localScale = childTransform.localScale * randomScale;
 
                                 // Keep the local position already set
                                 childTransform.localPosition = newPosition;

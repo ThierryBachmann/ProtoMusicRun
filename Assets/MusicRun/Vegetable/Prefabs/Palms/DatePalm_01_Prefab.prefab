@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4493489561980387476}
   m_Layer: 0
   m_Name: DatePalm_01_Prefab
-  m_TagString: Obstacle
+  m_TagString: TreeScalable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647

@@ -1115,8 +1115,8 @@ MonoBehaviour:
     goalGO: {fileID: 283134987}
     perlinVegetable: 0.3
     perlinChunk: 10
-    minScaleVegetable: 10.51
-    maxScaleVegetable: 13.78
+    minScaleVegetable: 0.71
+    maxScaleVegetable: 1.09
     runChunks:
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
     - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
@@ -1135,8 +1135,8 @@ MonoBehaviour:
     goalGO: {fileID: 283134987}
     perlinVegetable: 0.3
     perlinChunk: 100
-    minScaleVegetable: 0.5
-    maxScaleVegetable: 0.5
+    minScaleVegetable: 0.7
+    maxScaleVegetable: 0.9
     runChunks:
     - {fileID: 3245006867922576827, guid: 0786c1c0621985c4ea5ee25aab74599a, type: 3}
     - {fileID: 3245006867922576827, guid: 9017a3995fcc81049952ec486ec63b50, type: 3}

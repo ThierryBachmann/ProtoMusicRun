@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1008976142992812041}
   m_Layer: 0
   m_Name: SmallGrass_01_Prefab
-  m_TagString: Untagged
+  m_TagString: Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
