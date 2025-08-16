@@ -1100,6 +1100,9 @@ MonoBehaviour:
   chunkSize: 20
   renderDistance: 5
   disableObstacles: 1
+  perlinVegetable: 0.1
+  perlinChunk: 100
+  currentPlayerChunk: {x: 0, y: 0}
   levels:
   - enabled: 1
     name: Flat desert
@@ -1108,6 +1111,7 @@ MonoBehaviour:
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
+    BonusCount: 1
     deltaCurrentChunk: {x: 0, y: 20}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
@@ -1123,6 +1127,7 @@ MonoBehaviour:
     RatioSpeedMusic: 0.25
     MinSpeedMusic: 0.2
     MaxSpeedMusic: 1.99
+    BonusCount: 1
     deltaCurrentChunk: {x: 0, y: 20}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
@@ -1130,7 +1135,8 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 0786c1c0621985c4ea5ee25aab74599a, type: 3}
     - {fileID: 3245006867922576827, guid: 9017a3995fcc81049952ec486ec63b50, type: 3}
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
-    runBonus: []
+    runBonus:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
   - enabled: 0
     name: TEST
     description: WITH LOW VEGETALS
@@ -1138,6 +1144,7 @@ MonoBehaviour:
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
+    BonusCount: 1
     deltaCurrentChunk: {x: 0, y: 5}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
@@ -1151,14 +1158,13 @@ MonoBehaviour:
     RatioSpeedMusic: 0.25
     MinSpeedMusic: 0.2
     MaxSpeedMusic: 1.99
+    BonusCount: 1
     deltaCurrentChunk: {x: 0, y: 5}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     runChunks:
     - {fileID: 3245006867922576827, guid: 15611db54f497d749a1f68fe6934e026, type: 3}
     runBonus: []
-  perlinScale: 0.1
-  perlinAmplitude: 100
 --- !u!4 &240111798
 Transform:
   m_ObjectHideFlags: 0

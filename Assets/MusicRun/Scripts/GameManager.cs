@@ -2,6 +2,7 @@ using MidiPlayerTK;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -178,12 +179,26 @@ namespace MusicRun
         void Update()
         {
             // Exemple : touche R pour redémarrer la partie
-            if (Input.GetKeyDown(KeyCode.H)) HelperScreenDisplay();
-            if (Input.GetKeyDown(KeyCode.C)) NextLevel();
-            if (Input.GetKeyDown(KeyCode.S)) StopGame();
-            if (Input.GetKeyDown(KeyCode.R)) RestartGame();
-            if (Input.GetKeyDown(KeyCode.A)) actionDisplay.SwitchVisible();
-            if (Input.GetKeyDown(KeyCode.L)) LeaderboardSwitchDisplay();
+            //if (Input.GetKeyDown(KeyCode.H)) HelperScreenDisplay();
+
+            if (Input.anyKeyDown)
+            {
+                foreach (char c in Input.inputString)
+                {
+                    if (c == 'h' || c == 'H') HelperScreenDisplay();
+                    if (c == 'N' || c == 'N') NextLevel();
+                    if (c == 's' || c == 'S') StopGame();
+                    if (c == 'r' || c == 'R') RestartGame();
+                    if (c == 'h' || c == 'H') HelperScreenDisplay();
+                    if (c == 'a' || c == 'A') actionDisplay.SwitchVisible();
+                    if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
+                    if (c == 'g' || c == 'G')
+                    {
+                        terrainGenerator.ClearChunks(0);
+                        terrainGenerator.UpdateChunks();
+                    }
+                }
+            }
 
             if (pauseButton.IsOn && gameRunning)
             {

@@ -15,6 +15,19 @@ namespace MusicRun
         public int chunkSize = 20;
         public int renderDistance = 2;
         public bool disableObstacles = false;
+
+        [Header("How much vegetable must be spread on chunk")]
+        [Range(0f, 10f)]
+        public float perlinVegetable = 0.3f;
+
+        [Header("How much vegetable must be spread by chunk")]
+        [Range(0f, 10f)]
+        public float perlinChunk = 100f;
+
+        [Header("For readonly")]
+        public Vector2Int currentPlayerChunk;
+
+        [Header("Defined Levels")]
         public Level[] levels;
 
         private Level currentLevel;
@@ -24,14 +37,12 @@ namespace MusicRun
         private GameObject currentGoal;
         private Vector2Int goalChunkCoord;
         private Dictionary<Vector2Int, GameObject> spawnedChunks = new Dictionary<Vector2Int, GameObject>();
-        private Vector2Int currentPlayerChunk;
-        public float perlinScale = 0.3f;
-        public float perlinAmplitude = 100f;
         private GameManager gameManager;
         private PlayerController player;
 
         public GameObject StartGO { get => currentStart; }
         public Level CurrentLevel { get => currentLevel; }
+        public Vector2Int CurrentPlayerChunk { get => currentPlayerChunk; }
 
         private void Awake()
         {
@@ -112,7 +123,7 @@ namespace MusicRun
 
             // Move the start chunk to the current player position (which is the current goal)
             currentStart = currentLevel.startGO;
-            startChunkCoord = currentPlayerChunk;
+            startChunkCoord = CurrentPlayerChunk;
             currentStart.name = $"start_{currentIndexLevel}_{startChunkCoord.x}_{startChunkCoord.y}";
 
             // Remove existing chunk in the spawnedChunks dictionary if it exists
@@ -136,7 +147,7 @@ namespace MusicRun
                 return;
             }
             currentGoal = currentLevel.goalGO;
-            goalChunkCoord = currentPlayerChunk + currentLevel.deltaCurrentChunk;
+            goalChunkCoord = CurrentPlayerChunk + currentLevel.deltaCurrentChunk;
             currentGoal.name = $"goal_{currentIndexLevel}_{goalChunkCoord.x}_{goalChunkCoord.y}";
             if (spawnedChunks.ContainsKey(goalChunkCoord))
             {
@@ -174,7 +185,7 @@ namespace MusicRun
         {
             Vector2Int playerChunk = PositionToChunk(player.transform.position);
 
-            if (playerChunk != currentPlayerChunk)
+            if (playerChunk != CurrentPlayerChunk)
             {
                 //Debug.Log($"Player enters in a chunk: x={player.transform.position.x} z={player.transform.position.z} --> playerChunk: {playerChunk}");
 
@@ -183,7 +194,7 @@ namespace MusicRun
             }
         }
 
-        void UpdateChunks()
+        public void UpdateChunks()
         {
             // will contains chunks coord around the player at a distance of -renderDistance to renderDistance
             HashSet<Vector2Int> newChunks = new HashSet<Vector2Int>();
@@ -192,7 +203,7 @@ namespace MusicRun
             {
                 for (int z = -renderDistance; z <= renderDistance; z++)
                 {
-                    Vector2Int chunkCoord = currentPlayerChunk + new Vector2Int(x, z);
+                    Vector2Int chunkCoord = CurrentPlayerChunk + new Vector2Int(x, z);
                     newChunks.Add(chunkCoord);
 
                     // Does the chunk dictionary already contains this chunk? Don't instantiate for start and goal chunks.
@@ -204,37 +215,43 @@ namespace MusicRun
                         // Instantiate a random prefab from the current level's runChunks
                         GameObject chunkPrefabRandom = currentLevel.runChunks[UnityEngine.Random.Range(0, currentLevel.runChunks.Length)];
                         GameObject chunk = Instantiate(chunkPrefabRandom, spawnPos, Quaternion.identity);
-                        chunk.name = $"Chunk_{currentIndexLevel}_{chunkCoord.x}_{chunkCoord.y}";
-                        //Debug.Log($"Create level: {currentIndexLevel} chunk: {chunk.name} prefab: {randomPrefab.name}");
+                        chunk.name = $"Chunk - Level: {currentIndexLevel} - coord: {chunkCoord.x} {chunkCoord.y}";
+                        //Debug.Log($"Create chunk: {currentIndexLevel} {chunkCoord}  chunk: {chunk.name} prefab: {chunkPrefabRandom.name}");
 
                         foreach (Transform childTransform in chunk.transform)
                         {
                             if (childTransform.name.StartsWith("DatePalm") || childTransform.name.StartsWith("Sago") || childTransform.name.StartsWith("Grass") || childTransform.name.StartsWith("Fountain"))
                             {
-                                Vector3 basePosition = childTransform.localPosition;
+                                Vector3 childPosition = childTransform.localPosition;
 
-                                float offsetX = Mathf.PerlinNoise((basePosition.x + chunkCoord.x * 100f) * perlinScale, (basePosition.z + chunkCoord.y * 100f) * perlinScale);
-                                float offsetZ = Mathf.PerlinNoise((basePosition.z + chunkCoord.x * 100f) * perlinScale, (basePosition.x + chunkCoord.y * 100f) * perlinScale);
+                                /*
+                                    Perlin noise (invented by Ken Perlin) is a type of gradient noise — meaning it’s generated by smoothly interpolating 
+                                    between pseudo-random gradient values at grid points.
+                                    It’s not random white noise (which changes abruptly each sample), but a continuous, smooth function that produces “organic” patterns.
+                                */
 
-                                // Centrer autour de 0 et amplifier
-                                offsetX = (offsetX - 0.5f) * perlinAmplitude;
-                                offsetZ = (offsetZ - 0.5f) * perlinAmplitude;
+                                // Perlin generator for vegetable -  return a value between 0 and 1
+                                //  perlinVegetable: how much position are spread on the chunk. 0: all vegetables are at the same place on the current chunk.
+                                //  perlinChunk:  how much position are modified between chunk. 0: all vegetables are at the same place for each chunk.
+                                float offsetX = Mathf.PerlinNoise(
+                                    childPosition.x * perlinVegetable + chunkCoord.x * perlinChunk,
+                                    childPosition.z * perlinVegetable + chunkCoord.y * perlinChunk);
+                                float offsetZ = Mathf.PerlinNoise(
+                                    childPosition.z * perlinVegetable + chunkCoord.x * perlinChunk,
+                                    childPosition.x * perlinVegetable + chunkCoord.y * perlinChunk);
 
-                                Vector3 hitPoint = Vector3.zero;
+                                //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} offset:{offsetX} {offsetZ} ");
 
-                                //    Debug.Log($"Chunk: {chunkCoord} Child: {child.name} world: {child.position} local:{basePosition} --> no hit");
-                                // Avoid vegetable on the borders (-10, 10)
-                                float clamp = UnityEngine.Random.Range(7, 9);
-                                Vector3 newPosition = new Vector3(
-                                    Mathf.Clamp(basePosition.x + offsetX, -clamp, clamp),
-                                    basePosition.y,
-                                    Mathf.Clamp(basePosition.z + offsetZ, -clamp, clamp));
+                                // Position between -chunkSize and chunkSize
+                                offsetX = offsetX * chunkSize - chunkSize / 2f;
+                                offsetZ = offsetZ * chunkSize - chunkSize / 2f;
 
-                                //Debug.Log($"Chunk: {chunkCoord} Child: {child.name} world: {child.position} local:{basePosition} --> new: {newPosition} offset: {offsetX},  {offsetZ}");
-                                //if (heightY > -1f) Debug.Log($"    Found Height - localPosition:{basePosition.y} --> {heightY:0.00}");
+                                // Define position and place to the terrain
+                                Vector3 newPosition = new Vector3(offsetX, 5f, offsetZ);
+                                //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} local:{basePosition} --> new: {newPosition} ");
                                 childTransform.SetLocalPositionAndRotation(newPosition, Quaternion.identity);
-                                PlaceOnHighestTerrain(childTransform, 100f);
-
+                                if (!PlaceOnHighestTerrain(childTransform, 100f))
+                                    Debug.Log($"No hit, chunk: {chunkCoord} child: {childTransform.name} offsetX:{offsetX} offsetZ: {offsetZ} ");
                             }
                         }
 
@@ -256,14 +273,13 @@ namespace MusicRun
                             for (int i = 0; i < currentLevel.BonusCount; i++)
                             {
                                 GameObject bonusPrefabRandom = currentLevel.runBonus[UnityEngine.Random.Range(0, currentLevel.runBonus.Length)];
-
                                 GameObject bonus = Instantiate(bonusPrefabRandom);
                                 bonus.transform.SetParent(chunk.transform, false);
                                 float maxPos = chunkSize / 2f - 0.1f; // -0.1 to avoid border
                                 Vector3 bonusPos = new Vector3(UnityEngine.Random.Range(-maxPos, maxPos), 5f, UnityEngine.Random.Range(-maxPos, maxPos));
                                 bonus.transform.SetLocalPositionAndRotation(bonusPos, Quaternion.identity);
                                 PlaceOnHighestTerrain(bonus.transform, 100f);
-                                bonus.name = $"Bonus_{currentIndexLevel}_{chunkCoord.x}_{chunkCoord.y}";
+                                bonus.name = $"Bonus - level: {currentIndexLevel} - coord: {bonus.transform.localPosition}";
                             }
                         }
                     }
@@ -304,7 +320,7 @@ namespace MusicRun
 
             if (hits.Length == 0)
             {
-                Debug.Log($"    --> no hit. From position: {startPos}");
+                //Debug.Log($"    --> no hit. From position: {startPos}");
                 return false;
             }
 
@@ -315,7 +331,7 @@ namespace MusicRun
 
             if (terrainHits.Length == 0)
             {
-                Debug.Log($"    --> no terrain hit. All hits: {hits.Length} From position: {startPos}");
+                //Debug.Log($"    --> no terrain hit. All hits: {hits.Length} From position: {startPos}");
                 return false;
             }
 
@@ -346,8 +362,8 @@ namespace MusicRun
             {
                 for (int z = -renderDistance; z <= renderDistance; z++)
                 {
-                    Vector2Int chunkCoord = currentPlayerChunk + new Vector2Int(x, z);
-                    if ((chunkCoord - currentPlayerChunk).magnitude > atDistance)
+                    Vector2Int chunkCoord = CurrentPlayerChunk + new Vector2Int(x, z);
+                    if ((chunkCoord - CurrentPlayerChunk).magnitude >= atDistance)
                     {
                         // Does the chunk dictionary contains this chunk? Don't remove for start and goal chunks (in case of ...)).
                         if (spawnedChunks.ContainsKey(chunkCoord) && chunkCoord != goalChunkCoord && chunkCoord != startChunkCoord)
@@ -372,21 +388,27 @@ namespace MusicRun
         public string description;
         [Header("Defined MIDI associated to the level")]
         public int indexMIDI;
+
         [Range(0.1f, 5f)]
         public float RatioSpeedMusic = 0.3f;
         [Range(0.1f, 5f)]
         public float MinSpeedMusic = 0.1f;
         [Range(0.1f, 5f)]
         public float MaxSpeedMusic = 5f;
+
         [Range(0, 10)]
         public int BonusCount = 1;
+
         [Header("Delta chunk position with last goal")]
         public Vector2Int deltaCurrentChunk;
+
         [Header("Defined start and goal game object")]
         public GameObject startGO;
         public GameObject goalGO;
+
         [Header("Defined levels")]
         public GameObject[] runChunks;
+
         [Header("Defined bonus")]
         public GameObject[] runBonus;
     }
