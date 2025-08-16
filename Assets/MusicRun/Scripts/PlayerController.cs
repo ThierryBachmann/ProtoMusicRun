@@ -49,6 +49,7 @@ namespace MusicRun
         public HoldButton leftButton;
         public HoldButton rightButton;
         public HoldButton jumpButton;
+        // public SwitchButton pauseButton; defined in GameManager
 
         private CharacterController controller;
         private GameManager gameManager;
