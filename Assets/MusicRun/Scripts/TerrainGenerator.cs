@@ -11,14 +11,6 @@ namespace MusicRun
         public int renderDistance = 2;
         public bool disableObstacles = false;
 
-        [Header("How much vegetable must be spread on chunk")]
-        [Range(0f, 10f)]
-        public float perlinVegetable = 0.3f;
-
-        [Header("How much vegetable must be spread by chunk")]
-        [Range(0f, 10f)]
-        public float perlinChunk = 100f;
-
         [Header("For readonly")]
         public Vector2Int currentPlayerChunk;
 
@@ -229,11 +221,11 @@ namespace MusicRun
                                 //  perlinVegetable: how much position are spread on the chunk. 0: all vegetables are at the same place on the current chunk.
                                 //  perlinChunk:  how much position are modified between chunk. 0: all vegetables are at the same place for each chunk.
                                 float offsetX = Mathf.PerlinNoise(
-                                    childPosition.x * perlinVegetable + chunkCoord.x * perlinChunk,
-                                    childPosition.z * perlinVegetable + chunkCoord.y * perlinChunk);
+                                    childPosition.x * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
+                                    childPosition.z * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk);
                                 float offsetZ = Mathf.PerlinNoise(
-                                    childPosition.z * perlinVegetable + chunkCoord.x * perlinChunk,
-                                    childPosition.x * perlinVegetable + chunkCoord.y * perlinChunk);
+                                    childPosition.z * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
+                                    childPosition.x * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk);
 
                                 //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} offset:{offsetX} {offsetZ} ");
 
@@ -244,7 +236,25 @@ namespace MusicRun
                                 // Define position and place to the terrain
                                 Vector3 newPosition = new Vector3(offsetX, 5f, offsetZ);
                                 //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} local:{basePosition} --> new: {newPosition} ");
-                                childTransform.SetLocalPositionAndRotation(newPosition, Quaternion.identity);
+                                //childTransform.SetLocalPositionAndRotation(newPosition, Quaternion.identity);
+
+                                // Random Y rotation (0–360 degrees)
+                                float randomY = UnityEngine.Random.Range(0f, 360f);
+
+                                currentLevel.maxScaleVegetable = Mathf.Clamp(currentLevel.maxScaleVegetable, 0.1f, 15f);
+                                currentLevel.minScaleVegetable = Mathf.Clamp(currentLevel.minScaleVegetable, 0.1f, 15f);
+                                if (currentLevel.minScaleVegetable >= currentLevel.maxScaleVegetable)
+                                    currentLevel.minScaleVegetable = currentLevel.maxScaleVegetable - 0.1f;
+                                // Random scale variation (e.g. between 0.8x and 1.2x original size)
+                                float randomScale = UnityEngine.Random.Range(currentLevel.minScaleVegetable, currentLevel.maxScaleVegetable);
+
+                                // Apply to transform
+                                childTransform.localRotation = Quaternion.Euler(0f, randomY, 0f);
+                                childTransform.localScale = childTransform.localScale * randomScale;
+
+                                // Keep the local position already set
+                                childTransform.localPosition = newPosition;
+
                                 if (!PlaceOnHighestTerrain(childTransform, 100f))
                                     Debug.Log($"No hit, chunk: {chunkCoord} child: {childTransform.name} offsetX:{offsetX} offsetZ: {offsetZ} ");
                             }
@@ -400,6 +410,21 @@ namespace MusicRun
         [Header("Defined start and goal game object")]
         public GameObject startGO;
         public GameObject goalGO;
+
+        [Header("How much vegetable must be spread on chunk")]
+        [Range(0f, 10f)]
+        public float perlinVegetable = 0.3f;
+
+        [Header("How much vegetable must be spread by chunk")]
+        [Range(0f, 10f)]
+        public float perlinChunk = 100f;
+
+        [Header("Min Max fpr random vegetable scale")]
+        [Range(0.1f, 15f)]
+        public float minScaleVegetable = 0.5f;
+
+        [Range(0.1f, 15f)]
+        public float maxScaleVegetable = 0.5f;
 
         [Header("Defined levels")]
         public GameObject[] runChunks;
