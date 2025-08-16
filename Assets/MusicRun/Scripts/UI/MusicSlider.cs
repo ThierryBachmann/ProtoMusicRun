@@ -1,7 +1,7 @@
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
 using MidiPlayerTK;
+using TMPro;
 namespace MusicRun
 {
     public class MusicSlider : MonoBehaviour

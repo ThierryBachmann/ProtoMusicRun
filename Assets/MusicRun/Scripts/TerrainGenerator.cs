@@ -1,12 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
-using UnityEngine.ProBuilder.Shapes;
-using UnityEngine.SceneManagement;
 
 namespace MusicRun
 {
