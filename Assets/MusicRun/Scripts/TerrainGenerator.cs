@@ -283,8 +283,9 @@ namespace MusicRun
                         }
                         spawnedChunks.Add(chunkCoord, chunk);
 
-                        // Generate and place bonus 
-                        // ------------------------
+                        // Generate and place bonus.
+                        // When a chunk is re-generated (player return), no bonus are generated.
+                        // ---------------------------------------------------------------------
                         if (currentLevel.runBonus.Length > 0 && currentLevel.BonusCount > 0 && !spawnedBonus.ContainsKey(chunkCoord))
                         {
                             int count = (int)currentLevel.BonusCount;
@@ -306,7 +307,7 @@ namespace MusicRun
                                     Vector3 bonusPos = new Vector3(UnityEngine.Random.Range(-maxPos, maxPos), 5f, UnityEngine.Random.Range(-maxPos, maxPos));
                                     bonus.transform.SetLocalPositionAndRotation(bonusPos, Quaternion.identity);
                                     PlaceOnHighestTerrain(bonus.transform, 100f);
-                                    bonus.name = $"Bonus - level: {currentIndexLevel} - coord: {bonus.transform.localPosition}";
+                                    bonus.name = $"Bonus - level: {currentIndexLevel} - chunk {chunkCoord} - localPosition: {bonus.transform.localPosition}";
                                 }
                                 spawnedBonus.Add(chunkCoord, count);
                             }

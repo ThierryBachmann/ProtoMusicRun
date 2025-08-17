@@ -216,8 +216,8 @@ namespace MusicRun
             terrainGenerator.ResetTerrain();
             splashScreen.Hide();
             helperScreen.Hide();
-            currentLevelNumber = 1;
-            currentLevelIndex = terrainGenerator.SelectNextLevel(-1);
+            currentLevelNumber = 1; // always increase along the game
+            currentLevelIndex = terrainGenerator.SelectNextLevel(-1); // cycling around the game
             scoreManager.ScoreOverall = 0;
             CreateAndStartLevel(currentLevelIndex);
         }
