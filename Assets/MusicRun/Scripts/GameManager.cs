@@ -1,9 +1,11 @@
+using log4net.Core;
 using MidiPlayerTK;
 using MusicRun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace MusicRun
 {
@@ -43,6 +45,7 @@ namespace MusicRun
             goalHandler.OnLevelCompleted += OnLevelCompleted;
             leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
             leaderboard.OnScoreSubmitted += OnScoreSubmitted;
+            pauseButton.OnValueChanged += OnSwitchPause;
             Utilities.Init();
 
         }
@@ -105,7 +108,6 @@ namespace MusicRun
                 actionDisplay.Show();
                 actionDisplay.SelectActionsToShow();
             }
-            //leaderboardDisplay.Show(this);
         }
 
         private void OnScoreSubmitted(bool success)
@@ -137,14 +139,28 @@ namespace MusicRun
             if (success)
             {
                 Debug.Log("Score submitted successfully!");
-                // Show success UI
             }
             else
             {
                 Debug.Log("Failed to submit score");
-                // Show error UI
             }
         }
+
+        private void OnSwitchPause(bool pause)
+        {
+            Debug.Log($"OnSwitchPause pause:{pause} levelRunning:{levelRunning}");
+            if (pause)
+            {
+                midiManager.Pause();
+                levelRunning = false;
+            }
+            else
+            {
+                midiManager.UnPause();
+                levelRunning = true;
+            }
+        }
+
         void Update()
         {
             // Exemple : touche R pour redémarrer la partie
@@ -170,26 +186,7 @@ namespace MusicRun
                 }
             }
 
-            if (pauseButton.IsOn && gameRunning)
-            {
-                if (levelRunning)
-                {
-                    midiManager.Pause();
-                    levelRunning = false;
-                    //    actionDisplay.Show();
-                }
-            }
-
-            if (!pauseButton.IsOn && gameRunning)
-            {
-                if (!levelRunning)
-                {
-                    midiManager.UnPause();
-                    levelRunning = true;
-                    //    actionDisplay.Hide();
-                }
-            }
-
+            // Calculate level progression and intermediary score
             if (gameRunning && levelRunning)
             {
                 if (goalHandler.distanceAtStart > 0)
@@ -250,6 +247,7 @@ namespace MusicRun
         /// <param name="restartSame"></param>
         private void CreateAndStartLevel(int level, bool restartSame = false)
         {
+            Debug.Log($"CreateAndStartLevel {level}");
             scoreManager.ScoreLevel = 0;
             actionDisplay.Hide();
             actionPlay.Show();

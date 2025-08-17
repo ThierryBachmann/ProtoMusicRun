@@ -11,11 +11,6 @@ namespace MusicRun
         public int[] channelPlayed = new int[16]; // Array to track which channels are currently playing
         public float Progress { get { return (float)midiPlayer.MPTK_TickCurrent / (float)midiPlayer.MPTK_TickLastNote * 100f; } }
 
-        // If true, speed will change with tempo changes. Disabled by default (finally, not useful)
-        private bool SpeedAsTempoChange = false;
-        private float RatioTempoMusic = 0.4f;
-        private float MinTempoMusic = 50f;
-        private float MaxTempoMusic = 300f;
 
         private float previousSpeed = -1;
         private GameManager gameManager;
@@ -52,11 +47,16 @@ namespace MusicRun
                 foreach (var midiEvent in midiEvents)
                     channelPlayed[midiEvent.Channel]++;
             });
+
+            midiPlayer.OnEventEndPlayMidi.AddListener((name, endMidi) =>
+            {
+                Debug.Log($"MidiPlayer - End MIDI '{name}' '{endMidi}' {goalHandler.distanceAtStart}");
+            });
         }
 
         void Start()
         {
-  
+
         }
 
         private IEnumerator UpdateMaxDistanceMPTK()
@@ -64,7 +64,7 @@ namespace MusicRun
             // Wait for the goalHandler to have a valid distanceAtStart.
             while (goalHandler.distanceAtStart < 0)
                 yield return new WaitForSeconds(0.1f);
-            // Attenuation of volume with the distance from the player and the goal.
+            // Volume attenuation according the distance between the player and the goal.
             // When the player is at the start, the volume is 5% of the volume max at the goal.
             midiPlayer.MPTK_MaxDistance = goalHandler.distanceAtStart * 1.05f;
             Debug.Log($"MidiPlayer - MaxDistance set {midiPlayer.MPTK_MaxDistance}");
@@ -108,35 +108,24 @@ namespace MusicRun
             midiPlayer.MPTK_UnPause();
         }
 
-
         void Update()
         {
-            if (SpeedAsTempoChange)
+            float speedClamp = 1f;
+
+            // Calculate music speed from the player speed
+            if (gameManager.levelRunning)
             {
-                float speed = 50 + player.speedMultiplier * RatioTempoMusic;
-                float speedClamp = Mathf.Clamp(speed, MinTempoMusic, MaxTempoMusic);
-                if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speedClamp) > 2f)
-                {
-                    Debug.Log($"MidiPlayer - player.speedMultiplier: {player.speedMultiplier} music tempo {speedClamp}");
-                    midiPlayer.MPTK_Tempo = speedClamp;
-                    previousSpeed = speedClamp;
-                }
+                Level current = gameManager.terrainGenerator.CurrentLevel;
+                float speedMusic = player.speedMultiplier * current.RatioSpeedMusic;
+                speedClamp = Mathf.Clamp(speedMusic, current.MinSpeedMusic, current.MaxSpeedMusic);
             }
-            else
+
+            // Avoid changing speed at each frame
+            if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speedClamp) > 0.1f)
             {
-                float speedClamp = 1f;
-                if (gameManager.levelRunning)
-                {
-                    Level current = gameManager.terrainGenerator.CurrentLevel;
-                    float speed = player.speedMultiplier * current.RatioSpeedMusic;
-                    speedClamp = Mathf.Clamp(speed, current.MinSpeedMusic, current.MaxSpeedMusic);
-                }
-                if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speedClamp) > 0.1f)
-                {
-                    //Debug.Log($"player.speedMultiplier: {player.speedMultiplier} music speed {speedClamp}");
-                    midiPlayer.MPTK_Speed = speedClamp;
-                    previousSpeed = speedClamp;
-                }
+                Debug.Log($"MidiPlayer - player.speedMultiplier: {player.speedMultiplier} music speed {speedClamp}");
+                midiPlayer.MPTK_Speed = speedClamp;
+                previousSpeed = speedClamp;
             }
         }
     }

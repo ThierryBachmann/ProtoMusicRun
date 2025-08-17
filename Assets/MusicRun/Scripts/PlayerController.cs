@@ -79,7 +79,7 @@ namespace MusicRun
 
         public void LevelCompleted()
         {
-            speedMultiplier = Mathf.MoveTowards(speedMultiplier, 0f, Time.deltaTime * 15f);
+            speedMultiplier = 1f;
 
             HandleMovement(Vector3.zero);
         }

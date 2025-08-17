@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,6 +8,7 @@ namespace MusicRun
     public class SwitchButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         public bool IsOn { get; private set; }
+        public Action<bool> OnValueChanged;
 
         public Image BackgroundImage;
 
@@ -22,6 +24,7 @@ namespace MusicRun
         public void OnPointerDown(PointerEventData eventData)
         {
             IsOn = !IsOn;
+            OnValueChanged?.Invoke(IsOn);
             UpdateVisualState();
         }
 
