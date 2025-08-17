@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MusicRun
 {
-    public class MidiTempoSync : MonoBehaviour
+    public class MidiManager : MonoBehaviour
     {
         public MidiFilePlayer midiPlayer;
         public int[] channelPlayed = new int[16]; // Array to track which channels are currently playing
@@ -20,7 +20,7 @@ namespace MusicRun
         private float previousSpeed = -1;
         private GameManager gameManager;
         private PlayerController player;
-        public GoalHandler goalHandler;
+        private GoalHandler goalHandler;
         private float savedVolume;
         private bool mute = false;
 

@@ -30,7 +30,7 @@ namespace MusicRun
         public PanelDisplay actionPlay;
         public GoalReachedDisplay goalReachedDisplay;
         public TerrainGenerator terrainGenerator;
-        public MidiTempoSync midiTempoSync;
+        public MidiManager midiManager;
         public SwitchButton pauseButton;
         public SplashScreen splashScreen;
         public HelperScreen helperScreen;
@@ -161,7 +161,7 @@ namespace MusicRun
                     if (c == 'h' || c == 'H') HelperScreenDisplay();
                     if (c == 'a' || c == 'A') actionDisplay.SwitchVisible();
                     if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
-                    if (c == 'm' || c == 'M') midiTempoSync.SoundOnOff();
+                    if (c == 'm' || c == 'M') midiManager.SoundOnOff();
                     if (c == 'g' || c == 'G') StartCoroutine(ClearAndNextLevel());
                     {
                         terrainGenerator.ClearChunks(0);
@@ -174,7 +174,7 @@ namespace MusicRun
             {
                 if (levelRunning)
                 {
-                    midiTempoSync.Pause();
+                    midiManager.Pause();
                     levelRunning = false;
                     //    actionDisplay.Show();
                 }
@@ -184,7 +184,7 @@ namespace MusicRun
             {
                 if (!levelRunning)
                 {
-                    midiTempoSync.UnPause();
+                    midiManager.UnPause();
                     levelRunning = true;
                     //    actionDisplay.Hide();
                 }
@@ -196,7 +196,7 @@ namespace MusicRun
                     GoalPercentage = 100f - (goalHandler.distance / goalHandler.distanceAtStart * 100f);
                 else
                     GoalPercentage = 0f;
-                MusicPercentage = midiTempoSync.Progress;
+                MusicPercentage = midiManager.Progress;
                 scoreManager.ScoreGoal = scoreManager.CalculateScoreGoal(MusicPercentage, GoalPercentage);
             }
         }
@@ -265,7 +265,7 @@ namespace MusicRun
             terrainGenerator.CreateLevel(level);
             goalHandler.NewLevel();
             goalReachedDisplay.NewLevel();
-            midiTempoSync.StartPlayMIDI(terrainGenerator.CurrentLevel.indexMIDI);
+            midiManager.StartPlayMIDI(terrainGenerator.CurrentLevel.indexMIDI);
             gameRunning = true;
             levelRunning = true;
             playerController.LevelStarted();

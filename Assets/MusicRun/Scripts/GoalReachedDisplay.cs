@@ -56,13 +56,13 @@ namespace MusicRun
             // "   9999         9999            999"
             // "  9999       9999         9999
             bestScoreText.text = $" {player.playerLastScore,4}       {player.playerBestScore,4}            {player.playerPosition,4}";
-            string midiInfo = $"{gameManager.midiTempoSync.midiPlayer?.MPTK_MidiName}";
-            if (gameManager.midiTempoSync.midiPlayer.MPTK_MidiLoaded != null)
+            string midiInfo = $"{gameManager.midiManager.midiPlayer?.MPTK_MidiName}";
+            if (gameManager.midiManager.midiPlayer.MPTK_MidiLoaded != null)
             {
-                if (!string.IsNullOrEmpty(gameManager.midiTempoSync.midiPlayer.MPTK_MidiLoaded.TrackInstrumentName))
-                    midiInfo += "\n" + gameManager.midiTempoSync.midiPlayer.MPTK_MidiLoaded.TrackInstrumentName;
-                if (!string.IsNullOrEmpty(gameManager.midiTempoSync.midiPlayer.MPTK_MidiLoaded.Copyright))
-                    midiInfo += "\n" + gameManager.midiTempoSync.midiPlayer.MPTK_MidiLoaded.Copyright;
+                if (!string.IsNullOrEmpty(gameManager.midiManager.midiPlayer.MPTK_MidiLoaded.TrackInstrumentName))
+                    midiInfo += "\n" + gameManager.midiManager.midiPlayer.MPTK_MidiLoaded.TrackInstrumentName;
+                if (!string.IsNullOrEmpty(gameManager.midiManager.midiPlayer.MPTK_MidiLoaded.Copyright))
+                    midiInfo += "\n" + gameManager.midiManager.midiPlayer.MPTK_MidiLoaded.Copyright;
                 // SequenceTrackName ProgramName    TrackInstrumentName
             }
             midiInfoDisplayed.text = midiInfo;

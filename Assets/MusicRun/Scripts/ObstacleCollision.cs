@@ -13,7 +13,7 @@ namespace MusicRun
 
         private GameManager gameManager;
         private PlayerController player;
-        private MidiTempoSync midiTempoSync;
+        private MidiManager midiManager;
         private SoundManager SoundManager;
 
         void Awake()
@@ -22,7 +22,7 @@ namespace MusicRun
             if (gameManager == null)
                 return;
             player = gameManager.playerController;
-            midiTempoSync = gameManager.midiTempoSync;
+            midiManager = gameManager.midiManager;
             SoundManager = gameManager.soundManager;
 
             if (cameraShake == null && Camera.main != null)
@@ -44,7 +44,7 @@ namespace MusicRun
                 float applyShake = Mathf.Clamp(player.GetSpeed() / 7f, 0.5f, 3f);
                 Debug.Log($"obstacle hit by player : {hit.collider.name} {hit.collider.tag} applyShake:{applyShake}");
                 cameraShake.TriggerShake(0.4f, 0.15f * applyShake, 2f); 
-                midiTempoSync.midiPlayer.MPTK_Pause(1000);
+                midiManager.midiPlayer.MPTK_Pause(1000);
                 player.speedMultiplier = 0.5f;
                 SoundManager.PlayCollisionSound();
 

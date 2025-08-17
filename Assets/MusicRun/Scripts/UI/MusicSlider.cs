@@ -9,13 +9,13 @@ namespace MusicRun
         public Slider musicSlider;
         public TextMeshProUGUI musicText;
         private GameManager gameManager;
-        private MidiTempoSync midiTempoSync;
+        private MidiManager midiManager;
         void Awake()
         {
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            midiTempoSync = gameManager.midiTempoSync;
+            midiManager = gameManager.midiManager;
             Transform bgTransform = musicSlider.transform.Find("Fill Area").transform.Find("Fill");
             if (bgTransform != null)
             {
@@ -26,10 +26,10 @@ namespace MusicRun
 
         void Update()
         {
-            if (midiTempoSync.midiPlayer.MPTK_IsPlaying)
+            if (midiManager.midiPlayer.MPTK_IsPlaying)
             {
                 musicSlider.value = gameManager.MusicPercentage;
-                musicText.text = $"Music {midiTempoSync.Progress:F0} %";
+                musicText.text = $"Music {midiManager.Progress:F0} %";
             }
         }
     }
