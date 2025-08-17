@@ -1,4 +1,5 @@
 using MidiPlayerTK;
+using MusicRun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,7 +25,6 @@ namespace MusicRun
         public ScoreManager scoreManager;
         public LeaderboardDisplay leaderboardDisplay;
         public PlayerController playerController;
-        public MidiFilePlayer midiPlayer;
         public SoundManager soundManager;
         public ActionDisplay actionDisplay;
         public PanelDisplay actionPlay;
@@ -35,7 +35,6 @@ namespace MusicRun
         public SplashScreen splashScreen;
         public HelperScreen helperScreen;
 
-        public int[] channelPlayed = new int[16]; // Array to track which channels are currently playing
         void Awake()
         {
             // Subscribe to events
@@ -45,35 +44,7 @@ namespace MusicRun
             leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
             leaderboard.OnScoreSubmitted += OnScoreSubmitted;
             Utilities.Init();
-            midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
-            {
-                // Start of the MIDI playback has been triggered.
-                Debug.Log($"MidiPlayer Play MIDI '{name}' {goalHandler.distanceAtStart}");
-                // Reset some MIDI properties which can be done only when MIDI playback is started.
-                midiTempoSync.Reset();
-                StartCoroutine(UpdateMaxDistanceMPTK());
-                midiPlayer.MPTK_Transpose = 0;
-                midiPlayer.MPTK_MidiAutoRestart = false;
-                Array.Clear(channelPlayed, 0, 16);
-            });
-            midiPlayer.OnEventNotesMidi.AddListener((midiEvents) =>
-            {
-                // Handle MIDI events if needed
-                // Debug.Log($"MidiPlayer Notes: {midiEvents.Count}");
-                foreach (var midiEvent in midiEvents)
-                    channelPlayed[midiEvent.Channel]++;
-            });
-        }
 
-        private IEnumerator UpdateMaxDistanceMPTK()
-        {
-            // Wait for the goalHandler to have a valid distanceAtStart.
-            while (goalHandler.distanceAtStart < 0)
-                yield return new WaitForSeconds(0.1f);
-            // Attenuation of volume with the distance from the player and the goal.
-            // When the player is at the start, the volume is 5% of the volume max at the goal.
-            midiPlayer.MPTK_MaxDistance = goalHandler.distanceAtStart * 1.05f;
-            Debug.Log($"MaxDistance set {midiPlayer.MPTK_MaxDistance}");
         }
 
         void Start()
@@ -184,13 +155,14 @@ namespace MusicRun
                 foreach (char c in Input.inputString)
                 {
                     if (c == 'h' || c == 'H') HelperScreenDisplay();
-                    if (c == 'N' || c == 'N') NextLevel();
+                    if (c == 'n' || c == 'N') StartCoroutine(ClearAndNextLevel());
                     if (c == 's' || c == 'S') StopGame();
                     if (c == 'r' || c == 'R') RestartGame();
                     if (c == 'h' || c == 'H') HelperScreenDisplay();
                     if (c == 'a' || c == 'A') actionDisplay.SwitchVisible();
                     if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
-                    if (c == 'g' || c == 'G')
+                    if (c == 'm' || c == 'M') midiTempoSync.SoundOnOff();
+                    if (c == 'g' || c == 'G') StartCoroutine(ClearAndNextLevel());
                     {
                         terrainGenerator.ClearChunks(0);
                         terrainGenerator.UpdateChunks();
@@ -202,7 +174,7 @@ namespace MusicRun
             {
                 if (levelRunning)
                 {
-                    midiPlayer.MPTK_Pause();
+                    midiTempoSync.Pause();
                     levelRunning = false;
                     //    actionDisplay.Show();
                 }
@@ -212,7 +184,7 @@ namespace MusicRun
             {
                 if (!levelRunning)
                 {
-                    midiPlayer.MPTK_UnPause();
+                    midiTempoSync.UnPause();
                     levelRunning = true;
                     //    actionDisplay.Hide();
                 }
@@ -224,11 +196,19 @@ namespace MusicRun
                     GoalPercentage = 100f - (goalHandler.distance / goalHandler.distanceAtStart * 100f);
                 else
                     GoalPercentage = 0f;
-                MusicPercentage = ((float)midiPlayer.MPTK_TickCurrent / (float)midiPlayer.MPTK_TickLastNote) * 100f;
+                MusicPercentage = midiTempoSync.Progress;
                 scoreManager.ScoreGoal = scoreManager.CalculateScoreGoal(MusicPercentage, GoalPercentage);
             }
         }
 
+        public IEnumerator ClearAndNextLevel()
+        {
+            terrainGenerator.ClearChunks(0);
+            currentLevelNumber++;
+            currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
+            yield return null; // Wait one frame
+            CreateAndStartLevel(currentLevelIndex);
+        }
         public void LeaderboardSwitchDisplay()
         {
             leaderboardDisplay.SwitchVisible(playerController);
@@ -285,12 +265,7 @@ namespace MusicRun
             terrainGenerator.CreateLevel(level);
             goalHandler.NewLevel();
             goalReachedDisplay.NewLevel();
-            midiPlayer.MPTK_MidiIndex = terrainGenerator.CurrentLevel.indexMIDI;
-            if (midiPlayer != null)
-            {
-                midiPlayer.MPTK_Stop();
-                midiPlayer.MPTK_Play();
-            }
+            midiTempoSync.StartPlayMIDI(terrainGenerator.CurrentLevel.indexMIDI);
             gameRunning = true;
             levelRunning = true;
             playerController.LevelStarted();

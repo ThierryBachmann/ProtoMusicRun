@@ -201,7 +201,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -969,7 +969,6 @@ MonoBehaviour:
   scoreManager: {fileID: 211374106}
   leaderboardDisplay: {fileID: 973761168}
   playerController: {fileID: 256923874}
-  midiPlayer: {fileID: 738411423}
   soundManager: {fileID: 1870609031}
   actionDisplay: {fileID: 1397310892}
   actionPlay: {fileID: 105468824}
@@ -979,7 +978,6 @@ MonoBehaviour:
   pauseButton: {fileID: 1518020440}
   splashScreen: {fileID: 371084311}
   helperScreen: {fileID: 431561426}
-  channelPlayed: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!4 &152116609
 Transform:
   m_ObjectHideFlags: 0
@@ -1106,7 +1104,7 @@ MonoBehaviour:
     name: Flat desert
     description: 
     indexMIDI: 50
-    RatioSpeedMusic: 0.2
+    RatioSpeedMusic: 0.3
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
     BonusCount: 1
@@ -1126,7 +1124,7 @@ MonoBehaviour:
     name: 'Desert Medium '
     description: More dune ...
     indexMIDI: 80
-    RatioSpeedMusic: 0.25
+    RatioSpeedMusic: 0.3
     MinSpeedMusic: 0.2
     MaxSpeedMusic: 1.99
     BonusCount: 1
@@ -1595,6 +1593,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 331e1e0b1624ab840b286f0aa3aaa6e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  midiPlayer: {fileID: 738411423}
+  channelPlayed: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  goalHandler: {fileID: 0}
 --- !u!114 &283134996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2556,7 +2557,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.19995117, y: -9}
+  m_AnchoredPosition: {x: -0.19995117, y: -8.999878}
   m_SizeDelta: {x: -659.6, y: -382}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &371084308
@@ -3045,7 +3046,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.19995117, y: -9}
+  m_AnchoredPosition: {x: -0.19995117, y: -8.999878}
   m_SizeDelta: {x: -659.6, y: -382}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &431561426
@@ -3761,8 +3762,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -0.000022888184, y: -263.4}
-  m_SizeDelta: {x: 1920, y: 300}
+  m_AnchoredPosition: {x: -0.000022888184, y: -203.93}
+  m_SizeDelta: {x: 1920, y: 390}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &666012081
 MonoBehaviour:
@@ -3797,10 +3798,7 @@ MonoBehaviour:
     MIDI Toolkit Player Demonstration
     help text
 
-    MIDI Toolkit Player Demonstration help text
-
-    MIDI Toolkit
-    Player Demonstration help text'
+    MIDI Toolkit Player Demonstration help text'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3836,7 +3834,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -4417,6 +4415,10 @@ PrefabInstance:
       propertyPath: MaxDistance
       value: 9000
       objectReference: {fileID: 0}
+    - target: {fileID: 82347057954033728, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: rolloffMode
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 82585700720091338, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: OutputAudioMixerGroup
       value: 
@@ -4428,6 +4430,10 @@ PrefabInstance:
     - target: {fileID: 114662785300262660, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: maxDistance
       value: 1200
+      objectReference: {fileID: 0}
+    - target: {fileID: 114662785300262660, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: playOnStart
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114662785300262660, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: volumeGlobal
@@ -4462,6 +4468,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 375641947}
     - target: {fileID: 114662785300262660, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: showUnitySynthEffect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114662785300262660, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: MPTK_PauseOnFocusLoss
       value: 0
       objectReference: {fileID: 0}
@@ -4476,6 +4486,34 @@ PrefabInstance:
     - target: {fileID: 114662785300262660, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
       propertyPath: showMidiPerformanceParameter
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 164935779584603366, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 164958897878497272, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 166408923624218062, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 166594533298184498, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 169083345850379158, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 169083345850379158, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: m_LowpassResonanceQ
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 169083345850379158, guid: 32a8d8859acf18d4ba134834a876d5ea, type: 3}
+      propertyPath: lowpassLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 0.22692133
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4563,9 +4601,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 431561425}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 107.4, y: 650.1}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 94.7, y: 0}
   m_SizeDelta: {x: 1920, y: 50}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &835672203
@@ -5483,9 +5521,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 431561425}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 107.4, y: 566.48}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: -0.000022888184, y: -54.77}
   m_SizeDelta: {x: 1920, y: 50}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &985289949
@@ -7893,7 +7931,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1770975909
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7910,7 +7948,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 60.233387, y: 0.19998932}
+  m_AnchoredPosition: {x: 60.233387, y: -141.4}
   m_SizeDelta: {x: 1920, y: 58.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1770975910
@@ -7961,8 +7999,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 45
-  m_fontSizeBase: 45
+  m_fontSize: 35
+  m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -8880,13 +8918,33 @@ MonoBehaviour:
   MidiSound: {fileID: 609628727}
   RebuildJingles: 0
   Jingles:
-  - name: 
+  - name: Collision
     soundEvents:
+    - action: 1
+      value: 60
+      channel: 0
+      duration: 500
+      velocity: 127
+    - action: 1
+      value: 62
+      channel: 0
+      duration: 500
+      velocity: 127
+    - action: 1
+      value: 64
+      channel: 0
+      duration: 500
+      velocity: 127
     - action: 0
       value: 0
       channel: 0
       duration: 0
       velocity: 0
+    - action: 1
+      value: 50
+      channel: 0
+      duration: 1000
+      velocity: 127
 --- !u!4 &1870609032
 Transform:
   m_ObjectHideFlags: 0

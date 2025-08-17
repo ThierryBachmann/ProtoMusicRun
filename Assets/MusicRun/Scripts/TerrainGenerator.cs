@@ -228,7 +228,7 @@ namespace MusicRun
                                     childPosition.z * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
                                     childPosition.x * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk);
 
-                                Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
+                                //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
 
                                 // Position between -chunkSize and chunkSize
                                 offsetX = offsetX * chunkSize - chunkSize / 2f;
@@ -237,7 +237,7 @@ namespace MusicRun
                                 // Define position and place to the terrain
                                 Vector3 newPosition = new Vector3(offsetX, 5f, offsetZ);
                                 //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} local:{basePosition} --> new: {newPosition} ");
-                                if (childTransform.CompareTag("TreeScalable "))
+                                if (childTransform.CompareTag("TreeScalable"))
                                 {
                                     currentLevel.maxScaleVegetable = Mathf.Clamp(currentLevel.maxScaleVegetable, 0.1f, 15f);
                                     currentLevel.minScaleVegetable = Mathf.Clamp(currentLevel.minScaleVegetable, 0.1f, 15f);
@@ -252,9 +252,10 @@ namespace MusicRun
                                 float randomY = UnityEngine.Random.Range(0f, 360f);
                                 childTransform.localRotation = Quaternion.Euler(0f, randomY, 0f);
 
-                                // Keep the local position already set
+                                // Set the local position already set
                                 childTransform.localPosition = newPosition;
 
+                                // Search and apply the Y 
                                 if (!PlaceOnHighestTerrain(childTransform, 100f))
                                     Debug.Log($"No hit, chunk: {chunkCoord} child: {childTransform.name} offsetX:{offsetX} offsetZ: {offsetZ} ");
                             }

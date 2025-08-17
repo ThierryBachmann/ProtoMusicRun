@@ -8,54 +8,28 @@ namespace MusicRun
     {
         public Slider musicSlider;
         public TextMeshProUGUI musicText;
-
         private GameManager gameManager;
-        private MidiFilePlayer midiPlayer;
-
+        private MidiTempoSync midiTempoSync;
         void Awake()
         {
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            midiPlayer = gameManager.midiPlayer;
-           
+            midiTempoSync = gameManager.midiTempoSync;
             Transform bgTransform = musicSlider.transform.Find("Fill Area").transform.Find("Fill");
             if (bgTransform != null)
             {
                 Image sliderBackground = bgTransform.GetComponent<Image>();
                 sliderBackground.color = Utilities.ColorBase;
             }
-
-            midiPlayer.MPTK_StartPlayAtFirstNote = true;
-            midiPlayer.MPTK_MidiAutoRestart = false;
-            midiPlayer.OnEventStartPlayMidi.AddListener((string info) =>
-            {
-                if (info != null)
-                {
-                    Debug.Log($"Music started: {info}");
-                }
-            });
-            midiPlayer.OnEventEndPlayMidi.AddListener((string info, EventEndMidiEnum endMidi) =>
-            {
-                if (info != null)
-                {
-                    Debug.Log($"Music ended: {endMidi} {info}");
-                }
-            });
         }
 
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
         void Update()
         {
-            if (midiPlayer.MPTK_IsPlaying)
+            if (midiTempoSync.midiPlayer.MPTK_IsPlaying)
             {
                 musicSlider.value = gameManager.MusicPercentage;
-                musicText.text = $"Music {gameManager.MusicPercentage:F0} %";
+                musicText.text = $"Music {midiTempoSync.Progress:F0} %";
             }
         }
     }
