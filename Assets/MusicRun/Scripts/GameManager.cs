@@ -213,6 +213,7 @@ namespace MusicRun
 
         public void RestartGame()
         {
+            terrainGenerator.ResetTerrain();
             splashScreen.Hide();
             helperScreen.Hide();
             currentLevelNumber = 1;

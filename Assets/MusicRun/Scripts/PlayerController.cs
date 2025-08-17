@@ -69,6 +69,10 @@ namespace MusicRun
         void OnTriggerEnter(Collider other)
         {
             Debug.Log($"PlayerController trigger {other.tag}");
+            if (other.CompareTag("Bonus"))
+            {
+                other.transform.gameObject.SetActive(false);
+            }
         }
         public void LevelStarted()
         {

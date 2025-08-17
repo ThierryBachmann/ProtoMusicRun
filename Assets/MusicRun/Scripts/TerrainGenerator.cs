@@ -23,7 +23,8 @@ namespace MusicRun
         private Vector2Int startChunkCoord;
         private GameObject currentGoal;
         private Vector2Int goalChunkCoord;
-        private Dictionary<Vector2Int, GameObject> spawnedChunks = new Dictionary<Vector2Int, GameObject>();
+        private Dictionary<Vector2Int, GameObject> spawnedChunks;
+        private Dictionary<Vector2Int, int> spawnedBonus;
         private GameManager gameManager;
         private PlayerController player;
 
@@ -42,6 +43,13 @@ namespace MusicRun
 
         void Start()
         {
+        }
+
+        public void ResetTerrain()
+        {
+            ClearChunks(0);
+            spawnedChunks = new Dictionary<Vector2Int, GameObject>();
+            spawnedBonus = new Dictionary<Vector2Int, int>();
         }
 
         /// <summary>
@@ -145,7 +153,8 @@ namespace MusicRun
             currentGoal.transform.position = ChunkToPosition(goalChunkCoord);
             currentGoal.transform.rotation = Quaternion.identity;
             Debug.Log($"Add goal chunk coord: {goalChunkCoord} --> GO: {currentGoal.name} {currentGoal.transform.position}");
-            // currentPlayerChunk=new Vector2Int(9999,9999);
+
+            spawnedBonus = new Dictionary<Vector2Int, int>();
         }
 
         /// <summary>
@@ -274,18 +283,32 @@ namespace MusicRun
                         }
                         spawnedChunks.Add(chunkCoord, chunk);
 
-                        if (currentLevel.runBonus.Length > 0)
+                        // Generate and place bonus 
+                        // ------------------------
+                        if (currentLevel.runBonus.Length > 0 && currentLevel.BonusCount > 0 && !spawnedBonus.ContainsKey(chunkCoord))
                         {
-                            for (int i = 0; i < currentLevel.BonusCount; i++)
+                            int count = (int)currentLevel.BonusCount;
+                            if (currentLevel.BonusCount < 1)
                             {
-                                GameObject bonusPrefabRandom = currentLevel.runBonus[UnityEngine.Random.Range(0, currentLevel.runBonus.Length)];
-                                GameObject bonus = Instantiate(bonusPrefabRandom);
-                                bonus.transform.SetParent(chunk.transform, false);
-                                float maxPos = chunkSize / 2f - 0.1f; // -0.1 to avoid border
-                                Vector3 bonusPos = new Vector3(UnityEngine.Random.Range(-maxPos, maxPos), 5f, UnityEngine.Random.Range(-maxPos, maxPos));
-                                bonus.transform.SetLocalPositionAndRotation(bonusPos, Quaternion.identity);
-                                PlaceOnHighestTerrain(bonus.transform, 100f);
-                                bonus.name = $"Bonus - level: {currentIndexLevel} - coord: {bonus.transform.localPosition}";
+                                if (UnityEngine.Random.Range(0f, 1f) < currentLevel.BonusCount)
+                                    count = 1;
+                                else
+                                    count = 0;
+                            }
+                            if (count > 0)
+                            {
+                                for (int i = 0; i < currentLevel.BonusCount; i++)
+                                {
+                                    GameObject bonusPrefabRandom = currentLevel.runBonus[UnityEngine.Random.Range(0, currentLevel.runBonus.Length)];
+                                    GameObject bonus = Instantiate(bonusPrefabRandom);
+                                    bonus.transform.SetParent(chunk.transform, false);
+                                    float maxPos = chunkSize / 2f - 0.1f; // -0.1 to avoid border
+                                    Vector3 bonusPos = new Vector3(UnityEngine.Random.Range(-maxPos, maxPos), 5f, UnityEngine.Random.Range(-maxPos, maxPos));
+                                    bonus.transform.SetLocalPositionAndRotation(bonusPos, Quaternion.identity);
+                                    PlaceOnHighestTerrain(bonus.transform, 100f);
+                                    bonus.name = $"Bonus - level: {currentIndexLevel} - coord: {bonus.transform.localPosition}";
+                                }
+                                spawnedBonus.Add(chunkCoord, count);
                             }
                         }
                     }
@@ -364,23 +387,24 @@ namespace MusicRun
         /// <param name="atDistance"></param>
         public void ClearChunks(int atDistance)
         {
-            for (int x = -renderDistance; x <= renderDistance; x++)
-            {
-                for (int z = -renderDistance; z <= renderDistance; z++)
+            if (spawnedChunks != null)
+                for (int x = -renderDistance; x <= renderDistance; x++)
                 {
-                    Vector2Int chunkCoord = CurrentPlayerChunk + new Vector2Int(x, z);
-                    if ((chunkCoord - CurrentPlayerChunk).magnitude >= atDistance)
+                    for (int z = -renderDistance; z <= renderDistance; z++)
                     {
-                        // Does the chunk dictionary contains this chunk? Don't remove for start and goal chunks (in case of ...)).
-                        if (spawnedChunks.ContainsKey(chunkCoord) && chunkCoord != goalChunkCoord && chunkCoord != startChunkCoord)
+                        Vector2Int chunkCoord = CurrentPlayerChunk + new Vector2Int(x, z);
+                        if ((chunkCoord - CurrentPlayerChunk).magnitude >= atDistance)
                         {
-                            //Debug.Log($"ClearChunks {chunkCoord}");
-                            Destroy(spawnedChunks[chunkCoord]);
-                            spawnedChunks.Remove(chunkCoord);
+                            // Does the chunk dictionary contains this chunk? Don't remove for start and goal chunks (in case of ...)).
+                            if (spawnedChunks.ContainsKey(chunkCoord) && chunkCoord != goalChunkCoord && chunkCoord != startChunkCoord)
+                            {
+                                //Debug.Log($"ClearChunks {chunkCoord}");
+                                Destroy(spawnedChunks[chunkCoord]);
+                                spawnedChunks.Remove(chunkCoord);
+                            }
                         }
                     }
                 }
-            }
         }
 
     }
@@ -403,7 +427,7 @@ namespace MusicRun
         public float MaxSpeedMusic = 5f;
 
         [Range(0, 10)]
-        public int BonusCount = 1;
+        public float BonusCount = 1;
 
         [Header("Delta chunk position with last goal")]
         public Vector2Int deltaCurrentChunk;
