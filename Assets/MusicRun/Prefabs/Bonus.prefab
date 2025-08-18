@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7119474497903897130}
   - component: {fileID: 812907163354744505}
-  - component: {fileID: 8297703576553754643}
+  - component: {fileID: 4612588159478972828}
+  - component: {fileID: 432633739201639686}
   m_Layer: 0
   m_Name: Bonus
   m_TagString: Bonus
@@ -52,8 +53,8 @@ MonoBehaviour:
   rotationSpeedX: 0
   rotationSpeedY: 90
   rotationSpeedZ: 0
---- !u!65 &8297703576553754643
-BoxCollider:
+--- !u!135 &4612588159478972828
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -71,8 +72,35 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 5, y: 5, z: 5}
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Radius: 20
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &432633739201639686
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1043371857810829490}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1893754112053042380
 GameObject:
   m_ObjectHideFlags: 0
@@ -84,7 +112,6 @@ GameObject:
   - component: {fileID: 2264798802896729945}
   - component: {fileID: 2574684142818564113}
   - component: {fileID: 4898844462416830284}
-  - component: {fileID: 7809618722066882790}
   m_Layer: 0
   m_Name: PyramideHigh
   m_TagString: Untagged
@@ -160,28 +187,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7809618722066882790
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1893754112053042380}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
 --- !u!1 &2930605245831510961
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,7 +374,6 @@ GameObject:
   - component: {fileID: 7329935487219297148}
   - component: {fileID: 6731960591682278179}
   - component: {fileID: 3600824969074985459}
-  - component: {fileID: 6455497218402361236}
   m_Layer: 0
   m_Name: PyramideLow
   m_TagString: Untagged
@@ -445,25 +449,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6455497218402361236
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8131380490990547035}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}

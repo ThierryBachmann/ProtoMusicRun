@@ -1107,7 +1107,7 @@ MonoBehaviour:
     RatioSpeedMusic: 0.3
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
-    BonusCount: 0.26
+    BonusCount: 0.4
     deltaCurrentChunk: {x: 0, y: 20}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
@@ -1168,7 +1168,7 @@ MonoBehaviour:
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
-    BonusCount: 1
+    BonusCount: 10
     deltaCurrentChunk: {x: 0, y: 5}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
@@ -1178,7 +1178,8 @@ MonoBehaviour:
     maxScaleVegetable: 0.5
     runChunks:
     - {fileID: 3245006867922576827, guid: 073d80ae2c5c30840ae81cbd3b6be993, type: 3}
-    runBonus: []
+    runBonus:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
   - enabled: 0
     name: 'Desert Medium '
     description: More dune ...

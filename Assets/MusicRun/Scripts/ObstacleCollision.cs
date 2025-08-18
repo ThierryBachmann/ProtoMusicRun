@@ -1,5 +1,6 @@
 ﻿using MidiPlayerTK;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MusicRun
 {
@@ -14,7 +15,8 @@ namespace MusicRun
         private GameManager gameManager;
         private PlayerController player;
         private MidiManager midiManager;
-        private SoundManager SoundManager;
+        private SoundManager soundManager;
+        private ScoreManager scoreManager;
 
         void Awake()
         {
@@ -23,7 +25,8 @@ namespace MusicRun
                 return;
             player = gameManager.playerController;
             midiManager = gameManager.midiManager;
-            SoundManager = gameManager.soundManager;
+            soundManager = gameManager.soundManager;
+            scoreManager = gameManager.scoreManager;
 
             if (cameraShake == null && Camera.main != null)
             {
@@ -43,10 +46,11 @@ namespace MusicRun
             {
                 float applyShake = Mathf.Clamp(player.GetSpeed() / 7f, 0.5f, 3f);
                 Debug.Log($"obstacle hit by player : {hit.collider.name} {hit.collider.tag} applyShake:{applyShake}");
+                scoreManager.EndBonus();
                 cameraShake.TriggerShake(0.4f, 0.15f * applyShake, 2f); 
                 midiManager.midiPlayer.MPTK_Pause(1000);
                 player.speedMultiplier = 0.5f;
-                SoundManager.PlayCollisionSound();
+                soundManager.PlayCollisionSound();
 
                 Vector3 pushDir = Vector3.ProjectOnPlane(hit.normal, Vector3.up); 
                 player.ApplyKnockback(pushDir, knockbackPower * applyShake);

@@ -108,6 +108,7 @@ namespace MusicRun
                 actionDisplay.Show();
                 actionDisplay.SelectActionsToShow();
             }
+            playerController.LevelCompleted();
         }
 
         private void OnScoreSubmitted(bool success)
@@ -279,6 +280,7 @@ namespace MusicRun
             gameRunning = false;
             levelRunning = false;
             actionDisplay.Show();
+            playerController.LevelCompleted();
         }
 
         public void HelperScreenDisplay()

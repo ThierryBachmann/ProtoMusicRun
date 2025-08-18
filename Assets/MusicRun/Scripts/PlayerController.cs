@@ -52,6 +52,7 @@ namespace MusicRun
 
         private CharacterController controller;
         private GameManager gameManager;
+        private ScoreManager scoreManager;
         public DateTime timeStartLevel;
 
 
@@ -61,6 +62,7 @@ namespace MusicRun
             if (gameManager == null)
                 return;
             controller = GetComponent<CharacterController>();
+            scoreManager = gameManager.scoreManager;
         }
 
         void Start()
@@ -71,7 +73,22 @@ namespace MusicRun
             Debug.Log($"PlayerController trigger {other.tag}");
             if (other.CompareTag("Bonus"))
             {
-                other.transform.gameObject.SetActive(false);
+                scoreManager.StartBonus();
+
+                Rigidbody rb = other.attachedRigidbody;
+                if (rb != null)
+                {
+                    // Direction from player to bonus
+                    Vector3 kickDir = (other.transform.position - transform.position).normalized;
+                    kickDir.y = 0;
+                    // Add a forward + upward impulse (like a foot kick)
+                    Vector3 force = kickDir * GetSpeed() * 2f + Vector3.up * 5f;
+                    rb.AddForce(force, ForceMode.Impulse);
+                    rb.useGravity = true;
+                    // Optional: add spin
+                    //rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
+                }
+                Destroy(other.gameObject, 3f);
             }
         }
         public void LevelStarted()
@@ -84,7 +101,7 @@ namespace MusicRun
         public void LevelCompleted()
         {
             speedMultiplier = 1f;
-
+            scoreManager.EndBonus();
             HandleMovement(Vector3.zero);
         }
 

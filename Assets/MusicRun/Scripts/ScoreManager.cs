@@ -1,4 +1,35 @@
-﻿using UnityEngine;
+﻿// Idée pour le calcul du score:
+//  Score maxi si le joueur atteind l'objectif en meme temps que la fin du MIDI.
+//      Example calcul ratio: pourcentage avancement du slide bar MIDI (0 a 100) / pourcentage avancement du slide bar distance (0 a 100) 
+//          = 1 : score  100
+//          < 1 : bonus ratio * 100
+//          exemple : si objectif atteint à 80% du MIDI, 80 / 100 = 0.8, score = 0.8 * 100 = 80
+//      Aspect tactique : le player peut essayer d'optimiser son score en atteignant l'objectif en provoquant des collisions
+//      ou en evitant les collisions pour sécuriser un score en dessous de 100.
+//  Mais si le player arrive apres la fin du MIDI : level failed (tolerance de quelques secondes?) et doit recommencer le niveau. 
+//  Les obstacles et bonus ne sont régénérés, le player peut donc apprendre à optimiser son trajet.
+//
+//  Les bonus :
+//      - transposition de la musique d'une octave pendant 10 secondes vers le haut. Si pas de collision pendant cette période, le bonus
+//        est calculé en fonction du pourcentage de la musique jouée pendant cette période.
+//        max : 20 points pour 10 secondes de musique jouée sans collision. Le joueur va donc éviter une collision pour obtenir du bonus.
+//      - bonus speed multiplicateur pendant 10 secondes. 
+//  Les malus :
+//      - transposition de la musique d'une octave pendant 10 secondes vers le bas. Si pas de collision pendant cette période, le malus
+//        est calculé en fonction du pourcentage de la musique jouée pendant cette période.
+//        max : -20 points pour 10 secondes de musique jouée sans collision. Le joueur va donc provoquer une collision pour éviter le malus.
+
+//  Non, Score plus élevé si temps de trajet plus court (utilisation de speedMultiplier qui agit aussi sur la vitesse MIDI?)
+//      cela favorise l'évitement des colisions et le chemin le plus direct
+
+//if (!player.goalHandler.goalReached)
+//{
+//    float bonusDirection = player.goalHandler.goalAngle >= -15f && player.goalHandler.goalAngle <= 15f ? 1f : -1f;
+//    score += (long)(bonusDirection * player.speedMultiplier * coefficient);
+//    if (score < 0) score = 0;
+//}
+using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace MusicRun
@@ -15,10 +46,12 @@ namespace MusicRun
         public int ScoreGoal;
         public int ScoreOverall;
         public int ScoreBonus;
+        public float bonusInProgress;
+        public DateTime startBonusDateTime;
+        public bool startBonus;
 
         private GameManager gameManager;
         private PlayerController player;
-
         private void Awake()
         {
             gameManager = Utilities.FindGameManager();
@@ -26,46 +59,48 @@ namespace MusicRun
                 return;
             player = gameManager.playerController;
         }
-
+        void Start()
+        {
+            startBonusDateTime = DateTime.MaxValue;
+            bonusInProgress = 0;
+            startBonus = false;
+        }
         void Update()
         {
-            // Idée pour le calcul du score:
-            //  Score maxi si le joueur atteind l'objectif en meme temps que la fin du MIDI.
-            //      Example calcul ratio: pourcentage avancement du slide bar MIDI (0 a 100) / pourcentage avancement du slide bar distance (0 a 100) 
-            //          = 1 : score  100
-            //          < 1 : bonus ratio * 100
-            //          exemple : si objectif atteint à 80% du MIDI, 80 / 100 = 0.8, score = 0.8 * 100 = 80
-            //      Aspect tactique : le player peut essayer d'optimiser son score en atteignant l'objectif en provoquant des collisions
-            //      ou en evitant les collisions pour sécuriser un score en dessous de 100.
-            //  Mais si le player arrive apres la fin du MIDI : level failed (tolerance de quelques secondes?) et doit recommencer le niveau. 
-            //  Les obstacles et bonus ne sont régénérés, le player peut donc apprendre à optimiser son trajet.
-            //
-            //  Les bonus :
-            //      - transposition de la musique d'une octave pendant 10 secondes vers le haut. Si pas de collision pendant cette période, le bonus
-            //        est calculé en fonction du pourcentage de la musique jouée pendant cette période.
-            //        max : 20 points pour 10 secondes de musique jouée sans collision. Le joueur va donc éviter une collision pour obtenir du bonus.
-            //      - bonus speed multiplicateur pendant 10 secondes. 
-            //  Les malus :
-            //      - transposition de la musique d'une octave pendant 10 secondes vers le bas. Si pas de collision pendant cette période, le malus
-            //        est calculé en fonction du pourcentage de la musique jouée pendant cette période.
-            //        max : -20 points pour 10 secondes de musique jouée sans collision. Le joueur va donc provoquer une collision pour éviter le malus.
+            if (startBonus)
+            {
+                bonusInProgress = ((float)(DateTime.Now - startBonusDateTime).TotalMilliseconds / 1000f * 20f) / 10f;
+                if ((DateTime.Now - startBonusDateTime).TotalMilliseconds > 10000)
+                {
+                    EndBonus();
+                }
+            }
+        }
+        public void StartBonus()
+        {
+            EndBonus();
+            startBonusDateTime = DateTime.Now;
+            startBonus = true;
+        }
 
-            //  Non, Score plus élevé si temps de trajet plus court (utilisation de speedMultiplier qui agit aussi sur la vitesse MIDI?)
-            //      cela favorise l'évitement des colisions et le chemin le plus direct
-
-            //if (!player.goalHandler.goalReached)
-            //{
-            //    float bonusDirection = player.goalHandler.goalAngle >= -15f && player.goalHandler.goalAngle <= 15f ? 1f : -1f;
-            //    score += (long)(bonusDirection * player.speedMultiplier * coefficient);
-            //    if (score < 0) score = 0;
-            //}
+        public void EndBonus()
+        {
+            if (startBonus)
+            {
+                startBonus = false;
+                if (bonusInProgress > 0f)
+                {
+                    ScoreBonus += Mathf.RoundToInt(bonusInProgress);
+                    bonusInProgress = 0f;
+                }
+            }
         }
 
         public void CalculateScoreLevel(float musicProgress, float distanceProgress)
         {
             ScoreGoal = CalculateScoreGoal(musicProgress, distanceProgress);
             ScoreLevel = ScoreGoal + ScoreBonus;
-            ScoreOverall += ScoreGoal;
+            ScoreOverall += ScoreLevel;
             Debug.Log($"CalculateLevelScore ScoreGoal: {ScoreGoal} ScoreBonus: {ScoreBonus} ScoreLevel: {ScoreLevel} ScoreOverall:{ScoreOverall}");
         }
 
@@ -90,7 +125,7 @@ namespace MusicRun
             else
             {
                 // Calculate score based on the ratio of music progress to distance progress
-                float ratio = distanceProgress/musicProgress;
+                float ratio = distanceProgress / musicProgress;
                 score = Mathf.RoundToInt(100f * ratio);
                 score = Mathf.Clamp(score, 10, 100);
                 //Debug.Log($"CalculateScoreGoal ScoreGoal:{score} musicProgress:{musicProgress:N1} distanceProgress:{distanceProgress:N1} Ratio:{ratio:N1}");
