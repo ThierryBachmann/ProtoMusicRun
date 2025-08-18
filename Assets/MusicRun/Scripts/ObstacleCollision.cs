@@ -48,9 +48,8 @@ namespace MusicRun
                 Debug.Log($"obstacle hit by player : {hit.collider.name} {hit.collider.tag} applyShake:{applyShake}");
                 scoreManager.EndBonus();
                 cameraShake.TriggerShake(0.4f, 0.15f * applyShake, 2f); 
-                midiManager.midiPlayer.MPTK_Pause(1000);
                 player.speedMultiplier = 0.5f;
-                soundManager.PlayCollisionSound();
+                midiManager.ApplyPitch(0.98f, 2000f);
 
                 Vector3 pushDir = Vector3.ProjectOnPlane(hit.normal, Vector3.up); 
                 player.ApplyKnockback(pushDir, knockbackPower * applyShake);

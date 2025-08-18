@@ -108,6 +108,29 @@ namespace MusicRun
             midiPlayer.MPTK_UnPause();
         }
 
+        public void ApplyPitch(float pitchFactor=0.99f, float durationMilli=2000f)
+        {
+            StartCoroutine(PitchRoutine(pitchFactor , durationMilli));
+        }
+
+        private IEnumerator PitchRoutine(float pitchFactor, float durationMilli)
+        {
+            float duration = (durationMilli / 1000f) / 10f;
+            Debug.Log($"PitchRoutine {pitchFactor} {duration} * 10 sec.");
+            for (int i = 0; i < 10; i++)
+            {
+                for (int v = 0; v < midiPlayer.ActiveVoices.Count; v++)
+                {
+                    fluid_voice voice = midiPlayer.ActiveVoices[v];
+                    yield return null;
+                    //Debug.Log(voice.VoiceAudio.name);
+                    // When webplayer is enabled, all notes are played with independent Audiosource
+                    voice.VoiceAudio.Audiosource.pitch *= pitchFactor;
+                }
+                yield return Routine.WaitForSeconds(durationMilli);
+            }
+        }
+
         void Update()
         {
             float speedClamp = 1f;

@@ -53,6 +53,7 @@ namespace MusicRun
         private CharacterController controller;
         private GameManager gameManager;
         private ScoreManager scoreManager;
+        private MidiManager midiManager;
         public DateTime timeStartLevel;
 
 
@@ -63,6 +64,7 @@ namespace MusicRun
                 return;
             controller = GetComponent<CharacterController>();
             scoreManager = gameManager.scoreManager;
+            midiManager = gameManager.midiManager;
         }
 
         void Start()
@@ -78,6 +80,8 @@ namespace MusicRun
                 Rigidbody rb = other.attachedRigidbody;
                 if (rb != null)
                 {
+                    midiManager.ApplyPitch(1.05f, 300f);
+
                     // Direction from player to bonus
                     Vector3 kickDir = (other.transform.position - transform.position).normalized;
                     kickDir.y = 0;
