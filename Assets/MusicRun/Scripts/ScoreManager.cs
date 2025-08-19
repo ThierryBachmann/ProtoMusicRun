@@ -52,12 +52,15 @@ namespace MusicRun
 
         private GameManager gameManager;
         private PlayerController player;
+        private MidiManager midiManager;
+
         private void Awake()
         {
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
             player = gameManager.playerController;
+            midiManager = gameManager.midiManager;
         }
         void Start()
         {
@@ -79,6 +82,9 @@ namespace MusicRun
         public void StartBonus()
         {
             EndBonus();
+            midiManager.ApplyPitchChannel(1f, 300f);
+            midiManager.TransposeSet(12);
+            StartCoroutine(Utilities.WaitAndCall(2000, midiManager.TransposeClear));
             startBonusDateTime = DateTime.Now;
             startBonus = true;
         }
@@ -88,6 +94,8 @@ namespace MusicRun
             if (startBonus)
             {
                 startBonus = false;
+                midiManager.TransposeClear();
+
                 if (bonusInProgress > 0f)
                 {
                     ScoreBonus += Mathf.RoundToInt(bonusInProgress);

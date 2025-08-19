@@ -95,7 +95,7 @@ namespace MusicRun
             terrainGenerator.ClearChunks(1);
             if (nextLevelAuto)
             {
-                StartCoroutine(Utilities.WaitAndCall(2.5f, NextLevel));
+                StartCoroutine(Utilities.WaitAndCall(2500f, NextLevel));
             }
             else
             {

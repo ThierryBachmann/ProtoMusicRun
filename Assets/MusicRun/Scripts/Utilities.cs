@@ -34,7 +34,7 @@ namespace MusicRun
         /// <returns>An enumerator that can be used to control the delay and execution of the action.</returns>
         static public IEnumerator WaitAndCall(float delay, Action action)
         {
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSeconds(delay/1000f);
             action?.Invoke();
         }
 

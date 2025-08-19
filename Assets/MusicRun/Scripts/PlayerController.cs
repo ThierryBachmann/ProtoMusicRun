@@ -53,7 +53,6 @@ namespace MusicRun
         private CharacterController controller;
         private GameManager gameManager;
         private ScoreManager scoreManager;
-        private MidiManager midiManager;
         public DateTime timeStartLevel;
 
 
@@ -64,7 +63,6 @@ namespace MusicRun
                 return;
             controller = GetComponent<CharacterController>();
             scoreManager = gameManager.scoreManager;
-            midiManager = gameManager.midiManager;
         }
 
         void Start()
@@ -75,13 +73,12 @@ namespace MusicRun
             Debug.Log($"PlayerController trigger {other.tag}");
             if (other.CompareTag("Bonus"))
             {
+                // Bonus is managed by the ScoreManager
                 scoreManager.StartBonus();
 
                 Rigidbody rb = other.attachedRigidbody;
                 if (rb != null)
                 {
-                    midiManager.ApplyPitchChannel(1f, 300f);
-
                     // Direction from player to bonus
                     Vector3 kickDir = (other.transform.position - transform.position).normalized;
                     kickDir.y = 0;

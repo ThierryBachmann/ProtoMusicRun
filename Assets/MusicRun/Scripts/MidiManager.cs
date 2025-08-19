@@ -109,6 +109,15 @@ namespace MusicRun
             midiPlayer.MPTK_UnPause();
         }
 
+        public void TransposeSet(int transpose)
+        {
+            midiPlayer.MPTK_Transpose = transpose;
+        }
+        public void TransposeClear()
+        {
+            midiPlayer.MPTK_Transpose = 0;
+        }
+
         public void ApplyPitchChannel(float pitchTarget = 0.5f, float durationMilli = 2000f)
         {
             if (pitchTarget < 0f || pitchTarget > 1f)
@@ -167,17 +176,17 @@ namespace MusicRun
                 }
                 yield return Routine.WaitForSeconds(waitMillisecond / 1000f);
             }
-            
+
             // Restaure pitch original
             for (int channel = 0; channel < 16; channel++)
             {
-                    MPTKEvent mptkEvent = new MPTKEvent()
-                    {
-                        Command = MPTKCommand.PitchWheelChange,
-                        Channel = channel,
-                        Value = 8192
-                    };
-                    midiPlayer.MPTK_PlayDirectEvent(mptkEvent);
+                MPTKEvent mptkEvent = new MPTKEvent()
+                {
+                    Command = MPTKCommand.PitchWheelChange,
+                    Channel = channel,
+                    Value = 8192
+                };
+                midiPlayer.MPTK_PlayDirectEvent(mptkEvent);
             }
         }
         public void ApplyPitchAudioSource(float pitchFactor = 0.99f, float durationMilli = 2000f)
