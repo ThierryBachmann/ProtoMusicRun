@@ -81,6 +81,7 @@ namespace MusicRun
 
         public void StartPlayMIDI(int index)
         {
+            Array.Clear(channelPlayed, 0, 16);
             midiPlayer.MPTK_MidiIndex = index;
             if (midiPlayer != null)
             {
@@ -108,12 +109,93 @@ namespace MusicRun
             midiPlayer.MPTK_UnPause();
         }
 
-        public void ApplyPitch(float pitchFactor=0.99f, float durationMilli=2000f)
+        public void ApplyPitchChannel(float pitchTarget = 0.5f, float durationMilli = 2000f)
         {
-            StartCoroutine(PitchRoutine(pitchFactor , durationMilli));
+            if (pitchTarget < 0f || pitchTarget > 1f)
+            {
+                Debug.LogWarning($"PitchChannelRoutine - pitchFactor {pitchTarget} is incorrect, must be between 0 and 1");
+                return;
+            }
+            if (durationMilli < 50f || durationMilli >= 100000f)
+            {
+                Debug.LogWarning($"PitchChannelRoutine - durationMilli {durationMilli} is incorrect, must be between 10f and 10000f");
+                return;
+            }
+            StartCoroutine(PitchChannelRoutine(pitchTarget, durationMilli));
         }
 
-        private IEnumerator PitchRoutine(float pitchFactor, float durationMilli)
+
+        private IEnumerator PitchChannelRoutine(float pitchTarget, float durationMilli)
+        {
+            Debug.Log($"PitchChannelRoutine {pitchTarget} {durationMilli}");
+
+
+            // Change pitch (automatic return to center as a physical keyboard!)
+            // Gift from MPTK Pro! See MPTK_PlayPitchWheelChange.
+            // 0 is the lowest bend positions(default is 2 semitones), 
+            // 0.5 centered value, the sounding notes aren't being transposed up or down,
+            // 1 is the highest pitch bend position (default is 2 semitones)
+
+            float pitch = 0.5f; // centered value
+            float waitMillisecond = 100f; // Wait between each pitch change
+            float deltaPitchMilli = (pitchTarget - 0.5f) / durationMilli; // Delta pitch between each pitch change
+            DateTime stop = DateTime.Now.AddMilliseconds(durationMilli);
+            DateTime now = DateTime.Now;
+
+            while (now < stop)
+            {
+                // Useless, just for security
+                if (deltaPitchMilli < 0 && pitch <= pitchTarget) break;
+                if (deltaPitchMilli > 0 && pitch >= pitchTarget) break;
+
+                pitch += ((float)(DateTime.Now - now).TotalMilliseconds) * deltaPitchMilli;
+                //Debug.Log($"deltaPitchMilli: {deltaPitchMilli:F6} deltaTime: {(DateTime.Now - now).TotalMilliseconds:F6} pitch: {pitch:F6}");
+                now = DateTime.Now;
+
+                for (int channel = 0; channel < 16; channel++)
+                {
+                    if (channelPlayed[channel] > 0)
+                    {
+                        MPTKEvent mptkEvent = new MPTKEvent()
+                        {
+                            Command = MPTKCommand.PitchWheelChange,
+                            Channel = channel,
+                            Value = (int)Mathf.Lerp(0f, 16383f, pitch),
+                        };
+                        midiPlayer.MPTK_PlayDirectEvent(mptkEvent);
+                    }
+                }
+                yield return Routine.WaitForSeconds(waitMillisecond / 1000f);
+            }
+            
+            // Restaure pitch original
+            for (int channel = 0; channel < 16; channel++)
+            {
+                    MPTKEvent mptkEvent = new MPTKEvent()
+                    {
+                        Command = MPTKCommand.PitchWheelChange,
+                        Channel = channel,
+                        Value = 8192
+                    };
+                    midiPlayer.MPTK_PlayDirectEvent(mptkEvent);
+            }
+        }
+        public void ApplyPitchAudioSource(float pitchFactor = 0.99f, float durationMilli = 2000f)
+        {
+            if (pitchFactor < 0.2f || pitchFactor >= 2f)
+            {
+                Debug.LogWarning($"ApplyPitchAudiosource - pitchFactor {pitchFactor} is incorrect, must be between 0.2 and 2");
+                return;
+            }
+            if (durationMilli < 10f || durationMilli >= 100000f)
+            {
+                Debug.LogWarning($"ApplyPitchAudiosource - durationMilli {durationMilli} is incorrect, must be between 10f and 10000f");
+                return;
+            }
+            StartCoroutine(PitchAudiosourceRoutine(pitchFactor, durationMilli));
+        }
+
+        private IEnumerator PitchAudiosourceRoutine(float pitchFactor, float durationMilli)
         {
             float duration = (durationMilli / 1000f) / 10f;
             Debug.Log($"PitchRoutine {pitchFactor} {duration} * 10 sec.");

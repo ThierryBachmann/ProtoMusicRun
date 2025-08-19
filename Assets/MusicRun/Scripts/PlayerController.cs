@@ -80,7 +80,7 @@ namespace MusicRun
                 Rigidbody rb = other.attachedRigidbody;
                 if (rb != null)
                 {
-                    midiManager.ApplyPitch(1.05f, 300f);
+                    midiManager.ApplyPitchChannel(1f, 300f);
 
                     // Direction from player to bonus
                     Vector3 kickDir = (other.transform.position - transform.position).normalized;
