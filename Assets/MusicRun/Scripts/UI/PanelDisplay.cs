@@ -1,9 +1,11 @@
+﻿using System.Collections;
 using UnityEngine;
-using System.Collections;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace MusicRun
 {
-    public class PanelDisplay : MonoBehaviour
+    public class PanelDisplay : MonoBehaviour, IPointerClickHandler
     {
         public float animationDuration = 0.4f;
         public Vector3 startScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -56,6 +58,20 @@ namespace MusicRun
                 Hide();
             else
                 Show();
+        }
+
+        // Check if the click target is the panel itself (not a child like your button)
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            GameObject clicked = eventData.pointerCurrentRaycast.gameObject;
+            Debug.Log($"Panel clicked! {clicked}");
+
+            if (clicked != null && clicked.GetComponentInParent<Button>() != null)
+            {
+                // Clic sur un bouton → on ignore
+                return;
+            }
+            Hide();
         }
 
         public float Visible => canvasGroup.alpha;

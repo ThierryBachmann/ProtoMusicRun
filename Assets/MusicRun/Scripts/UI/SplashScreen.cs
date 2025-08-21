@@ -7,7 +7,11 @@ namespace MusicRun
 
     public class SplashScreen : PanelDisplay
     {
-        public Button help;
+        public Button unity;
+        public Button mptk;
+        public Button helpGame;
+        public SplashScreen splashScreen;
+        public HelperScreen helperScreen;
 
         public new void Awake()
         {
@@ -16,7 +20,14 @@ namespace MusicRun
 
         public new void Start()
         {
-            help.onClick.AddListener(() => Application.OpenURL("https://paxstellar.fr/"));
+            unity.onClick.AddListener(() => Application.OpenURL("https://assetstore.unity.com/packages/tools/audio/maestro-midi-player-tool-kit-free-107994"));
+            mptk.onClick.AddListener(() => Application.OpenURL("https://paxstellar.fr/"));
+            helpGame.onClick.AddListener(() =>
+            {
+                splashScreen.Hide();
+                helperScreen.Show();
+            });
+
             base.Start();
         }
     }

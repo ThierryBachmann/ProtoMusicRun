@@ -23,7 +23,7 @@ namespace MusicRun
             continueButton.onClick.AddListener(() => gameManager.NextLevel());
             stopButton.onClick.AddListener(() => gameManager.StopGame());
             leaderBoardButton.onClick.AddListener(() => gameManager.LeaderboardSwitchDisplay());
-            helper.onClick.AddListener(() => gameManager.HelperScreenDisplay());
+            helper.onClick.AddListener(() => gameManager.SplashScreenDisplay());
             base.Start();
         }
 

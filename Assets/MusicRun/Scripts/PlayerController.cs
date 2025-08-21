@@ -83,11 +83,11 @@ namespace MusicRun
                     Vector3 kickDir = (other.transform.position - transform.position).normalized;
                     kickDir.y = 0;
                     // Add a forward + upward impulse (like a foot kick)
-                    Vector3 force = kickDir * GetSpeed() * 2f + Vector3.up * 5f;
+                    Vector3 force = kickDir * GetSpeed() * 2f + Vector3.up * 8f;
                     rb.AddForce(force, ForceMode.Impulse);
                     rb.useGravity = true;
                     // Optional: add spin
-                    //rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
+                    rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
                 }
                 Destroy(other.gameObject, 3f);
             }

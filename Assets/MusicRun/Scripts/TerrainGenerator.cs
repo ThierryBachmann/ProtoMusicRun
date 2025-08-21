@@ -118,6 +118,7 @@ namespace MusicRun
 
             // Move the start chunk to the current player position (which is the current goal)
             currentStart = currentLevel.startGO;
+            currentStart.SetActive(true);
             startChunkCoord = CurrentPlayerChunk;
             currentStart.name = $"start_{currentIndexLevel}_{startChunkCoord.x}_{startChunkCoord.y}";
 

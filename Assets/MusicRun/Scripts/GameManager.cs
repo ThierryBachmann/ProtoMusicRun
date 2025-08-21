@@ -284,5 +284,12 @@ namespace MusicRun
             splashScreen.Hide();
             helperScreen.SwitchVisible();
         }
+        public void SplashScreenDisplay()
+        {
+            leaderboardDisplay.Hide();
+            helperScreen.Hide();
+            splashScreen.SwitchVisible();
+        }
+
     }
 }
