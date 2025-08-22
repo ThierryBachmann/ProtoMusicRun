@@ -240,7 +240,7 @@ namespace MusicRun
 
                                 //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
 
-                                // Position between -chunkSize and chunkSize
+                                // Position between -chunkSize/2 and chunkSize/2
                                 offsetX = offsetX * chunkSize - chunkSize / 2f;
                                 offsetZ = offsetZ * chunkSize - chunkSize / 2f;
 

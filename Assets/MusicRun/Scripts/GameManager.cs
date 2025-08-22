@@ -20,6 +20,7 @@ namespace MusicRun
         public GoalHandler goalHandler;
         public FirebaseLeaderboard leaderboard;
         public ScoreManager scoreManager;
+        public ScoreDisplay scoreDisplay;
         public LeaderboardDisplay leaderboardDisplay;
         public PlayerController playerController;
         public SoundManager soundManager;
@@ -128,6 +129,7 @@ namespace MusicRun
                 Debug.Log($"{i + 1}. {score.playerName:20}: {score.score} pts " +
                          $"(Time: {score.completionTime:F1}s, Efficiency: {score.pathEfficiency:F2})");
             }
+            scoreDisplay.SetTitle();
         }
 
         private void OnScoreSubmissionResult(bool success)

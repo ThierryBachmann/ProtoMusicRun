@@ -8,6 +8,7 @@ namespace MusicRun
     public class PanelDisplay : MonoBehaviour, IPointerClickHandler
     {
         public float animationDuration = 0.4f;
+        public bool closeOnClick = true;
         public Vector3 startScale = new Vector3(0.5f, 0.5f, 0.5f);
         public Vector3 endScale = Vector3.one;
 
@@ -63,15 +64,15 @@ namespace MusicRun
         // Check if the click target is the panel itself (not a child like your button)
         public void OnPointerClick(PointerEventData eventData)
         {
-            GameObject clicked = eventData.pointerCurrentRaycast.gameObject;
-            Debug.Log($"Panel clicked! {clicked}");
-
-            if (clicked != null && clicked.GetComponentInParent<Button>() != null)
+            if (closeOnClick)
             {
-                // Clic sur un bouton → on ignore
-                return;
+                GameObject clicked = eventData.pointerCurrentRaycast.gameObject;
+                //Debug.Log($"Panel clicked! {clicked}");
+
+                if (clicked != null && clicked.GetComponentInParent<Button>() != null)
+                    return;
+                Hide();
             }
-            Hide();
         }
 
         public float Visible => canvasGroup.alpha;

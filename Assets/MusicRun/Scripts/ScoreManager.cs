@@ -81,10 +81,9 @@ namespace MusicRun
         }
         public void StartBonus()
         {
+            Debug.Log("Start bonus Trans");
             EndBonus();
-            midiManager.ApplyPitchChannel(1f, 300f);
             midiManager.TransposeSet(12);
-            StartCoroutine(Utilities.WaitAndCall(2000, midiManager.TransposeClear));
             startBonusDateTime = DateTime.Now;
             startBonus = true;
         }
@@ -93,6 +92,8 @@ namespace MusicRun
         {
             if (startBonus)
             {
+                Debug.Log("End bonus Trans");
+
                 startBonus = false;
                 midiManager.TransposeClear();
 
