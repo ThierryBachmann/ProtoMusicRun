@@ -49,6 +49,8 @@ namespace MusicRun
         public float bonusInProgress;
         public DateTime startBonusDateTime;
         public bool startBonus;
+        public float durationBonus=5f;
+        public float valueBonus = 20f;
 
         private GameManager gameManager;
         private PlayerController player;
@@ -72,8 +74,9 @@ namespace MusicRun
         {
             if (startBonus)
             {
-                bonusInProgress = ((float)(DateTime.Now - startBonusDateTime).TotalMilliseconds / 1000f * 20f) / 10f;
-                if ((DateTime.Now - startBonusDateTime).TotalMilliseconds > 10000)
+                // increse bonus each delta time 
+                bonusInProgress = ((float)(DateTime.Now - startBonusDateTime).TotalMilliseconds / 1000f * valueBonus) / durationBonus;
+                if ((DateTime.Now - startBonusDateTime).TotalMilliseconds > durationBonus*1000f)
                 {
                     EndBonus();
                 }
@@ -83,7 +86,7 @@ namespace MusicRun
         {
             Debug.Log("Start bonus Trans");
             EndBonus();
-            midiManager.TransposeSet(12);
+            midiManager.TransposeSet(18);
             startBonusDateTime = DateTime.Now;
             startBonus = true;
         }

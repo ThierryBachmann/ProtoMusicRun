@@ -1108,6 +1108,7 @@ MonoBehaviour:
   goalHandler: {fileID: 283134993}
   leaderboard: {fileID: 1489650625}
   scoreManager: {fileID: 211374106}
+  headerDisplay: {fileID: 0}
   leaderboardDisplay: {fileID: 973761168}
   playerController: {fileID: 256923874}
   soundManager: {fileID: 1870609031}
@@ -1179,6 +1180,8 @@ MonoBehaviour:
   ScoreBonus: 0
   bonusInProgress: 0
   startBonus: 0
+  durationBonus: 3
+  valueBonus: 10
 --- !u!4 &211374107
 Transform:
   m_ObjectHideFlags: 0
@@ -1240,13 +1243,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkSize: 20
   renderDistance: 5
-  disableObstacles: 1
+  disableObstacles: 0
   currentPlayerChunk: {x: 0, y: 0}
   levels:
   - enabled: 1
     name: Flat desert
     description: 
-    indexMIDI: 6
+    indexMIDI: 8
     RatioSpeedMusic: 0.7
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
@@ -2831,7 +2834,7 @@ GameObject:
   - component: {fileID: 371084308}
   - component: {fileID: 371084311}
   m_Layer: 5
-  m_Name: SplashScreen&Script
+  m_Name: SplashScreen & Script
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3462,7 +3465,7 @@ GameObject:
   - component: {fileID: 431561427}
   - component: {fileID: 431561426}
   m_Layer: 5
-  m_Name: HelperScreen&Script
+  m_Name: HelperScreen & Script
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5728,7 +5731,7 @@ GameObject:
   - component: {fileID: 973761168}
   - component: {fileID: 973761169}
   m_Layer: 5
-  m_Name: Leaderboard&Script
+  m_Name: Leaderboard & Script
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7491,7 +7494,7 @@ GameObject:
   - component: {fileID: 1397310892}
   - component: {fileID: 1397310891}
   m_Layer: 5
-  m_Name: ActionGame&Script
+  m_Name: ActionGame & Script
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8523,7 +8526,7 @@ GameObject:
   - component: {fileID: 1611664822}
   - component: {fileID: 1611664823}
   m_Layer: 5
-  m_Name: Title&Script
+  m_Name: Header & Script
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8601,6 +8604,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6975b78f313e2424ba66744e37db415c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  titleText: {fileID: 1894201999}
   scoreText: {fileID: 1771018100}
   infoText: {fileID: 1770975910}
   quitButton: {fileID: 347110354}
@@ -9345,7 +9349,7 @@ GameObject:
   - component: {fileID: 1777382780}
   - component: {fileID: 1777382781}
   m_Layer: 5
-  m_Name: Slider&Script
+  m_Name: Slider & Script
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10521,7 +10525,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1179939235}
   m_HandleRect: {fileID: 1179939234}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

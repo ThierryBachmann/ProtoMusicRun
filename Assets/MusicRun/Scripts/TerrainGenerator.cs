@@ -241,8 +241,8 @@ namespace MusicRun
                                 //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
 
                                 // Position between -chunkSize/2 and chunkSize/2
-                                offsetX = offsetX * chunkSize - chunkSize / 2f;
-                                offsetZ = offsetZ * chunkSize - chunkSize / 2f;
+                                offsetX = offsetX * 1.2f * chunkSize - chunkSize / 2f;
+                                offsetZ = offsetZ * 1.2f * chunkSize - chunkSize / 2f;
 
                                 // Define position and place to the terrain
                                 Vector3 newPosition = new Vector3(offsetX, 5f, offsetZ);

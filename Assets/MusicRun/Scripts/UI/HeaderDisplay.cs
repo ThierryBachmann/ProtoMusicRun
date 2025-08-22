@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MusicRun
 {
-    public class ScoreDisplay : MonoBehaviour
+    public class HeaderDisplay : MonoBehaviour
     {
         public TextMeshProUGUI titleText;
         public TextMeshProUGUI scoreText;
