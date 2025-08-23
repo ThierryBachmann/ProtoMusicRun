@@ -1,3 +1,4 @@
+using MidiPlayerTK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,10 @@ namespace MusicRun
         public GameObject StartGO { get => currentStart; }
         public Level CurrentLevel { get => currentLevel; }
         public Vector2Int CurrentPlayerChunk { get => currentPlayerChunk; }
+
+        public float timeCreateChunk;
+        public float timeAverageCreate;
+        public int chunkCreatedCount;
 
         private void Awake()
         {
@@ -196,6 +201,8 @@ namespace MusicRun
             // will contains chunks coord around the player at a distance of -renderDistance to renderDistance
             HashSet<Vector2Int> newChunks = new HashSet<Vector2Int>();
 
+            DateTime startCreate = DateTime.Now;
+            chunkCreatedCount = 0;
             for (int x = -renderDistance; x <= renderDistance; x++)
             {
                 for (int z = -renderDistance; z <= renderDistance; z++)
@@ -206,6 +213,8 @@ namespace MusicRun
                     // Does the chunk dictionary already contains this chunk? Don't instantiate for start and goal chunks.
                     if (!spawnedChunks.ContainsKey(chunkCoord) && chunkCoord != goalChunkCoord && chunkCoord != startChunkCoord)
                     {
+                        //DateTime startCreate= DateTime.Now;
+                        chunkCreatedCount++;
                         // No, add it
                         Vector3 spawnPos = ChunkToPosition(chunkCoord);
 
@@ -238,11 +247,13 @@ namespace MusicRun
                                     childPosition.z * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
                                     childPosition.x * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk);
 
-                                //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
 
                                 // Position between -chunkSize/2 and chunkSize/2
-                                offsetX = offsetX * 1.2f * chunkSize - chunkSize / 2f;
-                                offsetZ = offsetZ * 1.2f * chunkSize - chunkSize / 2f;
+                                offsetX = offsetX * 1.1f * chunkSize - chunkSize / 2f;
+                                offsetZ = offsetZ * 1.1f * chunkSize - chunkSize / 2f;
+
+                                //if (Mathf.Abs(offsetX) > 9f || Mathf.Abs(offsetZ) > 9f)
+                                //    Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
 
                                 // Define position and place to the terrain
                                 Vector3 newPosition = new Vector3(offsetX, 5f, offsetZ);
@@ -313,9 +324,15 @@ namespace MusicRun
                                 spawnedBonus.Add(chunkCoord, count);
                             }
                         }
+
                     }
                 }
             }
+
+            timeCreateChunk = (float)(DateTime.Now - startCreate).TotalMilliseconds;
+            if (chunkCreatedCount != 0)
+                timeAverageCreate = timeCreateChunk / chunkCreatedCount;
+            Debug.Log($"{chunkCreatedCount} - {((chunkCreatedCount != 0) ? timeCreateChunk / chunkCreatedCount : "zero")} ms");
 
             // Remove from chunk dictionary, chunk out of view which are not in newChunks but keep the goal chunk
             List<Vector2Int> chunksToRemove = new List<Vector2Int>();

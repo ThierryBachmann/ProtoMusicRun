@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +7,10 @@ namespace MusicRun
     public class HeaderDisplay : MonoBehaviour
     {
         public TextMeshProUGUI titleText;
-        public TextMeshProUGUI scoreText;
+        public TitleItem itemLevel;
+        public TitleItem itemScore;
+        public TitleItem itemBonus;
+
         public TextMeshProUGUI infoText;
         public Button quitButton;
         public Button directionButton;
@@ -50,27 +52,48 @@ namespace MusicRun
 
         void Update()
         {
-            float score = scoreManager.CalculateScoreGoal(gameManager.MusicPercentage, gameManager.GoalPercentage);
-            // Level: 1 Score:0 Bonus: 0 Game Score:0
-            scoreText.text = $"Level: {gameManager.currentLevelNumber} Score:{score:N0} Bonus: {scoreManager.ScoreBonus+(int)scoreManager.bonusInProgress} Game Score:{scoreManager.ScoreOverall:N0}";
+
             //scoreText.text = $"{gameManager.leaderboard.GetPlayerName()} Level: {gameManager.currentLevelNumber} Score:{scoreManager.ScoreOverall:N0} Bonus: {scoreManager.ScoreBonus} Speed:{player.GetSpeed():N1}";
-            infoText.text = $"Debug index level:{gameManager.currentLevelIndex} dir:{goalHandler.goalDirection:F2} angle:{goalHandler.goalAngle:F2}";
-            Color targetColor = scoreText.color; // couleur par défaut
+            //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} dir:{goalHandler.goalDirection:F2} angle:{goalHandler.goalAngle:F2}";
+
+            infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
+
             directionButton.transform.localRotation = Quaternion.Euler(0f, 0f, -goalHandler.goalAngle);
-            if (goalHandler.goalReached)
-                targetColor = Utilities.ColorGreen;
+
+            //            scoreText.text = $"Level: {gameManager.currentLevelNumber} Score:{score:N0} Bonus: {scoreManager.ScoreBonus+(int)scoreManager.bonusInProgress} Game Score:{scoreManager.ScoreOverall:N0}";
+            if (gameManager.gameRunning)
+            {
+                float score = scoreManager.CalculateScoreGoal(gameManager.MusicPercentage, gameManager.GoalPercentage);
+                itemLevel.SetValue(gameManager.currentLevelNumber.ToString());
+                itemScore.SetValue(score.ToString());
+                itemBonus.SetValue((scoreManager.ScoreBonus + (int)scoreManager.bonusInProgress).ToString());
+                if (scoreManager.startBonus)
+                    itemBonus.SetColor(Utilities.ColorWarning);
+                else
+                    itemBonus.ResetColor();
+            }
             else
             {
-                targetColor = scoreManager.CalculateColor();
+                itemLevel.SetValue("");
+                itemScore.SetValue("");
+                itemBonus.SetValue("");
             }
 
-            if (currentTextColor != targetColor)
-            {
-                currentTextColor = targetColor;
-                scoreText.color = currentTextColor;
-            }
+            //    Color targetColor = scoreText.color; // couleur par défaut
+            //    if (goalHandler.goalReached)
+            //        targetColor = Utilities.ColorGreen;
+            //    else
+            //    {
+            //        targetColor = scoreManager.CalculateColor();
+            //    }
+
+            //    if (currentTextColor != targetColor)
+            //    {
+            //        currentTextColor = targetColor;
+            //        scoreText.color = currentTextColor;
+            //    }
+            //}
+
         }
-
-
     }
 }
