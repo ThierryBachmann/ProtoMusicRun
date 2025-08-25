@@ -176,7 +176,7 @@ namespace MusicRun
                     if (c == 'a' || c == 'A') actionDisplay.SwitchVisible();
                     if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
                     if (c == 'm' || c == 'M') midiManager.SoundOnOff();
-                    if (c == 'g' || c == 'G') StartCoroutine(ClearAndNextLevel());
+                    if (c == 'g' || c == 'G') 
                     {
                         terrainGenerator.ClearChunks(0);
                         terrainGenerator.UpdateChunks();
