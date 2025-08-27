@@ -9,7 +9,18 @@ namespace MusicRun
     {
         public MidiFilePlayer midiPlayer;
         public int[] channelPlayed = new int[16]; // Array to track which channels are currently playing
-        public float Progress { get { return (float)midiPlayer.MPTK_TickCurrent / (float)midiPlayer.MPTK_TickLastNote * 100f; } }
+
+        /// <summary>
+        /// Calculate playing progression in percentage. 
+        /// </summary>
+        public float Progress
+        {
+            get
+            {
+                Debug.Log($"Tick First Note: {midiPlayer.MPTK_TickFirstNote} Tick Last Note: {midiPlayer.MPTK_TickLastNote} Tick Current: {midiPlayer.MPTK_TickCurrent}");
+                return (midiPlayer.MPTK_TickCurrent * 100f) / (float)midiPlayer.MPTK_TickLastNote;
+            }
+        }
 
 
         private float previousSpeed = -1;
@@ -27,6 +38,7 @@ namespace MusicRun
             player = gameManager.playerController;
             goalHandler = gameManager.goalHandler;
             midiPlayer.MPTK_StartPlayAtFirstNote = true;
+            midiPlayer.MPTK_StopPlayOnLastNote = true;
             midiPlayer.MPTK_MidiAutoRestart = false;
             midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
             {

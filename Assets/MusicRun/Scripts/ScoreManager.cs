@@ -49,7 +49,7 @@ namespace MusicRun
         public float bonusInProgress;
         public DateTime startBonusDateTime;
         public bool startBonus;
-        public float durationBonus=5f;
+        public float durationBonus = 5f;
         public float valueBonus = 20f;
 
         private GameManager gameManager;
@@ -76,7 +76,7 @@ namespace MusicRun
             {
                 // increse bonus each delta time 
                 bonusInProgress = ((float)(DateTime.Now - startBonusDateTime).TotalMilliseconds / 1000f * valueBonus) / durationBonus;
-                if ((DateTime.Now - startBonusDateTime).TotalMilliseconds > durationBonus*1000f)
+                if ((DateTime.Now - startBonusDateTime).TotalMilliseconds > durationBonus * 1000f)
                 {
                     EndBonus();
                 }
@@ -116,12 +116,20 @@ namespace MusicRun
             Debug.Log($"CalculateLevelScore ScoreGoal: {ScoreGoal} ScoreBonus: {ScoreBonus} ScoreLevel: {ScoreLevel} ScoreOverall:{ScoreOverall}");
         }
 
+        /// <summary>
+        /// Calculate the score level in real time based on the ratio of music progress to distance progress.
+        /// 
+        /// </summary>
+        /// <param name="musicProgress"></param>
+        /// <param name="distanceProgress"></param>
+        /// <returns></returns>
         public int CalculateScoreGoal(float musicProgress, float distanceProgress)
         {
             int score = 0;
-            if (distanceProgress <= 0)
+            if (distanceProgress <= 2f && musicProgress < 2f)
             {
-                //Debug.Log("CalculateScoreGoal - Distance progress is zero or negative, cannot calculate score.");
+                // Score is calculated when distance and music play from a few times
+                // and avoid division by zero
             }
             else if (Mathf.Abs(musicProgress - distanceProgress) < 2f)
             {
@@ -150,7 +158,7 @@ namespace MusicRun
             Color targetColor;
             if (ScoreGoal >= 100) targetColor = Utilities.ColorGreen;
             else if (ScoreGoal >= 50) targetColor = Utilities.ColorWarning;
-            else if (ScoreGoal >= 20) targetColor = Utilities.ColorWarning;
+            else if (ScoreGoal >= 20) targetColor = Utilities.ColorAlert;
             else if (ScoreGoal >= 0) targetColor = Utilities.ColorAlert;
             else targetColor = Utilities.ColorWarning;
             return targetColor;

@@ -229,6 +229,8 @@ namespace MusicRun
                         else
                             CreateAndScaleVege(chunkCoord, chunk);
 
+                        spawnedChunks.Add(chunkCoord, chunk);
+
                         if (disableObstacles) // useful for test mode
                         {
                             foreach (Collider col in chunk.GetComponentsInChildren<Collider>())
@@ -240,38 +242,14 @@ namespace MusicRun
                                     col.enabled = false;
                             }
                         }
-                        spawnedChunks.Add(chunkCoord, chunk);
 
                         // Generate and place bonus.
                         // When a chunk is re-generated (player return), no bonus are generated.
                         // ---------------------------------------------------------------------
                         if (currentLevel.runBonus.Length > 0 && currentLevel.BonusCount > 0 && !spawnedBonus.ContainsKey(chunkCoord))
                         {
-                            int count = (int)currentLevel.BonusCount;
-                            if (currentLevel.BonusCount < 1)
-                            {
-                                if (UnityEngine.Random.Range(0f, 1f) < currentLevel.BonusCount)
-                                    count = 1;
-                                else
-                                    count = 0;
-                            }
-                            if (count > 0)
-                            {
-                                for (int i = 0; i < currentLevel.BonusCount; i++)
-                                {
-                                    GameObject bonusPrefabRandom = currentLevel.runBonus[UnityEngine.Random.Range(0, currentLevel.runBonus.Length)];
-                                    GameObject bonus = Instantiate(bonusPrefabRandom);
-                                    bonus.transform.SetParent(chunk.transform, false);
-                                    float maxPos = chunkSize / 2f - 0.1f; // -0.1 to avoid border
-                                    Vector3 bonusPos = new Vector3(UnityEngine.Random.Range(-maxPos, maxPos), 5f, UnityEngine.Random.Range(-maxPos, maxPos));
-                                    bonus.transform.SetLocalPositionAndRotation(bonusPos, Quaternion.identity);
-                                    PlaceOnHighestTerrain(bonus.transform, 100f);
-                                    bonus.name = $"Bonus - level: {currentIndexLevel} - chunk {chunkCoord} - localPosition: {bonus.transform.localPosition}";
-                                }
-                                spawnedBonus.Add(chunkCoord, count);
-                            }
+                            AddBonus(chunkCoord, chunk);
                         }
-
                     }
                 }
             }
@@ -299,6 +277,67 @@ namespace MusicRun
             {
                 //Debug.Log($"Remove {coord}");
                 spawnedChunks.Remove(coord);
+            }
+        }
+
+        public void ModifyChunkMesh(GameObject chunkObject)
+        {
+            // Accéder au MeshFilter principal
+            MeshFilter meshFilter = chunkObject.GetComponent<MeshFilter>();
+
+            if (meshFilter != null && meshFilter.sharedMesh != null)
+            {
+                // IMPORTANT : Créer une copie pour éviter de modifier l'asset original
+                Mesh mesh = Instantiate(meshFilter.sharedMesh);
+
+                // Modifier les vertices
+                Vector3[] vertices = mesh.vertices;
+
+                for (int i = 0; i < vertices.Length; i++)
+                {
+                    // Vos modifications ici
+                    vertices[i].y += UnityEngine.Random.Range(-1f, 1f);
+                }
+
+                // Appliquer les changements
+                mesh.vertices = vertices;
+                mesh.RecalculateNormals();
+                mesh.RecalculateBounds();
+
+                // Assigner le mesh modifié
+                meshFilter.mesh = mesh;
+            }
+        }
+        private void AddBonus(Vector2Int chunkCoord, GameObject chunk)
+        {
+            int count = (int)currentLevel.BonusCount;
+            if (currentLevel.BonusCount < 1)
+            {
+                // Special case when count is inferior to 1.
+                // Create 0 or 1 bonus with probality from BonusCount
+                if (UnityEngine.Random.Range(0f, 1f) < currentLevel.BonusCount)
+                    count = 1;
+                else
+                    count = 0;
+            }
+
+            // At least one bonus for this chunk
+            if (count > 0)
+            {
+                for (int i = 0; i < currentLevel.BonusCount; i++)
+                {
+                    GameObject bonusPrefabRandom = currentLevel.runBonus[UnityEngine.Random.Range(0, currentLevel.runBonus.Length)];
+                    GameObject bonus = Instantiate(bonusPrefabRandom);
+                    bonus.transform.SetParent(chunk.transform, false);
+                    float maxPos = chunkSize / 2f - 0.1f; // -0.1 to avoid border
+                    Vector3 bonusPos = new Vector3(UnityEngine.Random.Range(-maxPos, maxPos), 5f, UnityEngine.Random.Range(-maxPos, maxPos));
+                    bonus.transform.SetLocalPositionAndRotation(bonusPos, Quaternion.identity);
+                    PlaceOnHighestTerrain(bonus.transform, 100f);
+                    bonus.name = $"Bonus - level: {currentIndexLevel} - chunk {chunkCoord} - localPosition: {bonus.transform.localPosition}";
+                }
+
+                // Just keep a trace of bonus count for this chunk to avoid re-generate if player return
+                spawnedBonus.Add(chunkCoord, count);
             }
         }
 

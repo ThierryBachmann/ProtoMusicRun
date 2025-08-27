@@ -26,11 +26,17 @@ namespace MusicRun
 
         void Update()
         {
-            if (midiManager.midiPlayer.MPTK_IsPlaying)
+            if (gameManager.gameRunning)
             {
                 musicSlider.value = gameManager.MusicPercentage;
                 musicText.text = $"Music {midiManager.Progress:F0} %";
             }
+            else
+            {
+                musicSlider.value = 0;
+                musicText.text = "";
+            }
         }
+
     }
 }

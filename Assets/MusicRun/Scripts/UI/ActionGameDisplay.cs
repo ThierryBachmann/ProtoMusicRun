@@ -7,9 +7,9 @@ using UnityEngine.UI;
 namespace MusicRun
 {
 
-    public class ActionDisplay : PanelDisplay
+    public class ActionGameDisplay : PanelDisplay
     {
-        public Button rerunButton, continueButton, stopButton, leaderBoardButton, restartLevel, helper;
+        public Button startGameButton, nextLevelButton, stopButton, leaderBoardButton, retryLevelButton, helper;
 
         public new void Awake()
         {
@@ -18,9 +18,9 @@ namespace MusicRun
 
         public new void Start()
         {
-            rerunButton.onClick.AddListener(() => gameManager.RestartGame());
-            restartLevel.onClick.AddListener(() => gameManager.RestartLevel());
-            continueButton.onClick.AddListener(() => gameManager.NextLevel());
+            startGameButton.onClick.AddListener(() => gameManager.RestartGame());
+            retryLevelButton.onClick.AddListener(() => gameManager.RetryLevel());
+            nextLevelButton.onClick.AddListener(() => gameManager.NextLevel());
             stopButton.onClick.AddListener(() => gameManager.StopGame());
             leaderBoardButton.onClick.AddListener(() => gameManager.LeaderboardSwitchDisplay());
             helper.onClick.AddListener(() => gameManager.SplashScreenDisplay());
@@ -31,18 +31,18 @@ namespace MusicRun
         {
             if (gameManager.gameRunning && !gameManager.levelRunning)
             {
-                // Waiting to start a level
-                rerunButton.gameObject.SetActive(false);
-                restartLevel.gameObject.SetActive(true);
-                continueButton.gameObject.SetActive(true);
+                Debug.Log("Waiting to start a level");
+                startGameButton.gameObject.SetActive(false);
+                retryLevelButton.gameObject.SetActive(true);
+                nextLevelButton.gameObject.SetActive(true);
                 stopButton.gameObject.SetActive(true);
             }
             if (!gameManager.gameRunning)
             {
-                // Waiting to start a game
-                rerunButton.gameObject.SetActive(true);
-                restartLevel.gameObject.SetActive(false);
-                continueButton.gameObject.SetActive(false);
+                Debug.Log("Waiting to start a game");
+                startGameButton.gameObject.SetActive(true);
+                retryLevelButton.gameObject.SetActive(false);
+                nextLevelButton.gameObject.SetActive(false);
                 stopButton.gameObject.SetActive(false);
             }
         }

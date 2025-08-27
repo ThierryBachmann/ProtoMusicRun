@@ -24,14 +24,15 @@ namespace MusicRun
         public LeaderboardDisplay leaderboardDisplay;
         public PlayerController playerController;
         public SoundManager soundManager;
-        public ActionDisplay actionDisplay;
-        public PanelDisplay actionPlay;
+        public ActionGameDisplay actionGame;
+        public ActionLevelDisplay actionLevel;
         public GoalReachedDisplay goalReachedDisplay;
         public TerrainGenerator terrainGenerator;
         public MidiManager midiManager;
         public SwitchButton pauseButton;
         public SplashScreen splashScreen;
         public HelperScreen helperScreen;
+        public LevelFailedScreen levelFailedScreen;
 
         void Awake()
         {
@@ -55,9 +56,9 @@ namespace MusicRun
             else
             {
                 splashScreen.Show();
-                actionPlay.Hide();
-                actionDisplay.Show();
-                actionDisplay.SelectActionsToShow();
+                actionLevel.Hide();
+                actionGame.Show();
+                actionGame.SelectActionsToShow();
             }
             leaderboardDisplay.Hide();
 
@@ -100,9 +101,9 @@ namespace MusicRun
             }
             else
             {
-                actionPlay.Hide();
-                actionDisplay.Show();
-                actionDisplay.SelectActionsToShow();
+                actionLevel.Hide();
+                actionGame.Show();
+                actionGame.SelectActionsToShow();
             }
             playerController.LevelCompleted();
         }
@@ -173,10 +174,10 @@ namespace MusicRun
                     if (c == 's' || c == 'S') StopGame();
                     if (c == 'r' || c == 'R') RestartGame();
                     if (c == 'h' || c == 'H') HelperScreenDisplay();
-                    if (c == 'a' || c == 'A') actionDisplay.SwitchVisible();
+                    if (c == 'a' || c == 'A') actionGame.SwitchVisible();
                     if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
                     if (c == 'm' || c == 'M') midiManager.SoundOnOff();
-                    if (c == 'g' || c == 'G') 
+                    if (c == 'g' || c == 'G')
                     {
                         terrainGenerator.ClearChunks(0);
                         terrainGenerator.UpdateChunks();
@@ -193,6 +194,15 @@ namespace MusicRun
                     GoalPercentage = 0f;
                 MusicPercentage = midiManager.Progress;
                 scoreManager.ScoreGoal = scoreManager.CalculateScoreGoal(MusicPercentage, GoalPercentage);
+
+                if (MusicPercentage >= 100f && GoalPercentage <= 98f)
+                {
+                    levelRunning = false;
+                    levelFailedScreen.Show();
+                    actionLevel.Hide();
+                    actionGame.Show();
+                    actionGame.SelectActionsToShow();
+                }
             }
         }
 
@@ -214,6 +224,7 @@ namespace MusicRun
             terrainGenerator.ResetTerrain();
             splashScreen.Hide();
             helperScreen.Hide();
+            levelFailedScreen.Hide();
             currentLevelNumber = 1; // always increase along the game
             currentLevelIndex = terrainGenerator.SelectNextLevel(-1); // cycling around the game
             scoreManager.ScoreOverall = 0;
@@ -223,10 +234,11 @@ namespace MusicRun
         /// <summary>
         /// Restart the current level.
         /// </summary>
-        public void RestartLevel()
+        public void RetryLevel()
         {
             splashScreen.Hide();
             helperScreen.Hide();
+            levelFailedScreen.Hide();
             CreateAndStartLevel(currentLevelIndex, restartSame: true);
         }
 
@@ -234,6 +246,7 @@ namespace MusicRun
         {
             splashScreen.Hide();
             helperScreen.Hide();
+            levelFailedScreen.Hide();
             currentLevelNumber++;
             currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
             CreateAndStartLevel(currentLevelIndex);
@@ -248,8 +261,8 @@ namespace MusicRun
         {
             Debug.Log($"CreateAndStartLevel {level}");
             scoreManager.ScoreLevel = 0;
-            actionDisplay.Hide();
-            actionPlay.Show();
+            actionGame.Hide();
+            actionLevel.Show();
             leaderboardDisplay.Hide();
             if (restartSame)
             {
@@ -270,13 +283,13 @@ namespace MusicRun
 
         public void StopGame()
         {
-            actionPlay.Hide();
-            actionDisplay.Show();
+            actionLevel.Hide();
+            actionGame.Show();
             leaderboardDisplay.Hide();
             helperScreen.Hide();
             gameRunning = false;
             levelRunning = false;
-            actionDisplay.Show();
+            actionGame.Show();
             playerController.LevelCompleted();
         }
 
