@@ -55,8 +55,9 @@ namespace MusicRun
                     sliderBackground.color =targetColor;
                     currentBackgroundColor = targetColor;
                 }
-
             }
+            else
+                distanceSlider.value = 0;
         }
     }
 }
