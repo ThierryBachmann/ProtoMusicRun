@@ -22,7 +22,7 @@ namespace MusicRun
                 return;
             goalHandler = gameManager.goalHandler;
             scoreManager = gameManager.scoreManager;
-            playerController= gameManager.playerController;
+            playerController = gameManager.playerController;
 
             if (distanceSlider != null)
             {
@@ -43,16 +43,16 @@ namespace MusicRun
         // Update is called once per frame
         void Update()
         {
-            Color targetColor = Utilities.ColorBase; 
-            if (gameManager.gameRunning && gameManager.levelRunning)
+            Color targetColor = Utilities.ColorBase;
+            if (gameManager.gameRunning)
             {
                 distanceSlider.value = gameManager.GoalPercentage;
                 distanceText.text = $"{goalHandler.distance:F0} m   {playerController.GetSpeed():N1} m/s";
 
-                targetColor= scoreManager.CalculateColor();
+                targetColor = scoreManager.CalculateColor();
                 if (currentBackgroundColor != targetColor)
                 {
-                    sliderBackground.color =targetColor;
+                    sliderBackground.color = targetColor;
                     currentBackgroundColor = targetColor;
                 }
             }

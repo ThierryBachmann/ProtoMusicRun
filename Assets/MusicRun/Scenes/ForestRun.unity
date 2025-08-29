@@ -176,7 +176,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 5b341dab46f02bb4ba1bbf0126e6fc87, type: 3}
+  m_Texture: {fileID: 2800000, guid: 6967429ea38ac4440a89bec85740905c, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -1028,9 +1028,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animationDuration: 0.4
-  closeOnClick: 1
+  closeOnClick: 0
   startScale: {x: 0.6, y: 0.3, z: 0.3}
   endScale: {x: 1, y: 1, z: 1}
+  leftButton: {fileID: 84655585}
+  rightButton: {fileID: 1650216869}
+  jumpButton: {fileID: 1275283248}
+  pauseButton: {fileID: 1518020440}
 --- !u!1 &114040365
 GameObject:
   m_ObjectHideFlags: 0
@@ -1451,7 +1455,6 @@ MonoBehaviour:
   goalReachedDisplay: {fileID: 283134996}
   terrainGenerator: {fileID: 240111797}
   midiManager: {fileID: 804034793}
-  pauseButton: {fileID: 1518020440}
   splashScreen: {fileID: 371084311}
   helperScreen: {fileID: 431561426}
   levelFailedScreen: {fileID: 360585397}
@@ -1957,9 +1960,6 @@ MonoBehaviour:
   playerPosition: 99999
   playerBestScore: 0
   playerLastScore: 0
-  leftButton: {fileID: 84655585}
-  rightButton: {fileID: 1650216869}
-  jumpButton: {fileID: 1275283248}
 --- !u!143 &256923875
 CharacterController:
   m_ObjectHideFlags: 0
@@ -2017,143 +2017,6 @@ MonoBehaviour:
   cameraShake: {fileID: 330585548}
   cooldownDelay: 1.5
   knockbackPower: 6
---- !u!1 &260392267
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 260392268}
-  - component: {fileID: 260392270}
-  - component: {fileID: 260392269}
-  m_Layer: 5
-  m_Name: 'Title '
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &260392268
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 260392267}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 360585396}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 94.7, y: -24.88}
-  m_SizeDelta: {x: 1920, y: 50}
-  m_Pivot: {x: 0.5, y: 1}
---- !u!114 &260392269
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 260392267}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_text: 'Music Run Baby '
-  m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
-  m_fontColor32:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
-  m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
-  m_tintAllSprites: 0
-  m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: -1183493901
-  m_overrideHtmlColors: 0
-  m_faceColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontSize: 90
-  m_fontSizeBase: 90
-  m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 0
-  m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
-  m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_wordSpacing: 0
-  m_lineSpacing: 0
-  m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
-  m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
-  m_linkedTextComponent: {fileID: 0}
-  parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
-  checkPaddingRequired: 0
-  m_isRichText: 1
-  m_EmojiFallbackSupport: 1
-  m_parseCtrlCharacters: 1
-  m_isOrthographic: 1
-  m_isCullingEnabled: 0
-  m_horizontalMapping: 0
-  m_verticalMapping: 0
-  m_uvLineOffset: 0
-  m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 0
-  m_useMaxVisibleDescender: 1
-  m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
-  m_isUsingLegacyAnimationComponent: 0
-  m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_baseMaterial: {fileID: 0}
-  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!222 &260392270
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 260392267}
-  m_CullTransparentMesh: 1
 --- !u!1 &267365870
 GameObject:
   m_ObjectHideFlags: 0
@@ -3533,14 +3396,13 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1086212}
-  - {fileID: 260392268}
   - {fileID: 1593405523}
   m_Father: {fileID: 1820376250}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.19995117, y: 11.049927}
-  m_SizeDelta: {x: -659.6, y: -1034.5}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: -0.19995117, y: -552}
+  m_SizeDelta: {x: 1260.4, y: 291.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &360585397
 MonoBehaviour:
@@ -3566,7 +3428,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 360585395}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -3649,7 +3511,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -15.050049, y: -8.999756}
+  m_AnchoredPosition: {x: -15.050049, y: -8.999695}
   m_SizeDelta: {x: -500.10007, y: -382}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &371084308
@@ -3660,7 +3522,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 371084306}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -4566,7 +4428,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.19995117, y: -8.999756}
+  m_AnchoredPosition: {x: -0.19995117, y: -8.999695}
   m_SizeDelta: {x: -659.6, y: -382}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &431561426
@@ -9384,7 +9246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animationDuration: 0.4
-  closeOnClick: 1
+  closeOnClick: 0
   startScale: {x: 0.5, y: 0.5, z: 0.5}
   endScale: {x: 1, y: 1, z: 1}
   startGameButton: {fileID: 1953770001}
@@ -10332,8 +10194,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -0.000022888184, y: -203.93}
-  m_SizeDelta: {x: 1159, y: 390}
+  m_AnchoredPosition: {x: 93.9, y: -9.1}
+  m_SizeDelta: {x: 1161.49, y: 300}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1593405524
 MonoBehaviour:
@@ -10355,7 +10217,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Level failed! The music ended before you reached the goal. Retry?
+  m_text: 'Level failed!
+
+    The music ended before you reached the goal. Retry?'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -11489,14 +11353,14 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1397310886}
+  - {fileID: 105468818}
   - {fileID: 1611664819}
   - {fileID: 1777382777}
   - {fileID: 973761165}
   - {fileID: 371084307}
   - {fileID: 431561425}
   - {fileID: 360585396}
-  - {fileID: 1397310886}
-  - {fileID: 105468818}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -12437,7 +12301,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -495.2}
+  m_AnchoredPosition: {x: 0, y: -458.6}
   m_SizeDelta: {x: 1372.7, y: 390}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1944919689
@@ -12460,8 +12324,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <b>Reach the goal</b> before the music ends. For a higher score, finish
-    in sync with the music, collect bonuses, and aim for the top rank.
+  m_text: "<b>Reach the goal before the music ends.</b> \nFor a higher score, finish
+    in sync with the music, collect instruments & bonuses, and aim for the top rank."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

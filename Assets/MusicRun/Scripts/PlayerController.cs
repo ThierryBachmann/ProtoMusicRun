@@ -45,11 +45,6 @@ namespace MusicRun
         public long playerBestScore = 0;
         public long playerLastScore = 0;
 
-        public HoldButton leftButton;
-        public HoldButton rightButton;
-        public HoldButton jumpButton;
-        // public SwitchButton pauseButton; defined in GameManager
-
         private CharacterController controller;
         private GameManager gameManager;
         private ScoreManager scoreManager;
@@ -152,15 +147,15 @@ namespace MusicRun
 
         void HandleInput()
         {
-            if (leftButton.IsHeld || Input.GetKey(KeyCode.LeftArrow))
+            if (gameManager.actionLevel.leftButton.IsHeld || Input.GetKey(KeyCode.LeftArrow))
             {
                 targetAngle -= turnSpeed * Time.deltaTime;
             }
-            else if (rightButton.IsHeld || Input.GetKey(KeyCode.RightArrow))
+            else if (gameManager.actionLevel.rightButton.IsHeld || Input.GetKey(KeyCode.RightArrow))
             {
                 targetAngle += turnSpeed * Time.deltaTime;
             }
-            if (!isJumping && (Input.GetKeyDown(KeyCode.Space) || jumpButton.IsHeld))
+            if (!isJumping && (Input.GetKeyDown(KeyCode.Space) || gameManager.actionLevel.jumpButton.IsHeld))
             {
                 verticalVelocity.y = jumpForce;
                 isJumping = true;
