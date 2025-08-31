@@ -43,6 +43,8 @@ namespace MusicRun
                 Application.OpenURL("https://https://paxstellar.fr/news/");
             });
             SetTitle();
+            if (!gameManager.infoDebug)
+                infoText.gameObject.SetActive(false);
         }
 
         public void SetTitle()
@@ -50,13 +52,20 @@ namespace MusicRun
             titleText.text = $"Music Run - {gameManager.leaderboard.GetPlayerName()}";
         }
 
+        private float deltaTimeFPS = 0.0f;
         void Update()
         {
 
             //scoreText.text = $"{gameManager.leaderboard.GetPlayerName()} Level: {gameManager.currentLevelNumber} Score:{scoreManager.ScoreOverall:N0} Bonus: {scoreManager.ScoreBonus} Speed:{player.GetSpeed():N1}";
-            //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} dir:{goalHandler.goalDirection:F2} angle:{goalHandler.goalAngle:F2}";
 
-            infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
+            if (gameManager.infoDebug)
+            {
+                //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} dir:{goalHandler.goalDirection:F2} angle:{goalHandler.goalAngle:F2}";
+                // Exponential moving average for smoother results
+                deltaTimeFPS += (Time.deltaTime - deltaTimeFPS) * 0.1f;
+                //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
+                infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} FPS:{Mathf.Ceil(1.0f / deltaTimeFPS)} ";
+            }
 
             directionButton.transform.localRotation = Quaternion.Euler(0f, 0f, -goalHandler.goalAngle);
 

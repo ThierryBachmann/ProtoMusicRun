@@ -11,10 +11,13 @@ namespace MusicRun
         public bool levelRunning;
         public int currentLevelIndex;
         public int currentLevelNumber;
-        public bool startAuto;
-        public bool nextLevelAuto;
         public float MusicPercentage;
         public float GoalPercentage;
+
+        [Header("Debug")]
+        public bool startAuto;
+        public bool nextLevelAuto;
+        public bool infoDebug = false;
 
         [Header("GameObject reference")]
         public GoalHandler goalHandler;
