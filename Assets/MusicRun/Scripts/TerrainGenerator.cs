@@ -12,8 +12,6 @@ namespace MusicRun
         public int renderDistance = 2;
         public bool disableObstacles = false;
 
-        [Header("For readonly")]
-        public Vector2Int currentPlayerChunk;
 
         [Header("Defined Levels")]
         public Level[] levels;
@@ -21,9 +19,10 @@ namespace MusicRun
         private Level currentLevel;
         private int currentIndexLevel;
         private GameObject currentStart;
+        private Vector2Int currentChunk;
         private Vector2Int startChunkCoord;
-        private GameObject currentGoal;
         private Vector2Int goalChunkCoord;
+        private GameObject currentGoal;
         private Dictionary<Vector2Int, GameObject> spawnedChunks;
         private Dictionary<Vector2Int, int> spawnedBonus;
         private GameManager gameManager;
@@ -31,7 +30,6 @@ namespace MusicRun
 
         public GameObject StartGO { get => currentStart; }
         public Level CurrentLevel { get => currentLevel; }
-        public Vector2Int CurrentPlayerChunk { get => currentPlayerChunk; }
 
         public float timeCreateChunk;
         public float timeAverageCreate;
@@ -99,7 +97,7 @@ namespace MusicRun
             CreateStartAndGoalChunk();
             // Force to update chunks with real position of the player
             //currentPlayerChunk = new Vector2Int(-9999, -9999);
-            UpdateChunks();
+            UpdateChunks(startChunkCoord);
         }
 
         /// <summary>
@@ -124,7 +122,7 @@ namespace MusicRun
             // Move the start chunk to the current player position (which is the current goal)
             currentStart = currentLevel.startGO;
             currentStart.SetActive(true);
-            startChunkCoord = CurrentPlayerChunk;
+            startChunkCoord = currentChunk;
             currentStart.name = $"start_{currentIndexLevel}_{startChunkCoord.x}_{startChunkCoord.y}";
 
             // Remove existing chunk in the spawnedChunks dictionary if it exists
@@ -148,7 +146,7 @@ namespace MusicRun
                 return;
             }
             currentGoal = currentLevel.goalGO;
-            goalChunkCoord = CurrentPlayerChunk + currentLevel.deltaCurrentChunk;
+            goalChunkCoord = currentChunk + currentLevel.deltaCurrentChunk;
             currentGoal.name = $"goal_{currentIndexLevel}_{goalChunkCoord.x}_{goalChunkCoord.y}";
             if (spawnedChunks.ContainsKey(goalChunkCoord))
             {
@@ -168,7 +166,7 @@ namespace MusicRun
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
-        Vector2Int PositionToChunk(Vector3 position)
+        public Vector2Int PositionToChunk(Vector3 position)
         {
             return new Vector2Int((int)Mathf.Round(position.x / chunkSize), (int)Mathf.Round(position.z / chunkSize));
         }
@@ -178,26 +176,14 @@ namespace MusicRun
         /// </summary>
         /// <param name="chunkCoord">The chunk coordinates to convert. The X and Y components represent the chunk's position in the grid.</param>
         /// <returns>A <see cref="Vector3"/> representing the world-space position of the origin of the specified chunk.</returns>
-        Vector3 ChunkToPosition(Vector2Int chunkCoord)
+        public Vector3 ChunkToPosition(Vector2Int chunkCoord)
         {
             return new Vector3(chunkCoord.x * chunkSize, 0, chunkCoord.y * chunkSize);
         }
 
-        void Update()
+        public void UpdateChunks(Vector2Int currentChunk)
         {
-            Vector2Int playerChunk = PositionToChunk(player.transform.position);
-
-            if (playerChunk != CurrentPlayerChunk)
-            {
-                //Debug.Log($"Player enters in a chunk: x={player.transform.position.x} z={player.transform.position.z} --> playerChunk: {playerChunk}");
-
-                currentPlayerChunk = playerChunk;
-                UpdateChunks();
-            }
-        }
-
-        public void UpdateChunks()
-        {
+            this.currentChunk= currentChunk;
             // will contains chunks coord around the player at a distance of -renderDistance to renderDistance
             HashSet<Vector2Int> newChunks = new HashSet<Vector2Int>();
 
@@ -207,7 +193,7 @@ namespace MusicRun
             {
                 for (int z = -renderDistance; z <= renderDistance; z++)
                 {
-                    Vector2Int chunkCoord = CurrentPlayerChunk + new Vector2Int(x, z);
+                    Vector2Int chunkCoord = this.currentChunk + new Vector2Int(x, z);
                     newChunks.Add(chunkCoord);
 
                     // Does the chunk dictionary already contains this chunk? Don't instantiate for start and goal chunks.
@@ -516,8 +502,8 @@ namespace MusicRun
                 {
                     for (int z = -renderDistance; z <= renderDistance; z++)
                     {
-                        Vector2Int chunkCoord = CurrentPlayerChunk + new Vector2Int(x, z);
-                        if ((chunkCoord - CurrentPlayerChunk).magnitude >= atDistance)
+                        Vector2Int chunkCoord = currentChunk + new Vector2Int(x, z);
+                        if ((chunkCoord - currentChunk).magnitude >= atDistance)
                         {
                             // Does the chunk dictionary contains this chunk? Don't remove for start and goal chunks (in case of ...)).
                             if (spawnedChunks.ContainsKey(chunkCoord) && chunkCoord != goalChunkCoord && chunkCoord != startChunkCoord)

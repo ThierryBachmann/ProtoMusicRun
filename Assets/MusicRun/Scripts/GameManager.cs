@@ -176,7 +176,7 @@ namespace MusicRun
                     if (c == 'g' || c == 'G')
                     {
                         terrainGenerator.ClearChunks(0);
-                        terrainGenerator.UpdateChunks();
+                        terrainGenerator.UpdateChunks(playerController.CurrentPlayerChunk);
                     }
                 }
             }

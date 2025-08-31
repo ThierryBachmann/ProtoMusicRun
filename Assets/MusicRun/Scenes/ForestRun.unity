@@ -1653,8 +1653,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkSize: 20
   renderDistance: 5
-  disableObstacles: 1
-  currentPlayerChunk: {x: 0, y: 0}
+  disableObstacles: 0
   levels:
   - enabled: 1
     name: Flat desert
@@ -1663,11 +1662,11 @@ MonoBehaviour:
     RatioSpeedMusic: 0.7
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
-    deltaCurrentChunk: {x: 0, y: 20}
+    deltaCurrentChunk: {x: 0, y: 13}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     perlinVegetable: 0.3
-    perlinChunk: 10
+    perlinChunk: 8
     minScaleVegetable: 0.71
     maxScaleVegetable: 1.09
     runChunks:
@@ -1677,7 +1676,7 @@ MonoBehaviour:
     BonusCount: 0.4
     runBonus:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
-  - enabled: 0
+  - enabled: 1
     name: 'Desert Medium '
     description: More dune ...
     indexMIDI: 80
@@ -1699,7 +1698,7 @@ MonoBehaviour:
     BonusCount: 0.7
     runBonus:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
-  - enabled: 0
+  - enabled: 1
     name: Flat desert
     description: 
     indexMIDI: 50
@@ -1740,7 +1739,7 @@ MonoBehaviour:
     BonusCount: 10
     runBonus:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: 'Desert Medium '
     description: More dune ...
     indexMIDI: 80

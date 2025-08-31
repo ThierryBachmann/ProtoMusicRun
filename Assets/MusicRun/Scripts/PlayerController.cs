@@ -47,8 +47,14 @@ namespace MusicRun
 
         private CharacterController controller;
         private GameManager gameManager;
+        private TerrainGenerator terrainGenerator;
         private ScoreManager scoreManager;
         public DateTime timeStartLevel;
+
+        [Header("For readonly")]
+        private Vector2Int currentPlayerChunk;
+        
+        public Vector2Int CurrentPlayerChunk { get => currentPlayerChunk; }
 
 
         void Awake()
@@ -56,6 +62,7 @@ namespace MusicRun
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
+            terrainGenerator = gameManager.terrainGenerator;
             controller = GetComponent<CharacterController>();
             scoreManager = gameManager.scoreManager;
         }
@@ -143,6 +150,14 @@ namespace MusicRun
             HandleInput();
             HandleRotation();
             HandleMovement(forwardMove);
+
+            Vector2Int playerChunk = terrainGenerator.PositionToChunk(transform.position);
+            if (playerChunk != currentPlayerChunk)
+            {
+                Debug.Log($"Player enters in a chunk: x={transform.position.x} z={transform.position.z} --> playerChunk: {playerChunk}");
+                currentPlayerChunk = playerChunk;
+                terrainGenerator.UpdateChunks(currentPlayerChunk);
+            }
         }
 
         void HandleInput()
