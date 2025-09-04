@@ -1586,15 +1586,15 @@ namespace MidiPlayerTK
                     midiLoaded.MPTK_EnableChangeTempo = MPTK_EnableChangeTempo;
                     midiLoaded.endPlayAtLastNote = MPTK_StopPlayOnLastNote;
 
-                    if (MPTK_Spatialize)
-                    {
-                        distanceToListener = MidiPlayerGlobal.MPTK_DistanceToListener(this.transform);
-                        if (distanceToListener > MPTK_MaxDistance)
-                        {
-                            yield return -1;
-                            continue;
-                        }
-                    }
+                    //if (MPTK_Spatialize)
+                    //{
+                    //    distanceToListener = MidiPlayerGlobal.MPTK_DistanceToListener(this.transform);
+                    //    if (distanceToListener > MPTK_MaxDistance)
+                    //    {
+                    //        yield return -1;
+                    //        continue;
+                    //    }
+                    //}
 
                     if (playPause)
                     {
