@@ -31,12 +31,21 @@ namespace MusicRun
         {
             if (gameManager.gameRunning && !gameManager.levelRunning)
             {
-                Debug.Log("Waiting to start a level");
+                Debug.Log("Waiting to start a level when game is running");
                 startGameButton.gameObject.SetActive(false);
-                retryLevelButton.gameObject.SetActive(true);
-                nextLevelButton.gameObject.SetActive(true);
+                if (gameManager.levelFailed)
+                {
+                    retryLevelButton.gameObject.SetActive(true);
+                    nextLevelButton.gameObject.SetActive(false);
+                }
+                else
+                {
+                    retryLevelButton.gameObject.SetActive(false);
+                    nextLevelButton.gameObject.SetActive(true);
+                }
                 stopButton.gameObject.SetActive(true);
             }
+
             if (!gameManager.gameRunning)
             {
                 Debug.Log("Waiting to start a game");

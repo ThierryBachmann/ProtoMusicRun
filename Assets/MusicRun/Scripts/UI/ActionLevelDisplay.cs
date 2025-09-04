@@ -11,11 +11,20 @@ namespace MusicRun
         public HoldButton rightButton;
         public HoldButton jumpButton;
         public SwitchButton pauseButton;
+        public Button stopButton;
 
         public new void Awake()
         {
             base.Awake();
-            pauseButton.OnValueChanged += gameManager.OnSwitchPause;
+            stopButton.gameObject.SetActive(false);
+            pauseButton.OnValueChanged += pauseChange;
+            stopButton.onClick.AddListener(() => gameManager.StopGame());
+        }
+
+        private void pauseChange(bool pause)
+        {
+            stopButton.gameObject.SetActive(pause);
+            gameManager.OnSwitchPause(pause);
         }
 
         public new void Start()

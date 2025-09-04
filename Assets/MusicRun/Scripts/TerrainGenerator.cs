@@ -24,9 +24,9 @@ namespace MusicRun
         private Vector2Int goalChunkCoord;
         private GameObject currentGoal;
         private Dictionary<Vector2Int, GameObject> spawnedChunks;
+        //private Dictionary<Vector2Int, GameObject> freeChunks;
         private Dictionary<Vector2Int, int> spawnedBonus;
         private GameManager gameManager;
-        private PlayerController player;
 
         public GameObject StartGO { get => currentStart; }
         public Level CurrentLevel { get => currentLevel; }
@@ -40,7 +40,6 @@ namespace MusicRun
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            player = gameManager.playerController;
         }
 
 
@@ -52,6 +51,7 @@ namespace MusicRun
         {
             ClearChunks(0);
             spawnedChunks = new Dictionary<Vector2Int, GameObject>();
+            //freeChunks = new Dictionary<Vector2Int, GameObject>();
             spawnedBonus = new Dictionary<Vector2Int, int>();
         }
 

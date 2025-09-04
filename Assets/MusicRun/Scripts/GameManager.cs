@@ -9,6 +9,7 @@ namespace MusicRun
     {
         public bool gameRunning;
         public bool levelRunning;
+        public bool levelFailed;
         public int currentLevelIndex;
         public int currentLevelNumber;
         public float MusicPercentage;
@@ -52,6 +53,7 @@ namespace MusicRun
         {
             gameRunning = false;
             levelRunning = false;
+            levelFailed = false;
             if (startAuto)
                 RestartGame();
             else
@@ -159,6 +161,10 @@ namespace MusicRun
                 levelRunning = true;
             }
         }
+        public void OnExitGame()
+        {
+            StopGame();
+        }
 
         void Update()
         {
@@ -194,8 +200,10 @@ namespace MusicRun
                 MusicPercentage = midiManager.Progress;
                 scoreManager.ScoreGoal = scoreManager.CalculateScoreGoal(MusicPercentage, GoalPercentage);
 
+                // Check level failed
                 if (MusicPercentage >= 100f && GoalPercentage <= 98f)
                 {
+                    levelFailed = true;
                     levelRunning = false;
                     HideAllPopups();
                     levelFailedScreen.Show();
@@ -266,6 +274,7 @@ namespace MusicRun
         {
             Debug.Log($"CreateAndStartLevel {level}");
             scoreManager.ScoreLevel = 0;
+            levelFailed = false;
             actionGame.Hide();
             actionLevel.Show();
             HideAllPopups();
@@ -288,13 +297,15 @@ namespace MusicRun
 
         public void StopGame()
         {
-            actionLevel.Hide();
-            actionGame.Show();
-            HideAllPopups();
             gameRunning = false;
             levelRunning = false;
+            levelFailed = false;
+            actionLevel.Hide();
             actionGame.Show();
-            playerController.LevelCompleted();
+            SplashScreenDisplay();
+            actionGame.Show();
+            playerController.ResetPosition();
+            terrainGenerator.ResetTerrain();
         }
 
         public void HelperScreenDisplay()

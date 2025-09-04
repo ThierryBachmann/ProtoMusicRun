@@ -27,8 +27,6 @@ namespace MusicRun
                 currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
                 terrainGenerator.CreateLevel(currentLevelIndex);
             }
-
         }
-
     }
 }
