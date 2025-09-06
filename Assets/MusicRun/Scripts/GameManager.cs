@@ -10,6 +10,7 @@ namespace MusicRun
         public bool gameRunning;
         public bool levelRunning;
         public bool levelFailed;
+        public bool liteMode;
         public int currentLevelIndex;
         public int currentLevelNumber;
         public float MusicPercentage;
@@ -21,6 +22,8 @@ namespace MusicRun
         public bool infoDebug = false;
 
         [Header("GameObject reference")]
+        public Camera cameraSkybox;
+        public Camera cameraSoliColor;
         public GoalHandler goalHandler;
         public FirebaseLeaderboard leaderboard;
         public ScoreManager scoreManager;
@@ -35,11 +38,13 @@ namespace MusicRun
         public MidiManager midiManager;
         public SplashScreen splashScreen;
         public HelperScreen helperScreen;
+        public SettingScreen settingScreen;
         public LevelFailedScreen levelFailedScreen;
 
         void Awake()
         {
             // Subscribe to events
+            settingScreen.OnSettingChange += OnSettingChange;
             leaderboard.OnLeaderboardLoaded += OnDisplayLeaderboard;
             leaderboard.OnScoreSubmitted += OnScoreSubmissionResult;
             goalHandler.OnLevelCompleted += OnLevelCompleted;
@@ -68,6 +73,22 @@ namespace MusicRun
             ////// Create first level, just to have a view, will be recreated when game starts.
             ////currentLevelIndex = terrainGenerator.SelectNextLevel(-1);
             ////terrainGenerator.CreateLevel(0);
+        }
+
+        private void OnSettingChange()
+        {
+            Debug.Log($"Lite mode: {liteMode}");
+
+            if (liteMode)
+            {
+                cameraSkybox.enabled = false;
+                cameraSoliColor.enabled = true;
+            }
+            else
+            {
+                cameraSoliColor.enabled = false;
+                cameraSkybox.enabled = true;
+            }
         }
 
         private void OnLeaderboardLoaded(List<LeaderboardPlayerScore> scores)
@@ -218,6 +239,7 @@ namespace MusicRun
         {
             splashScreen.Hide();
             helperScreen.Hide();
+            settingScreen.Hide();
             levelFailedScreen.Hide();
             levelFailedScreen.Hide();
             leaderboardDisplay.Hide();

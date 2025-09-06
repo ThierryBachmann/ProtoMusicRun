@@ -40,7 +40,7 @@ namespace MusicRun
                 }
                 else
                 {
-                    retryLevelButton.gameObject.SetActive(false);
+                    retryLevelButton.gameObject.SetActive(true);
                     nextLevelButton.gameObject.SetActive(true);
                 }
                 stopButton.gameObject.SetActive(true);
