@@ -7,13 +7,20 @@ namespace MusicRun
     public class HeaderDisplay : MonoBehaviour
     {
         public TextMeshProUGUI titleText;
+        public TextMeshProUGUI liteModeActivated;
         public TitleItem itemLevel;
         public TitleItem itemScore;
         public TitleItem itemBonus;
+        public int FramePerSecond;
+        public int MinFPS=28;
+        public int MaxFPS=32;
+
 
         public TextMeshProUGUI infoText;
         public Button quitButton;
         public Button directionButton;
+
+        private float deltaTimeFPS = 0.0f;
         private Color currentTextColor;
         private GameManager gameManager;
         private ScoreManager scoreManager;
@@ -45,6 +52,13 @@ namespace MusicRun
             SetTitle();
             if (!gameManager.infoDebug)
                 infoText.gameObject.SetActive(false);
+            liteModeActivated.gameObject.SetActive(false);
+
+        }
+
+        public void LiteModeDisplay(bool display)
+        {
+            liteModeActivated.gameObject.SetActive(display);
         }
 
         public void SetTitle()
@@ -52,19 +66,36 @@ namespace MusicRun
             titleText.text = $"Music Run - {gameManager.leaderboard.GetPlayerName()}";
         }
 
-        private float deltaTimeFPS = 0.0f;
+
         void Update()
         {
 
             //scoreText.text = $"{gameManager.leaderboard.GetPlayerName()} Level: {gameManager.currentLevelNumber} Score:{scoreManager.ScoreOverall:N0} Bonus: {scoreManager.ScoreBonus} Speed:{player.GetSpeed():N1}";
 
+            //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} dir:{goalHandler.goalDirection:F2} angle:{goalHandler.goalAngle:F2}";
+            // Exponential moving average for smoother results
+            deltaTimeFPS += (Time.deltaTime - deltaTimeFPS) * 0.01f;
+            FramePerSecond = (int)((1.0f / deltaTimeFPS));
+            if (FramePerSecond < MinFPS)
+            {
+                if (!gameManager.liteMode)
+                {
+                    gameManager.liteMode = true;
+                    gameManager.LiteModeApply();
+                }
+            }
+            if (FramePerSecond > MaxFPS)
+            {
+                if (gameManager.liteMode)
+                {
+                    gameManager.liteMode = false;
+                    gameManager.LiteModeApply();
+                }
+            }
             if (gameManager.infoDebug)
             {
-                //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} dir:{goalHandler.goalDirection:F2} angle:{goalHandler.goalAngle:F2}";
-                // Exponential moving average for smoother results
-                deltaTimeFPS += (Time.deltaTime - deltaTimeFPS) * 0.1f;
                 //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
-                infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} FPS:{Mathf.Ceil(1.0f / deltaTimeFPS)} ";
+                infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} FPS:{FramePerSecond} ";
             }
 
             directionButton.transform.localRotation = Quaternion.Euler(0f, 0f, -goalHandler.goalAngle);

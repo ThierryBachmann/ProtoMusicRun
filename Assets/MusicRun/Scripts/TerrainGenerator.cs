@@ -9,7 +9,7 @@ namespace MusicRun
     public class TerrainGenerator : MonoBehaviour
     {
         public int chunkSize = 20;
-        public int renderDistance = 2;
+        public int renderDistance = 5;
         public bool disableObstacles = false;
 
 

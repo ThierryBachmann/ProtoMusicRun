@@ -21,6 +21,11 @@ namespace MusicRun
             stopButton.onClick.AddListener(() => gameManager.StopGame());
         }
 
+        public void ActivatePause(bool activate)
+        {
+            pauseButton.SetState(activate);
+        }
+
         private void pauseChange(bool pause)
         {
             stopButton.gameObject.SetActive(pause);

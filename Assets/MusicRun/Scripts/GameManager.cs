@@ -77,17 +77,26 @@ namespace MusicRun
 
         private void OnSettingChange()
         {
+            LiteModeApply();
+        }
+
+        public void LiteModeApply()
+        {
             Debug.Log($"Lite mode: {liteMode}");
 
             if (liteMode)
             {
+                headerDisplay.LiteModeDisplay(true);
                 cameraSkybox.enabled = false;
                 cameraSoliColor.enabled = true;
+                terrainGenerator.renderDistance = 1;
             }
             else
             {
+                headerDisplay.LiteModeDisplay(false);
                 cameraSoliColor.enabled = false;
                 cameraSkybox.enabled = true;
+                terrainGenerator.renderDistance = 5;
             }
         }
 
