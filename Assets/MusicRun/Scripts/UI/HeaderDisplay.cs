@@ -12,10 +12,8 @@ namespace MusicRun
         public TitleItem itemScore;
         public TitleItem itemBonus;
         public int FramePerSecond;
-        public int MinFPS=28;
-        public int MaxFPS=32;
-
-
+        public int LowerThresholdFPS = 28;
+        public int HysteresisBandFPS = 4;
         public TextMeshProUGUI infoText;
         public Button quitButton;
         public Button directionButton;
@@ -73,10 +71,11 @@ namespace MusicRun
             //scoreText.text = $"{gameManager.leaderboard.GetPlayerName()} Level: {gameManager.currentLevelNumber} Score:{scoreManager.ScoreOverall:N0} Bonus: {scoreManager.ScoreBonus} Speed:{player.GetSpeed():N1}";
 
             //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} dir:{goalHandler.goalDirection:F2} angle:{goalHandler.goalAngle:F2}";
+            
             // Exponential moving average for smoother results
             deltaTimeFPS += (Time.deltaTime - deltaTimeFPS) * 0.01f;
             FramePerSecond = (int)((1.0f / deltaTimeFPS));
-            if (FramePerSecond < MinFPS)
+            if (FramePerSecond < LowerThresholdFPS)
             {
                 if (!gameManager.liteMode)
                 {
@@ -84,7 +83,7 @@ namespace MusicRun
                     gameManager.LiteModeApply();
                 }
             }
-            if (FramePerSecond > MaxFPS)
+            if (FramePerSecond > LowerThresholdFPS + HysteresisBandFPS)
             {
                 if (gameManager.liteMode)
                 {

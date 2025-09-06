@@ -11,6 +11,7 @@ namespace MusicRun
         public bool levelRunning;
         public bool levelFailed;
         public bool liteMode;
+        public bool liteModeSetting;
         public int currentLevelIndex;
         public int currentLevelNumber;
         public float MusicPercentage;
@@ -84,19 +85,39 @@ namespace MusicRun
         {
             Debug.Log($"Lite mode: {liteMode}");
 
-            if (liteMode)
+            if (liteMode || liteModeSetting)
             {
                 headerDisplay.LiteModeDisplay(true);
-                cameraSkybox.enabled = false;
-                cameraSoliColor.enabled = true;
                 terrainGenerator.renderDistance = 1;
             }
             else
             {
                 headerDisplay.LiteModeDisplay(false);
-                cameraSoliColor.enabled = false;
-                cameraSkybox.enabled = true;
                 terrainGenerator.renderDistance = 5;
+            }
+            SkyApply();
+        }
+
+        public void SkyApply()
+        {
+            if (liteMode || liteModeSetting)
+            {
+                cameraSkybox.enabled = false;
+                cameraSoliColor.enabled = true;
+            }
+            else
+            {
+                cameraSoliColor.enabled = false;
+                if (terrainGenerator.CurrentLevel.Skybox != null)
+                {
+                    foreach (Camera camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))
+                        camera.enabled = false;
+                    terrainGenerator.CurrentLevel.Skybox.enabled = true;
+                }
+                else
+                {
+                    cameraSkybox.enabled = true;
+                }
             }
         }
 
@@ -307,6 +328,7 @@ namespace MusicRun
             scoreManager.ScoreLevel = 0;
             levelFailed = false;
             actionGame.Hide();
+            actionLevel.ActivatePause(false);
             actionLevel.Show();
             HideAllPopups();
             if (restartSame)

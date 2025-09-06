@@ -94,6 +94,7 @@ namespace MusicRun
         {
             currentLevel = levels[levelIndex];
             Debug.Log($"Start Level: {currentLevel.name} - {currentLevel.description}");
+            gameManager.LiteModeApply();
             CreateStartAndGoalChunk();
             // Force to update chunks with real position of the player
             //currentPlayerChunk = new Vector2Int(-9999, -9999);
@@ -183,7 +184,7 @@ namespace MusicRun
 
         public void UpdateChunks(Vector2Int currentChunk)
         {
-            this.currentChunk= currentChunk;
+            this.currentChunk = currentChunk;
             // will contains chunks coord around the player at a distance of -renderDistance to renderDistance
             HashSet<Vector2Int> newChunks = new HashSet<Vector2Int>();
 
@@ -534,6 +535,7 @@ namespace MusicRun
         public string description;
         [Header("Defined MIDI associated to the level")]
         public int indexMIDI;
+        public Camera Skybox;
 
         [Range(0.1f, 5f)]
         public float RatioSpeedMusic = 0.3f;

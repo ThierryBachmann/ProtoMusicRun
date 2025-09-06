@@ -24,6 +24,7 @@ namespace MusicRun
         public void ActivatePause(bool activate)
         {
             pauseButton.SetState(activate);
+            stopButton.gameObject.SetActive(activate);
         }
 
         private void pauseChange(bool pause)

@@ -23,7 +23,7 @@ namespace MusicRun
             toggleLiteMode.isOn = gameManager.liteMode;
             toggleLiteMode.onValueChanged.AddListener((val) => 
             { 
-                gameManager.liteMode = toggleLiteMode.isOn;
+                gameManager.liteModeSetting = toggleLiteMode.isOn;
                 OnSettingChange.Invoke();
             });
             base.Start();
