@@ -17,7 +17,7 @@ namespace MusicRun
         {
             get
             {
-                Debug.Log($"Tick First Note: {midiPlayer.MPTK_TickFirstNote} Tick Last Note: {midiPlayer.MPTK_TickLastNote} Tick Current: {midiPlayer.MPTK_TickCurrent}");
+                //Debug.Log($"Tick First Note: {midiPlayer.MPTK_TickFirstNote} Tick Last Note: {midiPlayer.MPTK_TickLastNote} Tick Current: {midiPlayer.MPTK_TickCurrent}");
                 return (midiPlayer.MPTK_TickCurrent * 100f) / (float)midiPlayer.MPTK_TickLastNote;
             }
         }

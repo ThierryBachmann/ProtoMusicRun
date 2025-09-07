@@ -24,7 +24,9 @@ namespace MusicRun
 
         [Header("GameObject reference")]
         public Camera cameraSkybox;
-        public Camera cameraSoliColor;
+        public Camera cameraSolidColor;
+        public Camera cameraSelected;
+
         public GoalHandler goalHandler;
         public FirebaseLeaderboard leaderboard;
         public ScoreManager scoreManager;
@@ -103,20 +105,23 @@ namespace MusicRun
             if (liteMode || liteModeSetting)
             {
                 cameraSkybox.enabled = false;
-                cameraSoliColor.enabled = true;
+                cameraSolidColor.enabled = true;
+                cameraSelected = cameraSolidColor;
             }
             else
             {
-                cameraSoliColor.enabled = false;
+                cameraSolidColor.enabled = false;
                 if (terrainGenerator.CurrentLevel.Skybox != null)
                 {
                     foreach (Camera camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))
                         camera.enabled = false;
                     terrainGenerator.CurrentLevel.Skybox.enabled = true;
+                    cameraSelected = terrainGenerator.CurrentLevel.Skybox;
                 }
                 else
                 {
                     cameraSkybox.enabled = true;
+                    cameraSelected = cameraSkybox;
                 }
             }
         }
@@ -291,6 +296,7 @@ namespace MusicRun
 
         public void RestartGame()
         {
+            goalHandler.gameObject.SetActive(true);
             terrainGenerator.ResetTerrain();
             HideAllPopups();
             levelFailedScreen.Hide();
@@ -340,6 +346,7 @@ namespace MusicRun
                 terrainGenerator.CreateLevel(level);
             }
             terrainGenerator.CreateLevel(level);
+            goalHandler.gameObject.SetActive(true);
             goalHandler.NewLevel();
             goalReachedDisplay.NewLevel();
             midiManager.StartPlayMIDI(terrainGenerator.CurrentLevel.indexMIDI);
@@ -350,6 +357,7 @@ namespace MusicRun
 
         public void StopGame()
         {
+            goalHandler.gameObject.SetActive(false);
             gameRunning = false;
             levelRunning = false;
             levelFailed = false;

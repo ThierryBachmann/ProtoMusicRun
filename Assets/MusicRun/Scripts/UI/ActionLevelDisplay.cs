@@ -10,8 +10,10 @@ namespace MusicRun
         public HoldButton leftButton;
         public HoldButton rightButton;
         public HoldButton jumpButton;
-        public SwitchButton pauseButton;
         public Button stopButton;
+        public Button settingButton;
+        public SwitchButton pauseButton;
+        public SettingScreen settingScreen;
 
         public new void Awake()
         {
@@ -19,17 +21,20 @@ namespace MusicRun
             stopButton.gameObject.SetActive(false);
             pauseButton.OnValueChanged += pauseChange;
             stopButton.onClick.AddListener(() => gameManager.StopGame());
+            settingButton.onClick.AddListener(() => settingScreen.Show());
         }
 
         public void ActivatePause(bool activate)
         {
             pauseButton.SetState(activate);
             stopButton.gameObject.SetActive(activate);
+            settingButton.gameObject.SetActive(activate);
         }
 
         private void pauseChange(bool pause)
         {
             stopButton.gameObject.SetActive(pause);
+            settingButton.gameObject.SetActive(pause);
             gameManager.OnSwitchPause(pause);
         }
 
