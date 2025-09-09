@@ -5,6 +5,7 @@ namespace MusicRun
     [System.Serializable]
     public class LeaderboardPlayerScore
     {
+        public string userId;
         public string playerName;
         public int playerPosition;
         public long score;
@@ -14,8 +15,9 @@ namespace MusicRun
         public int maxLevel;
         public long timestamp;
 
-        public LeaderboardPlayerScore(string name, long score, float time, float efficiency, float speed, int level)
+        public LeaderboardPlayerScore(string _userId, string name, long score, float time, float efficiency, float speed, int level)
         {
+            userId = _userId;
             playerName = name;
             this.score = score;
             completionTime = time;

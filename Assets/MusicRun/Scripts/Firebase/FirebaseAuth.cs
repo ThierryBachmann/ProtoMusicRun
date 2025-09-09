@@ -52,7 +52,7 @@ namespace MusicRun
     public class FirebaseAuth : MonoBehaviour
     {
         [Header("Player Info")]
-        public string playerDisplayName = "";
+        //public string playerDisplayName = "";
         public bool isAuthenticated = false;
 
         private string userId = "";
@@ -105,13 +105,13 @@ namespace MusicRun
                     SaveAuthData();
 
                     // Generate or load player display name
-                    if (string.IsNullOrEmpty(playerDisplayName))
-                    {
-                        playerDisplayName = GeneratePlayerName();
-                        SavePlayerName();
-                    }
+                    //if (string.IsNullOrEmpty(playerDisplayName))
+                    //{
+                    //    playerDisplayName = GeneratePlayerName();
+                    //    SavePlayerName();
+                    //}
 
-                    Debug.Log($"Anonymous authentication successful! User ID: {userId} {playerDisplayName}");
+                    Debug.Log($"Anonymous authentication successful! User ID: {userId}");
                     OnAuthenticationComplete?.Invoke(true);
                 }
                 catch (Exception e)
@@ -152,41 +152,24 @@ namespace MusicRun
                     if (DateTime.Now - authTime < TimeSpan.FromMinutes(50)) // Refresh before expiry
                     {
                         isAuthenticated = true;
-                        playerDisplayName = PlayerPrefs.GetString("player_name", "");
-                        Debug.Log($"Loaded saved authentication {playerDisplayName}");
+                        Debug.Log($"Loaded saved authentication");
                     }
                 }
             }
             Debug.Log($"LoadSavedAuth User ID: {userId} {isAuthenticated}");
         }
 
-        private string GeneratePlayerName()
-        {
-            // Generate a fun, music-themed name
-            string[] adjectives = { "Melodic", "Rhythmic", "Sonic", "Harmonic", "Beat", "Bass", "Treble", "Echo", "Tempo", "Groove" };
-            string[] nouns = { "Runner", "Dasher", "Sprinter", "Racer", "Seeker", "Explorer", "Navigator", "Traveler", "Wanderer", "Pathfinder" };
+     
 
-            string adjective = adjectives[UnityEngine.Random.Range(0, adjectives.Length)];
-            string noun = nouns[UnityEngine.Random.Range(0, nouns.Length)];
-            int number = UnityEngine.Random.Range(100, 999);
 
-            return $"{adjective}{noun}{number}";
-        }
-
-        private void SavePlayerName()
-        {
-            PlayerPrefs.SetString("player_name", playerDisplayName);
-            PlayerPrefs.Save();
-        }
-
-        public void SetPlayerName(string newName)
-        {
-            if (!string.IsNullOrEmpty(newName) && newName.Length <= 20)
-            {
-                playerDisplayName = newName;
-                SavePlayerName();
-            }
-        }
+        //public void SetPlayerName(string newName)
+        //{
+        //    if (!string.IsNullOrEmpty(newName) && newName.Length <= 20)
+        //    {
+        //        playerDisplayName = newName;
+        //        SavePlayerName();
+        //    }
+        //}
 
         public string GetUserId()
         {
@@ -196,11 +179,6 @@ namespace MusicRun
         public string GetIdToken()
         {
             return idToken;
-        }
-
-        public string GetPlayerName()
-        {
-            return playerDisplayName;
         }
 
         public bool IsAuthenticated()

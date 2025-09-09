@@ -58,7 +58,7 @@ namespace MusicRun
 
                 if (string.IsNullOrEmpty(jsonResponse) || jsonResponse == "null")
                 {
-                    Debug.LogError($"Failed to load leaderboard: json empty");
+                    Debug.Log($"Failed to load leaderboard: json empty");
                     OnLeaderboardLoaded?.Invoke(new List<LeaderboardPlayerScore>());
                     yield break;
                 }
@@ -265,11 +265,6 @@ namespace MusicRun
             }
         }
 
-        public string GetPlayerName()
-        {
-            return firebaseAuth.playerDisplayName;
-        }
-
         public void GetPlayerRank(Action<LeaderboardPlayerScore> onRankFound)
         {
             if (!disableLeaderBoard)
@@ -285,7 +280,7 @@ namespace MusicRun
 
             if (scores != null)
             {
-                LeaderboardPlayerScore score = scores.Find(p => p.playerName == firebaseAuth.playerDisplayName);
+                LeaderboardPlayerScore score = scores.Find(p => p.userId == firebaseAuth.GetUserId());
                 if (score != null)
                 {
                     Debug.Log($"GetPlayerRankCoroutine score found {score}");

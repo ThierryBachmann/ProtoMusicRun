@@ -86,7 +86,7 @@ namespace MusicRun
         {
             Debug.Log("Start bonus Trans");
             EndBonus();
-            midiManager.TransposeSet(18);
+            midiManager.TransposeSet(6);
             startBonusDateTime = DateTime.Now;
             startBonus = true;
         }

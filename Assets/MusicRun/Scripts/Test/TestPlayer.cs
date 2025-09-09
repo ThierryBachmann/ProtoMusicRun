@@ -48,8 +48,11 @@ namespace MusicRun
 
         void Update()
         {
-            HandleInput();
-            HandleRotation();
+            if (enableMovement)
+            {
+                HandleInput();
+                HandleRotation();
+            }
         }
 
         void HandleInput()

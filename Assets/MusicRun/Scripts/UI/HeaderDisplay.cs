@@ -61,7 +61,7 @@ namespace MusicRun
 
         public void SetTitle()
         {
-            titleText.text = $"Music Run - {gameManager.leaderboard.GetPlayerName()}";
+            titleText.text = $"Music Run - {player.playerName}";
         }
 
 

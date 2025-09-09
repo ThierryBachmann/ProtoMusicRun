@@ -67,7 +67,7 @@ namespace MusicRun
             if (closeOnClick)
             {
                 GameObject clicked = eventData.pointerCurrentRaycast.gameObject;
-                Debug.Log($"Panel clicked! {clicked} {eventData}");
+                //Debug.Log($"Panel clicked! {clicked} {eventData}");
 
                 if (clicked != null && clicked.GetComponentInParent<Button>() != null)
                     return;

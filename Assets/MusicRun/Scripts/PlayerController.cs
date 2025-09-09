@@ -41,6 +41,7 @@ namespace MusicRun
         public float knockbackDecay = 4f;
 
         [Header("Score")]
+        public string playerName = "";
         public int playerPosition = 99999;
         public long playerBestScore = 0;
         public long playerLastScore = 0;
@@ -65,11 +66,23 @@ namespace MusicRun
             terrainGenerator = gameManager.terrainGenerator;
             controller = GetComponent<CharacterController>();
             scoreManager = gameManager.scoreManager;
+            gameManager.settingScreen.OnSettingChange += OnSettingChange;
+            playerName = PlayerPrefs.GetString("player_name");
         }
 
         void Start()
         {
+            gameManager.settingScreen.SetValue();
         }
+
+        private void OnSettingChange()
+        {
+            Debug.Log("PlayerController OnSettingChange");
+            gameManager.headerDisplay.SetTitle();
+            PlayerPrefs.SetString("player_name", playerName);
+            PlayerPrefs.Save();
+        }
+
         void OnTriggerEnter(Collider other)
         {
             Debug.Log($"PlayerController trigger {other.tag}");

@@ -5,5 +5,6 @@ namespace MusicRun
     {
         public string firebaseApiKey = "";
         public string firebaseProjectId = "";
+
     }
 }

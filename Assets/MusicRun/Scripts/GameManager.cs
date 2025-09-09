@@ -21,6 +21,7 @@ namespace MusicRun
         public bool startAuto;
         public bool nextLevelAuto;
         public bool infoDebug = false;
+        public bool enableShortcutKeys = false;
 
         [Header("GameObject reference")]
         public Camera cameraSkybox;
@@ -80,6 +81,7 @@ namespace MusicRun
 
         private void OnSettingChange()
         {
+            Debug.Log("GameManager OnSettingChange");
             LiteModeApply();
         }
 
@@ -111,7 +113,7 @@ namespace MusicRun
             else
             {
                 cameraSolidColor.enabled = false;
-                if (terrainGenerator.CurrentLevel.Skybox != null)
+                if (terrainGenerator.CurrentLevel != null && terrainGenerator.CurrentLevel.Skybox != null)
                 {
                     foreach (Camera camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))
                         camera.enabled = false;
@@ -128,13 +130,13 @@ namespace MusicRun
 
         private void OnLeaderboardLoaded(List<LeaderboardPlayerScore> scores)
         {
-            Debug.Log($"=== PLAYER RANK {leaderboard.GetPlayerName()} === ");
-            LeaderboardPlayerScore playerRank = scores.Find(s => s.playerName == leaderboard.GetPlayerName());
+            Debug.Log($"=== PLAYER RANK {playerController.playerName} === ");
+            LeaderboardPlayerScore playerRank = scores.Find(s => s.playerName == playerController.playerName);
             if (playerRank != null)
                 Debug.Log($"Player Rank {playerRank.playerName:20}: {playerRank.score} pts " +
                      $"(Time: {playerRank.completionTime:F1}s, Efficiency: {playerRank.pathEfficiency:F2})");
             else
-                Debug.Log($"Player Rank not found");
+                Debug.Log($"Player Rank not found {playerController.playerName:20}");
 
         }
 
@@ -142,13 +144,14 @@ namespace MusicRun
         {
             scoreManager.CalculateScoreLevel(MusicPercentage, GoalPercentage);
             LeaderboardPlayerScore playerScore = new LeaderboardPlayerScore(
-                         leaderboard.GetPlayerName(),
-                         scoreManager.ScoreLevel,
-                         999,
-                         999,
-                         999,
-                         1
-                          );
+                        leaderboard.firebaseAuth.GetUserId(),
+                        playerController.playerName,
+                        scoreManager.ScoreLevel,
+                        999,
+                        999,
+                        999,
+                        1
+                        );
             leaderboard.SubmitScore(playerScore);
             levelRunning = false;
 
@@ -189,7 +192,6 @@ namespace MusicRun
                 Debug.Log($"{i + 1}. {score.playerName:20}: {score.score} pts " +
                          $"(Time: {score.completionTime:F1}s, Efficiency: {score.pathEfficiency:F2})");
             }
-            headerDisplay.SetTitle();
         }
 
         private void OnScoreSubmissionResult(bool success)
@@ -227,24 +229,25 @@ namespace MusicRun
             // Exemple : touche R pour redémarrer la partie
             //if (Input.GetKeyDown(KeyCode.H)) HelperScreenDisplay();
 
-            if (Input.anyKeyDown)
-            {
-                foreach (char c in Input.inputString)
+            if (enableShortcutKeys)
+                if (Input.anyKeyDown)
                 {
-                    if (c == 'h' || c == 'H') HelperScreenDisplay();
-                    if (c == 'n' || c == 'N') StartCoroutine(ClearAndNextLevel());
-                    if (c == 's' || c == 'S') StopGame();
-                    if (c == 'r' || c == 'R') RestartGame();
-                    if (c == 'a' || c == 'A') actionGame.SwitchVisible();
-                    if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
-                    if (c == 'm' || c == 'M') midiManager.SoundOnOff();
-                    if (c == 'g' || c == 'G')
+                    foreach (char c in Input.inputString)
                     {
-                        terrainGenerator.ClearChunks(0);
-                        terrainGenerator.UpdateChunks(playerController.CurrentPlayerChunk);
+                        if (c == 'h' || c == 'H') HelperScreenDisplay();
+                        if (c == 'n' || c == 'N') StartCoroutine(ClearAndNextLevel());
+                        if (c == 's' || c == 'S') StopGame();
+                        if (c == 'r' || c == 'R') RestartGame();
+                        if (c == 'a' || c == 'A') actionGame.SwitchVisible();
+                        if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
+                        if (c == 'm' || c == 'M') midiManager.SoundOnOff();
+                        if (c == 'g' || c == 'G')
+                        {
+                            terrainGenerator.ClearChunks(0);
+                            terrainGenerator.UpdateChunks(playerController.CurrentPlayerChunk);
+                        }
                     }
                 }
-            }
 
             // Calculate level progression and intermediary score
             if (gameRunning && levelRunning)
