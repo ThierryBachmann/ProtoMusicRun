@@ -273,8 +273,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.9999998
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2366,16 +2366,16 @@ MonoBehaviour:
     description: More dune ...
     indexMIDI: 80
     Skybox: {fileID: 1193833017}
-    RatioSpeedMusic: 0.7
-    MinSpeedMusic: 0.7
-    MaxSpeedMusic: 2.49
+    RatioSpeedMusic: 0.47
+    MinSpeedMusic: 0.55
+    MaxSpeedMusic: 1.28
     deltaCurrentChunk: {x: 0, y: 20}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     perlinVegetable: 0.3
-    perlinChunk: 100
-    minScaleVegetable: 0.7
-    maxScaleVegetable: 0.9
+    perlinChunk: 7.15
+    minScaleVegetable: 0.4
+    maxScaleVegetable: 1.28
     runChunks:
     - {fileID: 3245006867922576827, guid: 0786c1c0621985c4ea5ee25aab74599a, type: 3}
     - {fileID: 3245006867922576827, guid: 9017a3995fcc81049952ec486ec63b50, type: 3}
