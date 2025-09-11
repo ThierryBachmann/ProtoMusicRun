@@ -36,6 +36,19 @@ namespace MusicRun
 
             base.Start();
         }
+
+        public new void Show()
+        {
+            gameManager.enableShortcutKeys = false;
+            base.Show();
+        }
+
+        public new void Hide()
+        {
+            gameManager.enableShortcutKeys = true;
+            base.Hide();
+        }
+
         public void SetValue()
         {
             toggleLiteMode.isOn = gameManager.liteMode;
