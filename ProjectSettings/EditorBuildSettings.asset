@@ -15,5 +15,6 @@ EditorBuildSettings:
     path: Assets/MidiPlayer/Demo/FreeDemos/TestMidiStream.unity
     guid: 7438ff6964cbede408a92dbdfdaddb8f
   m_configObjects:
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.input.settings: {fileID: 11400000, guid: b2b24efe0d7bcdd4da66dbd0ba2c69ae, type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 78053875b9fd31c4ebb412bee87f93da, type: 3}
   m_UseUCBPForAssetBundles: 0

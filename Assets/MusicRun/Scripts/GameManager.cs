@@ -44,6 +44,7 @@ namespace MusicRun
         public HelperScreen helperScreen;
         public SettingScreen settingScreen;
         public LevelFailedScreen levelFailedScreen;
+        public TouchEnabler touchEnabler;
 
         void Awake()
         {

@@ -11,6 +11,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace MusicRun
 {
@@ -50,6 +51,8 @@ namespace MusicRun
         private GameManager gameManager;
         private TerrainGenerator terrainGenerator;
         private ScoreManager scoreManager;
+        private TouchEnabler touchEnabler;
+
         public DateTime timeStartLevel;
 
         [Header("For readonly")]
@@ -57,6 +60,7 @@ namespace MusicRun
 
         public Vector2Int CurrentPlayerChunk { get => currentPlayerChunk; }
 
+        [SerializeField] private float minSwipeDistance = 50f; // en pixels
 
         void Awake()
         {
@@ -66,6 +70,7 @@ namespace MusicRun
             terrainGenerator = gameManager.terrainGenerator;
             controller = GetComponent<CharacterController>();
             scoreManager = gameManager.scoreManager;
+            touchEnabler= gameManager.touchEnabler;
             gameManager.settingScreen.OnSettingChange += OnSettingChange;
             playerName = PlayerPrefs.GetString("player_name");
         }
@@ -75,13 +80,64 @@ namespace MusicRun
             gameManager.settingScreen.SetValue();
         }
 
-        private void OnSettingChange()
-        {
-            Debug.Log("PlayerController OnSettingChange");
-            gameManager.headerDisplay.SetTitle();
-            PlayerPrefs.SetString("player_name", playerName);
-            PlayerPrefs.Save();
-        }
+        //private void OnEnable()
+        //{
+        //    controls.Gameplay.Enable();
+        //    controls.Gameplay.Swipe.performed += OnSwipe;
+        //    controls.Gameplay.Swipe.started += Swipe_started;
+        //    controls.Gameplay.TurnLeft.performed += (cb) => { Debug.Log($"TurnLeft.performed {controls.Gameplay.TurnLeft.IsPressed()}"); };
+        //    controls.Gameplay.TurnLeft.canceled += (cb) => { Debug.Log("TurnLeft.canceled"); };
+        //    controls.Gameplay.TurnRight.performed += (cb) => { Debug.Log("TurnRight.performed"); };
+        //    controls.Gameplay.TurnRight.canceled += (cb) => { Debug.Log("TurnRight.canceled"); };
+        //}
+
+        //public Vector2 startPos;
+        //private void Swipe_started(InputAction.CallbackContext obj)
+        //{
+        //    startPos = controls.Gameplay.Swipe.ReadValue<Vector2>();
+        //    Debug.Log($"Swipe startPos {startPos}");
+        //}
+
+        //private void OnDisable()
+        //{
+        //    controls.Gameplay.Disable();
+        //}
+
+        //private void OnSwipe(InputAction.CallbackContext ctx)
+        //{
+        //    Vector2 currentPos = ctx.ReadValue<Vector2>();
+        //    Debug.Log($"Swipe currentPos {currentPos}");
+
+        //    Vector2 swipe = currentPos - startPos;
+
+        //    if (swipe.magnitude < minSwipeDistance) return;
+
+        //    if (Mathf.Abs(swipe.x) > Mathf.Abs(swipe.y))
+        //    {
+        //        Debug.Log($"Swipe {swipe}");
+
+        //        if (swipe.x > 0)
+        //            TurnRight();
+        //        else
+        //            TurnLeft();
+        //    }
+
+        //    // (Optionnel : reset l’input pour éviter de re-déclencher)
+        //    controls.Gameplay.Swipe.Disable();
+        //    controls.Gameplay.Swipe.Enable();
+        //}
+
+        //private void TurnLeft()
+        //{
+        //    Debug.Log("Tourner à gauche");
+        //    // rotation joueur
+        //}
+
+        //private void TurnRight()
+        //{
+        //    Debug.Log("Tourner à droite");
+        //    // rotation joueur
+        //}
 
         void OnTriggerEnter(Collider other)
         {
@@ -107,6 +163,15 @@ namespace MusicRun
                 Destroy(other.gameObject, 3f);
             }
         }
+
+        private void OnSettingChange()
+        {
+            Debug.Log("PlayerController OnSettingChange");
+            gameManager.headerDisplay.SetTitle();
+            PlayerPrefs.SetString("player_name", playerName);
+            PlayerPrefs.Save();
+        }
+
         public void LevelStarted()
         {
             ResetPosition();
@@ -178,11 +243,11 @@ namespace MusicRun
 
         void HandleInput()
         {
-            if (gameManager.actionLevel.leftButton.IsHeld || Input.GetKey(KeyCode.LeftArrow))
+            if (gameManager.actionLevel.leftButton.IsHeld || touchEnabler.TurnLeftIsPressed)
             {
                 targetAngle -= turnSpeed * Time.deltaTime;
             }
-            else if (gameManager.actionLevel.rightButton.IsHeld || Input.GetKey(KeyCode.RightArrow))
+            else if (gameManager.actionLevel.rightButton.IsHeld || touchEnabler.TurnRightIsPressed)
             {
                 targetAngle += turnSpeed * Time.deltaTime;
             }

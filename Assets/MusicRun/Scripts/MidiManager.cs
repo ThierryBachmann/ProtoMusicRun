@@ -148,7 +148,7 @@ namespace MusicRun
 
         private IEnumerator PitchChannelRoutine(float pitchTarget, float durationMilli)
         {
-            Debug.Log($"PitchChannelRoutine {pitchTarget} {durationMilli}");
+            //Debug.Log($"PitchChannelRoutine {pitchTarget} {durationMilli}");
 
 
             // Change pitch (automatic return to center as a physical keyboard!)
