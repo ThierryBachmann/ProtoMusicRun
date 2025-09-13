@@ -1,14 +1,13 @@
 ﻿using MusicRun;
 using UnityEngine;
 using UnityEngine.InputSystem.EnhancedTouch;
-using UnityEngine.InputSystem.XR;
-using UnityEngine.SceneManagement;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class TouchEnabler : MonoBehaviour
 {
-    public float minSwipeDistance = 50f; // pixels
-    public PlayerControls controls;
+    public float minSwipeDistanceX = 1f; // pixels
+    public float minSwipeDistanceY = 50f; // pixels
+    public InputSystemAction controls;
 
     private Vector2 startPos;
     private bool swipeInProgress = false;
@@ -17,7 +16,7 @@ public class TouchEnabler : MonoBehaviour
 
     void Awake()
     {
-        controls = new PlayerControls();
+        controls = new InputSystemAction();
         swipeInProgress = false;
         swipHorizontalDirection = 0;
         swipVerticalDirection = 0;
@@ -39,13 +38,14 @@ public class TouchEnabler : MonoBehaviour
 
     public bool TurnLeftIsPressed => controls.Gameplay.TurnLeft.IsPressed() || swipHorizontalDirection > 0;
     public bool TurnRightIsPressed => controls.Gameplay.TurnRight.IsPressed() || swipHorizontalDirection < 0;
+    public bool TurnUpIsPressed => controls.Gameplay.Jump.IsPressed() || swipVerticalDirection > 0;
 
 
     void Update()
     {
         foreach (var t in Touch.activeTouches)
         {
-            Debug.Log($"touch id:{t.touchId} pos:{t.screenPosition} phase:{t.phase}");
+            //Debug.Log($"touch id:{t.touchId} pos:{t.screenPosition} phase:{t.phase}");
             switch (t.phase)
             {
                 case UnityEngine.InputSystem.TouchPhase.Began:
@@ -58,24 +58,15 @@ public class TouchEnabler : MonoBehaviour
                         Vector2 endPos = t.screenPosition;
                         Vector2 delta = endPos - startPos;
 
-                        if (delta.magnitude > minSwipeDistance)
+                        if (delta.magnitude > minSwipeDistanceX)
                         {
-                            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
-                            {
-                                if (delta.x > 0)
-                                    swipHorizontalDirection = -1;
-
-                                else
-                                    swipHorizontalDirection = 1;
-                            }
-                            else
-                            {
-                                if (delta.y > 0)
-                                    swipVerticalDirection = 1;
-                                else
-                                    swipVerticalDirection = -1;
-                            }
-                            startPos = endPos;
+                            swipHorizontalDirection = delta.x > 0 ? -1 : 1;
+                            startPos.x = endPos.x;
+                        }
+                        if (delta.magnitude > minSwipeDistanceY)
+                        {
+                            swipVerticalDirection = delta.y > 0 ? 1 : -1;
+                            startPos.y = endPos.y;
                         }
                     }
                     break;

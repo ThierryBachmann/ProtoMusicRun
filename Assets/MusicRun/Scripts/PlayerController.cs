@@ -60,8 +60,6 @@ namespace MusicRun
 
         public Vector2Int CurrentPlayerChunk { get => currentPlayerChunk; }
 
-        [SerializeField] private float minSwipeDistance = 50f; // en pixels
-
         void Awake()
         {
             gameManager = Utilities.FindGameManager();
@@ -251,7 +249,7 @@ namespace MusicRun
             {
                 targetAngle += turnSpeed * Time.deltaTime;
             }
-            if (!isJumping && (Input.GetKeyDown(KeyCode.Space) || gameManager.actionLevel.jumpButton.IsHeld))
+            if (!isJumping && (gameManager.actionLevel.jumpButton.IsHeld || touchEnabler.TurnUpIsPressed))
             {
                 verticalVelocity.y = jumpForce;
                 isJumping = true;

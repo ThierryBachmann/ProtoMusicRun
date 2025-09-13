@@ -273,7 +273,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2651,7 +2651,6 @@ MonoBehaviour:
   playerPosition: 99999
   playerBestScore: 0
   playerLastScore: 0
-  minSwipeDistance: 50
 --- !u!143 &256923875
 CharacterController:
   m_ObjectHideFlags: 0
@@ -15028,7 +15027,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7644f6403e0a64eb65ed695ebdfc57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSwipeDistance: 50
+  minSwipeDistanceX: 1
+  minSwipeDistanceY: 200
 --- !u!4 &1930568709
 Transform:
   m_ObjectHideFlags: 0

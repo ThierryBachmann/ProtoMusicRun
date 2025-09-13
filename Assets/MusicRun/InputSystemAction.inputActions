@@ -1,6 +1,6 @@
 {
     "version": 1,
-    "name": "PlayerControls",
+    "name": "InputSystemAction",
     "maps": [
         {
             "name": "Gameplay",
@@ -19,6 +19,15 @@
                     "name": "TurnLeft",
                     "type": "Button",
                     "id": "1b0bc90b-97c9-4d1c-8502-65aaa7b46b6d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "f6c60af6-782b-4eef-b94f-2b8113cb2ac8",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -45,6 +54,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "TurnLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d7d0ac75-5995-484c-8133-ed6ab939ea26",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
