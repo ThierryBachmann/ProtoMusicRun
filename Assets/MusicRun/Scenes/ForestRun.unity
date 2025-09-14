@@ -2640,12 +2640,14 @@ MonoBehaviour:
   targetAngle: 0
   currentAngle: 0
   knockback: {x: 0, y: 0, z: 0}
-  speedMultiplier: 0.5
-  initialSpeed: 5
-  turnSpeed: 0.25
-  maxAngle: 45
-  gravity: 20
-  jumpForce: 0.15
+  MinSpeed: 2
+  MaxSpeed: 10
+  Acceleration: 0.2
+  Speed: 1
+  TurnSpeed: 0.25
+  MaxAngle: 45
+  gravity: 10
+  JumpForce: 0.15
   knockbackDecay: 4
   playerName: 
   playerPosition: 99999

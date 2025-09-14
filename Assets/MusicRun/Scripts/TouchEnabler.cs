@@ -38,9 +38,9 @@ namespace MusicRun
             EnhancedTouchSupport.Disable();
         }
 
-        public bool TurnLeftIsPressed => controls.Gameplay.TurnLeft.IsPressed() || SwipeHorizontalValue > 0f;
-        public bool TurnRightIsPressed => controls.Gameplay.TurnRight.IsPressed() || SwipeHorizontalValue < 0f;
-        public bool TurnUpIsPressed => controls.Gameplay.Jump.IsPressed() || SwipeVerticalValue > 0;
+        public bool TurnLeftIsPressed => controls.Gameplay.TurnLeft.IsPressed();
+        public bool TurnRightIsPressed => controls.Gameplay.TurnRight.IsPressed();
+        public bool TurnUpIsPressed => controls.Gameplay.Jump.IsPressed();
 
 
         void Update()

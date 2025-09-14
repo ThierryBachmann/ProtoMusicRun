@@ -185,23 +185,24 @@ namespace MusicRun
         void HandleInput()
         {
             if (gameManager.actionLevel.leftButton.IsHeld || touchEnabler.TurnLeftIsPressed)
-            {
-                // Swipe value is negative
-                targetAngle += TurnSpeed * touchEnabler.SwipeHorizontalValue * Time.deltaTime;
-            }
+                targetAngle -= TurnSpeed * 250f * Time.deltaTime;
             else if (gameManager.actionLevel.rightButton.IsHeld || touchEnabler.TurnRightIsPressed)
-            {
-                // Swipe value is positive, so same code but for clarity we prefer check direction independently.
-                targetAngle += TurnSpeed * touchEnabler.SwipeHorizontalValue * Time.deltaTime;
-            }
+                targetAngle += TurnSpeed * 250f * Time.deltaTime;
 
-            if (!isJumping && (gameManager.actionLevel.jumpButton.IsHeld || touchEnabler.TurnUpIsPressed))
+            if (touchEnabler.SwipeHorizontalValue != 0f)
+                targetAngle += TurnSpeed * touchEnabler.SwipeHorizontalValue * Time.deltaTime;
+
+            if (!isJumping)
             {
-                verticalVelocity.y = JumpForce * touchEnabler.SwipeVerticalValue;
+                if (gameManager.actionLevel.jumpButton.IsHeld || touchEnabler.TurnUpIsPressed)
+                    verticalVelocity.y = JumpForce * 50f;
+                if (touchEnabler.SwipeVerticalValue != 0f)
+                    verticalVelocity.y = JumpForce * touchEnabler.SwipeVerticalValue;
                 isJumping = true;
                 touchEnabler.ResetSwipeVertical();
             }
 
+            
             if (transform.position.y < 0f)
                 StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, 4, transform.position.z)));
 
