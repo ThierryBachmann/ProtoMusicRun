@@ -2338,7 +2338,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkSize: 20
   renderDistance: 5
-  disableObstacles: 0
+  disableObstacles: 1
   levels:
   - enabled: 1
     name: Flat desert
@@ -2642,10 +2642,10 @@ MonoBehaviour:
   knockback: {x: 0, y: 0, z: 0}
   speedMultiplier: 0.5
   initialSpeed: 5
-  turnSpeed: 90
+  turnSpeed: 0.25
   maxAngle: 45
   gravity: 20
-  jumpForce: 10
+  jumpForce: 0.15
   knockbackDecay: 4
   playerName: 
   playerPosition: 99999
@@ -15028,7 +15028,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minSwipeDistanceX: 1
-  minSwipeDistanceY: 200
+  minSwipeDistanceY: 50
+  SwipeHorizontalValue: 0
+  SwipeVerticalValue: 0
 --- !u!4 &1930568709
 Transform:
   m_ObjectHideFlags: 0

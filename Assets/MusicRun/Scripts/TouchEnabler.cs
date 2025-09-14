@@ -3,80 +3,97 @@ using UnityEngine;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
-public class TouchEnabler : MonoBehaviour
+namespace MusicRun
 {
-    public float minSwipeDistanceX = 1f; // pixels
-    public float minSwipeDistanceY = 50f; // pixels
-    public InputSystemAction controls;
-
-    private Vector2 startPos;
-    private bool swipeInProgress = false;
-    private int swipHorizontalDirection;
-    private int swipVerticalDirection;
-
-    void Awake()
+    public class TouchEnabler : MonoBehaviour
     {
-        controls = new InputSystemAction();
-        swipeInProgress = false;
-        swipHorizontalDirection = 0;
-        swipVerticalDirection = 0;
+        public float minSwipeDistanceX = 1f; // pixels
+        public float minSwipeDistanceY = 50f; // pixels
+        public float SwipeHorizontalValue;
+        public float SwipeVerticalValue;
+        public InputSystemAction controls;
 
-    }
-    void OnEnable()
-    {
-        controls.Gameplay.Enable();
-        // Finally, enabled with Window → Analysis → Input Debugger.
-        //    EnhancedTouchSupport.Enable();
-        //    TouchSimulation.Enable();
-    }
+        private Vector2 startPos;
+        private bool swipeInProgress = false;
 
-    void OnDisable()
-    {
-        controls.Gameplay.Disable();
-        EnhancedTouchSupport.Disable();
-    }
-
-    public bool TurnLeftIsPressed => controls.Gameplay.TurnLeft.IsPressed() || swipHorizontalDirection > 0;
-    public bool TurnRightIsPressed => controls.Gameplay.TurnRight.IsPressed() || swipHorizontalDirection < 0;
-    public bool TurnUpIsPressed => controls.Gameplay.Jump.IsPressed() || swipVerticalDirection > 0;
-
-
-    void Update()
-    {
-        foreach (var t in Touch.activeTouches)
+        void Awake()
         {
-            //Debug.Log($"touch id:{t.touchId} pos:{t.screenPosition} phase:{t.phase}");
-            switch (t.phase)
+            controls = new InputSystemAction();
+            swipeInProgress = false;
+            SwipeHorizontalValue = 0;
+            SwipeVerticalValue = 0;
+        }
+
+        void OnEnable()
+        {
+            controls.Gameplay.Enable();
+            // Finally, enabled with Window → Analysis → Input Debugger.
+            //    EnhancedTouchSupport.Enable();
+            //    TouchSimulation.Enable();
+        }
+
+        void OnDisable()
+        {
+            controls.Gameplay.Disable();
+            EnhancedTouchSupport.Disable();
+        }
+
+        public bool TurnLeftIsPressed => controls.Gameplay.TurnLeft.IsPressed() || SwipeHorizontalValue > 0f;
+        public bool TurnRightIsPressed => controls.Gameplay.TurnRight.IsPressed() || SwipeHorizontalValue < 0f;
+        public bool TurnUpIsPressed => controls.Gameplay.Jump.IsPressed() || SwipeVerticalValue > 0;
+
+
+        void Update()
+        {
+            foreach (var t in Touch.activeTouches)
             {
-                case UnityEngine.InputSystem.TouchPhase.Began:
-                    startPos = t.screenPosition;
-                    swipeInProgress = true;
-                    break;
-                case UnityEngine.InputSystem.TouchPhase.Moved:
-                    if (swipeInProgress)
-                    {
-                        Vector2 endPos = t.screenPosition;
-                        Vector2 delta = endPos - startPos;
-
-                        if (delta.magnitude > minSwipeDistanceX)
+                //Debug.Log($"touch id:{t.touchId} pos:{t.screenPosition} phase:{t.phase}");
+                switch (t.phase)
+                {
+                    case UnityEngine.InputSystem.TouchPhase.Began:
+                        startPos = t.screenPosition;
+                        swipeInProgress = true;
+                        break;
+                    case UnityEngine.InputSystem.TouchPhase.Moved:
+                        if (swipeInProgress)
                         {
-                            swipHorizontalDirection = delta.x > 0 ? -1 : 1;
-                            startPos.x = endPos.x;
+                            Vector2 endPos = t.screenPosition;
+                            Vector2 delta = endPos - startPos;
+                            Debug.Log(delta);
+                            if (Mathf.Abs(delta.x) > minSwipeDistanceX)
+                            {
+                                SwipeHorizontalValue = delta.x;
+                                //startPos.x = endPos.x;
+                            }
+                            if (Mathf.Abs(delta.y) > minSwipeDistanceY)
+                            {
+                                SwipeVerticalValue = delta.y;
+                                startPos.y = endPos.y;
+                            }
                         }
-                        if (delta.magnitude > minSwipeDistanceY)
-                        {
-                            swipVerticalDirection = delta.y > 0 ? 1 : -1;
-                            startPos.y = endPos.y;
-                        }
-                    }
-                    break;
+                        break;
 
-                case UnityEngine.InputSystem.TouchPhase.Ended:
-                    swipeInProgress = false;
-                    swipHorizontalDirection = 0;
-                    swipVerticalDirection = 0;
-                    break;
+                    case UnityEngine.InputSystem.TouchPhase.Ended:
+                        swipeInProgress = false;
+                        // The swipe direction maintains theirs values even without move but until the ended.
+                        SwipeHorizontalValue = 0;
+                        SwipeVerticalValue = 0;
+                        break;
+                }
             }
         }
+
+        /// <summary>
+        /// The swipe direction maintains theirs values even without move but until the ended.
+        /// To change this behavior client can reset the swipe.
+        /// Not used, player turn continuously until the gesture end.
+        /// </summary>
+        public void ResetSwipeHorizontal(){ SwipeHorizontalValue = 0; }
+        /// <summary>
+        /// The swipe direction maintains theirs values even without move but until the ended.
+        /// To change this behavior client can reset the swipe.
+        /// Player stops jumping at the first detection.
+        /// </summary>
+        public void ResetSwipeVertical() { SwipeVerticalValue = 0; }
     }
 }

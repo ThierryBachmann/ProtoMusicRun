@@ -36,7 +36,7 @@ namespace MusicRun
 
         [Header("Jump")]
         public float gravity = 12.81f;
-        public float jumpForce;
+        public float jumpForce = 10f;
 
         [Header("Knock‑back")]
         public float knockbackDecay = 4f;
@@ -68,7 +68,7 @@ namespace MusicRun
             terrainGenerator = gameManager.terrainGenerator;
             controller = GetComponent<CharacterController>();
             scoreManager = gameManager.scoreManager;
-            touchEnabler= gameManager.touchEnabler;
+            touchEnabler = gameManager.touchEnabler;
             gameManager.settingScreen.OnSettingChange += OnSettingChange;
             playerName = PlayerPrefs.GetString("player_name");
         }
@@ -243,17 +243,22 @@ namespace MusicRun
         {
             if (gameManager.actionLevel.leftButton.IsHeld || touchEnabler.TurnLeftIsPressed)
             {
-                targetAngle -= turnSpeed * Time.deltaTime;
+                // Swipe value is negative
+                targetAngle += turnSpeed * touchEnabler.SwipeHorizontalValue * Time.deltaTime;
             }
             else if (gameManager.actionLevel.rightButton.IsHeld || touchEnabler.TurnRightIsPressed)
             {
-                targetAngle += turnSpeed * Time.deltaTime;
+                // Swipe value is positive, so same code but for clarity we prefer check direction independently.
+                targetAngle += turnSpeed * touchEnabler.SwipeHorizontalValue * Time.deltaTime;
             }
+
             if (!isJumping && (gameManager.actionLevel.jumpButton.IsHeld || touchEnabler.TurnUpIsPressed))
             {
-                verticalVelocity.y = jumpForce;
+                verticalVelocity.y = jumpForce * touchEnabler.SwipeVerticalValue;
                 isJumping = true;
+                touchEnabler.ResetSwipeVertical();
             }
+
             if (transform.position.y < 0f)
                 StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, 4, transform.position.z)));
 
@@ -278,7 +283,7 @@ namespace MusicRun
             if (knockback.sqrMagnitude > 0.01f)
             {
                 forwardMove += knockback;
-                knockback = Vector3.Lerp(knockback, Vector3.zero, Time.deltaTime * knockbackDecay);
+                knockback = Vector3.Lerp(knockback, Vector3.zero, t: Time.deltaTime * knockbackDecay);
             }
             else
             {
