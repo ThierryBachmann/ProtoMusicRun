@@ -94,7 +94,7 @@ namespace MusicRun
             if (gameManager.infoDebug)
             {
                 //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
-                infoText.text = $"Debug index level:{gameManager.currentLevelIndex} Speed:{player.speedMultiplier:F1} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} FPS:{FramePerSecond} ";
+                infoText.text = $"Debug index level:{gameManager.currentLevelIndex} Speed:{player.Speed:F1} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} FPS:{FramePerSecond} ";
             }
 
             directionButton.transform.localRotation = Quaternion.Euler(0f, 0f, -goalHandler.goalAngle);

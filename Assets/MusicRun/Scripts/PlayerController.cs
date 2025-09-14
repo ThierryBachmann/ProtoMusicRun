@@ -27,16 +27,18 @@ namespace MusicRun
         public Vector3 knockback = Vector3.zero;
 
         [Header("Movement")]
-        public float speedMultiplier;
-        public float initialSpeed;
+        public float MinSpeed;
+        public float MaxSpeed;
+        public float Acceleration = 0.1f;
+        public float Speed;
 
         [Header("Orientation")]
-        public float turnSpeed = 90f;
-        public float maxAngle = 45f;
+        public float TurnSpeed = 0.25f;
+        public float MaxAngle = 45f;
 
         [Header("Jump")]
         public float gravity = 12.81f;
-        public float jumpForce = 10f;
+        public float JumpForce = 0.15f;
 
         [Header("Knock‑back")]
         public float knockbackDecay = 4f;
@@ -78,65 +80,6 @@ namespace MusicRun
             gameManager.settingScreen.SetValue();
         }
 
-        //private void OnEnable()
-        //{
-        //    controls.Gameplay.Enable();
-        //    controls.Gameplay.Swipe.performed += OnSwipe;
-        //    controls.Gameplay.Swipe.started += Swipe_started;
-        //    controls.Gameplay.TurnLeft.performed += (cb) => { Debug.Log($"TurnLeft.performed {controls.Gameplay.TurnLeft.IsPressed()}"); };
-        //    controls.Gameplay.TurnLeft.canceled += (cb) => { Debug.Log("TurnLeft.canceled"); };
-        //    controls.Gameplay.TurnRight.performed += (cb) => { Debug.Log("TurnRight.performed"); };
-        //    controls.Gameplay.TurnRight.canceled += (cb) => { Debug.Log("TurnRight.canceled"); };
-        //}
-
-        //public Vector2 startPos;
-        //private void Swipe_started(InputAction.CallbackContext obj)
-        //{
-        //    startPos = controls.Gameplay.Swipe.ReadValue<Vector2>();
-        //    Debug.Log($"Swipe startPos {startPos}");
-        //}
-
-        //private void OnDisable()
-        //{
-        //    controls.Gameplay.Disable();
-        //}
-
-        //private void OnSwipe(InputAction.CallbackContext ctx)
-        //{
-        //    Vector2 currentPos = ctx.ReadValue<Vector2>();
-        //    Debug.Log($"Swipe currentPos {currentPos}");
-
-        //    Vector2 swipe = currentPos - startPos;
-
-        //    if (swipe.magnitude < minSwipeDistance) return;
-
-        //    if (Mathf.Abs(swipe.x) > Mathf.Abs(swipe.y))
-        //    {
-        //        Debug.Log($"Swipe {swipe}");
-
-        //        if (swipe.x > 0)
-        //            TurnRight();
-        //        else
-        //            TurnLeft();
-        //    }
-
-        //    // (Optionnel : reset l’input pour éviter de re-déclencher)
-        //    controls.Gameplay.Swipe.Disable();
-        //    controls.Gameplay.Swipe.Enable();
-        //}
-
-        //private void TurnLeft()
-        //{
-        //    Debug.Log("Tourner à gauche");
-        //    // rotation joueur
-        //}
-
-        //private void TurnRight()
-        //{
-        //    Debug.Log("Tourner à droite");
-        //    // rotation joueur
-        //}
-
         void OnTriggerEnter(Collider other)
         {
             Debug.Log($"PlayerController trigger {other.tag}");
@@ -152,7 +95,7 @@ namespace MusicRun
                     Vector3 kickDir = (other.transform.position - transform.position).normalized;
                     kickDir.y = 0;
                     // Add a forward + upward impulse (like a foot kick)
-                    Vector3 force = kickDir * GetSpeed() * 2f + Vector3.up * 8f;
+                    Vector3 force = kickDir * Speed * 2f + Vector3.up * 8f;
                     rb.AddForce(force, ForceMode.Impulse);
                     rb.useGravity = true;
                     // Optional: add spin
@@ -174,12 +117,12 @@ namespace MusicRun
         {
             ResetPosition();
             timeStartLevel = DateTime.Now;
-            speedMultiplier = 0.5f;
+            Speed = MinSpeed;
         }
 
         public void LevelCompleted()
         {
-            speedMultiplier = 1f;
+            Speed = MinSpeed;
             scoreManager.EndBonus();
             HandleMovement(Vector3.zero);
         }
@@ -191,7 +134,7 @@ namespace MusicRun
 
         public void ResetPosition()
         {
-            speedMultiplier = 0.5f;
+            Speed = MinSpeed;
 
             controller.enabled = false;
             Vector3 previous = transform.position;
@@ -220,8 +163,8 @@ namespace MusicRun
             if (enableMovement && gameManager.levelRunning && !gameManager.goalHandler.goalReached)
             {
                 // Slowly increase speed multiplier until 10 at 0.1 per second
-                speedMultiplier = Mathf.MoveTowards(speedMultiplier, 10f, Time.deltaTime * 0.1f);
-                forwardMove = transform.forward * initialSpeed * speedMultiplier;
+                Speed = Mathf.MoveTowards(Speed, MaxSpeed, Time.deltaTime * Acceleration);
+                forwardMove = transform.forward * Speed;
             }
             HandleInput();
             HandleRotation();
@@ -244,17 +187,17 @@ namespace MusicRun
             if (gameManager.actionLevel.leftButton.IsHeld || touchEnabler.TurnLeftIsPressed)
             {
                 // Swipe value is negative
-                targetAngle += turnSpeed * touchEnabler.SwipeHorizontalValue * Time.deltaTime;
+                targetAngle += TurnSpeed * touchEnabler.SwipeHorizontalValue * Time.deltaTime;
             }
             else if (gameManager.actionLevel.rightButton.IsHeld || touchEnabler.TurnRightIsPressed)
             {
                 // Swipe value is positive, so same code but for clarity we prefer check direction independently.
-                targetAngle += turnSpeed * touchEnabler.SwipeHorizontalValue * Time.deltaTime;
+                targetAngle += TurnSpeed * touchEnabler.SwipeHorizontalValue * Time.deltaTime;
             }
 
             if (!isJumping && (gameManager.actionLevel.jumpButton.IsHeld || touchEnabler.TurnUpIsPressed))
             {
-                verticalVelocity.y = jumpForce * touchEnabler.SwipeVerticalValue;
+                verticalVelocity.y = JumpForce * touchEnabler.SwipeVerticalValue;
                 isJumping = true;
                 touchEnabler.ResetSwipeVertical();
             }
@@ -314,7 +257,5 @@ namespace MusicRun
             if (controller.isGrounded)
                 isJumping = false;
         }
-
-        public float GetSpeed() => initialSpeed * speedMultiplier;
     }
 }

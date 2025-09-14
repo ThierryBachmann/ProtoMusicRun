@@ -47,7 +47,7 @@ namespace MusicRun
             if (gameManager.gameRunning)
             {
                 distanceSlider.value = gameManager.GoalPercentage;
-                distanceText.text = $"{goalHandler.distance:F0} m   {playerController.GetSpeed():N1} m/s";
+                distanceText.text = $"{goalHandler.distance:F0} m   {playerController.Speed:N1} m/s";
 
                 targetColor = scoreManager.CalculateColor();
                 if (currentBackgroundColor != targetColor)

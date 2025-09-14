@@ -242,7 +242,7 @@ namespace MusicRun
             if (gameManager.levelRunning)
             {
                 Level current = gameManager.terrainGenerator.CurrentLevel;
-                float speedMusic = player.speedMultiplier * current.RatioSpeedMusic;
+                float speedMusic = player.Speed * current.RatioSpeedMusic;
                 speedClamp = Mathf.Clamp(speedMusic, current.MinSpeedMusic, current.MaxSpeedMusic);
             }
 

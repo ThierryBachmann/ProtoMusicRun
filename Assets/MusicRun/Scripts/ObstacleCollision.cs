@@ -33,7 +33,7 @@ namespace MusicRun
 
             if (hit.collider.CompareTag("Obstacle"))
             {
-                float applyShake = Mathf.Clamp(player.GetSpeed() / 7f, 0.5f, 3f);
+                float applyShake = Mathf.Clamp(player.Speed / 7f, 0.5f, 3f);
                 //Debug.Log($"obstacle hit by player : {hit.collider.name} {hit.collider.tag} applyShake:{applyShake}");
                 gameManager.scoreManager.EndBonus();
                 if (gameManager.cameraSelected != null)
@@ -47,7 +47,7 @@ namespace MusicRun
                 else
                     Debug.LogWarning("No current camera");
 
-                gameManager.playerController.speedMultiplier = 0.5f;
+                gameManager.playerController.Speed = gameManager.playerController.MinSpeed;
                 gameManager.midiManager.ApplyPitchChannel(0.2f, 500f);
 
                 Vector3 pushDir = Vector3.ProjectOnPlane(hit.normal, Vector3.up);
