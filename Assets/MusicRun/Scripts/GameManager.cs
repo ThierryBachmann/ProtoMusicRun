@@ -11,7 +11,8 @@ namespace MusicRun
         public bool levelRunning;
         public bool levelFailed;
         public bool liteMode;
-        public bool liteModeSetting;
+        public bool liteAutoSetting;
+        public bool liteForceSetting;
         public int currentLevelIndex;
         public int currentLevelNumber;
         public float MusicPercentage;
@@ -22,6 +23,10 @@ namespace MusicRun
         public bool nextLevelAuto;
         public bool infoDebug = false;
         public bool enableShortcutKeys = false;
+        public int FramePerSecond;
+        private float deltaTimeFPS = 0.0f;
+        public int LowerThresholdFPS = 28;
+        public int HysteresisBandFPS = 4;
 
         [Header("GameObject reference")]
         public Camera cameraSkybox;
@@ -83,6 +88,10 @@ namespace MusicRun
         private void OnSettingChange()
         {
             Debug.Log("GameManager OnSettingChange");
+            if (!liteAutoSetting)
+                liteMode = liteForceSetting;
+            else
+                CalculateLiteMode();
             LiteModeApply();
         }
 
@@ -90,7 +99,7 @@ namespace MusicRun
         {
             Debug.Log($"Lite mode: {liteMode}");
 
-            if (liteMode || liteModeSetting)
+            if (liteMode)
             {
                 headerDisplay.LiteModeDisplay(true);
                 terrainGenerator.renderDistance = 1;
@@ -105,7 +114,7 @@ namespace MusicRun
 
         public void SkyApply()
         {
-            if (liteMode || liteModeSetting)
+            if (liteMode)
             {
                 cameraSkybox.enabled = false;
                 cameraSolidColor.enabled = true;
@@ -270,6 +279,38 @@ namespace MusicRun
                     actionLevel.Hide();
                     actionGame.Show();
                     actionGame.SelectActionsToShow();
+                }
+            }
+
+            CalculateFPS();
+            CalculateLiteMode();
+        }
+
+        public void CalculateFPS()
+        {
+            // Exponential moving average for smoother results
+            deltaTimeFPS += (Time.deltaTime - deltaTimeFPS) * 0.01f;
+            FramePerSecond = (int)((1.0f / deltaTimeFPS));
+        }
+        public void CalculateLiteMode()
+        {
+            if (liteAutoSetting)
+            {
+                if (FramePerSecond < LowerThresholdFPS)
+                {
+                    if (!liteMode)
+                    {
+                        liteMode = true;
+                        LiteModeApply();
+                    }
+                }
+                if (FramePerSecond > LowerThresholdFPS + HysteresisBandFPS)
+                {
+                    if (liteMode)
+                    {
+                        liteMode = false;
+                        LiteModeApply();
+                    }
                 }
             }
         }

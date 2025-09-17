@@ -11,14 +11,10 @@ namespace MusicRun
         public TitleItem itemLevel;
         public TitleItem itemScore;
         public TitleItem itemBonus;
-        public int FramePerSecond;
-        public int LowerThresholdFPS = 28;
-        public int HysteresisBandFPS = 4;
         public TextMeshProUGUI infoText;
         public Button quitButton;
         public Button directionButton;
 
-        private float deltaTimeFPS = 0.0f;
         private Color currentTextColor;
         private GameManager gameManager;
         private ScoreManager scoreManager;
@@ -47,9 +43,12 @@ namespace MusicRun
                 Debug.Log("directionButton");
                 Application.OpenURL("https://https://paxstellar.fr/news/");
             });
+
             SetTitle();
+
             if (!gameManager.infoDebug)
                 infoText.gameObject.SetActive(false);
+
             liteModeActivated.gameObject.SetActive(false);
 
         }
@@ -71,30 +70,12 @@ namespace MusicRun
             //scoreText.text = $"{gameManager.leaderboard.GetPlayerName()} Level: {gameManager.currentLevelNumber} Score:{scoreManager.ScoreOverall:N0} Bonus: {scoreManager.ScoreBonus} Speed:{player.GetSpeed():N1}";
 
             //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} dir:{goalHandler.goalDirection:F2} angle:{goalHandler.goalAngle:F2}";
-            
-            // Exponential moving average for smoother results
-            deltaTimeFPS += (Time.deltaTime - deltaTimeFPS) * 0.01f;
-            FramePerSecond = (int)((1.0f / deltaTimeFPS));
-            if (FramePerSecond < LowerThresholdFPS)
-            {
-                if (!gameManager.liteMode)
-                {
-                    gameManager.liteMode = true;
-                    gameManager.LiteModeApply();
-                }
-            }
-            if (FramePerSecond > LowerThresholdFPS + HysteresisBandFPS)
-            {
-                if (gameManager.liteMode)
-                {
-                    gameManager.liteMode = false;
-                    gameManager.LiteModeApply();
-                }
-            }
+
+
             if (gameManager.infoDebug)
             {
                 //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
-                infoText.text = $"Debug index level:{gameManager.currentLevelIndex} Speed:{player.Speed:F1} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} FPS:{FramePerSecond} ";
+                infoText.text = $"Debug index level:{gameManager.currentLevelIndex} Speed:{player.Speed:F1} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} FPS:{gameManager.FramePerSecond} ";
             }
 
             directionButton.transform.localRotation = Quaternion.Euler(0f, 0f, -goalHandler.goalAngle);

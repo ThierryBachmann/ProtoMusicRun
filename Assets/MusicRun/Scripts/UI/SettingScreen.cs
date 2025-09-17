@@ -10,7 +10,8 @@ namespace MusicRun
 
     public class SettingScreen : PanelDisplay
     {
-        public Toggle toggleLiteMode;
+        public Toggle toggleLiteAuto;
+        public Toggle toggleLiteForce;
         public TMP_InputField inputName;
 
         public Action OnSettingChange;
@@ -22,12 +23,20 @@ namespace MusicRun
 
         public new void Start()
         {
-            toggleLiteMode.isOn = gameManager.liteMode;
-            toggleLiteMode.onValueChanged.AddListener(val =>
+            toggleLiteAuto.isOn = gameManager.liteMode;
+            toggleLiteAuto.onValueChanged.AddListener(val =>
             {
-                gameManager.liteModeSetting = toggleLiteMode.isOn;
+                gameManager.liteAutoSetting = toggleLiteAuto.isOn;
                 OnSettingChange.Invoke();
             });
+
+            toggleLiteForce.isOn = gameManager.liteMode;
+            toggleLiteForce.onValueChanged.AddListener(val =>
+            {
+                gameManager.liteForceSetting = toggleLiteForce.isOn;
+                OnSettingChange.Invoke();
+            });
+
             inputName.onValueChanged.AddListener(val =>
             {
                 player.playerName = inputName.text;
@@ -51,7 +60,7 @@ namespace MusicRun
 
         public void SetValue()
         {
-            toggleLiteMode.isOn = gameManager.liteMode;
+            toggleLiteForce.isOn = gameManager.liteMode;
             inputName.SetTextWithoutNotify(player.playerName);
         }
         private string GeneratePlayerName()

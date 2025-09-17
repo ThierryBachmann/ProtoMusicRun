@@ -70,6 +70,7 @@ namespace MusicRun
             // If no saved auth, authenticate anonymously
             if (!isAuthenticated)
             {
+                Debug.Log("Local user id not found");
                 StartCoroutine(AuthenticateAnonymously());
             }
             else
@@ -79,7 +80,7 @@ namespace MusicRun
 
         public IEnumerator AuthenticateAnonymously()
         {
-            Debug.Log($"AuthenticateAnonymously");
+            Debug.Log($"AuthenticateAnonymously, create a user id");
 
             FirebaseKey key = new FirebaseKey();
 
@@ -158,9 +159,6 @@ namespace MusicRun
             }
             Debug.Log($"LoadSavedAuth User ID: {userId} {isAuthenticated}");
         }
-
-     
-
 
         //public void SetPlayerName(string newName)
         //{
