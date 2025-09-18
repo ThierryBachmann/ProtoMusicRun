@@ -101,6 +101,7 @@
     <Compile Include="Assets\MidiPlayer\Demo\FreeDemos\Script\TestMidiFilePlayerMulti\SavWav.cs" />
     <Compile Include="Assets\MidiPlayer\Demo\Water\Water\Scripts\SpecularLighting.cs" />
     <Compile Include="Assets\MidiPlayer\Demo\FreeMVP\LoadMidiAndPlay.cs" />
+    <Compile Include="Assets\MidiPlayer\Demo\ConvertToUnity6\HelperConvert.cs" />
     <Compile Include="Assets\MidiPlayer\Demo\FreeDemos\Script\ExternalComponents\FlyingCamera.cs" />
     <Compile Include="Assets\MidiPlayer\Demo\Water\Water\Scripts\WaterBase.cs" />
     <Compile Include="Assets\MidiPlayer\Demo\FreeDemos\Script\TestMidiFileLoad.cs" />

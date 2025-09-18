@@ -5,6 +5,7 @@ using UnityEngine;
 using System;
 using MidiPlayerTK;
 using UnityEditor;
+using System.Threading;
 
 namespace DemoMPTK
 {
@@ -564,67 +565,60 @@ namespace DemoMPTK
 
         void OnGUI()
         {
-            try
-            {
-                if (myStyle == null) { myStyle = new CustomStyle(); HelperDemo.myStyle = myStyle; }
+            if (myStyle == null) { myStyle = new CustomStyle(); HelperDemo.myStyle = myStyle; }
 
-                if (midiFilePlayer != null)
+            if (midiFilePlayer != null)
+            {
+                scale = HelperDemo.GUIScale();
+                widthScaledLeftPanel = widthLeftPanel;/// scale.x;
+                widthGUI = (ViewerEnabled ? widthScaledLeftPanel : Screen.width / scale.x);
+                // +25 to avoid useless HScroll
+                scrollerWindow = GUILayout.BeginScrollView(scrollerWindow, false, false, GUILayout.Width(widthGUI + 25), GUILayout.Height(Screen.height / scale.y));
+
+                //goViewer.transform.position = new Vector3(widthLeftPanel, goViewer.transform.position.y, goViewer.transform.position.z);
+
+                HelperDemo.GUI_Horizontal(HelperDemo.Zone.INIT);
+                HelperDemo.GUI_Vertical(HelperDemo.Zone.INIT);
+
+                // Display popup in first to avoid activate other layout behind
+                PopMidi.Draw(MidiPlayerGlobal.MPTK_ListMidi, midiFilePlayer.MPTK_MidiIndex, myStyle);
+                MainMenu.Display("Test MIDI File Player Scripting - Demonstrate how to use the MPTK API to Play Midi", myStyle, widthGUI,
+                    "https://paxstellar.fr/midi-file-player-detailed-view-2/");
+                GUISelectSoundFont.Display(scrollerWindow, myStyle, widthGUI);
+
+                HelperDemo.GUI_Horizontal(HelperDemo.Zone.BEGIN, myStyle.BacgDemosMedium, GUILayout.Width(widthGUI));
+                GUILayout.Label($"Select a MIDI file:", myStyle.TitleLabel3, GUILayout.Width(80));
+                // Open the popup to select a midi
+                if (GUILayout.Button($"{midiFilePlayer.MPTK_MidiIndex} - '{midiFilePlayer.MPTK_MidiName}'", GUILayout.Height(40), GUILayout.Width(300)))
+                    PopMidi.Show = !PopMidi.Show;
+                if (Application.isEditor)
                 {
-                    scale = HelperDemo.GUIScale();
-                    widthScaledLeftPanel = widthLeftPanel;/// scale.x;
-                    widthGUI = (ViewerEnabled ? widthScaledLeftPanel : Screen.width / scale.x);
-                    // +25 to avoid useless HScroll
-                    scrollerWindow = GUILayout.BeginScrollView(scrollerWindow, false, false, GUILayout.Width(widthGUI + 25), GUILayout.Height(Screen.height / scale.y));
-
-                    //goViewer.transform.position = new Vector3(widthLeftPanel, goViewer.transform.position.y, goViewer.transform.position.z);
-
-                    HelperDemo.GUI_Horizontal(HelperDemo.Zone.INIT);
-                    HelperDemo.GUI_Vertical(HelperDemo.Zone.INIT);
-
-                    // Display popup in first to avoid activate other layout behind
-                    PopMidi.Draw(MidiPlayerGlobal.MPTK_ListMidi, midiFilePlayer.MPTK_MidiIndex, myStyle);
-                    MainMenu.Display("Test MIDI File Player Scripting - Demonstrate how to use the MPTK API to Play Midi", myStyle, widthGUI,
-                        "https://paxstellar.fr/midi-file-player-detailed-view-2/");
-                    GUISelectSoundFont.Display(scrollerWindow, myStyle, widthGUI);
-
-                    HelperDemo.GUI_Horizontal(HelperDemo.Zone.BEGIN, myStyle.BacgDemosMedium, GUILayout.Width(widthGUI));
-                    GUILayout.Label($"Select a MIDI file:", myStyle.TitleLabel3, GUILayout.Width(80));
-                    // Open the popup to select a midi
-                    if (GUILayout.Button($"{midiFilePlayer.MPTK_MidiIndex} - '{midiFilePlayer.MPTK_MidiName}'", GUILayout.Height(40), GUILayout.Width(300)))
-                        PopMidi.Show = !PopMidi.Show;
-                    if (Application.isEditor)
-                    {
-                        GUILayout.Space(10);
-                        GUILayout.Label("This demo is built with IMGUI, unfortunately the garbage collector causes wait times in editor mode.\nSolved by building with IL2CPP.", myStyle.TitleLabel3);
-                    }
-                    HelperDemo.GUI_Horizontal(HelperDemo.Zone.END);
-
-                    HelperDemo.GUI_Horizontal(HelperDemo.Zone.BEGIN); // for left/right panel
-
-                    // Midi action
-                    OnGUI_LeftPanel();
-
-                    // Display information about the MIDI
-                    if (!ViewerEnabled)
-                        OnGUI_RightPanel();
-
-                    HelperDemo.GUI_Horizontal(HelperDemo.Zone.END); // for left/right panel
-
-                    if (Application.isEditor)
-                    {
-                        HelperDemo.GUI_Horizontal(HelperDemo.Zone.BEGIN, myStyle.BacgDemosLight);
-                        GUILayout.Label("Go to your Hierarchy, select GameObject MidiFilePlayer: inspector contains a lot of parameters to control the sound.", myStyle.TitleLabel2);
-                        HelperDemo.GUI_Horizontal(HelperDemo.Zone.END);
-                    }
-
-                    HelperDemo.GUI_Horizontal(HelperDemo.Zone.CLEAN);
-                    HelperDemo.GUI_Vertical(HelperDemo.Zone.CLEAN);
-                    GUILayout.EndScrollView();
+                    GUILayout.Space(10);
+                    GUILayout.Label("This demo is built with IMGUI, unfortunately the garbage collector causes wait times in editor mode.\nSolved by building with IL2CPP.", myStyle.TitleLabel3);
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"Error  {ex}");
+                HelperDemo.GUI_Horizontal(HelperDemo.Zone.END);
+
+                HelperDemo.GUI_Horizontal(HelperDemo.Zone.BEGIN); // for left/right panel
+
+                // Midi action
+                OnGUI_LeftPanel();
+
+                // Display information about the MIDI
+                if (!ViewerEnabled)
+                    OnGUI_RightPanel();
+
+                HelperDemo.GUI_Horizontal(HelperDemo.Zone.END); // for left/right panel
+
+                if (Application.isEditor)
+                {
+                    HelperDemo.GUI_Horizontal(HelperDemo.Zone.BEGIN, myStyle.BacgDemosLight);
+                    GUILayout.Label("Go to your Hierarchy, select GameObject MidiFilePlayer: inspector contains a lot of parameters to control the sound.", myStyle.TitleLabel2);
+                    HelperDemo.GUI_Horizontal(HelperDemo.Zone.END);
+                }
+
+                HelperDemo.GUI_Horizontal(HelperDemo.Zone.CLEAN);
+                HelperDemo.GUI_Vertical(HelperDemo.Zone.CLEAN);
+                GUILayout.EndScrollView();
             }
         }
 
@@ -692,7 +686,7 @@ namespace DemoMPTK
 #if MPTK_PRO
                     HelperDemo.GUI_EffectUnity(widthIndent, midiFilePlayer.MPTK_EffectUnity);
 #else
-                    HelperDemo.GUI_EffectUnity(widthIndent);
+                HelperDemo.GUI_EffectUnity(widthIndent);
 #endif
             }
 
@@ -1262,27 +1256,7 @@ namespace DemoMPTK
                 float currentVolume = midiFilePlayer.MPTK_Channels[channel].Volume;
                 float volume = HelperDemo.GUI_Slider(null, currentVolume, 0f, 1f, alignCaptionRight: true, enableButton: false, widthCaption: -1, widthSlider: 100, widthLabelValue: 40);
                 if (volume != currentVolume)
-                {
                     midiFilePlayer.MPTK_Channels[channel].Volume = volume;
-
-                    int volume_msb = (int)Mathf.Lerp(0,127,volume);
-                    midiFilePlayer.MPTK_PlayDirectEvent(new MPTKEvent()
-                    {
-                        Command = MPTKCommand.ControlChange,
-                        Controller = MPTKController.VOLUME_MSB,
-                        Value = volume_msb,
-                        Channel = channel
-                    });
-                    Debug.Log($"{volume:F2} {volume_msb:F0}");
-
-                    //float attenuation = -200f * (float)Math.Log10(volume);
-                    //Debug.Log($"{volume:F2} {attenuation:F0}");
-                    //midiFilePlayer.ActiveVoices.ForEach(v => 
-                    //{ 
-                    //    if (v.channel.Channel == channel)
-                    //        v.attenuation = attenuation; 
-                    //});
-                }
 
                 //! [ExampleUsingChannelAPI_5]
 

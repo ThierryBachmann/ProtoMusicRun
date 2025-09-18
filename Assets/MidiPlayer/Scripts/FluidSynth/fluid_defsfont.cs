@@ -39,7 +39,7 @@ namespace MidiPlayerTK
             fluid_voice voice;
             List<HiMod> mod_list = new List<HiMod>();
 
-            // v2.15 - restaure initial value before transpose
+            // v2.15 - restaure intial value before transpose
             if (MPTK_Transpose != 0 && note.Channel != MPTK_TransExcludedChannel)
                 note.TransposeValue(MPTK_Transpose);
 
@@ -303,7 +303,7 @@ namespace MidiPlayerTK
                                     sLogSampleUse.Clear();
                                     sLogSampleUse.Append($"Channel:{note.Channel:00} Bank:{Channels[note.Channel].BankNum:000} Preset:{Channels[note.Channel].PresetNum:000} ");
                                     sLogSampleUse.Append($"{defpreset.Name,-21} Key:{note.Value,-3}({HelperNoteLabel.LabelFromMidi(note.Value),-3}) ");
-                                    sLogSampleUse.Append($"Transp.:{(note.notTransposedValue == -1 ? 0 : note.Value - note.notTransposedValue),-3} ");
+                                    sLogSampleUse.Append($"Transp.:{(note.OriginalValue == -1 ? 0 : note.Value - note.OriginalValue),-3} ");
                                     sLogSampleUse.Append($"Vel.:{note.Velocity,-3} ");
                                     sLogSampleUse.Append(note.Duration >= 0 ? $"Duration:{note.Duration,6} ms {voice.DurationTick,9} ticks " : "Inf.  ");
                                     sLogSampleUse.Append($"Instr:{inst.Name,-21} Sample:{soundFont.HiSf.Samples[voice_zone.Index].Name,-21} ");

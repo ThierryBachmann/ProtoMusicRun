@@ -238,7 +238,7 @@ namespace MidiPlayerTK
                 {
                     if (!midiPlayerLib.MidiPlayer.MPTK_CorePlayer)
                     {
-                        EditorUtility.DisplayDialog("MIDI Player ", "Can't play a MIDI in non core mode. WebGL build enabled?", "Ok");
+                        EditorUtility.DisplayDialog("MIDI Player ", "Can't play MIDI in non core mode. WebGL build enabled?", "Ok");
                     }
                     else
                     {

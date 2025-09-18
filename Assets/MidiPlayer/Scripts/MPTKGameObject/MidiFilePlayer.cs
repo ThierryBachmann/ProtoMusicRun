@@ -1586,15 +1586,15 @@ namespace MidiPlayerTK
                     midiLoaded.MPTK_EnableChangeTempo = MPTK_EnableChangeTempo;
                     midiLoaded.endPlayAtLastNote = MPTK_StopPlayOnLastNote;
 
-                    //if (MPTK_Spatialize)
-                    //{
-                    //    distanceToListener = MidiPlayerGlobal.MPTK_DistanceToListener(this.transform);
-                    //    if (distanceToListener > MPTK_MaxDistance)
-                    //    {
-                    //        yield return -1;
-                    //        continue;
-                    //    }
-                    //}
+                    if (MPTK_Spatialize)
+                    {
+                        distanceToListener = MidiPlayerGlobal.MPTK_DistanceToListener(this.transform);
+                        if (distanceToListener > MPTK_MaxDistance && MPTK_PauseOnMaxDistance)
+                        {
+                            yield return -1;
+                            continue;
+                        }
+                    }
 
                     if (playPause)
                     {
@@ -1889,25 +1889,21 @@ namespace MidiPlayerTK
                         if (MPTK_Spatialize)
                         {
                             distanceToListener = MidiPlayerGlobal.MPTK_DistanceToListener(this.transform);
-                            bool pause = distanceToListener > MPTK_MaxDistance ? true : false;
+                            bool pause = distanceToListener > MPTK_MaxDistance;
                             if (pause != distancePause)
                             {
-                                distancePause = pause;
-                                if (distancePause)
+                                if (MPTK_PauseOnMaxDistance)
                                 {
-                                    watchMidi.Stop();
+                                    distancePause = pause;
+                                    if (distancePause)
+                                    {
+                                        watchMidi.Stop();
+                                    }
+                                    else
+                                        watchMidi.Start();
                                 }
-                                else
-                                    watchMidi.Start();
                             }
-                            //if (distanceToListener > MPTK_MaxDistance)
-                            //    MPTK_Pause();
-                            //else if (playPause)
-                            //{
-                            //    MPTK_UnPause();
-                            //}
                         }
-
 
 
                         if (needDelayToStart && delayRampUpSecond > 0f)
