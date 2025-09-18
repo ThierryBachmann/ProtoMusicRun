@@ -6,6 +6,11 @@ using UnityEngine;
 
 namespace MusicRun
 {
+    /// <summary>
+    /// Create music jingles. Works like macro over MIDI to build short MIDI sequence.
+    /// MIDI sequences are defined in the inspector and play by the game on scenario events.
+    /// Not used here.
+    /// </summary>
     public class SoundManager : MonoBehaviour
     {
 
@@ -36,6 +41,7 @@ namespace MusicRun
             StartCoroutine(PlaySoundCoroutine("Collision"));
         }
 
+        /* no need to dynamically rebuild jingles. They are all defined at start
         private float timeInterval = 0.5f; // Time interval in seconds
         private float timer = 0.0f;
         public void Update()
@@ -54,6 +60,8 @@ namespace MusicRun
                 timer = 0.0f;
             }
         }
+        */
+
         public IEnumerator PlaySoundCoroutine(string name)
         {
             List<SoundEvent> sounds;

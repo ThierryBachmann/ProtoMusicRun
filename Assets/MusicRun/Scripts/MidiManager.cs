@@ -37,9 +37,20 @@ namespace MusicRun
                 return;
             player = gameManager.playerController;
             goalHandler = gameManager.goalHandler;
+
+            // Some MIDIs have delay before starting playing music and extra time at the last note.
+            // Avoid this with this configuration.
             midiPlayer.MPTK_StartPlayAtFirstNote = true;
             midiPlayer.MPTK_StopPlayOnLastNote = true;
+
+            // When the MIDI reach the end, it's a signal to stop the level. 
             midiPlayer.MPTK_MidiAutoRestart = false;
+
+            // Continue plyaying when the player (which holds the AudioListener) is to far to the AudioSource (holds by the MidiPlayer at the goal).
+            // The volume sound will be zero but the MIDI sequencer is not pause. Maestro MPTK 2.16.1.
+            // Note: distance is defined for each scene with MPTK_MaxDistance see UpdateMaxDistanceMPTK()
+            midiPlayer.MPTK_PauseOnMaxDistance = false; midiPlayer.MPTK_MaxDistance = 0;
+
             midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
             {
                 // Start of the MIDI playback has been triggered.
@@ -153,9 +164,9 @@ namespace MusicRun
 
             // Change pitch (automatic return to center as a physical keyboard!)
             // Gift from MPTK Pro! See MPTK_PlayPitchWheelChange.
-            // 0 is the lowest bend positions(default is 2 semitones), 
-            // 0.5 centered value, the sounding notes aren't being transposed up or down,
-            // 1 is the highest pitch bend position (default is 2 semitones)
+            //   0       the lowest bend positions(default is 2 semitones), 
+            //   0.5     centered value, the sounding notes aren't being transposed up or down,
+            //   1       highest pitch bend position (default is 2 semitones)
 
             float pitch = 0.5f; // centered value
             float waitMillisecond = 100f; // Wait between each pitch change
@@ -189,7 +200,7 @@ namespace MusicRun
                 yield return Routine.WaitForSeconds(waitMillisecond / 1000f);
             }
 
-            // Restaure pitch original
+            // Restore pitch original
             for (int channel = 0; channel < 16; channel++)
             {
                 MPTKEvent mptkEvent = new MPTKEvent()
@@ -205,18 +216,18 @@ namespace MusicRun
         {
             if (pitchFactor < 0.2f || pitchFactor >= 2f)
             {
-                Debug.LogWarning($"ApplyPitchAudiosource - pitchFactor {pitchFactor} is incorrect, must be between 0.2 and 2");
+                Debug.LogWarning($"ApplyPitchAudioSource - pitchFactor {pitchFactor} is incorrect, must be between 0.2 and 2");
                 return;
             }
             if (durationMilli < 10f || durationMilli >= 100000f)
             {
-                Debug.LogWarning($"ApplyPitchAudiosource - durationMilli {durationMilli} is incorrect, must be between 10f and 10000f");
+                Debug.LogWarning($"ApplyPitchAudioSource - durationMilli {durationMilli} is incorrect, must be between 10f and 10000f");
                 return;
             }
-            StartCoroutine(PitchAudiosourceRoutine(pitchFactor, durationMilli));
+            StartCoroutine(PitchAudioSourceRoutine(pitchFactor, durationMilli));
         }
 
-        private IEnumerator PitchAudiosourceRoutine(float pitchFactor, float durationMilli)
+        private IEnumerator PitchAudioSourceRoutine(float pitchFactor, float durationMilli)
         {
             float duration = (durationMilli / 1000f) / 10f;
             Debug.Log($"PitchRoutine {pitchFactor} {duration} * 10 sec.");
@@ -241,12 +252,13 @@ namespace MusicRun
             // Calculate music speed from the player speed
             if (gameManager.levelRunning)
             {
+                // Min and max music speed are defined by level
                 Level current = gameManager.terrainGenerator.CurrentLevel;
                 float speedMusic = player.Speed * current.RatioSpeedMusic;
                 speedClamp = Mathf.Clamp(speedMusic, current.MinSpeedMusic, current.MaxSpeedMusic);
             }
 
-            // Avoid changing speed at each frame
+            // Avoid changing speed at each frame but every 100 ms
             if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speedClamp) > 0.1f)
             {
                 //Debug.Log($"MidiPlayer - player.speedMultiplier: {player.speedMultiplier} music speed {speedClamp}");
