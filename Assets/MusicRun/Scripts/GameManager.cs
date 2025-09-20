@@ -39,7 +39,6 @@ namespace MusicRun
         public HeaderDisplay headerDisplay;
         public LeaderboardDisplay leaderboardDisplay;
         public PlayerController playerController;
-        public SoundManager soundManager;
         public ActionGameDisplay actionGame;
         public ActionLevelDisplay actionLevel;
         public GoalReachedDisplay goalReachedDisplay;

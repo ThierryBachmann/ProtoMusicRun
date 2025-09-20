@@ -1,5 +1,6 @@
 ﻿using MusicRun;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
@@ -12,6 +13,9 @@ namespace MusicRun
         public float SwipeHorizontalValue;
         public float SwipeVerticalValue;
         public InputSystemAction controls;
+        public bool TurnLeftIsPressed => controls.Gameplay.TurnLeft.IsPressed();
+        public bool TurnRightIsPressed => controls.Gameplay.TurnRight.IsPressed();
+        public bool TurnUpIsPressed => controls.Gameplay.Jump.IsPressed();
 
         private Vector2 startPos;
         private bool swipeInProgress = false;
@@ -30,6 +34,7 @@ namespace MusicRun
             // Finally, enabled with Window → Analysis → Input Debugger.
             //    EnhancedTouchSupport.Enable();
             //    TouchSimulation.Enable();
+    //        controls.Gameplay.Start.performed += OnStartPressed;
         }
 
         void OnDisable()
@@ -38,10 +43,7 @@ namespace MusicRun
             EnhancedTouchSupport.Disable();
         }
 
-        public bool TurnLeftIsPressed => controls.Gameplay.TurnLeft.IsPressed();
-        public bool TurnRightIsPressed => controls.Gameplay.TurnRight.IsPressed();
-        public bool TurnUpIsPressed => controls.Gameplay.Jump.IsPressed();
-
+     
 
         void Update()
         {

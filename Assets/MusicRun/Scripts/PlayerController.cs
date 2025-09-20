@@ -78,6 +78,12 @@ namespace MusicRun
         void Start()
         {
             gameManager.settingScreen.SetValue();
+            touchEnabler.controls.Gameplay.Start.performed += OnStartPressed;
+        }
+
+        private void OnStartPressed(InputAction.CallbackContext context)
+        {
+            gameManager.RestartGame(); // NextLevel();
         }
 
         void OnTriggerEnter(Collider other)
