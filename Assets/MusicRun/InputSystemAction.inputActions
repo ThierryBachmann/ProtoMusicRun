@@ -90,6 +90,17 @@
                 },
                 {
                     "name": "",
+                    "id": "eacbb477-6bf0-45e0-a0ae-455dc42978e3",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TurnRight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "257d42d6-7096-4c71-8f8c-85eaef477bec",
                     "path": "<Keyboard>/leftArrow",
                     "interactions": "",
@@ -125,6 +136,17 @@
                     "name": "",
                     "id": "497fae2b-95fa-4ce3-b089-cb034d84a04a",
                     "path": "<Gamepad>/leftStick/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TurnLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bc8d534d-a9f8-482b-9845-c64d12d04712",
+                    "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

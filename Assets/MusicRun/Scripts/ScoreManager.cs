@@ -30,7 +30,6 @@
 //}
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace MusicRun
 {
@@ -46,15 +45,9 @@ namespace MusicRun
         public int ScoreGoal;
         public int ScoreOverall;
         public int ScoreBonus;
-        public float bonusInProgress;
-        public DateTime startBonusDateTime;
-        public bool startBonus;
-        public float durationBonus = 5f;
-        public float valueBonus = 20f;
 
         private GameManager gameManager;
         private PlayerController player;
-        private MidiManager midiManager;
 
         private void Awake()
         {
@@ -62,50 +55,6 @@ namespace MusicRun
             if (gameManager == null)
                 return;
             player = gameManager.playerController;
-            midiManager = gameManager.midiManager;
-        }
-        void Start()
-        {
-            startBonusDateTime = DateTime.MaxValue;
-            bonusInProgress = 0;
-            startBonus = false;
-        }
-        void Update()
-        {
-            if (startBonus)
-            {
-                // increse bonus each delta time 
-                bonusInProgress = ((float)(DateTime.Now - startBonusDateTime).TotalMilliseconds / 1000f * valueBonus) / durationBonus;
-                if ((DateTime.Now - startBonusDateTime).TotalMilliseconds > durationBonus * 1000f)
-                {
-                    EndBonus();
-                }
-            }
-        }
-        public void StartBonus()
-        {
-            Debug.Log("Start bonus Trans");
-            EndBonus();
-            midiManager.TransposeSet(6);
-            startBonusDateTime = DateTime.Now;
-            startBonus = true;
-        }
-
-        public void EndBonus()
-        {
-            if (startBonus)
-            {
-                Debug.Log("End bonus Trans");
-
-                startBonus = false;
-                midiManager.TransposeClear();
-
-                if (bonusInProgress > 0f)
-                {
-                    ScoreBonus += Mathf.RoundToInt(bonusInProgress);
-                    bonusInProgress = 0f;
-                }
-            }
         }
 
         public void CalculateScoreLevel(float musicProgress, float distanceProgress)

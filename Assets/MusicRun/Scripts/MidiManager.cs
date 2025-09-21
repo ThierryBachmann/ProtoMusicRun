@@ -136,6 +136,12 @@ namespace MusicRun
         {
             midiPlayer.MPTK_Transpose = transpose;
         }
+
+        public void TransposeAdd(int transpose)
+        {
+            midiPlayer.MPTK_Transpose += transpose;
+        }
+
         public void TransposeClear()
         {
             midiPlayer.MPTK_Transpose = 0;

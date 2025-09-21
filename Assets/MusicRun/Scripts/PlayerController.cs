@@ -92,7 +92,7 @@ namespace MusicRun
             if (other.CompareTag("Bonus"))
             {
                 // Bonus is managed by the ScoreManager
-                scoreManager.StartBonus();
+                gameManager.bonusManager.StartBonus();
 
                 Rigidbody rb = other.attachedRigidbody;
                 if (rb != null)
@@ -129,7 +129,7 @@ namespace MusicRun
         public void LevelCompleted()
         {
             Speed = MinSpeed;
-            scoreManager.EndBonus();
+            gameManager.bonusManager.EndBonus();
             HandleMovement(Vector3.zero);
         }
 

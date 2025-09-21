@@ -18,6 +18,7 @@ namespace MusicRun
         private Color currentTextColor;
         private GameManager gameManager;
         private ScoreManager scoreManager;
+        private BonusManager bonusManager;
         private PlayerController player;
         private GoalHandler goalHandler;
 
@@ -27,6 +28,7 @@ namespace MusicRun
             if (gameManager == null)
                 return;
             scoreManager = gameManager.scoreManager;
+            bonusManager = gameManager.bonusManager;
             player = gameManager.playerController;
             goalHandler = gameManager.goalHandler;
         }
@@ -86,8 +88,8 @@ namespace MusicRun
                 float score = scoreManager.CalculateScoreGoal(gameManager.MusicPercentage, gameManager.GoalPercentage);
                 itemLevel.SetValue(gameManager.currentLevelNumber.ToString());
                 itemScore.SetValue(score.ToString());
-                itemBonus.SetValue((scoreManager.ScoreBonus + (int)scoreManager.bonusInProgress).ToString());
-                if (scoreManager.startBonus)
+                itemBonus.SetValue((scoreManager.ScoreBonus + (int)bonusManager.bonusInProgress).ToString());
+                if (bonusManager.startBonus)
                     itemBonus.SetColor(Utilities.ColorWarning);
                 else
                     itemBonus.ResetColor();

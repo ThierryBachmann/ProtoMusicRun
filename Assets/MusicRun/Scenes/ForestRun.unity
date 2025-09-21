@@ -1841,11 +1841,11 @@ MonoBehaviour:
   cameraSelected: {fileID: 0}
   goalHandler: {fileID: 283134993}
   leaderboard: {fileID: 1489650625}
-  scoreManager: {fileID: 211374106}
+  scoreManager: {fileID: 211374108}
+  bonusManager: {fileID: 211374109}
   headerDisplay: {fileID: 1611664822}
   leaderboardDisplay: {fileID: 973761168}
   playerController: {fileID: 256923874}
-  soundManager: {fileID: 1870609031}
   actionGame: {fileID: 1397310892}
   actionLevel: {fileID: 105468824}
   goalReachedDisplay: {fileID: 283134996}
@@ -1890,34 +1890,15 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 211374107}
-  - component: {fileID: 211374106}
+  - component: {fileID: 211374109}
+  - component: {fileID: 211374108}
   m_Layer: 0
-  m_Name: ScoreManager
+  m_Name: Score & Bonus Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &211374106
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 211374105}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d2f66e51ada3a646ab97e2a228955b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ScoreLevel: 0
-  ScoreGoal: 0
-  ScoreOverall: 0
-  ScoreBonus: 0
-  bonusInProgress: 0
-  startBonus: 0
-  durationBonus: 3
-  valueBonus: 10
 --- !u!4 &211374107
 Transform:
   m_ObjectHideFlags: 0
@@ -1933,6 +1914,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &211374108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211374105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c181b38a21936674795935a621275813, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScoreLevel: 0
+  ScoreGoal: 0
+  ScoreOverall: 0
+  ScoreBonus: 0
+--- !u!114 &211374109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211374105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d2f66e51ada3a646ab97e2a228955b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bonusInProgress: 0
+  startBonus: 0
+  durationBonus: 5
+  valueBonus: 20
 --- !u!114 &219239741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2352,10 +2365,10 @@ MonoBehaviour:
     description: 
     indexMIDI: 3
     Skybox: {fileID: 327158888}
-    RatioSpeedMusic: 0.7
-    MinSpeedMusic: 0.5
-    MaxSpeedMusic: 2.41
-    deltaCurrentChunk: {x: 0, y: 13}
+    RatioSpeedMusic: 0.6
+    MinSpeedMusic: 0.4
+    MaxSpeedMusic: 1.3
+    deltaCurrentChunk: {x: 0, y: 6}
     startGO: {fileID: 182037368}
     goalGO: {fileID: 283134987}
     perlinVegetable: 0.3
@@ -2366,7 +2379,7 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
     - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
     vegetables: []
-    BonusCount: 0.4
+    BonusCount: 1
     runBonus:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
   - enabled: 1

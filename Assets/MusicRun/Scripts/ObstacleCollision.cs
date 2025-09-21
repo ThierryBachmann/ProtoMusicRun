@@ -35,7 +35,7 @@ namespace MusicRun
             {
                 float applyShake = Mathf.Clamp(player.Speed / 7f, 0.5f, 3f);
                 //Debug.Log($"obstacle hit by player : {hit.collider.name} {hit.collider.tag} applyShake:{applyShake}");
-                gameManager.scoreManager.EndBonus();
+                gameManager.bonusManager.EndBonus(); 
                 if (gameManager.cameraSelected != null)
                 {
                     CameraShake cameraShake = gameManager.cameraSelected.GetComponent<CameraShake>();

@@ -36,6 +36,7 @@ namespace MusicRun
         public GoalHandler goalHandler;
         public FirebaseLeaderboard leaderboard;
         public ScoreManager scoreManager;
+        public BonusManager bonusManager;
         public HeaderDisplay headerDisplay;
         public LeaderboardDisplay leaderboardDisplay;
         public PlayerController playerController;
