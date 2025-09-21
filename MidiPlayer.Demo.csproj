@@ -10,7 +10,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{FEB2C7A4-2C33-37FC-535C-0CDBA2F8F786}</ProjectGuid>
+    <ProjectGuid>{617314BA-81DA-97F6-8EC0-76AB21118E95}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>MidiPlayer.Demo</AssemblyName>
@@ -1140,7 +1140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="MidiPlayer.Run.csproj">
-      <Project>{6BCFFE97-234F-A283-7C99-FA8217327784}</Project>
+      <Project>{B15E2397-A74C-4675-6B6A-11719769027A}</Project>
       <Name>MidiPlayer.Run</Name>
     </ProjectReference>
   </ItemGroup>

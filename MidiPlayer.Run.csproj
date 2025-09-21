@@ -10,7 +10,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{6BCFFE97-234F-A283-7C99-FA8217327784}</ProjectGuid>
+    <ProjectGuid>{B15E2397-A74C-4675-6B6A-11719769027A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>MidiPlayer.Run</AssemblyName>
