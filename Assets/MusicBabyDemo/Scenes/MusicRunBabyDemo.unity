@@ -5549,17 +5549,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f1aa4788763f8854c9826e449686c328, type: 3}
---- !u!114 &609628727 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114320350483668748, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-  m_PrefabInstance: {fileID: 609628726}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a10fc17731b73e545b0078250340235c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &609628728 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
@@ -14399,36 +14388,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d4aca7ce325a3d438cf912bb8d586a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MidiSound: {fileID: 609628727}
-  RebuildJingles: 0
-  Jingles:
-  - name: Collision
-    soundEvents:
-    - action: 1
-      value: 60
-      channel: 0
-      duration: 500
-      velocity: 127
-    - action: 1
-      value: 62
-      channel: 0
-      duration: 500
-      velocity: 127
-    - action: 1
-      value: 64
-      channel: 0
-      duration: 500
-      velocity: 127
-    - action: 0
-      value: 0
-      channel: 0
-      duration: 0
-      velocity: 0
-    - action: 1
-      value: 50
-      channel: 0
-      duration: 1000
-      velocity: 127
 --- !u!4 &1870609032
 Transform:
   m_ObjectHideFlags: 0
