@@ -81,7 +81,7 @@ crashlytics-build.properties
 /Assets/KANIYONIKA/
 /Assets/PrimitivesPro/
 /Assets/PrimitivesPro.meta
-/Assets/MusicRun/Scripts/Firebase/FirebaseKeyGitIgnore.cs
-/Assets/MusicRun/Scripts/Firebase/FirebaseKeyGitIgnore.cs.meta
+FirebaseKeyGitIgnore.cs
+FirebaseKeyGitIgnore.cs.meta
 /BuildWebGL/
 /BuildWebGLTest/
