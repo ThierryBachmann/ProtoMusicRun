@@ -5,7 +5,7 @@ namespace MusicRun
     {
         public FirebaseKey()
         {
-            firebaseApiKey = "AIzaSyAjxUwK9iS7IBMhDk1LJ-gRzh7AZCBwIzA";// "AIzaSyADsdund2yX2Cco3v2fWquqGxtgmKWSt5w";
+            firebaseApiKey = "";
             firebaseProjectId = "protorunmusic";
         }
     }
