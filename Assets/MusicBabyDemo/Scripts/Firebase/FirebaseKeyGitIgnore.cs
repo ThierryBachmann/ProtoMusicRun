@@ -6,7 +6,7 @@ namespace MusicRun
         public FirebaseKey()
         {
             firebaseApiKey = "";
-            firebaseProjectId = "";
+            firebaseProjectId = "protorunmusic";
         }
     }
 }

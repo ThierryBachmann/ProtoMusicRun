@@ -76,12 +76,10 @@ crashlytics-build.properties
 /[Aa]ssets/Tutorial/
 /Assets/ResonanceAudio
 /Assets/ResonanceAudio.meta
-/Assets/Scripts/Firebase/FirebaseKeyGitIgnore.cs
-/Assets/Scripts/Firebase/FirebaseKeyGitIgnore.cs.meta
 /Assets/KANIYONIKA/
 /Assets/PrimitivesPro/
 /Assets/PrimitivesPro.meta
-FirebaseKeyGitIgnore.cs
-FirebaseKeyGitIgnore.cs.meta
+*GitIgnore.cs
+*GitIgnore.cs.meta
 /BuildWebGL/
 /BuildWebGLTest/
