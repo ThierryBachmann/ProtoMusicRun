@@ -233,9 +233,13 @@ namespace MusicRun
                         // Generate and place bonus.
                         // When a chunk is re-generated (player return), no bonus are generated.
                         // ---------------------------------------------------------------------
-                        if (currentLevel.runBonus.Length > 0 && currentLevel.BonusCount > 0 && !spawnedBonus.ContainsKey(chunkCoord))
+                        if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusScoreDentity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
                         {
-                            AddBonus(chunkCoord, chunk);
+                            //AddBonusScore(chunkCoord, chunk, currentLevel.bonusScoreDentity, currentLevel.bonusScorePrefab);
+                        }
+                        if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDentity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
+                        {
+                            AddBonusScore(chunkCoord, chunk, currentLevel.bonusInstrumentDentity, currentLevel.bonusInstrumentPrefab);
                         }
                     }
                 }
@@ -295,25 +299,27 @@ namespace MusicRun
                 meshFilter.mesh = mesh;
             }
         }
-        private void AddBonus(Vector2Int chunkCoord, GameObject chunk)
+        // 
+        private void AddBonusScore(Vector2Int chunkCoord, GameObject chunk, float density,GameObject[] prefab)
         {
-            int count = (int)currentLevel.BonusCount;
-            if (currentLevel.BonusCount < 1)
+            int count = 1;
+            if (density < 1)
             {
                 // Special case when count is inferior to 1.
                 // Create 0 or 1 bonus with probality from BonusCount
-                if (UnityEngine.Random.Range(0f, 1f) < currentLevel.BonusCount)
+                if (UnityEngine.Random.Range(0f, 1f) < density)
                     count = 1;
                 else
                     count = 0;
             }
-
+            else
+                count = (int)density;
             // At least one bonus for this chunk
             if (count > 0)
             {
-                for (int i = 0; i < currentLevel.BonusCount; i++)
+                for (int i = 0; i < density; i++)
                 {
-                    GameObject bonusPrefabRandom = currentLevel.runBonus[UnityEngine.Random.Range(0, currentLevel.runBonus.Length)];
+                    GameObject bonusPrefabRandom = prefab[UnityEngine.Random.Range(0, prefab.Length)];
                     GameObject bonus = Instantiate(bonusPrefabRandom);
                     bonus.transform.SetParent(chunk.transform, false);
                     float maxPos = chunkSize / 2f - 0.1f; // -0.1 to avoid border
@@ -530,12 +536,16 @@ namespace MusicRun
     [Serializable]
     public class Level
     {
+        [Header("Whether to use this scene.")]
         public bool enabled;
+        [Header("Title and Description displayed at the scene start.")]
         public string name;
+        [TextArea]
         public string description;
+        [Header("Select a camera with a dedicated skybox for this scene.")]
+        public Camera Skybox;
         [Header("Defined MIDI associated to the level")]
         public int indexMIDI;
-        public Camera Skybox;
 
         [Range(0.1f, 5f)]
         public float RatioSpeedMusic = 0.3f;
@@ -573,9 +583,16 @@ namespace MusicRun
         [Header("Defined Vegetables")]
         public Vegetable[] vegetables;
 
-        [Header("Defined bonus")]
+        [Header("Score Bonus")]
         [Range(0, 10)]
-        public float BonusCount = 1;
-        public GameObject[] runBonus;
+        [Tooltip("Description")]
+        public float bonusScoreDentity = 1;
+        public GameObject[] bonusScorePrefab;
+
+        [Header("Instrument Bonus")]
+        [Range(0, 10)]
+        [Tooltip("Description")]
+        public float bonusInstrumentDentity = 1;
+        public GameObject[] bonusInstrumentPrefab;
     }
 }
