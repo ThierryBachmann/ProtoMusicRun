@@ -50,6 +50,7 @@ namespace MusicRun
         public SettingScreen settingScreen;
         public LevelFailedScreen levelFailedScreen;
         public TouchEnabler touchEnabler;
+        public SceneGoal sceneGoal;
 
         void Awake()
         {
@@ -323,6 +324,7 @@ namespace MusicRun
             levelFailedScreen.Hide();
             levelFailedScreen.Hide();
             leaderboardDisplay.Hide();
+            sceneGoal.Hide();
         }
 
         public IEnumerator ClearAndNextLevel()
@@ -382,6 +384,7 @@ namespace MusicRun
             actionLevel.ActivatePause(false);
             actionLevel.Show();
             HideAllPopups();
+
             if (restartSame)
             {
                 playerController.ResetPosition();
@@ -398,6 +401,10 @@ namespace MusicRun
             gameRunning = true;
             levelRunning = true;
             playerController.LevelStarted();
+            OnSwitchPause(true);
+            sceneGoal.OnClose += (ok) => { OnSwitchPause(false); };
+            sceneGoal.SetInfo(terrainGenerator.CurrentLevel.name, terrainGenerator.CurrentLevel.description);
+            sceneGoal.Show();
         }
 
         public void StopGame()

@@ -17,6 +17,7 @@ namespace MusicRun
 
         protected GameManager gameManager;
         protected PlayerController player;
+        public System.Action<bool> OnClose;
 
         public void Awake()
         {
@@ -71,6 +72,8 @@ namespace MusicRun
 
                 if (clicked != null && clicked.GetComponentInParent<Button>() != null)
                     return;
+                OnClose?.Invoke(true);
+
                 Hide();
             }
         }
