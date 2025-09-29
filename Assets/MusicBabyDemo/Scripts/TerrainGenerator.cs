@@ -202,45 +202,7 @@ namespace MusicRun
                     {
                         //DateTime startCreate= DateTime.Now;
                         chunkCreatedCount++;
-                        // No, add it
-                        Vector3 spawnPos = ChunkToPosition(chunkCoord);
-
-                        // Instantiate a random prefab from the current level's runChunks
-                        GameObject chunkPrefabRandom = currentLevel.runChunks[UnityEngine.Random.Range(0, currentLevel.runChunks.Length)];
-                        GameObject chunk = Instantiate(chunkPrefabRandom, spawnPos, Quaternion.identity);
-                        chunk.name = $"Chunk - Level: {currentIndexLevel} - coord: {chunkCoord.x} {chunkCoord.y}";
-                        //Debug.Log($"Create chunk: {currentIndexLevel} {chunkCoord}  chunk: {chunk.name} prefab: {chunkPrefabRandom.name}");
-
-                        if (currentLevel.vegetables.Length == 0)
-                            PlaceAndScaleExistingVege(chunkCoord, chunk);
-                        else
-                            CreateAndScaleVege(chunkCoord, chunk);
-
-                        spawnedChunks.Add(chunkCoord, chunk);
-
-                        if (disableObstacles) // useful for test mode
-                        {
-                            foreach (Collider col in chunk.GetComponentsInChildren<Collider>())
-                            {
-                                // keeps the GameObject visible, but disables any physical interaction.
-                                // To disable collision detection, we can disable the collider component.
-                                // But add tag "Obstacle" to the collision object associated to the gameobject.
-                                if (col.CompareTag("Obstacle"))
-                                    col.enabled = false;
-                            }
-                        }
-
-                        // Generate and place bonus.
-                        // When a chunk is re-generated (player return), no bonus are generated.
-                        // ---------------------------------------------------------------------
-                        if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusScoreDentity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
-                        {
-                            //AddBonusScore(chunkCoord, chunk, currentLevel.bonusScoreDentity, currentLevel.bonusScorePrefab);
-                        }
-                        if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDentity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
-                        {
-                            AddBonusScore(chunkCoord, chunk, currentLevel.bonusInstrumentDentity, currentLevel.bonusInstrumentPrefab);
-                        }
+                        CreateChunk(chunkCoord);
                     }
                 }
             }
@@ -270,10 +232,54 @@ namespace MusicRun
                 spawnedChunks.Remove(coord);
             }
         }
+        private void CreateChunk(Vector2Int chunkCoord)
+        {
+            // No, add it
+            Vector3 spawnPos = ChunkToPosition(chunkCoord);
 
+            // Instantiate a random prefab from the current level's runChunks
+            GameObject chunkPrefabRandom = currentLevel.runChunks[UnityEngine.Random.Range(0, currentLevel.runChunks.Length)];
+            GameObject chunk = Instantiate(chunkPrefabRandom, spawnPos, Quaternion.identity);
+            chunk.name = $"Chunk - Level: {currentIndexLevel} - coord: {chunkCoord.x} {chunkCoord.y}";
+            //Debug.Log($"Create chunk: {currentIndexLevel} {chunkCoord}  chunk: {chunk.name} prefab: {chunkPrefabRandom.name}");
+
+            if (currentLevel.vegetables.Length == 0)
+                PlaceAndScaleExistingVege(chunkCoord, chunk);
+            else
+                CreateAndScaleVege(chunkCoord, chunk);
+
+            spawnedChunks.Add(chunkCoord, chunk);
+
+            if (disableObstacles) // useful for test mode
+            {
+                foreach (Collider col in chunk.GetComponentsInChildren<Collider>())
+                {
+                    // keeps the GameObject visible, but disables any physical interaction.
+                    // To disable collision detection, we can disable the collider component.
+                    // But add tag "Obstacle" to the collision object associated to the gameobject.
+                    if (col.CompareTag("Obstacle"))
+                        col.enabled = false;
+                }
+            }
+
+            // Generate and place bonus.
+            // When a chunk is re-generated (player return), no bonus are generated.
+            // ---------------------------------------------------------------------
+            if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusScoreDentity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
+            {
+                int count = AddBonusScore(chunkCoord, chunk, currentLevel.bonusScoreDentity, currentLevel.bonusScorePrefab);
+                if (count > 0)
+                    // Just keep a trace of bonus count for this chunk to avoid re-generate if player return
+                    spawnedBonus.Add(chunkCoord, count);
+
+            }
+            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDentity > 0)
+            {
+                AddBonusScore(chunkCoord, chunk, currentLevel.bonusInstrumentDentity, currentLevel.bonusInstrumentPrefab);
+            }
+        }
         public void ModifyChunkMesh(GameObject chunkObject)
         {
-            // Accéder au MeshFilter principal
             MeshFilter meshFilter = chunkObject.GetComponent<MeshFilter>();
 
             if (meshFilter != null && meshFilter.sharedMesh != null)
@@ -300,13 +306,13 @@ namespace MusicRun
             }
         }
         // 
-        private void AddBonusScore(Vector2Int chunkCoord, GameObject chunk, float density,GameObject[] prefab)
+        private int AddBonusScore(Vector2Int chunkCoord, GameObject chunk, float density, GameObject[] prefab)
         {
             int count = 1;
             if (density < 1)
             {
                 // Special case when count is inferior to 1.
-                // Create 0 or 1 bonus with probality from BonusCount
+                // Create 0 or 1 bonus with probability from BonusCount
                 if (UnityEngine.Random.Range(0f, 1f) < density)
                     count = 1;
                 else
@@ -328,10 +334,8 @@ namespace MusicRun
                     PlaceOnHighestTerrain(bonus.transform, 100f);
                     bonus.name = $"Bonus - level: {currentIndexLevel} - chunk {chunkCoord} - localPosition: {bonus.transform.localPosition}";
                 }
-
-                // Just keep a trace of bonus count for this chunk to avoid re-generate if player return
-                spawnedBonus.Add(chunkCoord, count);
             }
+            return count;
         }
 
         private void PlaceAndScaleExistingVege(Vector2Int chunkCoord, GameObject chunk)
