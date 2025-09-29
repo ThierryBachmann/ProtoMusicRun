@@ -2438,7 +2438,11 @@ MonoBehaviour:
     description: A very short level to understand the principles.
     Skybox: {fileID: 327158888}
     indexMIDI: 3
-    RatioSpeedMusic: 0.6
+    listMIDI:
+    - 1
+    - 2
+    health: 1021
+    RatioSpeedMusic: 3.91
     MinSpeedMusic: 0.4
     MaxSpeedMusic: 1.3
     deltaCurrentChunk: {x: 0, y: 6}
@@ -2455,7 +2459,7 @@ MonoBehaviour:
     bonusScoreDentity: 1
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
-    bonusInstrumentDentity: 3.16
+    bonusInstrumentDentity: 0.57
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 1
@@ -2463,6 +2467,8 @@ MonoBehaviour:
     description: More dune ...
     Skybox: {fileID: 1193833017}
     indexMIDI: 80
+    listMIDI: []
+    health: 100
     RatioSpeedMusic: 0.47
     MinSpeedMusic: 0.55
     MaxSpeedMusic: 1.28
@@ -2487,6 +2493,8 @@ MonoBehaviour:
     description: 
     Skybox: {fileID: 327158888}
     indexMIDI: 50
+    listMIDI: []
+    health: 100
     RatioSpeedMusic: 0.68
     MinSpeedMusic: 0.53
     MaxSpeedMusic: 2.41
@@ -2510,6 +2518,8 @@ MonoBehaviour:
     description: WITH LOW VEGETALS
     Skybox: {fileID: 327158888}
     indexMIDI: 50
+    listMIDI: []
+    health: 100
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
@@ -2532,6 +2542,8 @@ MonoBehaviour:
     description: More dune ...
     Skybox: {fileID: 1193833017}
     indexMIDI: 80
+    listMIDI: []
+    health: 100
     RatioSpeedMusic: 0.25
     MinSpeedMusic: 0.2
     MaxSpeedMusic: 1.99

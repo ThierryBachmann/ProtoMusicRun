@@ -1,0 +1,999 @@
+GenericPropertyJSON: {
+    "name": "levels",
+    "type": -1,
+    "arraySize": 5,
+    "arrayType": "Level",
+    "children": [
+        {
+            "name": "Array",
+            "type": -1,
+            "arraySize": 5,
+            "arrayType": "Level",
+            "children": [
+                {
+                    "name": "size",
+                    "type": 12,
+                    "val": 5
+                },
+                {
+                    "name": "data",
+                    "type": -1,
+                    "children": [
+                        {
+                            "name": "enabled",
+                            "type": 1,
+                            "val": true
+                        },
+                        {
+                            "name": "name",
+                            "type": 3,
+                            "val": "Flat Desert"
+                        },
+                        {
+                            "name": "description",
+                            "type": 3,
+                            "val": "A very short level to understand the principles of the game."
+                        },
+                        {
+                            "name": "Skybox",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57688}"
+                        },
+                        {
+                            "name": "indexMIDI",
+                            "type": 0,
+                            "val": 3
+                        },
+                        {
+                            "name": "RatioSpeedMusic",
+                            "type": 2,
+                            "val": 3.91
+                        },
+                        {
+                            "name": "MinSpeedMusic",
+                            "type": 2,
+                            "val": 0.4
+                        },
+                        {
+                            "name": "MaxSpeedMusic",
+                            "type": 2,
+                            "val": 1.3
+                        },
+                        {
+                            "name": "deltaCurrentChunk",
+                            "type": 20,
+                            "val": "Vector2(0,6)"
+                        },
+                        {
+                            "name": "startGO",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57572}"
+                        },
+                        {
+                            "name": "goalGO",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57650}"
+                        },
+                        {
+                            "name": "perlinVegetable",
+                            "type": 2,
+                            "val": 0.3
+                        },
+                        {
+                            "name": "perlinChunk",
+                            "type": 2,
+                            "val": 8
+                        },
+                        {
+                            "name": "minScaleVegetable",
+                            "type": 2,
+                            "val": 0.71
+                        },
+                        {
+                            "name": "maxScaleVegetable",
+                            "type": 2,
+                            "val": 1.09
+                        },
+                        {
+                            "name": "runChunks",
+                            "type": -1,
+                            "arraySize": 2,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 2,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 2
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"5bb220d0ff9d1054085ca18663eec33d\",\"localId\":3245006867922576827,\"type\":3,\"instanceID\":48088}"
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"6c39054fbaf07a341bd46566a34d3322\",\"localId\":3245006867922576827,\"type\":3,\"instanceID\":48090}"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "vegetables",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "Vegetable",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "Vegetable",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bonusScoreDentity",
+                            "type": 2,
+                            "val": 1
+                        },
+                        {
+                            "name": "bonusScorePrefab",
+                            "type": -1,
+                            "arraySize": 1,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 1,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 1
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"5444d575fd8670c47a94591d554daafd\",\"localId\":1043371857810829490,\"type\":3,\"instanceID\":48092}"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bonusInstrumentDentity",
+                            "type": 2,
+                            "val": 0.57
+                        },
+                        {
+                            "name": "bonusInstrumentPrefab",
+                            "type": -1,
+                            "arraySize": 1,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 1,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 1
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"438b8e3b8f642534b9fe11fc28046452\",\"localId\":1043371857810829490,\"type\":3,\"instanceID\":48094}"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "data",
+                    "type": -1,
+                    "children": [
+                        {
+                            "name": "enabled",
+                            "type": 1,
+                            "val": true
+                        },
+                        {
+                            "name": "name",
+                            "type": 3,
+                            "val": "Desert Medium "
+                        },
+                        {
+                            "name": "description",
+                            "type": 3,
+                            "val": "More dune ..."
+                        },
+                        {
+                            "name": "Skybox",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":58184}"
+                        },
+                        {
+                            "name": "indexMIDI",
+                            "type": 0,
+                            "val": 80
+                        },
+                        {
+                            "name": "RatioSpeedMusic",
+                            "type": 2,
+                            "val": 0.47
+                        },
+                        {
+                            "name": "MinSpeedMusic",
+                            "type": 2,
+                            "val": 0.55
+                        },
+                        {
+                            "name": "MaxSpeedMusic",
+                            "type": 2,
+                            "val": 1.28
+                        },
+                        {
+                            "name": "deltaCurrentChunk",
+                            "type": 20,
+                            "val": "Vector2(0,20)"
+                        },
+                        {
+                            "name": "startGO",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57572}"
+                        },
+                        {
+                            "name": "goalGO",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57650}"
+                        },
+                        {
+                            "name": "perlinVegetable",
+                            "type": 2,
+                            "val": 0.3
+                        },
+                        {
+                            "name": "perlinChunk",
+                            "type": 2,
+                            "val": 7.15
+                        },
+                        {
+                            "name": "minScaleVegetable",
+                            "type": 2,
+                            "val": 0.4
+                        },
+                        {
+                            "name": "maxScaleVegetable",
+                            "type": 2,
+                            "val": 1.28
+                        },
+                        {
+                            "name": "runChunks",
+                            "type": -1,
+                            "arraySize": 3,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 3,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 3
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"0786c1c0621985c4ea5ee25aab74599a\",\"localId\":3245006867922576827,\"type\":3,\"instanceID\":48096}"
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"9017a3995fcc81049952ec486ec63b50\",\"localId\":3245006867922576827,\"type\":3,\"instanceID\":48098}"
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"5bb220d0ff9d1054085ca18663eec33d\",\"localId\":3245006867922576827,\"type\":3,\"instanceID\":48088}"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "vegetables",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "Vegetable",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "Vegetable",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bonusScoreDentity",
+                            "type": 2,
+                            "val": 1
+                        },
+                        {
+                            "name": "bonusScorePrefab",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bonusInstrumentDentity",
+                            "type": 2,
+                            "val": 1
+                        },
+                        {
+                            "name": "bonusInstrumentPrefab",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "data",
+                    "type": -1,
+                    "children": [
+                        {
+                            "name": "enabled",
+                            "type": 1,
+                            "val": true
+                        },
+                        {
+                            "name": "name",
+                            "type": 3,
+                            "val": "Flat desert"
+                        },
+                        {
+                            "name": "description",
+                            "type": 3,
+                            "val": ""
+                        },
+                        {
+                            "name": "Skybox",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57688}"
+                        },
+                        {
+                            "name": "indexMIDI",
+                            "type": 0,
+                            "val": 50
+                        },
+                        {
+                            "name": "RatioSpeedMusic",
+                            "type": 2,
+                            "val": 0.68
+                        },
+                        {
+                            "name": "MinSpeedMusic",
+                            "type": 2,
+                            "val": 0.53
+                        },
+                        {
+                            "name": "MaxSpeedMusic",
+                            "type": 2,
+                            "val": 2.41
+                        },
+                        {
+                            "name": "deltaCurrentChunk",
+                            "type": 20,
+                            "val": "Vector2(0,20)"
+                        },
+                        {
+                            "name": "startGO",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57572}"
+                        },
+                        {
+                            "name": "goalGO",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57650}"
+                        },
+                        {
+                            "name": "perlinVegetable",
+                            "type": 2,
+                            "val": 0.3
+                        },
+                        {
+                            "name": "perlinChunk",
+                            "type": 2,
+                            "val": 100
+                        },
+                        {
+                            "name": "minScaleVegetable",
+                            "type": 2,
+                            "val": 2
+                        },
+                        {
+                            "name": "maxScaleVegetable",
+                            "type": 2,
+                            "val": 5
+                        },
+                        {
+                            "name": "runChunks",
+                            "type": -1,
+                            "arraySize": 2,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 2,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 2
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"5bb220d0ff9d1054085ca18663eec33d\",\"localId\":3245006867922576827,\"type\":3,\"instanceID\":48088}"
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"6c39054fbaf07a341bd46566a34d3322\",\"localId\":3245006867922576827,\"type\":3,\"instanceID\":48090}"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "vegetables",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "Vegetable",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "Vegetable",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bonusScoreDentity",
+                            "type": 2,
+                            "val": 1
+                        },
+                        {
+                            "name": "bonusScorePrefab",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bonusInstrumentDentity",
+                            "type": 2,
+                            "val": 1
+                        },
+                        {
+                            "name": "bonusInstrumentPrefab",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "data",
+                    "type": -1,
+                    "children": [
+                        {
+                            "name": "enabled",
+                            "type": 1,
+                            "val": false
+                        },
+                        {
+                            "name": "name",
+                            "type": 3,
+                            "val": "TEST_FLAT"
+                        },
+                        {
+                            "name": "description",
+                            "type": 3,
+                            "val": "WITH LOW VEGETALS"
+                        },
+                        {
+                            "name": "Skybox",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57688}"
+                        },
+                        {
+                            "name": "indexMIDI",
+                            "type": 0,
+                            "val": 50
+                        },
+                        {
+                            "name": "RatioSpeedMusic",
+                            "type": 2,
+                            "val": 0.2
+                        },
+                        {
+                            "name": "MinSpeedMusic",
+                            "type": 2,
+                            "val": 0.31
+                        },
+                        {
+                            "name": "MaxSpeedMusic",
+                            "type": 2,
+                            "val": 2.98
+                        },
+                        {
+                            "name": "deltaCurrentChunk",
+                            "type": 20,
+                            "val": "Vector2(0,5)"
+                        },
+                        {
+                            "name": "startGO",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57572}"
+                        },
+                        {
+                            "name": "goalGO",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57650}"
+                        },
+                        {
+                            "name": "perlinVegetable",
+                            "type": 2,
+                            "val": 0.3
+                        },
+                        {
+                            "name": "perlinChunk",
+                            "type": 2,
+                            "val": 10
+                        },
+                        {
+                            "name": "minScaleVegetable",
+                            "type": 2,
+                            "val": 0.5
+                        },
+                        {
+                            "name": "maxScaleVegetable",
+                            "type": 2,
+                            "val": 2
+                        },
+                        {
+                            "name": "runChunks",
+                            "type": -1,
+                            "arraySize": 1,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 1,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 1
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"073d80ae2c5c30840ae81cbd3b6be993\",\"localId\":3245006867922576827,\"type\":3,\"instanceID\":48100}"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "vegetables",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "Vegetable",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "Vegetable",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bonusScoreDentity",
+                            "type": 2,
+                            "val": 1
+                        },
+                        {
+                            "name": "bonusScorePrefab",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bonusInstrumentDentity",
+                            "type": 2,
+                            "val": 1
+                        },
+                        {
+                            "name": "bonusInstrumentPrefab",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "data",
+                    "type": -1,
+                    "children": [
+                        {
+                            "name": "enabled",
+                            "type": 1,
+                            "val": false
+                        },
+                        {
+                            "name": "name",
+                            "type": 3,
+                            "val": "Desert Medium "
+                        },
+                        {
+                            "name": "description",
+                            "type": 3,
+                            "val": "More dune ..."
+                        },
+                        {
+                            "name": "Skybox",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":58184}"
+                        },
+                        {
+                            "name": "indexMIDI",
+                            "type": 0,
+                            "val": 80
+                        },
+                        {
+                            "name": "RatioSpeedMusic",
+                            "type": 2,
+                            "val": 0.25
+                        },
+                        {
+                            "name": "MinSpeedMusic",
+                            "type": 2,
+                            "val": 0.2
+                        },
+                        {
+                            "name": "MaxSpeedMusic",
+                            "type": 2,
+                            "val": 1.99
+                        },
+                        {
+                            "name": "deltaCurrentChunk",
+                            "type": 20,
+                            "val": "Vector2(0,5)"
+                        },
+                        {
+                            "name": "startGO",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57572}"
+                        },
+                        {
+                            "name": "goalGO",
+                            "type": 5,
+                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":57650}"
+                        },
+                        {
+                            "name": "perlinVegetable",
+                            "type": 2,
+                            "val": 0.5
+                        },
+                        {
+                            "name": "perlinChunk",
+                            "type": 2,
+                            "val": 10
+                        },
+                        {
+                            "name": "minScaleVegetable",
+                            "type": 2,
+                            "val": 0.2
+                        },
+                        {
+                            "name": "maxScaleVegetable",
+                            "type": 2,
+                            "val": 0.97
+                        },
+                        {
+                            "name": "runChunks",
+                            "type": -1,
+                            "arraySize": 1,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 1,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 1
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": 5,
+                                            "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"15611db54f497d749a1f68fe6934e026\",\"localId\":3245006867922576827,\"type\":3,\"instanceID\":48102}"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "vegetables",
+                            "type": -1,
+                            "arraySize": 3,
+                            "arrayType": "Vegetable",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 3,
+                                    "arrayType": "Vegetable",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 3
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": -1,
+                                            "children": [
+                                                {
+                                                    "name": "vegetable",
+                                                    "type": 5,
+                                                    "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"a96fe3b502c283d43a00b406db68c805\",\"localId\":2119144853030675351,\"type\":3,\"instanceID\":48104}"
+                                                },
+                                                {
+                                                    "name": "count",
+                                                    "type": 0,
+                                                    "val": 5
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": -1,
+                                            "children": [
+                                                {
+                                                    "name": "vegetable",
+                                                    "type": 5,
+                                                    "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"bbfa97e30b239ec498ca9f0057602c4c\",\"localId\":5211187223157371982,\"type\":3,\"instanceID\":48106}"
+                                                },
+                                                {
+                                                    "name": "count",
+                                                    "type": 0,
+                                                    "val": 5
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "data",
+                                            "type": -1,
+                                            "children": [
+                                                {
+                                                    "name": "vegetable",
+                                                    "type": 5,
+                                                    "val": "UnityEditor.ObjectWrapperJSON:{\"guid\":\"ceeaa13298b01e747ad8cc611e5d66fe\",\"localId\":891825496699488124,\"type\":3,\"instanceID\":48108}"
+                                                },
+                                                {
+                                                    "name": "count",
+                                                    "type": 0,
+                                                    "val": 5
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bonusScoreDentity",
+                            "type": 2,
+                            "val": 1
+                        },
+                        {
+                            "name": "bonusScorePrefab",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bonusInstrumentDentity",
+                            "type": 2,
+                            "val": 1
+                        },
+                        {
+                            "name": "bonusInstrumentPrefab",
+                            "type": -1,
+                            "arraySize": 0,
+                            "arrayType": "PPtr<$GameObject>",
+                            "children": [
+                                {
+                                    "name": "Array",
+                                    "type": -1,
+                                    "arraySize": 0,
+                                    "arrayType": "PPtr<$GameObject>",
+                                    "children": [
+                                        {
+                                            "name": "size",
+                                            "type": 12,
+                                            "val": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
