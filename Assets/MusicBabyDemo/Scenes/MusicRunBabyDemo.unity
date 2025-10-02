@@ -274,7 +274,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
   m_Value: 1
-  m_Size: 0.9999998
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1944,11 +1944,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 171178028}
   m_CullTransparentMesh: 1
---- !u!1 &182037368 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3245006867922576827, guid: 0c222c68698265d40b68d29f17fbc120, type: 3}
-  m_PrefabInstance: {fileID: 129832321}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &182037369 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7969010532264824609, guid: 0c222c68698265d40b68d29f17fbc120, type: 3}
@@ -2019,21 +2014,6 @@ MonoBehaviour:
   startBonus: 0
   durationBonus: 5
   valueBonus: 20
---- !u!114 &219239741
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc2b118d1a6c1154983be5ee4bf1b510, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  applySFReverb: 0
-  applySFChorus: 0
-  applySFFilter: 1
 --- !u!1 &221032689
 GameObject:
   m_ObjectHideFlags: 0
@@ -2435,18 +2415,14 @@ MonoBehaviour:
   levels:
   - enabled: 1
     name: Flat Desert
-    description: A very short level to understand the principles.
+    description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
     indexMIDI: 3
-    listMIDI:
-    - 1
-    - 2
-    health: 1021
     RatioSpeedMusic: 3.91
     MinSpeedMusic: 0.4
     MaxSpeedMusic: 1.3
     deltaCurrentChunk: {x: 0, y: 6}
-    startGO: {fileID: 182037368}
+    startGO: {fileID: 883430262}
     goalGO: {fileID: 283134987}
     perlinVegetable: 0.3
     perlinChunk: 8
@@ -2456,7 +2432,7 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
     - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
     vegetables: []
-    bonusScoreDentity: 1
+    bonusScoreDensity: 1
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDentity: 0.57
@@ -2467,13 +2443,11 @@ MonoBehaviour:
     description: More dune ...
     Skybox: {fileID: 1193833017}
     indexMIDI: 80
-    listMIDI: []
-    health: 100
     RatioSpeedMusic: 0.47
     MinSpeedMusic: 0.55
     MaxSpeedMusic: 1.28
     deltaCurrentChunk: {x: 0, y: 20}
-    startGO: {fileID: 182037368}
+    startGO: {fileID: 883430262}
     goalGO: {fileID: 283134987}
     perlinVegetable: 0.3
     perlinChunk: 7.15
@@ -2484,23 +2458,23 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 9017a3995fcc81049952ec486ec63b50, type: 3}
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
     vegetables: []
-    bonusScoreDentity: 1
-    bonusScorePrefab: []
+    bonusScoreDensity: 1
+    bonusScorePrefab:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDentity: 1
-    bonusInstrumentPrefab: []
+    bonusInstrumentPrefab:
+    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 1
     name: Flat desert
     description: 
-    Skybox: {fileID: 327158888}
+    Skybox: {fileID: 1193833017}
     indexMIDI: 50
-    listMIDI: []
-    health: 100
     RatioSpeedMusic: 0.68
     MinSpeedMusic: 0.53
     MaxSpeedMusic: 2.41
     deltaCurrentChunk: {x: 0, y: 20}
-    startGO: {fileID: 182037368}
-    goalGO: {fileID: 283134987}
+    startGO: {fileID: 883430262}
+    goalGO: {fileID: 330585543}
     perlinVegetable: 0.3
     perlinChunk: 100
     minScaleVegetable: 2
@@ -2509,22 +2483,22 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
     - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
     vegetables: []
-    bonusScoreDentity: 1
-    bonusScorePrefab: []
+    bonusScoreDensity: 1
+    bonusScorePrefab:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDentity: 1
-    bonusInstrumentPrefab: []
-  - enabled: 0
+    bonusInstrumentPrefab:
+    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
+  - enabled: 1
     name: TEST_FLAT
     description: WITH LOW VEGETALS
-    Skybox: {fileID: 327158888}
+    Skybox: {fileID: 0}
     indexMIDI: 50
-    listMIDI: []
-    health: 100
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
     deltaCurrentChunk: {x: 0, y: 5}
-    startGO: {fileID: 182037368}
+    startGO: {fileID: 883430262}
     goalGO: {fileID: 283134987}
     perlinVegetable: 0.3
     perlinChunk: 10
@@ -2533,22 +2507,22 @@ MonoBehaviour:
     runChunks:
     - {fileID: 3245006867922576827, guid: 073d80ae2c5c30840ae81cbd3b6be993, type: 3}
     vegetables: []
-    bonusScoreDentity: 1
-    bonusScorePrefab: []
+    bonusScoreDensity: 1
+    bonusScorePrefab:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDentity: 1
-    bonusInstrumentPrefab: []
+    bonusInstrumentPrefab:
+    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 0
     name: 'Desert Medium '
     description: More dune ...
-    Skybox: {fileID: 1193833017}
+    Skybox: {fileID: 0}
     indexMIDI: 80
-    listMIDI: []
-    health: 100
     RatioSpeedMusic: 0.25
     MinSpeedMusic: 0.2
     MaxSpeedMusic: 1.99
     deltaCurrentChunk: {x: 0, y: 5}
-    startGO: {fileID: 182037368}
+    startGO: {fileID: 883430262}
     goalGO: {fileID: 283134987}
     perlinVegetable: 0.5
     perlinChunk: 10
@@ -2563,10 +2537,12 @@ MonoBehaviour:
       count: 5
     - vegetable: {fileID: 891825496699488124, guid: ceeaa13298b01e747ad8cc611e5d66fe, type: 3}
       count: 5
-    bonusScoreDentity: 1
-    bonusScorePrefab: []
+    bonusScoreDensity: 1
+    bonusScorePrefab:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDentity: 1
-    bonusInstrumentPrefab: []
+    bonusInstrumentPrefab:
+    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   timeCreateChunk: 0
   timeAverageCreate: 0
   chunkCreatedCount: 0
@@ -2804,7 +2780,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 327158883}
-  - {fileID: 1193833013}
   - {fileID: 330585546}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3279,7 +3254,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1193833013}
   m_Father: {fileID: 256923878}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!45 &327158884
@@ -5684,80 +5660,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 603662823}
   m_CullTransparentMesh: 1
---- !u!1001 &609628726
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1870609032}
-    m_Modifications:
-    - target: {fileID: 1367716147436054, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_Name
-      value: MidiStreamPlayer
-      objectReference: {fileID: 0}
-    - target: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114320350483668748, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: volumeGlobal
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114320350483668748, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: MPTK_LogEvents
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114320350483668748, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-      propertyPath: MPTK_EffectSoundFont
-      value: 
-      objectReference: {fileID: 219239741}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f1aa4788763f8854c9826e449686c328, type: 3}
---- !u!4 &609628728 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4977113046780174, guid: f1aa4788763f8854c9826e449686c328, type: 3}
-  m_PrefabInstance: {fileID: 609628726}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &618001776
 GameObject:
   m_ObjectHideFlags: 0
@@ -8601,6 +8503,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 866844667}
   m_CullTransparentMesh: 1
+--- !u!1 &883430262 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3245006867922576827, guid: 0c222c68698265d40b68d29f17fbc120, type: 3}
+  m_PrefabInstance: {fileID: 129832321}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &923243612
 GameObject:
   m_ObjectHideFlags: 0
@@ -10137,7 +10044,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 256923878}
+  m_Father: {fileID: 327158883}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!45 &1193833014
 Skybox:
@@ -15047,51 +14954,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &1870609030
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1870609032}
-  - component: {fileID: 1870609031}
-  m_Layer: 0
-  m_Name: SoundManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1870609031
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1870609030}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d4aca7ce325a3d438cf912bb8d586a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1870609032
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1870609030}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: -0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 609628728}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1881417830
 GameObject:
   m_ObjectHideFlags: 0
@@ -16804,7 +16666,6 @@ SceneRoots:
   - {fileID: 211374107}
   - {fileID: 1820376250}
   - {fileID: 802721084}
-  - {fileID: 1870609032}
   - {fileID: 1489650626}
   - {fileID: 804034794}
   - {fileID: 1213716470}

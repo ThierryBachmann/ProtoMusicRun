@@ -6,17 +6,17 @@ using UnityEngine;
 
 namespace MusicRun
 {
+    [Serializable]
     public class TerrainGenerator : MonoBehaviour
     {
         public int chunkSize = 20;
         public int renderDistance = 5;
         public bool disableObstacles = false;
 
-
         [Header("Defined Levels")]
-        public Level[] levels;
+        public TerrainLevel[] levels;
 
-        private Level currentLevel;
+        private TerrainLevel currentLevel;
         private int currentIndexLevel;
         private GameObject currentStart;
         private Vector2Int currentChunk;
@@ -29,7 +29,7 @@ namespace MusicRun
         private GameManager gameManager;
 
         public GameObject StartGO { get => currentStart; }
-        public Level CurrentLevel { get => currentLevel; }
+        public TerrainLevel CurrentLevel { get => currentLevel; }
 
         public float timeCreateChunk;
         public float timeAverageCreate;
@@ -63,7 +63,7 @@ namespace MusicRun
         public int SelectNextLevel(int levelIndex)
         {
             bool oneLevelEnabledAtLeast = false;
-            foreach (Level level in levels) if (level.enabled) { oneLevelEnabledAtLeast = true; break; }
+            foreach (TerrainLevel level in levels) if (level.enabled) { oneLevelEnabledAtLeast = true; break; }
 
             if (!oneLevelEnabledAtLeast)
             {
@@ -265,9 +265,9 @@ namespace MusicRun
             // Generate and place bonus.
             // When a chunk is re-generated (player return), no bonus are generated.
             // ---------------------------------------------------------------------
-            if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusScoreDentity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
+            if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusScoreDensity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
             {
-                int count = AddBonusScore(chunkCoord, chunk, currentLevel.bonusScoreDentity, currentLevel.bonusScorePrefab);
+                int count = AddBonusScore(chunkCoord, chunk, currentLevel.bonusScoreDensity, currentLevel.bonusScorePrefab);
                 if (count > 0)
                     // Just keep a trace of bonus count for this chunk to avoid re-generate if player return
                     spawnedBonus.Add(chunkCoord, count);
@@ -527,7 +527,6 @@ namespace MusicRun
                     }
                 }
         }
-
     }
 
     [Serializable]
@@ -535,68 +534,5 @@ namespace MusicRun
     {
         public GameObject vegetable;
         public int count;
-    }
-
-    [Serializable]
-    public class Level
-    {
-        [Header("Whether to use this scene.")]
-        public bool enabled;
-        [Header("Title and Description displayed at the scene start.")]
-        public string name;
-        [TextArea]
-        public string description;
-        [Header("Select a camera with a dedicated skybox for this scene.")]
-        public Camera Skybox;
-        [Header("Defined MIDI associated to the level")]
-        public int indexMIDI;
-
-        [Range(0.1f, 5f)]
-        public float RatioSpeedMusic = 0.3f;
-        [Range(0.1f, 5f)]
-        public float MinSpeedMusic = 0.1f;
-        [Range(0.1f, 5f)]
-        public float MaxSpeedMusic = 5f;
-
-
-        [Header("Delta chunk position with last goal")]
-        public Vector2Int deltaCurrentChunk;
-
-        [Header("Defined start and goal game object")]
-        public GameObject startGO;
-        public GameObject goalGO;
-
-        [Header("How much vegetable must be spread on chunk")]
-        [Range(0f, 10f)]
-        public float perlinVegetable = 0.3f;
-
-        [Header("How much vegetable must be spread by chunk")]
-        [Range(0f, 10f)]
-        public float perlinChunk = 100f;
-
-        [Header("Min Max fpr random vegetable scale")]
-        [Range(0.1f, 15f)]
-        public float minScaleVegetable = 0.5f;
-
-        [Range(0.1f, 15f)]
-        public float maxScaleVegetable = 0.5f;
-
-        [Header("Defined levels")]
-        public GameObject[] runChunks;
-
-        [Header("Defined Vegetables")]
-        public Vegetable[] vegetables;
-
-        [Header("Score Bonus")]
-        [Range(0, 10)]
-        [Tooltip("Description")]
-        public float bonusScoreDentity = 1;
-        public GameObject[] bonusScorePrefab;
-
-        [Header("Instrument Bonus")]
-        [Range(0, 10)]
-        [Tooltip("Description")]
-        public float bonusInstrumentDentity = 1;
-        public GameObject[] bonusInstrumentPrefab;
     }
 }

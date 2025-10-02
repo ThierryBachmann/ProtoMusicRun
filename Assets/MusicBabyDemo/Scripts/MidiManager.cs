@@ -259,7 +259,7 @@ namespace MusicRun
             if (gameManager.levelRunning)
             {
                 // Min and max music speed are defined by level
-                Level current = gameManager.terrainGenerator.CurrentLevel;
+                TerrainLevel current = gameManager.terrainGenerator.CurrentLevel;
                 float speedMusic = player.Speed * current.RatioSpeedMusic;
                 speedClamp = Mathf.Clamp(speedMusic, current.MinSpeedMusic, current.MaxSpeedMusic);
             }
