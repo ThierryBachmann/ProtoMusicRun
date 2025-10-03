@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 432633739201639686}
   m_Layer: 0
   m_Name: BonusInstrument
-  m_TagString: Bonus
+  m_TagString: Instrument
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

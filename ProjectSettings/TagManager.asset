@@ -11,6 +11,7 @@ TagManager:
   - TreeScallable
   - Grass
   - TreeScalable
+  - Instrument
   layers:
   - Default
   - TransparentFX

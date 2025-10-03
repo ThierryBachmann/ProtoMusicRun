@@ -28,8 +28,10 @@
 //    score += (long)(bonusDirection * player.speedMultiplier * coefficient);
 //    if (score < 0) score = 0;
 //}
+using Codice.CM.Common;
 using System;
 using UnityEngine;
+using static Codice.Client.Common.EventTracking.TrackFeatureUseEvent.Features.DesktopGUI.Filters;
 
 namespace MusicRun
 {
@@ -70,6 +72,28 @@ namespace MusicRun
                 }
             }
         }
+
+        public void TriggerBonus(Collider collider)
+        {
+            // Bonus is managed by the ScoreManager
+            gameManager.bonusManager.StartBonus();
+
+            Rigidbody rb = collider.attachedRigidbody;
+            if (rb != null)
+            {
+                // Direction from player to bonus
+                Vector3 kickDir = (collider.transform.position - transform.position).normalized;
+                kickDir.y = 0;
+                // Add a forward + upward impulse (like a foot kick)
+                Vector3 force = kickDir * gameManager.playerController.Speed * 2f + Vector3.up * 8f;
+                rb.AddForce(force, ForceMode.Impulse);
+                rb.useGravity = true;
+                // Optional: add spin
+                rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
+            }
+            Destroy(collider.gameObject, 3f);
+        }
+
         public void StartBonus()
         {
             Debug.Log("Start bonus Trans");

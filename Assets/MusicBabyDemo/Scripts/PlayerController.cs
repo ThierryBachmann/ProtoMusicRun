@@ -86,28 +86,16 @@ namespace MusicRun
             gameManager.RestartGame(); // NextLevel();
         }
 
-        void OnTriggerEnter(Collider other)
+        void OnTriggerEnter(Collider collider)
         {
-            Debug.Log($"PlayerController trigger {other.tag}");
-            if (other.CompareTag("Bonus"))
+            Debug.Log($"PlayerController trigger {collider.tag}");
+            if (collider.CompareTag("Bonus"))
             {
-                // Bonus is managed by the ScoreManager
-                gameManager.bonusManager.StartBonus();
-
-                Rigidbody rb = other.attachedRigidbody;
-                if (rb != null)
-                {
-                    // Direction from player to bonus
-                    Vector3 kickDir = (other.transform.position - transform.position).normalized;
-                    kickDir.y = 0;
-                    // Add a forward + upward impulse (like a foot kick)
-                    Vector3 force = kickDir * Speed * 2f + Vector3.up * 8f;
-                    rb.AddForce(force, ForceMode.Impulse);
-                    rb.useGravity = true;
-                    // Optional: add spin
-                    rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
-                }
-                Destroy(other.gameObject, 3f);
+                gameManager.bonusManager.TriggerBonus(collider);
+            }
+            else if (collider.CompareTag("Instrument"))
+            {
+                gameManager.bonusManager.TriggerBonus(collider);
             }
         }
 
