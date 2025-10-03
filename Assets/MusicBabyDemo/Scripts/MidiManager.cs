@@ -1,4 +1,5 @@
 using MidiPlayerTK;
+using MPTK.NAudio.Midi;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -46,7 +47,7 @@ namespace MusicRun
             // When the MIDI reach the end, it's a signal to stop the level. 
             midiPlayer.MPTK_MidiAutoRestart = false;
 
-            // Continue plyaying when the player (which holds the AudioListener) is to far to the AudioSource (holds by the MidiPlayer at the goal).
+            // Continue playing when the player (which holds the AudioListener) is to far to the AudioSource (holds by the MidiPlayer at the goal).
             // The volume sound will be zero but the MIDI sequencer is not pause. Maestro MPTK 2.16.1.
             // Note: distance is defined for each scene with MPTK_MaxDistance see UpdateMaxDistanceMPTK()
             midiPlayer.MPTK_PauseOnMaxDistance = false; midiPlayer.MPTK_MaxDistance = 0;
@@ -67,8 +68,6 @@ namespace MusicRun
             {
                 // Handle MIDI events if needed
                 // Debug.Log($"MidiPlayer Notes: {midiEvents.Count}");
-                foreach (var midiEvent in midiEvents)
-                    channelPlayed[midiEvent.Channel]++;
             });
 
             midiPlayer.OnEventEndPlayMidi.AddListener((name, endMidi) =>
@@ -102,17 +101,42 @@ namespace MusicRun
             previousSpeed = -1;
         }
 
+        /// <summary>
+        /// Where we start playing the MIDI
+        /// </summary>
+        /// <param name="index"></param>
         public void StartPlayMIDI(int index)
         {
-            Array.Clear(channelPlayed, 0, 16);
-            midiPlayer.MPTK_MidiIndex = index;
             if (midiPlayer != null)
             {
+                // Not necessary but in case of ...
                 midiPlayer.MPTK_Stop();
-                midiPlayer.MPTK_Play();
+
+                // Select and load the MIDI
+                midiPlayer.MPTK_MidiIndex = index;
+                midiPlayer.MPTK_Load();
+
+                // Search instrument played on each channel
+                Array.Clear(channelPlayed, 0, 16);
+                for (int channel = 0; channel < channelPlayed.Length; channel++)
+                    channelPlayed[channel] = -1;
+
+                foreach (var midiEvent in midiPlayer.MPTK_MidiLoaded.MPTK_MidiEvents)
+                    if (midiEvent.Command == MPTKCommand.PatchChange)
+                        channelPlayed[midiEvent.Channel] = midiEvent.Value;
+
+                for (int channel = 0; channel < channelPlayed.Length; channel++)
+                    if (channelPlayed[channel] >= 0)
+                        Debug.Log($"Channel {channel} instrument {channelPlayed[channel]}");
+
+                // PLay MIDI, avoid to reload it
+                midiPlayer.MPTK_Play(alreadyLoaded: true);
             }
         }
 
+        /// <summary>
+        /// When the sound is off, the MIDI continue playing
+        /// </summary>
         public void SoundOnOff()
         {
             if (mute)
@@ -147,6 +171,11 @@ namespace MusicRun
             midiPlayer.MPTK_Transpose = 0;
         }
 
+        /// <summary>
+        /// Apply a pitch change on a channel for a duration. The pitch change is progressive along the duration.
+        /// </summary>
+        /// <param name="pitchTarget"></param>
+        /// <param name="durationMilli"></param>
         public void ApplyPitchChannel(float pitchTarget = 0.5f, float durationMilli = 2000f)
         {
             if (pitchTarget < 0f || pitchTarget > 1f)
@@ -162,17 +191,21 @@ namespace MusicRun
             StartCoroutine(PitchChannelRoutine(pitchTarget, durationMilli));
         }
 
-
+        /// <summary>
+        /// Change pitch (automatic return to center as a physical keyboard!)
+        /// Gift from MPTK Pro! See MPTK_PlayPitchWheelChange.
+        ///   0       the lowest bend positions(default is 2 semitones), 
+        ///   0.5     centered value, the sounding notes aren't being transposed up or down,
+        ///   1       highest pitch bend position (default is 2 semitones)
+        /// </summary>
+        /// <param name="pitchTarget"></param>
+        /// <param name="durationMilli"></param>
+        /// <returns></returns>
         private IEnumerator PitchChannelRoutine(float pitchTarget, float durationMilli)
         {
             //Debug.Log($"PitchChannelRoutine {pitchTarget} {durationMilli}");
 
 
-            // Change pitch (automatic return to center as a physical keyboard!)
-            // Gift from MPTK Pro! See MPTK_PlayPitchWheelChange.
-            //   0       the lowest bend positions(default is 2 semitones), 
-            //   0.5     centered value, the sounding notes aren't being transposed up or down,
-            //   1       highest pitch bend position (default is 2 semitones)
 
             float pitch = 0.5f; // centered value
             float waitMillisecond = 100f; // Wait between each pitch change
