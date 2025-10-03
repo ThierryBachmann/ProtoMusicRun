@@ -31,6 +31,9 @@ namespace MusicRun
         private float savedVolume;
         private bool mute = false;
 
+        /// <summary>
+        /// Instantiated at each new level, perhaps not the best approach ...
+        /// </summary>
         void Awake()
         {
             gameManager = Utilities.FindGameManager();
@@ -50,7 +53,8 @@ namespace MusicRun
             // Continue playing when the player (which holds the AudioListener) is to far to the AudioSource (holds by the MidiPlayer at the goal).
             // The volume sound will be zero but the MIDI sequencer is not pause. Maestro MPTK 2.16.1.
             // Note: distance is defined for each scene with MPTK_MaxDistance see UpdateMaxDistanceMPTK()
-            midiPlayer.MPTK_PauseOnMaxDistance = false; midiPlayer.MPTK_MaxDistance = 0;
+            midiPlayer.MPTK_PauseOnMaxDistance = false; 
+            midiPlayer.MPTK_MaxDistance = 0;
 
             midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
             {
@@ -81,6 +85,11 @@ namespace MusicRun
 
         }
 
+        /// <summary>
+        /// The volume is directly linked to the distance between the player and the goal.
+        /// Set at new level.
+        /// </summary>
+        /// <returns></returns>
         private IEnumerator UpdateMaxDistanceMPTK()
         {
             // Wait for the goalHandler to have a valid distanceAtStart.
@@ -204,9 +213,6 @@ namespace MusicRun
         private IEnumerator PitchChannelRoutine(float pitchTarget, float durationMilli)
         {
             //Debug.Log($"PitchChannelRoutine {pitchTarget} {durationMilli}");
-
-
-
             float pitch = 0.5f; // centered value
             float waitMillisecond = 100f; // Wait between each pitch change
             float deltaPitchMilli = (pitchTarget - 0.5f) / durationMilli; // Delta pitch between each pitch change
@@ -239,7 +245,7 @@ namespace MusicRun
                 yield return Routine.WaitForSeconds(waitMillisecond / 1000f);
             }
 
-            // Restore pitch original
+            // Restore original pitch by sending a MIDI command PitchWheelChange directly to the MIDI synthesizer
             for (int channel = 0; channel < 16; channel++)
             {
                 MPTKEvent mptkEvent = new MPTKEvent()
@@ -251,6 +257,7 @@ namespace MusicRun
                 midiPlayer.MPTK_PlayDirectEvent(mptkEvent);
             }
         }
+
         public void ApplyPitchAudioSource(float pitchFactor = 0.99f, float durationMilli = 2000f)
         {
             if (pitchFactor < 0.2f || pitchFactor >= 2f)
@@ -269,7 +276,7 @@ namespace MusicRun
         private IEnumerator PitchAudioSourceRoutine(float pitchFactor, float durationMilli)
         {
             float duration = (durationMilli / 1000f) / 10f;
-            Debug.Log($"PitchRoutine {pitchFactor} {duration} * 10 sec.");
+            //Debug.Log($"PitchRoutine {pitchFactor} {duration} * 10 sec.");
             for (int i = 0; i < 10; i++)
             {
                 for (int v = 0; v < midiPlayer.ActiveVoices.Count; v++)
