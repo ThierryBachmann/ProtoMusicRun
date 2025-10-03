@@ -2432,9 +2432,11 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
     - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
     vegetables: []
-    bonusScoreDensity: 1
+    bonusScoreDensity: 4.31
+    bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
+    - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
     bonusInstrumentDentity: 0.57
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
@@ -2459,8 +2461,10 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
     vegetables: []
     bonusScoreDensity: 1
+    bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
+    - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
     bonusInstrumentDentity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
@@ -2484,6 +2488,7 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
     vegetables: []
     bonusScoreDensity: 1
+    bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDentity: 1
@@ -2508,6 +2513,7 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 073d80ae2c5c30840ae81cbd3b6be993, type: 3}
     vegetables: []
     bonusScoreDensity: 1
+    bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDentity: 1
@@ -2538,6 +2544,7 @@ MonoBehaviour:
     - vegetable: {fileID: 891825496699488124, guid: ceeaa13298b01e747ad8cc611e5d66fe, type: 3}
       count: 5
     bonusScoreDensity: 1
+    bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDentity: 1

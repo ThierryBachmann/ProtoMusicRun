@@ -75,8 +75,11 @@ namespace MusicRun
 
         public void TriggerBonus(Collider collider)
         {
-            // Bonus is managed by the ScoreManager
-            gameManager.bonusManager.StartBonus();
+            if (collider.CompareTag("Malus"))
+                valueBonus = -20f;
+            else
+                valueBonus = 20f;
+            StartBonus();
 
             Rigidbody rb = collider.attachedRigidbody;
             if (rb != null)
@@ -96,9 +99,11 @@ namespace MusicRun
 
         public void StartBonus()
         {
-            Debug.Log("Start bonus Trans");
-            //EndBonus();
-            midiManager.TransposeAdd(6);
+            Debug.Log($"Start bonus Trans {valueBonus}");
+            if (valueBonus > 0)
+                midiManager.TransposeAdd(6);
+            else
+                midiManager.TransposeAdd(-6);
             startBonusDateTime = DateTime.Now;
             startBonus = true;
         }

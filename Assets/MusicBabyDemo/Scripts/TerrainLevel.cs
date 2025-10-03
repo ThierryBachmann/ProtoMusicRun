@@ -64,10 +64,14 @@ namespace MusicRun
         [Header("Defined Vegetables")]
         public Vegetable[] vegetables;
 
-        [Header("Score Bonus")]
+        [Header("Score Bonus & Malus")]
         [Range(0, 10)]
         [Tooltip("Description")]
         public float bonusScoreDensity = 1;
+
+        [Range(0, 1)]
+        [Tooltip("Ratio between Bonus and Malus: 0 only bonus, 1 only malus")]
+        public float bonusMalusRatio = 0.5f ;
         public GameObject[] bonusScorePrefab;
 
         [Header("Instrument Bonus")]

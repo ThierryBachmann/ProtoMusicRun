@@ -12,6 +12,7 @@ TagManager:
   - Grass
   - TreeScalable
   - Instrument
+  - Malus
   layers:
   - Default
   - TransparentFX

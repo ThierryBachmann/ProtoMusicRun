@@ -20,9 +20,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: PulsingMaterialBlackToOrange
+  m_Name: PulsingMaterialGreenToOrange
   m_Shader: {fileID: -6465566751694194690, guid: d5cea734b4177a84ba80f51c533e29f6, type: 3}
-  m_Parent: {fileID: 2100000, guid: 46d91638632c6ce4d94f23a6010a9d15, type: 2}
+  m_Parent: {fileID: 2100000, guid: 83ed72c0f4a95084da9b1b53ebc4064b, type: 2}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -40,6 +40,7 @@ Material:
     m_Ints: []
     m_Floats: []
     m_Colors:
+    - _Base_Color: {r: 0.06407974, g: 0.9056604, b: 0.1912403, a: 1}
     - _Change_Color: {r: 1, g: 0.4656816, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

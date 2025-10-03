@@ -89,7 +89,7 @@ namespace MusicRun
         void OnTriggerEnter(Collider collider)
         {
             Debug.Log($"PlayerController trigger {collider.tag}");
-            if (collider.CompareTag("Bonus"))
+            if (collider.CompareTag("Bonus") || collider.CompareTag("Malus"))
             {
                 gameManager.bonusManager.TriggerBonus(collider);
             }

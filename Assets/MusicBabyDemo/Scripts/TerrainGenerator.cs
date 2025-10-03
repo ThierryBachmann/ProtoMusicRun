@@ -267,15 +267,11 @@ namespace MusicRun
             // ---------------------------------------------------------------------
             if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusScoreDensity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
             {
-                int count = AddBonusScore(chunkCoord, chunk, currentLevel.bonusScoreDensity, currentLevel.bonusScorePrefab);
-                if (count > 0)
-                    // Just keep a trace of bonus count for this chunk to avoid re-generate if player return
-                    spawnedBonus.Add(chunkCoord, count);
-
+                AddBonusScore(chunkCoord, chunk, currentLevel.bonusScoreDensity, currentLevel.bonusMalusRatio, currentLevel.bonusScorePrefab);
             }
             if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDentity > 0)
             {
-                AddBonusScore(chunkCoord, chunk, currentLevel.bonusInstrumentDentity, currentLevel.bonusInstrumentPrefab);
+                //         AddBonusScore(chunkCoord, chunk, currentLevel.bonusInstrumentDentity, currentLevel.bonusInstrumentPrefab);
             }
         }
         public void ModifyChunkMesh(GameObject chunkObject)
@@ -306,7 +302,7 @@ namespace MusicRun
             }
         }
         // 
-        private int AddBonusScore(Vector2Int chunkCoord, GameObject chunk, float density, GameObject[] prefab)
+        private void AddBonusScore(Vector2Int chunkCoord, GameObject chunk, float density, float ratio, GameObject[] prefab)
         {
             int count = 1;
             if (density < 1)
@@ -325,7 +321,18 @@ namespace MusicRun
             {
                 for (int i = 0; i < density; i++)
                 {
-                    GameObject bonusPrefabRandom = prefab[UnityEngine.Random.Range(0, prefab.Length)];
+                    int indexPrefab;
+                    if (prefab.Length == 1)
+                        indexPrefab = 0;
+                    else
+                    {
+                        // Ratio between Bonus and Malus: 0 only bonus, 1 only malus
+                        if (UnityEngine.Random.Range(0f, 1f) > ratio)
+                            indexPrefab = 1;
+                        else
+                            indexPrefab = 0;
+                    }
+                    GameObject bonusPrefabRandom = prefab[indexPrefab];
                     GameObject bonus = Instantiate(bonusPrefabRandom);
                     bonus.transform.SetParent(chunk.transform, false);
                     float maxPos = chunkSize / 2f - 0.1f; // -0.1 to avoid border
@@ -334,8 +341,11 @@ namespace MusicRun
                     PlaceOnHighestTerrain(bonus.transform, 100f);
                     bonus.name = $"Bonus - level: {currentIndexLevel} - chunk {chunkCoord} - localPosition: {bonus.transform.localPosition}";
                 }
+
+                // Just keep a trace of bonus count for this chunk to avoid re-generate if player return
+                spawnedBonus.Add(chunkCoord, count);
+
             }
-            return count;
         }
 
         private void PlaceAndScaleExistingVege(Vector2Int chunkCoord, GameObject chunk)
