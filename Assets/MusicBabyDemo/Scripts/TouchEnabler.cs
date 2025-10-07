@@ -31,25 +31,27 @@ namespace MusicRun
         void OnEnable()
         {
             controls.Gameplay.Enable();
+            EnhancedTouchSupport.Enable();
+            TouchSimulation.Enable();
+
             // Finally, enabled with Window → Analysis → Input Debugger.
             //    EnhancedTouchSupport.Enable();
             //    TouchSimulation.Enable();
-    //        controls.Gameplay.Start.performed += OnStartPressed;
+            //        controls.Gameplay.Start.performed += OnStartPressed;
         }
 
         void OnDisable()
         {
             controls.Gameplay.Disable();
             EnhancedTouchSupport.Disable();
+            TouchSimulation.Disable();
         }
-
-     
 
         void Update()
         {
             foreach (var t in Touch.activeTouches)
             {
-                //Debug.Log($"touch id:{t.touchId} pos:{t.screenPosition} phase:{t.phase}");
+                Debug.Log($"touch id:{t.touchId} pos:{t.screenPosition} phase:{t.phase}");
                 switch (t.phase)
                 {
                     case UnityEngine.InputSystem.TouchPhase.Began:
