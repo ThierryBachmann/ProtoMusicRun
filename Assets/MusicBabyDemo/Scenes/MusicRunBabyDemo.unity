@@ -273,7 +273,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2411,19 +2411,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkSize: 20
   renderDistance: 5
-  disableObstacles: 1
+  disableObstacles: 0
   levels:
-  - enabled: 1
+  - enabled: 0
     name: Flat Desert
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
     indexMIDI: 3
+    LoopsToGoal: 0
     RatioSpeedMusic: 3.91
     MinSpeedMusic: 0.4
     MaxSpeedMusic: 1.3
-    deltaCurrentChunk: {x: 0, y: 6}
     startGO: {fileID: 883430262}
     goalGO: {fileID: 283134987}
+    deltaGoalChunk: {x: 0, y: 5}
     perlinVegetable: 0.3
     perlinChunk: 8
     minScaleVegetable: 0.71
@@ -2437,20 +2438,21 @@ MonoBehaviour:
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
-    bonusInstrumentDentity: 0.57
+    bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: 'Desert Medium '
     description: More dune ...
     Skybox: {fileID: 1193833017}
     indexMIDI: 80
+    LoopsToGoal: 0
     RatioSpeedMusic: 0.47
     MinSpeedMusic: 0.55
     MaxSpeedMusic: 1.28
-    deltaCurrentChunk: {x: 0, y: 20}
     startGO: {fileID: 883430262}
     goalGO: {fileID: 283134987}
+    deltaGoalChunk: {x: 0, y: 20}
     perlinVegetable: 0.3
     perlinChunk: 7.15
     minScaleVegetable: 0.4
@@ -2465,20 +2467,21 @@ MonoBehaviour:
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
-    bonusInstrumentDentity: 1
+    bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: Flat desert
-    description: 
+    description: Flat
     Skybox: {fileID: 1193833017}
     indexMIDI: 50
+    LoopsToGoal: 0
     RatioSpeedMusic: 0.68
     MinSpeedMusic: 0.53
     MaxSpeedMusic: 2.41
-    deltaCurrentChunk: {x: 0, y: 20}
     startGO: {fileID: 883430262}
     goalGO: {fileID: 330585543}
+    deltaGoalChunk: {x: 0, y: 20}
     perlinVegetable: 0.3
     perlinChunk: 100
     minScaleVegetable: 2
@@ -2491,20 +2494,21 @@ MonoBehaviour:
     bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
-    bonusInstrumentDentity: 1
+    bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: TEST_FLAT
-    description: WITH LOW VEGETALS
+    description: Low vegetation
     Skybox: {fileID: 0}
     indexMIDI: 50
+    LoopsToGoal: 0
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
-    deltaCurrentChunk: {x: 0, y: 5}
     startGO: {fileID: 883430262}
     goalGO: {fileID: 283134987}
+    deltaGoalChunk: {x: 0, y: 5}
     perlinVegetable: 0.3
     perlinChunk: 10
     minScaleVegetable: 0.5
@@ -2516,22 +2520,23 @@ MonoBehaviour:
     bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
-    bonusInstrumentDentity: 1
+    bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 0
-    name: 'Desert Medium '
-    description: More dune ...
+  - enabled: 1
+    name: Random Vegetation
+    description: Add random vegetation on each chunk
     Skybox: {fileID: 0}
     indexMIDI: 80
+    LoopsToGoal: 0
     RatioSpeedMusic: 0.25
     MinSpeedMusic: 0.2
     MaxSpeedMusic: 1.99
-    deltaCurrentChunk: {x: 0, y: 5}
     startGO: {fileID: 883430262}
     goalGO: {fileID: 283134987}
-    perlinVegetable: 0.5
-    perlinChunk: 10
+    deltaGoalChunk: {x: 0, y: 5}
+    perlinVegetable: 2.33
+    perlinChunk: 2.3
     minScaleVegetable: 0.2
     maxScaleVegetable: 0.97
     runChunks:
@@ -2547,7 +2552,7 @@ MonoBehaviour:
     bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
-    bonusInstrumentDentity: 1
+    bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   timeCreateChunk: 0

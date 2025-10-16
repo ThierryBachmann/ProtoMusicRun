@@ -106,7 +106,7 @@ namespace MusicRun
         /// </summary>
         private void CreateStartAndGoalChunk()
         {
-            Debug.Log($"Create Start and Goal Chunk Delta={currentLevel.deltaCurrentChunk}");
+            Debug.Log($"Create Start and Goal Chunk Delta={currentLevel.deltaGoalChunk}");
 
             // Better to clear chunks before creating new ones (in a prvious Unity frame) 
             // To be sure to remove all previous chunks when the level is changed (collider seems remained).
@@ -147,7 +147,7 @@ namespace MusicRun
                 return;
             }
             currentGoal = currentLevel.goalGO;
-            goalChunkCoord = currentChunk + currentLevel.deltaCurrentChunk;
+            goalChunkCoord = currentChunk + currentLevel.deltaGoalChunk;
             currentGoal.name = $"goal_{currentIndexLevel}_{goalChunkCoord.x}_{goalChunkCoord.y}";
             if (spawnedChunks.ContainsKey(goalChunkCoord))
             {
@@ -269,7 +269,7 @@ namespace MusicRun
             {
                 AddBonusScore(chunkCoord, chunk, currentLevel.bonusScoreDensity, currentLevel.bonusMalusRatio, currentLevel.bonusScorePrefab);
             }
-            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDentity > 0)
+            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDensity > 0)
             {
                 //         AddBonusScore(chunkCoord, chunk, currentLevel.bonusInstrumentDentity, currentLevel.bonusInstrumentPrefab);
             }
@@ -383,8 +383,8 @@ namespace MusicRun
                     //    Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
 
                     // Define position and place to the terrain
-                    Vector3 newPosition = new Vector3(offsetX, 5f, offsetZ);
-                    //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} local:{basePosition} --> new: {newPosition} ");
+                    Vector3 localPosition = new Vector3(offsetX, 5f, offsetZ);
+                    Debug.Log($"Chunk: {chunkCoord} Vege: {childTransform.name} localPosition: {localPosition} ");
                     if (childTransform.CompareTag("TreeScalable"))
                     {
                         currentLevel.maxScaleVegetable = Mathf.Clamp(currentLevel.maxScaleVegetable, 0.1f, 15f);
@@ -401,7 +401,7 @@ namespace MusicRun
                     childTransform.localRotation = Quaternion.Euler(0f, randomY, 0f);
 
                     // Set the local position already set
-                    childTransform.localPosition = newPosition;
+                    childTransform.localPosition = localPosition;
 
                     // Search and apply the Y 
                     if (!PlaceOnHighestTerrain(childTransform, 100f))
@@ -431,14 +431,17 @@ namespace MusicRun
                             perlinChunk:  how much position are modified between chunk. 0: all vegetables are at the same place for each chunk.
                     */
                     float localX = Mathf.PerlinNoise(
-                        chunkCoord.x * currentLevel.perlinChunk + indexCount * currentLevel.perlinVegetable,
-                        chunkCoord.y * currentLevel.perlinChunk + indexCount * currentLevel.perlinVegetable);
-                    float localY = Mathf.PerlinNoise(
-                        chunkCoord.y * currentLevel.perlinChunk + indexCount * currentLevel.perlinVegetable,
-                        chunkCoord.x * currentLevel.perlinChunk + indexCount * currentLevel.perlinVegetable);
+                        (indexCount + 1) * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
+                        (indexCount + 1) * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk);
+                    float localZ = Mathf.PerlinNoise(
+                        (indexCount + 1) * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk,
+                        (indexCount + 1) * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk);
 
                     // Position between -chunkSize/2 and chunkSize/2
-                    Vector3 localPosition = new Vector3(localX * chunkSize - chunkSize / 2f, 5f, localY * chunkSize - chunkSize / 2f);
+                    localX = localX * 1.1f * chunkSize - chunkSize / 2f;
+                    localZ = localZ * 1.1f * chunkSize - chunkSize / 2f;
+
+                    Vector3 localPosition = new Vector3(localX, 5f, localZ);
                     vege.transform.localPosition = localPosition;
 
                     vege.name = $"Vege - {vege.name} - coord: {localPosition.x} {localPosition.z}";
@@ -447,7 +450,7 @@ namespace MusicRun
                         Debug.LogWarning($"No hit, chunk: {chunkCoord} child: {vege.name} position:{vege.transform.localPosition} ");
 
 
-                    //Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} local:{basePosition} --> new: {newPosition} ");
+                    Debug.Log($"Chunk: {chunkCoord} Vege: {vege.name} localPosition: {localPosition} ");
                     if (vege.CompareTag("TreeScalable"))
                     {
                         currentLevel.maxScaleVegetable = Mathf.Clamp(currentLevel.maxScaleVegetable, 0.1f, 15f);
