@@ -1095,6 +1095,7 @@ MonoBehaviour:
   closeOnClick: 1
   startScale: {x: 0.5, y: 0.5, z: 0.5}
   endScale: {x: 1, y: 1, z: 1}
+  IsVisible: 0
   toggleLiteAuto: {fileID: 357775641}
   toggleLiteForce: {fileID: 1495322263}
   inputName: {fileID: 1925868474}
@@ -1275,6 +1276,7 @@ MonoBehaviour:
   closeOnClick: 0
   startScale: {x: 0.6, y: 0.3, z: 0.3}
   endScale: {x: 1, y: 1, z: 1}
+  IsVisible: 0
   leftButton: {fileID: 84655585}
   rightButton: {fileID: 1650216869}
   jumpButton: {fileID: 1275283248}
@@ -2413,7 +2415,7 @@ MonoBehaviour:
   renderDistance: 5
   disableObstacles: 0
   levels:
-  - enabled: 0
+  - enabled: 1
     name: Flat Desert
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
@@ -2441,7 +2443,7 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 0
+  - enabled: 1
     name: 'Desert Medium '
     description: More dune ...
     Skybox: {fileID: 1193833017}
@@ -2470,7 +2472,7 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 0
+  - enabled: 1
     name: Flat desert
     description: Flat
     Skybox: {fileID: 1193833017}
@@ -2497,7 +2499,7 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 0
+  - enabled: 1
     name: TEST_FLAT
     description: Low vegetation
     Skybox: {fileID: 0}
@@ -4159,6 +4161,7 @@ MonoBehaviour:
   closeOnClick: 1
   startScale: {x: 0.3, y: 0.3, z: 0.3}
   endScale: {x: 1, y: 1, z: 1}
+  IsVisible: 0
 --- !u!225 &360585398
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4318,6 +4321,7 @@ MonoBehaviour:
   closeOnClick: 1
   startScale: {x: 0.3, y: 0.3, z: 0.3}
   endScale: {x: 1, y: 1, z: 1}
+  IsVisible: 0
   helpGame: {fileID: 1124797402}
   settingGame: {fileID: 66844891}
   splashScreen: {fileID: 371084311}
@@ -4963,6 +4967,7 @@ MonoBehaviour:
   closeOnClick: 1
   startScale: {x: 0.3, y: 0.3, z: 0.3}
   endScale: {x: 1, y: 1, z: 1}
+  IsVisible: 0
   unity: {fileID: 1430868861}
   help: {fileID: 114040367}
 --- !u!225 &431561427
@@ -5083,7 +5088,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 474558910}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -5133,6 +5138,7 @@ MonoBehaviour:
   closeOnClick: 1
   startScale: {x: 0.5, y: 0.5, z: 0.5}
   endScale: {x: 1, y: 1, z: 1}
+  IsVisible: 0
   titleText: {fileID: 641559041}
   infoText: {fileID: 1808774242}
 --- !u!222 &474558915
@@ -8889,6 +8895,7 @@ MonoBehaviour:
   closeOnClick: 1
   startScale: {x: 0.1, y: 0.1, z: 0.1}
   endScale: {x: 1, y: 1, z: 1}
+  IsVisible: 0
   leaderboardPanel: {fileID: 973761164}
   bestScoreText: {fileID: 816391498}
   leaderboardContentParent: {fileID: 123607232}
@@ -11857,6 +11864,7 @@ MonoBehaviour:
   closeOnClick: 0
   startScale: {x: 0.5, y: 0.5, z: 0.5}
   endScale: {x: 1, y: 1, z: 1}
+  IsVisible: 0
   startGameButton: {fileID: 1953770001}
   nextLevelButton: {fileID: 866844669}
   stopButton: {fileID: 331547791}

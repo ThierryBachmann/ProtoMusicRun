@@ -384,7 +384,7 @@ namespace MusicRun
 
                     // Define position and place to the terrain
                     Vector3 localPosition = new Vector3(offsetX, 5f, offsetZ);
-                    Debug.Log($"Chunk: {chunkCoord} Vege: {childTransform.name} localPosition: {localPosition} ");
+                    //Debug.Log($"Chunk: {chunkCoord} Vege: {childTransform.name} localPosition: {localPosition} ");
                     if (childTransform.CompareTag("TreeScalable"))
                     {
                         currentLevel.maxScaleVegetable = Mathf.Clamp(currentLevel.maxScaleVegetable, 0.1f, 15f);
@@ -450,7 +450,7 @@ namespace MusicRun
                         Debug.LogWarning($"No hit, chunk: {chunkCoord} child: {vege.name} position:{vege.transform.localPosition} ");
 
 
-                    Debug.Log($"Chunk: {chunkCoord} Vege: {vege.name} localPosition: {localPosition} ");
+                    //Debug.Log($"Chunk: {chunkCoord} Vege: {vege.name} localPosition: {localPosition} ");
                     if (vege.CompareTag("TreeScalable"))
                     {
                         currentLevel.maxScaleVegetable = Mathf.Clamp(currentLevel.maxScaleVegetable, 0.1f, 15f);

@@ -11,13 +11,15 @@ namespace MusicRun
         public bool closeOnClick = true;
         public Vector3 startScale = new Vector3(0.5f, 0.5f, 0.5f);
         public Vector3 endScale = Vector3.one;
+        public System.Action<bool> OnClose;
+        public bool IsVisible;
+
+        protected GameManager gameManager;
+        protected PlayerController player;
 
         private CanvasGroup canvasGroup;
         private RectTransform rectTransform;
 
-        protected GameManager gameManager;
-        protected PlayerController player;
-        public System.Action<bool> OnClose;
 
         public void Awake()
         {
@@ -31,6 +33,7 @@ namespace MusicRun
 
             // Start hidden and small
             canvasGroup.alpha = 0;
+            IsVisible = false;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
             rectTransform.localScale = startScale;
@@ -43,7 +46,8 @@ namespace MusicRun
 
         public void Show()
         {
-            if (Visible < 0.5f)
+            Debug.Log($"Panel Display {name} Show - Visible: {IsVisible}");
+            if (!IsVisible)
             {
                 StartCoroutine(AnimateIn());
             }
@@ -51,12 +55,15 @@ namespace MusicRun
 
         public void Hide()
         {
-            if (Visible >= 0.5f)
+            Debug.Log($"Panel Display {name} Hide - Visible:{IsVisible}");
+            if (IsVisible)
+            {
                 StartCoroutine(AnimateOut());
+            }
         }
         public void SwitchVisible()
         {
-            if (Visible > 0.5f)
+            if (IsVisible)
                 Hide();
             else
                 Show();
@@ -78,7 +85,6 @@ namespace MusicRun
             }
         }
 
-        public float Visible => canvasGroup.alpha;
 
         private IEnumerator AnimateIn()
         {
@@ -102,6 +108,7 @@ namespace MusicRun
             canvasGroup.alpha = 1;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
+            IsVisible = true;
         }
 
         private IEnumerator AnimateOut()
@@ -125,6 +132,7 @@ namespace MusicRun
             canvasGroup.alpha = 0;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
+            IsVisible = false;
         }
     }
 }

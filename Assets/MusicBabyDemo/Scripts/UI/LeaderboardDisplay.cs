@@ -33,19 +33,16 @@ namespace MusicRun
 
         public void Show(PlayerController player)
         {
-            if (Visible < 0.5f)
-            {
-                //Debug.Log("Showing panel: " + leaderboardPanel.name);
-                //leaderboardPanel.SetActive(true);
-                StartCoroutine(leaderboard.LoadLeaderboard());
-                RefreshPlayerScore(player);
-                Show();
-            }
+            //Debug.Log("Showing panel: " + leaderboardPanel.name);
+            //leaderboardPanel.SetActive(true);
+            StartCoroutine(leaderboard.LoadLeaderboard());
+            RefreshPlayerScore(player);
+            Show();
         }
 
         public void SwitchVisible(PlayerController player)
         {
-            if (Visible > 0.5f)
+            if (IsVisible)
                 Hide();
             else
                 Show(player);
