@@ -79,10 +79,10 @@ namespace MusicRun
         [Tooltip("Array of vegetation prefabs used for random placement in this level.")]
         public Vegetable[] vegetables;
 
-        [Header("Score Bonus / Malus")]
+        [Header(" Bonus / Malus")]
         [Range(0, 10)]
         [Tooltip("Density of score bonus objects placed along the path. Higher values mean more bonuses.")]
-        public float bonusScoreDensity = 1;
+        public float bonusMalusDensity = 1;
 
         [Range(0, 1)]
         [Tooltip("Balance between bonuses and penalties: 0 = only bonuses, 1 = only penalties.")]

@@ -2413,14 +2413,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkSize: 20
   renderDistance: 5
-  disableObstacles: 0
+  disableObstacles: 1
   levels:
   - enabled: 1
     name: Flat Desert
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
     indexMIDI: 3
-    LoopsToGoal: 0
+    LoopsToGoal: 2
     RatioSpeedMusic: 3.91
     MinSpeedMusic: 0.4
     MaxSpeedMusic: 1.3
@@ -2718,7 +2718,7 @@ GameObject:
   - component: {fileID: 256923879}
   - component: {fileID: 256923880}
   m_Layer: 0
-  m_Name: PlayerController
+  m_Name: PlayerController & Camera & Collision
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2906,7 +2906,7 @@ GameObject:
   - component: {fileID: 283134993}
   - component: {fileID: 283134996}
   m_Layer: 0
-  m_Name: GoalHandler & MidiPlayer
+  m_Name: Goal & MidiPlayer
   m_TagString: Goal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12216,7 +12216,7 @@ GameObject:
   - component: {fileID: 1489650625}
   - component: {fileID: 1489650624}
   m_Layer: 0
-  m_Name: Firebase
+  m_Name: Firebase Leaderboard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

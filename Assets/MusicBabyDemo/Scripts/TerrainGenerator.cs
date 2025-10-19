@@ -96,6 +96,7 @@ namespace MusicRun
             Debug.Log($"Start Level: {currentLevel.name} - {currentLevel.description}");
             gameManager.LiteModeApply();
             CreateStartAndGoalChunk();
+            if (currentLevel.LoopsToGoal <= 0) currentLevel.LoopsToGoal = 1;
             // Force to update chunks with real position of the player
             //currentPlayerChunk = new Vector2Int(-9999, -9999);
             UpdateChunks(startChunkCoord);
@@ -265,9 +266,9 @@ namespace MusicRun
             // Generate and place bonus.
             // When a chunk is re-generated (player return), no bonus are generated.
             // ---------------------------------------------------------------------
-            if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusScoreDensity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
+            if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusMalusDensity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
             {
-                AddBonusScore(chunkCoord, chunk, currentLevel.bonusScoreDensity, currentLevel.bonusMalusRatio, currentLevel.bonusScorePrefab);
+                AddBonusMalus(chunkCoord, chunk, currentLevel.bonusMalusDensity, currentLevel.bonusMalusRatio, currentLevel.bonusScorePrefab);
             }
             if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDensity > 0)
             {
@@ -302,8 +303,9 @@ namespace MusicRun
             }
         }
         // 
-        private void AddBonusScore(Vector2Int chunkCoord, GameObject chunk, float density, float ratio, GameObject[] prefab)
+        private void AddBonusMalus(Vector2Int chunkCoord, GameObject chunk, float density, float ratio, GameObject[] prefab)
         {
+            Debug.Log($"AddBonusMalus density:{density:F1} ratio:{ratio:F1}");
             int count = 1;
             if (density < 1)
             {
