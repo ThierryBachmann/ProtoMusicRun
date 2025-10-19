@@ -19,7 +19,12 @@ namespace MusicRun
             get
             {
                 //Debug.Log($"Tick First Note: {midiPlayer.MPTK_TickFirstNote} Tick Last Note: {midiPlayer.MPTK_TickLastNote} Tick Current: {midiPlayer.MPTK_TickCurrent}");
-                return (midiPlayer.MPTK_TickCurrent * 100f) / (float)midiPlayer.MPTK_TickLastNote;
+                if (countLoop > gameManager.terrainGenerator.CurrentLevel.LoopsToGoal)
+                    return 100f;
+                else
+                    return
+                        (float)(midiPlayer.MPTK_TickCurrent + ((countLoop - 1) * midiPlayer.MPTK_TickLastNote)) /
+                        (float)(midiPlayer.MPTK_TickLastNote * gameManager.terrainGenerator.CurrentLevel.LoopsToGoal) * 100f;
             }
         }
 
@@ -30,6 +35,7 @@ namespace MusicRun
         private GoalHandler goalHandler;
         private float savedVolume;
         private bool mute = false;
+        public int countLoop = 0;
 
         /// <summary>
         /// Instantiated at each new level, perhaps not the best approach ...
@@ -53,7 +59,7 @@ namespace MusicRun
             // Continue playing when the player (which holds the AudioListener) is to far to the AudioSource (holds by the MidiPlayer at the goal).
             // The volume sound will be zero but the MIDI sequencer is not pause. Maestro MPTK 2.16.1.
             // Note: distance is defined for each scene with MPTK_MaxDistance see UpdateMaxDistanceMPTK()
-            midiPlayer.MPTK_PauseOnMaxDistance = false; 
+            midiPlayer.MPTK_PauseOnMaxDistance = false;
             midiPlayer.MPTK_MaxDistance = 0;
 
             midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
@@ -63,8 +69,10 @@ namespace MusicRun
                 // Reset some MIDI properties which can be done only when MIDI playback is started.
                 Reset();
                 StartCoroutine(UpdateMaxDistanceMPTK());
+                countLoop++;
                 midiPlayer.MPTK_Transpose = 0;
-                midiPlayer.MPTK_MidiAutoRestart = false;
+                midiPlayer.MPTK_MidiAutoRestart = gameManager.terrainGenerator.CurrentLevel.LoopsToGoal == 1 ? false : true;
+
                 Array.Clear(channelPlayed, 0, 16);
             });
 
@@ -77,6 +85,9 @@ namespace MusicRun
             midiPlayer.OnEventEndPlayMidi.AddListener((name, endMidi) =>
             {
                 Debug.Log($"MidiPlayer - End MIDI '{name}' '{endMidi}' {goalHandler.distanceAtStart}");
+                // if (gameManager.terrainGenerator.CurrentLevel.LoopsToGoal > 0)
+
+
             });
         }
 
@@ -118,6 +129,7 @@ namespace MusicRun
         {
             if (midiPlayer != null)
             {
+                countLoop = 0;
                 // Not necessary but in case of ...
                 midiPlayer.MPTK_Stop();
 
