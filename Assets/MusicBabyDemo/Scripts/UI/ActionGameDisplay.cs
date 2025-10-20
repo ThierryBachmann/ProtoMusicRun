@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 // icon from https://www.streamlinehq.com/icons/sharp-gradient
@@ -18,12 +19,26 @@ namespace MusicRun
 
         public new void Start()
         {
-            startGameButton.onClick.AddListener(() => gameManager.RestartGame());
+            startGameButton.onClick.AddListener(() => gameManager.StartGame());
             retryLevelButton.onClick.AddListener(() => gameManager.RetryLevel());
             nextLevelButton.onClick.AddListener(() => gameManager.NextLevel());
             stopButton.onClick.AddListener(() => gameManager.StopGame());
             leaderBoardButton.onClick.AddListener(() => gameManager.LeaderboardSwitchDisplay());
             helper.onClick.AddListener(() => gameManager.SplashScreenDisplay());
+            gameManager.touchEnabler.controls.Gameplay.Start.performed += (InputAction.CallbackContext context) =>
+            {
+                if (!gameManager.gameRunning)
+                    gameManager.StartGame();
+                else if (gameManager.levelPaused)
+                {
+                    if (gameManager.levelFailed)
+                        gameManager.RetryLevel();
+                    else
+                        gameManager.NextLevel();
+                    
+                }
+            };
+
             base.Start();
         }
 

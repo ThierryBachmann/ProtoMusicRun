@@ -78,12 +78,6 @@ namespace MusicRun
         void Start()
         {
             gameManager.settingScreen.SetValue();
-            touchEnabler.controls.Gameplay.Start.performed += OnStartPressed;
-        }
-
-        private void OnStartPressed(InputAction.CallbackContext context)
-        {
-            gameManager.RestartGame(); // NextLevel();
         }
 
         void OnTriggerEnter(Collider collider)
@@ -154,7 +148,7 @@ namespace MusicRun
         void Update()
         {
             Vector3 forwardMove = Vector3.zero;
-            if (enableMovement && gameManager.levelRunning && !gameManager.goalHandler.goalReached)
+            if (enableMovement && gameManager.levelRunning && !gameManager.goalHandler.goalReached && !gameManager.levelPaused)
             {
                 // Slowly increase speed multiplier until 10 at 0.1 per second
                 Speed = Mathf.MoveTowards(Speed, MaxSpeed, Time.deltaTime * Acceleration);
@@ -196,7 +190,7 @@ namespace MusicRun
                 touchEnabler.ResetSwipeVertical();
             }
 
-            
+
             if (transform.position.y < 0f)
                 StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, 4, transform.position.z)));
 

@@ -79,7 +79,7 @@ namespace MusicRun
 
                 if (clicked != null && clicked.GetComponentInParent<Button>() != null)
                     return;
-                OnClose?.Invoke(true);
+               
 
                 Hide();
             }
@@ -133,6 +133,7 @@ namespace MusicRun
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
             IsVisible = false;
+            OnClose?.Invoke(true);
         }
     }
 }

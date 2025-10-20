@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace MusicRun
 {
@@ -9,6 +10,7 @@ namespace MusicRun
     {
         public bool gameRunning;
         public bool levelRunning;
+        public bool levelPaused;
         public bool levelFailed;
         public bool liteMode;
         public bool liteAutoSetting;
@@ -69,9 +71,10 @@ namespace MusicRun
         {
             gameRunning = false;
             levelRunning = false;
+            levelPaused = false;
             levelFailed = false;
             if (startAuto)
-                RestartGame();
+                StartGame();
             else
             {
                 splashScreen.Show();
@@ -85,6 +88,7 @@ namespace MusicRun
             ////currentLevelIndex = terrainGenerator.SelectNextLevel(-1);
             ////terrainGenerator.CreateLevel(0);
         }
+
 
         private void OnSettingChange()
         {
@@ -216,19 +220,23 @@ namespace MusicRun
                 Debug.Log("Failed to submit score");
             }
         }
+
         public void OnSwitchPause(bool pause)
         {
-            Debug.Log($"OnSwitchPause pause:{pause} levelRunning:{levelRunning}");
+            Debug.Log($"-level- OnSwitchPause pause:{pause} levelPaused was:{levelPaused}");
             if (pause)
             {
                 midiManager.Pause();
-                levelRunning = false;
+                levelPaused = true;
             }
             else
             {
                 midiManager.UnPause();
-                levelRunning = true;
+                levelPaused = false;
             }
+            // Toggling the visibility and state of related UI elements. 
+            actionLevel.ActivatePause(pause);
+
         }
         public void OnExitGame()
         {
@@ -246,9 +254,9 @@ namespace MusicRun
                     foreach (char c in Input.inputString)
                     {
                         if (c == 'h' || c == 'H') HelperScreenDisplay();
-                        if (c == 'n' || c == 'N') StartCoroutine(ClearAndNextLevel());
+                        if (c == 'n' || c == 'N') StartCoroutine(ClearAndNextLevelTest());
                         if (c == 's' || c == 'S') StopGame();
-                        if (c == 'r' || c == 'R') RestartGame();
+                        if (c == 'r' || c == 'R') StartGame();
                         if (c == 'a' || c == 'A') actionGame.SwitchVisible();
                         if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
                         if (c == 'm' || c == 'M') midiManager.SoundOnOff();
@@ -261,7 +269,7 @@ namespace MusicRun
                 }
 
             // Calculate level progression and intermediary score
-            if (gameRunning && levelRunning)
+            if (gameRunning && levelRunning && !levelPaused)
             {
                 if (goalHandler.distanceAtStart > 0)
                     GoalPercentage = 100f - (goalHandler.distance / goalHandler.distanceAtStart * 100f);
@@ -327,7 +335,7 @@ namespace MusicRun
             sceneGoal.Hide();
         }
 
-        public IEnumerator ClearAndNextLevel()
+        public IEnumerator ClearAndNextLevelTest()
         {
             terrainGenerator.ClearChunks(0);
             currentLevelNumber++;
@@ -341,8 +349,9 @@ namespace MusicRun
             leaderboardDisplay.SwitchVisible(playerController);
         }
 
-        public void RestartGame()
+        public void StartGame()
         {
+            Debug.Log("-level- StartGame Level 1");
             goalHandler.gameObject.SetActive(true);
             terrainGenerator.ResetTerrain();
             HideAllPopups();
@@ -358,16 +367,20 @@ namespace MusicRun
         /// </summary>
         public void RetryLevel()
         {
+            Debug.Log("-level- RetryLevel");
             HideAllPopups();
             CreateAndStartLevel(currentLevelIndex, restartSame: true);
+            OnSwitchPause(false);
         }
 
         public void NextLevel()
         {
+            Debug.Log("-level- NextLevel");
             HideAllPopups();
             currentLevelNumber++;
             currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
             CreateAndStartLevel(currentLevelIndex);
+            OnSwitchPause(false);
         }
 
         /// <summary>
@@ -381,7 +394,6 @@ namespace MusicRun
             scoreManager.ScoreLevel = 0;
             levelFailed = false;
             actionGame.Hide();
-            actionLevel.ActivatePause(false);
             actionLevel.Show();
             HideAllPopups();
 
@@ -400,8 +412,8 @@ namespace MusicRun
             midiManager.StartPlayMIDI(terrainGenerator.CurrentLevel.indexMIDI);
             gameRunning = true;
             levelRunning = true;
-            playerController.LevelStarted();
             OnSwitchPause(true);
+            playerController.LevelStarted();
             sceneGoal.OnClose += (ok) => { OnSwitchPause(false); };
             sceneGoal.SetInfo(terrainGenerator.CurrentLevel.name, terrainGenerator.CurrentLevel.description);
             sceneGoal.Show();
@@ -412,6 +424,7 @@ namespace MusicRun
             goalHandler.gameObject.SetActive(false);
             gameRunning = false;
             levelRunning = false;
+            levelPaused = false;
             levelFailed = false;
             actionLevel.Hide();
             actionGame.Show();
