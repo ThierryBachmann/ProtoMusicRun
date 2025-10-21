@@ -19,12 +19,15 @@ namespace MusicRun
 
         public new void Start()
         {
+            // Game logic from the button on screen
             startGameButton.onClick.AddListener(() => gameManager.StartGame());
             retryLevelButton.onClick.AddListener(() => gameManager.RetryLevel());
             nextLevelButton.onClick.AddListener(() => gameManager.NextLevel());
             stopButton.onClick.AddListener(() => gameManager.StopGame());
             leaderBoardButton.onClick.AddListener(() => gameManager.LeaderboardSwitchDisplay());
             helper.onClick.AddListener(() => gameManager.SplashScreenDisplay());
+
+            // Game logic from the gamepad
             gameManager.touchEnabler.controls.Gameplay.Start.performed += (InputAction.CallbackContext context) =>
             {
                 if (!gameManager.gameRunning)
@@ -35,7 +38,11 @@ namespace MusicRun
                         gameManager.RetryLevel();
                     else
                         gameManager.NextLevel();
-                    
+
+                }
+                else if (!gameManager.levelRunning)
+                {
+                    gameManager.NextLevel();
                 }
             };
 

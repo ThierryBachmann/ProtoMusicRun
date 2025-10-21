@@ -2416,7 +2416,7 @@ MonoBehaviour:
   renderDistance: 5
   disableObstacles: 1
   levels:
-  - enabled: 1
+  - enabled: 0
     name: Flat Desert
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
@@ -2455,7 +2455,7 @@ MonoBehaviour:
     MaxSpeedMusic: 1.28
     startGO: {fileID: 883430262}
     goalGO: {fileID: 283134987}
-    deltaGoalChunk: {x: 0, y: 20}
+    deltaGoalChunk: {x: 0, y: 3}
     perlinVegetable: 0.3
     perlinChunk: 7.15
     minScaleVegetable: 0.4
@@ -2470,33 +2470,6 @@ MonoBehaviour:
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
-    bonusInstrumentDensity: 1
-    bonusInstrumentPrefab:
-    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
-    name: Flat desert
-    description: Flat
-    Skybox: {fileID: 1193833017}
-    indexMIDI: 50
-    LoopsToGoal: 0
-    RatioSpeedMusic: 0.68
-    MinSpeedMusic: 0.53
-    MaxSpeedMusic: 2.41
-    startGO: {fileID: 883430262}
-    goalGO: {fileID: 330585543}
-    deltaGoalChunk: {x: 0, y: 20}
-    perlinVegetable: 0.3
-    perlinChunk: 100
-    minScaleVegetable: 2
-    maxScaleVegetable: 5
-    runChunks:
-    - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
-    - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
-    vegetables: []
-    bonusMalusDensity: 1
-    bonusMalusRatio: 0.5
-    bonusScorePrefab:
-    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}

@@ -370,7 +370,6 @@ namespace MusicRun
             Debug.Log("-level- RetryLevel");
             HideAllPopups();
             CreateAndStartLevel(currentLevelIndex, restartSame: true);
-            OnSwitchPause(false);
         }
 
         public void NextLevel()
@@ -380,7 +379,6 @@ namespace MusicRun
             currentLevelNumber++;
             currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
             CreateAndStartLevel(currentLevelIndex);
-            OnSwitchPause(false);
         }
 
         /// <summary>
@@ -390,7 +388,7 @@ namespace MusicRun
         /// <param name="restartSame"></param>
         private void CreateAndStartLevel(int level, bool restartSame = false)
         {
-            Debug.Log($"CreateAndStartLevel {level}");
+            Debug.Log($"-level- CreateAndStartLevel {level}");
             scoreManager.ScoreLevel = 0;
             levelFailed = false;
             actionGame.Hide();
