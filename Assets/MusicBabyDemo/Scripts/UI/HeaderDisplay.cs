@@ -90,7 +90,10 @@ namespace MusicRun
                 itemScore.SetValue(score.ToString());
                 itemBonus.SetValue((scoreManager.ScoreBonus + (int)bonusManager.bonusInProgress).ToString());
                 if (bonusManager.startBonus)
-                    itemBonus.SetColor(Utilities.ColorWarning);
+                    if (bonusManager.valueBonus > 0)
+                        itemBonus.SetColor(Utilities.ColorGreen);
+                    else
+                        itemBonus.SetColor(Utilities.ColorWarning);
                 else
                     itemBonus.ResetColor();
             }
