@@ -83,8 +83,9 @@ namespace MusicRun
             if (rb != null)
             {
                 // Direction from player to bonus
-                Vector3 kickDir = (collider.transform.position - transform.position).normalized;
+                Vector3 kickDir = (collider.transform.position - gameManager.playerController.transform.position).normalized;
                 kickDir.y = 0;
+                //Debug.Log($"{collider.transform.position } {gameManager.playerController.transform.position} kickDir:{kickDir} ");
                 // Add a forward + upward impulse (like a foot kick)
                 Vector3 force = kickDir * gameManager.playerController.Speed * 2f + Vector3.up * 8f;
                 rb.AddForce(force, ForceMode.Impulse);
@@ -100,17 +101,17 @@ namespace MusicRun
             Rigidbody rb = collider.attachedRigidbody;
             if (rb != null)
             {
-                // Direction from player to bonus
-                Vector3 kickDir = (collider.transform.position - transform.position).normalized;
+                // Direction from player to instrument
+                Vector3 kickDir = (collider.transform.position - gameManager.playerController.transform.position).normalized;
                 kickDir.y = 0;
-                // Add a forward + upward impulse (like a foot kick)
+                // Add a forward + upward impulse (like a foot kick) bur no gravity
                 Vector3 force = kickDir * gameManager.playerController.Speed * 2f + Vector3.up * 1f;
                 rb.AddForce(force, ForceMode.Impulse);
                 rb.useGravity = false;
                 // Optional: add spin
                 rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
             }
-            Destroy(collider.gameObject, 3f);
+            Destroy(collider.gameObject, 5f);
         }
 
 
