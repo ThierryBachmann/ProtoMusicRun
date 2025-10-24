@@ -30,6 +30,9 @@ namespace MusicRun
         [Tooltip("Number of times the MIDI music should loop before reaching the goal.")]
         [Range(1, 10)]
         public int LoopsToGoal;
+        [Tooltip("When enabled, player must find instrument which are played in the MIDI.")]
+        public bool SearchForInstrument;
+
 
         [Header("Music Speed")]
         [Range(0.1f, 5f)]
@@ -75,13 +78,13 @@ namespace MusicRun
         [Tooltip("List of terrain chunk prefabs that compose the running path.")]
         public GameObject[] runChunks;
 
-        [Header("Vegetables used for random placement in this level")]
+        [Header("Vegetables used for random placement in this level. Not yet used.")]
         [Tooltip("Array of vegetation prefabs used for random placement in this level.")]
         public Vegetable[] vegetables;
 
         [Header(" Bonus / Malus")]
         [Range(0, 10)]
-        [Tooltip("Density of score bonus objects placed along the path. Higher values mean more bonuses.")]
+        [Tooltip("Density of score bonus objects placed along the path. Higher values mean more bonuses. Set to 0 to disable.")]
         public float bonusMalusDensity = 1;
 
         [Range(0, 1)]

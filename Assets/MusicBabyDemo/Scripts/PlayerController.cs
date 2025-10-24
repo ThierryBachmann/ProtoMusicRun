@@ -89,7 +89,7 @@ namespace MusicRun
             }
             else if (collider.CompareTag("Instrument"))
             {
-                gameManager.bonusManager.TriggerBonus(collider);
+                gameManager.bonusManager.TriggerInstrument(collider);
             }
         }
 

@@ -95,6 +95,26 @@ namespace MusicRun
             Destroy(collider.gameObject, 3f);
         }
 
+        public void TriggerInstrument(Collider collider)
+        {
+            Rigidbody rb = collider.attachedRigidbody;
+            if (rb != null)
+            {
+                // Direction from player to bonus
+                Vector3 kickDir = (collider.transform.position - transform.position).normalized;
+                kickDir.y = 0;
+                // Add a forward + upward impulse (like a foot kick)
+                Vector3 force = kickDir * gameManager.playerController.Speed * 2f + Vector3.up * 1f;
+                rb.AddForce(force, ForceMode.Impulse);
+                rb.useGravity = false;
+                // Optional: add spin
+                rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
+            }
+            Destroy(collider.gameObject, 3f);
+        }
+
+
+
         public void StartBonus()
         {
             Debug.Log($"Start bonus Trans {valueBonus}");

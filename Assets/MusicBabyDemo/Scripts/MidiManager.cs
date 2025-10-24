@@ -2,14 +2,21 @@ using MidiPlayerTK;
 using MPTK.NAudio.Midi;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MusicRun
 {
     public class MidiManager : MonoBehaviour
     {
+        public class ChannelInstrument
+        {
+            public int Channel;
+            public int Preset;
+            public bool Set;
+        }
         public MidiFilePlayer midiPlayer;
-        public int[] channelPlayed = new int[16]; // Array to track which channels are currently playing
+        public Dictionary<int, ChannelInstrument> ChannelPlayed;
 
         /// <summary>
         /// Calculate playing progression in percentage. 
@@ -72,8 +79,6 @@ namespace MusicRun
                 countLoop++;
                 midiPlayer.MPTK_Transpose = 0;
                 midiPlayer.MPTK_MidiAutoRestart = gameManager.terrainGenerator.CurrentLevel.LoopsToGoal == 1 ? false : true;
-
-                Array.Clear(channelPlayed, 0, 16);
             });
 
             midiPlayer.OnEventNotesMidi.AddListener((midiEvents) =>
@@ -138,17 +143,21 @@ namespace MusicRun
                 midiPlayer.MPTK_Load();
 
                 // Search instrument played on each channel
-                Array.Clear(channelPlayed, 0, 16);
-                for (int channel = 0; channel < channelPlayed.Length; channel++)
-                    channelPlayed[channel] = -1;
+                ChannelPlayed = new Dictionary<int, ChannelInstrument>();
 
                 foreach (var midiEvent in midiPlayer.MPTK_MidiLoaded.MPTK_MidiEvents)
                     if (midiEvent.Command == MPTKCommand.PatchChange)
-                        channelPlayed[midiEvent.Channel] = midiEvent.Value;
-
-                for (int channel = 0; channel < channelPlayed.Length; channel++)
-                    if (channelPlayed[channel] >= 0)
-                        Debug.Log($"Channel {channel} instrument {channelPlayed[channel]}");
+                    {
+                        if (!ChannelPlayed.ContainsKey(midiEvent.Channel))
+                        {
+                            ChannelPlayed.Add(midiEvent.Channel, new ChannelInstrument() { Preset = midiEvent.Value, Set = false });
+                            Debug.Log($"Found instrument: {midiEvent.Value} on channel {midiEvent.Channel} ");
+                        }
+                        else
+                            Debug.Log($"Instrument already found on Channel {midiEvent.Channel} instrument: {midiEvent.Value}");
+                        if (gameManager.terrainGenerator.CurrentLevel.SearchForInstrument)
+                            midiEvent.Value = 0;
+                    }
 
                 // PLay MIDI, avoid to reload it
                 midiPlayer.MPTK_Play(alreadyLoaded: true);
@@ -243,16 +252,13 @@ namespace MusicRun
 
                 for (int channel = 0; channel < 16; channel++)
                 {
-                    if (channelPlayed[channel] > 0)
+                    MPTKEvent mptkEvent = new MPTKEvent()
                     {
-                        MPTKEvent mptkEvent = new MPTKEvent()
-                        {
-                            Command = MPTKCommand.PitchWheelChange,
-                            Channel = channel,
-                            Value = (int)Mathf.Lerp(0f, 16383f, pitch),
-                        };
-                        midiPlayer.MPTK_PlayDirectEvent(mptkEvent);
-                    }
+                        Command = MPTKCommand.PitchWheelChange,
+                        Channel = channel,
+                        Value = (int)Mathf.Lerp(0f, 16383f, pitch),
+                    };
+                    midiPlayer.MPTK_PlayDirectEvent(mptkEvent);
                 }
                 yield return Routine.WaitForSeconds(waitMillisecond / 1000f);
             }

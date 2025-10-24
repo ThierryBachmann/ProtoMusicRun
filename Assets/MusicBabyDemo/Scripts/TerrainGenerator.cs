@@ -26,6 +26,7 @@ namespace MusicRun
         private Dictionary<Vector2Int, GameObject> spawnedChunks;
         //private Dictionary<Vector2Int, GameObject> freeChunks;
         private Dictionary<Vector2Int, int> spawnedBonus;
+        private Dictionary<Vector2Int, int> spawnedInstrument;
         private GameManager gameManager;
 
         public GameObject StartGO { get => currentStart; }
@@ -53,6 +54,7 @@ namespace MusicRun
             spawnedChunks = new Dictionary<Vector2Int, GameObject>();
             //freeChunks = new Dictionary<Vector2Int, GameObject>();
             spawnedBonus = new Dictionary<Vector2Int, int>();
+            spawnedInstrument = new Dictionary<Vector2Int, int>();
         }
 
         /// <summary>
@@ -161,6 +163,7 @@ namespace MusicRun
             Debug.Log($"Add goal chunk coord: {goalChunkCoord} --> GO: {currentGoal.name} {currentGoal.transform.position}");
 
             spawnedBonus = new Dictionary<Vector2Int, int>();
+            spawnedInstrument = new Dictionary<Vector2Int, int>();
         }
 
         /// <summary>
@@ -270,9 +273,9 @@ namespace MusicRun
             {
                 AddBonusMalus(chunkCoord, chunk, currentLevel.bonusMalusDensity, currentLevel.bonusMalusRatio, currentLevel.bonusScorePrefab);
             }
-            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDensity > 0)
+            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDensity > 0 && !spawnedInstrument.ContainsKey(chunkCoord))
             {
-                //         AddBonusScore(chunkCoord, chunk, currentLevel.bonusInstrumentDentity, currentLevel.bonusInstrumentPrefab);
+                AddInstrument(chunkCoord, chunk, currentLevel.bonusInstrumentDensity, currentLevel.bonusInstrumentPrefab);
             }
         }
         public void ModifyChunkMesh(GameObject chunkObject)
@@ -349,7 +352,41 @@ namespace MusicRun
 
             }
         }
+        private void AddInstrument(Vector2Int chunkCoord, GameObject chunk, float density, GameObject[] prefab)
+        {
+            Debug.Log($"AddInstrument density:{density:F1}");
+            int count = 1;
+            if (density < 1)
+            {
+                // Special case when count is inferior to 1.
+                // Create 0 or 1 bonus with probability from BonusCount
+                if (UnityEngine.Random.Range(0f, 1f) < density)
+                    count = 1;
+                else
+                    count = 0;
+            }
+            else
+                count = (int)density;
+            // At least one bonus for this chunk
+            if (count > 0)
+            {
+                for (int i = 0; i < density; i++)
+                {
+                    int indexPrefab = UnityEngine.Random.Range(0, prefab.Length);
+                    GameObject instrumentPrefabRandom = prefab[indexPrefab];
+                    GameObject instrument = Instantiate(instrumentPrefabRandom);
+                    instrument.transform.SetParent(chunk.transform, false);
+                    Vector3 instrumentPos = new Vector3(UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f), 5f, UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f));
+                    instrument.transform.SetLocalPositionAndRotation(instrumentPos, Quaternion.identity);
+                    PlaceOnHighestTerrain(instrument.transform, 100f, 4f);
+                    instrument.name = $"AddInstrument - level: {currentIndexLevel} - chunk {chunkCoord} - localPosition: {instrument.transform.localPosition}";
+                }
 
+                // Just keep a trace of bonus count for this chunk to avoid re-generate if player return
+                spawnedInstrument.Add(chunkCoord, count);
+
+            }
+        }
         private void PlaceAndScaleExistingVege(Vector2Int chunkCoord, GameObject chunk)
         {
 
@@ -476,7 +513,7 @@ namespace MusicRun
         /// </summary>
         /// <param name="obj">Objet à placer</param>
         /// <param name="maxRayHeight">Hauteur max du rayon pour détecter le sol</param>
-        public static bool PlaceOnHighestTerrain(Transform obj, float maxRayHeight = 100f)
+        public static bool PlaceOnHighestTerrain(Transform obj, float maxRayHeight = 100f, float yShift = 0f)
         {
             Vector3 startPos = obj.position + Vector3.up * maxRayHeight;
             Ray ray = new Ray(startPos, Vector3.down);
@@ -508,7 +545,7 @@ namespace MusicRun
                 chunk = obj.parent;
             Vector3 localPos = chunk.InverseTransformPoint(topHit.point);
 
-            obj.localPosition = new Vector3(localPos.x, localPos.y, localPos.z);
+            obj.localPosition = new Vector3(localPos.x, localPos.y + yShift, localPos.z);
 
             // Debug purpose ....
             //obj.name = obj.name.Substring(0, 6) + "_" + chunk.name + "_" + topHit.transform.name;

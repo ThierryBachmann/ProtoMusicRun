@@ -51,7 +51,7 @@ namespace MusicRun
         {
             foreach (var t in Touch.activeTouches)
             {
-                Debug.Log($"touch id:{t.touchId} pos:{t.screenPosition} phase:{t.phase}");
+                //Debug.Log($"touch id:{t.touchId} pos:{t.screenPosition} phase:{t.phase}");
                 switch (t.phase)
                 {
                     case UnityEngine.InputSystem.TouchPhase.Began:
