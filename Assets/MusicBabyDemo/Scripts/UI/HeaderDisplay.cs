@@ -11,6 +11,7 @@ namespace MusicRun
         public TitleItem itemLevel;
         public TitleItem itemScore;
         public TitleItem itemBonus;
+        public TitleItem itemInstrument;
         public TextMeshProUGUI infoText;
         public Button quitButton;
         public Button directionButton;
@@ -96,12 +97,14 @@ namespace MusicRun
                         itemBonus.SetColor(Utilities.ColorWarning);
                 else
                     itemBonus.ResetColor();
+                itemInstrument.SetValue($"{gameManager.midiManager.InstrumentRestored} / {gameManager.midiManager.InstrumentFound}");
             }
             else
             {
                 itemLevel.SetValue("");
                 itemScore.SetValue("");
                 itemBonus.SetValue("");
+                itemInstrument.SetValue("");
             }
 
             //    Color targetColor = scoreText.color; // couleur par défaut

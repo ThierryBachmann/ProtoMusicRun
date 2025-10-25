@@ -274,7 +274,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -904,11 +904,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1867055021595112432, guid: ac080e9af669875429919b0b893865ee, type: 3}
       propertyPath: m_Name
-      value: PanelBestPlayer
+      value: PanelInstrument
       objectReference: {fileID: 0}
     - target: {fileID: 2181623646786241559, guid: ac080e9af669875429919b0b893865ee, type: 3}
       propertyPath: m_text
-      value: Top Player Score
+      value: Instrument
       objectReference: {fileID: 0}
     - target: {fileID: 2628005635081313367, guid: ac080e9af669875429919b0b893865ee, type: 3}
       propertyPath: m_AnchorMax.y
@@ -929,6 +929,10 @@ PrefabInstance:
     - target: {fileID: 2628005635081313367, guid: ac080e9af669875429919b0b893865ee, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2778600940056375287, guid: ac080e9af669875429919b0b893865ee, type: 3}
+      propertyPath: m_text
+      value: 16 / 16
       objectReference: {fileID: 0}
     - target: {fileID: 6182337259497284078, guid: ac080e9af669875429919b0b893865ee, type: 3}
       propertyPath: m_Pivot.x
@@ -992,7 +996,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6182337259497284078, guid: ac080e9af669875429919b0b893865ee, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 966.8
+      value: 692.19
       objectReference: {fileID: 0}
     - target: {fileID: 6182337259497284078, guid: ac080e9af669875429919b0b893865ee, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -2423,12 +2427,13 @@ MonoBehaviour:
     indexMIDI: 3
     LoopsToGoal: 2
     SearchForInstrument: 1
+    SubstitutionInstrument: 66
     RatioSpeedMusic: 3.91
     MinSpeedMusic: 0.4
     MaxSpeedMusic: 1.3
     startGO: {fileID: 883430262}
     goalGO: {fileID: 283134987}
-    deltaGoalChunk: {x: 0, y: 12}
+    deltaGoalChunk: {x: 0, y: 8}
     perlinVegetable: 0.3
     perlinChunk: 8
     minScaleVegetable: 0.71
@@ -2442,7 +2447,7 @@ MonoBehaviour:
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
-    bonusInstrumentDensity: 1.07
+    bonusInstrumentDensity: 1.44
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 1
@@ -2452,6 +2457,7 @@ MonoBehaviour:
     indexMIDI: 80
     LoopsToGoal: 0
     SearchForInstrument: 1
+    SubstitutionInstrument: 0
     RatioSpeedMusic: 0.47
     MinSpeedMusic: 0.55
     MaxSpeedMusic: 1.28
@@ -2482,6 +2488,7 @@ MonoBehaviour:
     indexMIDI: 50
     LoopsToGoal: 0
     SearchForInstrument: 1
+    SubstitutionInstrument: 0
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
@@ -2509,6 +2516,7 @@ MonoBehaviour:
     indexMIDI: 80
     LoopsToGoal: 0
     SearchForInstrument: 0
+    SubstitutionInstrument: 0
     RatioSpeedMusic: 0.25
     MinSpeedMusic: 0.2
     MaxSpeedMusic: 1.99
@@ -4529,8 +4537,8 @@ RectTransform:
   - {fileID: 1220159231}
   - {fileID: 435673925}
   - {fileID: 1567204029}
-  - {fileID: 2099186790}
   - {fileID: 1009404858}
+  - {fileID: 2099186790}
   m_Father: {fileID: 1611664819}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6679,7 +6687,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6182337259497284078, guid: ac080e9af669875429919b0b893865ee, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 710.9
+      value: 983.9
       objectReference: {fileID: 0}
     - target: {fileID: 6182337259497284078, guid: ac080e9af669875429919b0b893865ee, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -7026,6 +7034,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   midiPlayer: {fileID: 738411423}
+  InstrumentFound: 0
+  InstrumentRestored: 0
   countLoop: 0
 --- !u!4 &804034794
 Transform:
@@ -9273,6 +9283,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6182337259497284078, guid: ac080e9af669875429919b0b893865ee, type: 3}
   m_PrefabInstance: {fileID: 95141715}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1009404859 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6272452127754423252, guid: ac080e9af669875429919b0b893865ee, type: 3}
+  m_PrefabInstance: {fileID: 95141715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2648a77fb4c70b44b4ee7bb71b512ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1050222836
 GameObject:
   m_ObjectHideFlags: 0
@@ -13196,6 +13217,7 @@ MonoBehaviour:
   itemLevel: {fileID: 1220159232}
   itemScore: {fileID: 435673926}
   itemBonus: {fileID: 1567204030}
+  itemInstrument: {fileID: 1009404859}
   infoText: {fileID: 1770975910}
   quitButton: {fileID: 347110354}
   directionButton: {fileID: 1516289030}
@@ -15373,8 +15395,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294931247
-  m_fontColor: {r: 0.18396229, g: 0.45250562, b: 1, a: 1}
+    rgba: 4289551413
+  m_fontColor: {r: 0.20784314, g: 0.36078432, b: 0.6784314, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

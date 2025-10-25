@@ -110,6 +110,7 @@ namespace MusicRun
                 rb.useGravity = false;
                 // Optional: add spin
                 rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
+                gameManager.midiManager.RestoreMidiChannel();
             }
             Destroy(collider.gameObject, 5f);
         }

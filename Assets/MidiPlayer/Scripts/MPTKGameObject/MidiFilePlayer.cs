@@ -1731,7 +1731,7 @@ namespace MidiPlayerTK
                 }
 
                 if ((MPTK_MidiAutoRestart || replayMidi) && !stopMidi)
-                    MPTK_Play();
+                    MPTK_Play(alreadyLoaded);
                 //stopMidiToPlay = false;
             }
             catch (System.Exception ex)
@@ -1787,9 +1787,9 @@ namespace MidiPlayerTK
                 }
             }
             if (Application.isPlaying)
-                Routine.RunCoroutine(ThreadInternalMidiPlaying(currentMidiName, fromPosition, toPosition).CancelWith(gameObject), Segment.RealtimeUpdate);
+                Routine.RunCoroutine(ThreadInternalMidiPlaying(currentMidiName, fromPosition, toPosition, alreadyLoaded).CancelWith(gameObject), Segment.RealtimeUpdate);
             else
-                Routine.RunCoroutine(ThreadInternalMidiPlaying(currentMidiName, fromPosition, toPosition), Segment.EditorUpdate);
+                Routine.RunCoroutine(ThreadInternalMidiPlaying(currentMidiName, fromPosition, toPosition, alreadyLoaded), Segment.EditorUpdate);
             yield return 0;
         }
 
@@ -1808,7 +1808,7 @@ namespace MidiPlayerTK
         // if timePosition is true, fromPosition and toPosition are used (if > 0)
         // else fromTick and toTick are used (if > 0)
         // MIDI must be already loaded
-        protected IEnumerator<float> ThreadInternalMidiPlaying(string currentMidiName, float fromPosition = 0, float toPosition = 0)
+        protected IEnumerator<float> ThreadInternalMidiPlaying(string currentMidiName, float fromPosition = 0, float toPosition = 0, bool alreadyLoaded = false)
         {
             if (midiLoaded != null && midiLoaded.MPTK_MidiEvents != null && midiLoaded.MPTK_MidiEvents.Count != 0)
             {
@@ -2060,7 +2060,7 @@ namespace MidiPlayerTK
                     Debug.LogException(ex);
                 }
 
-                if (replayMidi && !stopMidi) MPTK_Play();
+                if (replayMidi && !stopMidi) MPTK_Play(alreadyLoaded);
             }
             catch (System.Exception ex)
             {

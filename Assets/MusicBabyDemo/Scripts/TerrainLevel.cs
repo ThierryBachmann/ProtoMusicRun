@@ -32,6 +32,8 @@ namespace MusicRun
         public int LoopsToGoal;
         [Tooltip("When enabled, player must find instrument which are played in the MIDI.")]
         public bool SearchForInstrument;
+        [Range(0, 127)]
+        public int SubstitutionInstrument;
 
 
         [Header("Music Speed")]

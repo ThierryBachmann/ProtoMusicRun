@@ -13,10 +13,13 @@ namespace MusicRun
         {
             public int Channel;
             public int Preset;
-            public bool Set;
+            public bool Restored;
+            public MPTKEvent MidiEventChanged;
         }
         public MidiFilePlayer midiPlayer;
         public Dictionary<int, ChannelInstrument> ChannelPlayed;
+        public int InstrumentFound;
+        public int InstrumentRestored;
 
         /// <summary>
         /// Calculate playing progression in percentage. 
@@ -71,7 +74,7 @@ namespace MusicRun
 
             midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
             {
-                // Start of the MIDI playback has been triggered.
+                // MIDI playback start triggered.
                 Debug.Log($"MidiPlayer - Play MIDI '{name}' {goalHandler.distanceAtStart}");
                 // Reset some MIDI properties which can be done only when MIDI playback is started.
                 Reset();
@@ -91,8 +94,6 @@ namespace MusicRun
             {
                 Debug.Log($"MidiPlayer - End MIDI '{name}' '{endMidi}' {goalHandler.distanceAtStart}");
                 // if (gameManager.terrainGenerator.CurrentLevel.LoopsToGoal > 0)
-
-
             });
         }
 
@@ -141,27 +142,52 @@ namespace MusicRun
                 // Select and load the MIDI
                 midiPlayer.MPTK_MidiIndex = index;
                 midiPlayer.MPTK_Load();
-
-                // Search instrument played on each channel
-                ChannelPlayed = new Dictionary<int, ChannelInstrument>();
-
-                foreach (var midiEvent in midiPlayer.MPTK_MidiLoaded.MPTK_MidiEvents)
-                    if (midiEvent.Command == MPTKCommand.PatchChange)
-                    {
-                        if (!ChannelPlayed.ContainsKey(midiEvent.Channel))
-                        {
-                            ChannelPlayed.Add(midiEvent.Channel, new ChannelInstrument() { Preset = midiEvent.Value, Set = false });
-                            Debug.Log($"Found instrument: {midiEvent.Value} on channel {midiEvent.Channel} ");
-                        }
-                        else
-                            Debug.Log($"Instrument already found on Channel {midiEvent.Channel} instrument: {midiEvent.Value}");
-                        if (gameManager.terrainGenerator.CurrentLevel.SearchForInstrument)
-                            midiEvent.Value = 0;
-                    }
-
+                ClearMidiChannel();
                 // PLay MIDI, avoid to reload it
                 midiPlayer.MPTK_Play(alreadyLoaded: true);
             }
+        }
+
+        private void ClearMidiChannel()
+        {
+            // Search instrument played on each channel
+            ChannelPlayed = new Dictionary<int, ChannelInstrument>();
+
+            foreach (MPTKEvent midiEvent in midiPlayer.MPTK_MidiLoaded.MPTK_MidiEvents)
+                if (midiEvent.Command == MPTKCommand.PatchChange)
+                {
+                    if (!ChannelPlayed.ContainsKey(midiEvent.Channel))
+                    {
+                        ChannelPlayed.Add(midiEvent.Channel, new ChannelInstrument()
+                        {
+                            Channel = midiEvent.Channel,
+                            Preset = midiEvent.Value,
+                            Restored = false,
+                            MidiEventChanged = midiEvent
+                        });
+                        Debug.Log($"MidiPlayer - Found instrument: {midiEvent.Value} on channel {midiEvent.Channel} ");
+                    }
+                    else
+                        Debug.Log($"MidiPlayer - Instrument already found on Channel {midiEvent.Channel} instrument: {midiEvent.Value}");
+                    if (gameManager.terrainGenerator.CurrentLevel.SearchForInstrument)
+                        midiEvent.Value = gameManager.terrainGenerator.CurrentLevel.SubstitutionInstrument;
+                }
+            InstrumentFound = ChannelPlayed.Count;
+            InstrumentRestored = 0;
+        }
+
+        public void RestoreMidiChannel()
+        {
+            foreach (ChannelInstrument instrument in ChannelPlayed.Values)
+                if (!instrument.Restored)
+                {
+                    midiPlayer.MPTK_Channels[instrument.Channel].PresetNum = instrument.Preset;
+                    instrument.MidiEventChanged.Value = instrument.Preset;
+                    instrument.Restored = true;
+                    InstrumentRestored++;
+                    Debug.Log($"MidiPlayer - Restore instrument {instrument.Preset} on channel {instrument.Channel} ");
+                    break;
+                }
         }
 
         /// <summary>
