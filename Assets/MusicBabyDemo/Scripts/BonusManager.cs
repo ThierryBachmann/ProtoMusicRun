@@ -111,6 +111,7 @@ namespace MusicRun
                 // Optional: add spin
                 rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
                 gameManager.midiManager.RestoreMidiChannel();
+                gameManager.headerDisplay.itemInstrument.BlinkBackground(Utilities.ColorGreen, 3f, 0.1f);
             }
             Destroy(collider.gameObject, 5f);
         }

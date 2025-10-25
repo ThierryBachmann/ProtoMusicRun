@@ -1,5 +1,4 @@
 using MidiPlayerTK;
-using MPTK.NAudio.Midi;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +8,9 @@ namespace MusicRun
 {
     public class MidiManager : MonoBehaviour
     {
+        /// <summary>
+        /// Information about preset change found in the MIDI
+        /// </summary>
         public class ChannelInstrument
         {
             public int Channel;
@@ -16,6 +18,7 @@ namespace MusicRun
             public bool Restored;
             public MPTKEvent MidiEventChanged;
         }
+
         public MidiFilePlayer midiPlayer;
         public Dictionary<int, ChannelInstrument> ChannelPlayed;
         public int InstrumentFound;
@@ -103,8 +106,8 @@ namespace MusicRun
         }
 
         /// <summary>
-        /// The volume is directly linked to the distance between the player and the goal.
-        /// Set at new level.
+        /// The MIDI global volume is directly linked to the distance between the player and the goal.
+        /// Set at new level but a delau can occurs, so let the level be built.
         /// </summary>
         /// <returns></returns>
         private IEnumerator UpdateMaxDistanceMPTK()
@@ -148,6 +151,12 @@ namespace MusicRun
             }
         }
 
+        /// <summary>
+        /// Clears and initializes the MIDI channel data by identifying instruments played on each channel.
+        /// </summary>
+        /// <remarks>This method resets the <see cref="ChannelPlayed"/> dictionary and populates it with
+        /// instruments found in the loaded MIDI events. It logs the instruments found on each channel and updates the
+        /// MIDI event value if a substitution instrument is required by the current level configuration.</remarks>
         private void ClearMidiChannel()
         {
             // Search instrument played on each channel
@@ -158,6 +167,8 @@ namespace MusicRun
                 {
                     if (!ChannelPlayed.ContainsKey(midiEvent.Channel))
                     {
+                        // Store instrument information and PatchChange MIDI event to restore the original value
+                        // in case of the MIDI is looped (MIDI is not reloaded when restart is done).
                         ChannelPlayed.Add(midiEvent.Channel, new ChannelInstrument()
                         {
                             Channel = midiEvent.Channel,
@@ -169,6 +180,9 @@ namespace MusicRun
                     }
                     else
                         Debug.Log($"MidiPlayer - Instrument already found on Channel {midiEvent.Channel} instrument: {midiEvent.Value}");
+
+                    // Clear preset to a default value set for the level only if mode "Search for instrument" is enabled.
+                    // But this mode is so interesting, it will perhaps available for each level!
                     if (gameManager.terrainGenerator.CurrentLevel.SearchForInstrument)
                         midiEvent.Value = gameManager.terrainGenerator.CurrentLevel.SubstitutionInstrument;
                 }
@@ -176,6 +190,12 @@ namespace MusicRun
             InstrumentRestored = 0;
         }
 
+        /// <summary>
+        /// Restores the MIDI channel to its original instrument preset.
+        /// </summary>
+        /// <remarks>This method iterates through the collection of played channels and restores the first
+        /// non-restored instrument to its original preset. Once restored, the instrument is marked as restored, and the
+        /// restoration count is incremented.</remarks>
         public void RestoreMidiChannel()
         {
             foreach (ChannelInstrument instrument in ChannelPlayed.Values)
