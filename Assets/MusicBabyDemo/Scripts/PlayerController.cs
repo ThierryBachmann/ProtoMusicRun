@@ -150,7 +150,7 @@ namespace MusicRun
             Vector3 forwardMove = Vector3.zero;
             if (enableMovement && gameManager.levelRunning && !gameManager.goalHandler.goalReached && !gameManager.levelPaused)
             {
-                // Slowly increase speed multiplier until 10 at 0.1 per second
+                // Slowly increase speed multiplier until MaxSpeed at Acceleration per second
                 Speed = Mathf.MoveTowards(Speed, MaxSpeed, Time.deltaTime * Acceleration);
                 forwardMove = transform.forward * Speed;
             }
@@ -163,7 +163,7 @@ namespace MusicRun
                 Vector2Int playerChunk = terrainGenerator.PositionToChunk(transform.position);
                 if (playerChunk != currentPlayerChunk)
                 {
-                    Debug.Log($"Player enters in a chunk: x={transform.position.x} z={transform.position.z} --> playerChunk: {playerChunk}");
+                    //Debug.Log($"Player enters in a chunk: x={transform.position.x} z={transform.position.z} --> playerChunk: {playerChunk}");
                     currentPlayerChunk = playerChunk;
                     terrainGenerator.UpdateChunks(currentPlayerChunk);
                 }
@@ -183,11 +183,16 @@ namespace MusicRun
             if (!isJumping)
             {
                 if (gameManager.actionLevel.jumpButton.IsHeld || touchEnabler.TurnUpIsPressed)
+                {
                     verticalVelocity.y = JumpForce * 50f;
+                    isJumping = true;
+                }
                 if (touchEnabler.SwipeVerticalValue != 0f)
+                {
                     verticalVelocity.y = JumpForce * touchEnabler.SwipeVerticalValue;
-                isJumping = true;
-                touchEnabler.ResetSwipeVertical();
+                    isJumping = true;
+                    touchEnabler.ResetSwipeVertical();
+                }
             }
 
 
