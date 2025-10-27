@@ -273,7 +273,7 @@ namespace MusicRun
             {
                 AddBonusMalus(chunkCoord, chunk, currentLevel.bonusMalusDensity, currentLevel.bonusMalusRatio, currentLevel.bonusScorePrefab);
             }
-            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDensity > 0 && !spawnedInstrument.ContainsKey(chunkCoord))
+            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDensity > 0/* && !spawnedInstrument.ContainsKey(chunkCoord)*/)
             {
                 AddInstrument(chunkCoord, chunk, currentLevel.bonusInstrumentDensity, currentLevel.bonusInstrumentPrefab);
             }
@@ -308,7 +308,7 @@ namespace MusicRun
         // 
         private void AddBonusMalus(Vector2Int chunkCoord, GameObject chunk, float density, float ratio, GameObject[] prefab)
         {
-            Debug.Log($"AddBonusMalus density:{density:F1} ratio:{ratio:F1}");
+            //Debug.Log($"AddBonusMalus density:{density:F1} ratio:{ratio:F1}");
             int count = 1;
             if (density < 1)
             {
@@ -354,7 +354,7 @@ namespace MusicRun
         }
         private void AddInstrument(Vector2Int chunkCoord, GameObject chunk, float density, GameObject[] prefab)
         {
-            Debug.Log($"AddInstrument density:{density:F1}");
+            //Debug.Log($"AddInstrument density:{density:F1}");
             int count = 1;
             if (density < 1)
             {
@@ -378,12 +378,12 @@ namespace MusicRun
                     instrument.transform.SetParent(chunk.transform, false);
                     Vector3 instrumentPos = new Vector3(UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f), 5f, UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f));
                     instrument.transform.SetLocalPositionAndRotation(instrumentPos, Quaternion.identity);
-                    PlaceOnHighestTerrain(instrument.transform, 100f, 4f);
+                    PlaceOnHighestTerrain(instrument.transform, 100f, 1f);//, 4f);
                     instrument.name = $"AddInstrument - level: {currentIndexLevel} - chunk {chunkCoord} - localPosition: {instrument.transform.localPosition}";
                 }
 
                 // Just keep a trace of bonus count for this chunk to avoid re-generate if player return
-                spawnedInstrument.Add(chunkCoord, count);
+                //spawnedInstrument.Add(chunkCoord, count);
 
             }
         }

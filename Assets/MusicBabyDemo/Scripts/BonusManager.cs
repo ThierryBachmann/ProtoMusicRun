@@ -35,6 +35,7 @@
 // }
 
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace MusicRun
@@ -71,6 +72,8 @@ namespace MusicRun
         /// Total value to award for a completed bonus window. Positive for bonus, negative for malus.
         /// </summary>
         public float valueBonus = 20f;
+
+        public GameObject goal;
 
         private GameManager gameManager;
         private MidiManager midiManager;
@@ -143,7 +146,7 @@ namespace MusicRun
                 rb.AddForce(force, ForceMode.Impulse);
                 rb.useGravity = true;
 
-                // Optional: add a random spin for visual variety.
+                // Add a random spin for visual variety.
                 rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
             }
 
@@ -158,20 +161,12 @@ namespace MusicRun
         /// <param name="collider">Collider of the instrument pickup object.</param>
         public void TriggerInstrument(Collider collider)
         {
-            Rigidbody rb = collider.attachedRigidbody;
-            if (rb != null)
+            Debug.Log($"Bonus - TriggerInstrument:{collider.transform.name}");
+
+            if (collider.attachedRigidbody != null)
             {
-                // Direction from player to the instrument (horizontal only).
-                Vector3 kickDir = (collider.transform.position - gameManager.playerController.transform.position).normalized;
-                kickDir.y = 0;
-
-                // Add a gentle forward + slight upward impulse and keep the object floating (no gravity).
-                Vector3 force = kickDir * gameManager.playerController.Speed * 2f + Vector3.up * 1f;
-                rb.AddForce(force, ForceMode.Impulse);
-                rb.useGravity = false;
-
-                // Optional: add spin for visual effect.
-                rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
+                // Start coroutine to move toward the goal
+                StartCoroutine(MoveTowardGoal(collider));
 
                 // Restore one MIDI channel's original instrument preset.
                 gameManager.midiManager.RestoreMidiChannel();
@@ -179,9 +174,81 @@ namespace MusicRun
                 // Provide UI feedback: blink the instrument item background in green.
                 gameManager.headerDisplay.itemInstrument.BlinkBackground(Utilities.ColorGreen, 3f, 0.1f);
             }
+        }
 
-            // Destroy the instrument object after a longer delay to allow the restore animation to be visible.
-            Destroy(collider.gameObject, 5f);
+        private IEnumerator MoveTowardGoal(Collider collider)
+        {
+            float speed = 15f; // Units per second
+            float stopDistance = 1f;
+            Rigidbody rb = collider.attachedRigidbody;
+            GameObject obj = collider.gameObject;
+
+
+            // Direction from player to the instrument (horizontal only).
+            Vector3 kickDir = (obj.transform.position - gameManager.playerController.transform.position).normalized;
+            kickDir.y = 0;
+
+            // Add a gentle forward + slight upward impulse and keep the object floating (no gravity).
+            Vector3 force = kickDir * gameManager.playerController.Speed * 2f + Vector3.up * 1f;
+            rb.AddForce(force, ForceMode.Impulse);
+            
+            // Disable gravity so the object moves in a controlled straight line
+            rb.useGravity = false;
+
+            // Add spin for visual effect.
+            //rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
+
+            yield return new WaitForSeconds(1f);
+
+            // Disable any residual movement from physics before starting
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+
+            // Prevent collisions with the goal to avoid unwanted rebounds
+            Physics.IgnoreCollision(collider, goal.GetComponent<Collider>(), true);
+
+            Vector3 goalPos = goal.transform.position;
+            goalPos.y = 1f;
+
+            // Use FixedUpdate timing for smooth, physics-consistent motion
+            while (true)
+            {
+                Vector3 direction = goalPos - obj.transform.position;
+                float distance = direction.magnitude;
+
+                // Reset any physics-driven motion every frame to avoid drifts or rebounds
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+
+                Debug.Log($"Bonus - Goal:{goalPos}  Bonus:{obj.transform.position} Dir:{direction} Dist:{distance} {obj.name}");
+                if (distance < stopDistance)
+                    break;
+
+                // Wait for the next physics step instead of every rendered frame
+                rb.MovePosition(rb.position + direction.normalized * speed * Time.deltaTime);
+
+
+                yield return new WaitForFixedUpdate();
+            }
+
+            //float forceMagnitude = 0.05f; // Adjust for desired speed
+            //rb.AddForce((goalPos - obj.transform.position) * forceMagnitude, ForceMode.Impulse);
+
+            //while (true)
+            //{
+            //    Vector3 direction = goalPos - obj.transform.position;
+            //    float distance = direction.magnitude;
+            //    Debug.Log($"Bonus - Goal:{goalPos}  Bonus:{obj.transform.position} Dir:{direction} Dist:{distance} {obj.name}");
+            //    if (distance < stopDistance)
+            //        break;
+
+            //    rb.AddForce(direction * forceMagnitude, ForceMode.Impulse);
+            //    yield return null;
+            //}
+
+            Debug.Log($"Bonus - Destroy Instrument {obj.name}");
+            //rb.isKinematic = true;
+            Destroy(obj);
         }
 
         /// <summary>
@@ -190,7 +257,7 @@ namespace MusicRun
         /// </summary>
         public void StartBonus()
         {
-            Debug.Log($"Start bonus Trans {valueBonus}");
+            Debug.Log($"Bonus - start Trans {valueBonus}");
             if (valueBonus > 0)
                 midiManager.TransposeAdd(6); // transpose up one octave (approx. 6 semitones * 2 = octave depending on game convention)
             else
@@ -206,7 +273,7 @@ namespace MusicRun
         {
             if (startBonus)
             {
-                Debug.Log("End bonus Trans");
+                Debug.Log("Bonus - end Trans");
 
                 startBonus = false;
                 midiManager.TransposeClear();

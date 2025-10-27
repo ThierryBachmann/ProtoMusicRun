@@ -6,7 +6,7 @@ namespace MusicRun
     public class GoalHandler : MonoBehaviour
     {
         public GoalSpotlightAnimator goalSpotlightAnimator;
-        public GameObject sphere;
+        public GameObject Pyramid;
         public GameObject Goal;
         public float distance;            // (debug) distance actuelle
         public float distanceAtStart;            // (debug) distance actuelle
