@@ -189,13 +189,13 @@ namespace MusicRun
             kickDir.y = 0;
 
             // Add a gentle forward + slight upward impulse and keep the object floating (no gravity).
-            Vector3 force = kickDir * gameManager.playerController.Speed * 2f + Vector3.up * 1f;
+            Vector3 force = kickDir * gameManager.playerController.Speed * 3f + Vector3.up;
             rb.AddForce(force, ForceMode.Impulse);
             
             // Disable gravity so the object moves in a controlled straight line
             rb.useGravity = false;
 
-            // Add spin for visual effect.
+            // Add spin for visual effect. Finally, better without ...
             //rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
 
             yield return new WaitForSeconds(1f);
@@ -204,7 +204,7 @@ namespace MusicRun
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
 
-            // Prevent collisions with the goal to avoid unwanted rebounds
+            // Prevent collisions with the goal to avoid unwanted rebounds (rb.isKinematic = true could also works)
             Physics.IgnoreCollision(collider, goal.GetComponent<Collider>(), true);
 
             Vector3 goalPos = goal.transform.position;
@@ -220,7 +220,7 @@ namespace MusicRun
                 rb.linearVelocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
 
-                Debug.Log($"Bonus - Goal:{goalPos}  Bonus:{obj.transform.position} Dir:{direction} Dist:{distance} {obj.name}");
+                //Debug.Log($"Bonus - Goal:{goalPos}  Bonus:{obj.transform.position} Dir:{direction} Dist:{distance} {obj.name}");
                 if (distance < stopDistance)
                     break;
 
@@ -231,9 +231,10 @@ namespace MusicRun
                 yield return new WaitForFixedUpdate();
             }
 
+
+            // Other solution with only AddForce (seems not robust)
             //float forceMagnitude = 0.05f; // Adjust for desired speed
             //rb.AddForce((goalPos - obj.transform.position) * forceMagnitude, ForceMode.Impulse);
-
             //while (true)
             //{
             //    Vector3 direction = goalPos - obj.transform.position;
@@ -248,6 +249,7 @@ namespace MusicRun
 
             Debug.Log($"Bonus - Destroy Instrument {obj.name}");
             //rb.isKinematic = true;
+            // Destroy immediately after reaching the goal (no need for isKinematic)
             Destroy(obj);
         }
 

@@ -98,6 +98,8 @@ namespace MusicRun
                 else
                     itemBonus.ResetColor();
                 itemInstrument.SetValue($"{gameManager.midiManager.InstrumentRestored} / {gameManager.midiManager.InstrumentFound}");
+                if (gameManager.midiManager.InstrumentRestored >= gameManager.midiManager.InstrumentFound)
+                    itemInstrument.SetColor(Utilities.ColorGreen);
             }
             else
             {
