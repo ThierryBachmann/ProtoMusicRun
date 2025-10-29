@@ -172,7 +172,7 @@ namespace MusicRun
                 gameManager.midiManager.RestoreMidiChannel();
 
                 // Provide UI feedback: blink the instrument item background in green.
-                gameManager.headerDisplay.itemInstrument.BlinkBackground(Utilities.ColorGreen, 3f, 0.1f);
+                gameManager.headerDisplay.itemInstrument.BlinkBackground(Utilities.ColorGreen, 3f, 0.3f);
             }
         }
 

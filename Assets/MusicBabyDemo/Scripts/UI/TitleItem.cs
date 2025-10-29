@@ -48,27 +48,12 @@ public class TitleItem : MonoBehaviour
     public void BlinkBackground(Color color, float duration, float interval = 0.2f)
     {
         if (imageBackground == null) imageBackground = GetComponent<Image>();
-        if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
         blinkCoroutine = StartCoroutine(BlinkRoutine(color, duration, interval));
-    }
-
-    /// <summary>
-    /// Stop any active blinking and restore the original background color.
-    /// </summary>
-    public void StopBlink()
-    {
-        if (blinkCoroutine != null)
-        {
-            StopCoroutine(blinkCoroutine);
-            blinkCoroutine = null;
-        }
-        ResetColor();
     }
 
     private IEnumerator BlinkRoutine(Color color, float duration, float interval)
     {
         float elapsed = 0f;
-        bool useTarget = false;
 
         // Defensive: clamp values
         interval = Mathf.Max(0.01f, interval);
@@ -76,16 +61,11 @@ public class TitleItem : MonoBehaviour
 
         while (elapsed < duration)
         {
-            imageBackground.color = useTarget ? color : backgroundColor;
-            useTarget = !useTarget;
-
-            float wait = Mathf.Min(interval, duration - elapsed);
-            yield return new WaitForSeconds(wait);
-            elapsed += wait;
+            imageBackground.color = color;
+            yield return new WaitForSeconds(interval);
+            imageBackground.color = backgroundColor;
+            yield return new WaitForSeconds(interval);
+            elapsed += 2 * interval;
         }
-
-        // Ensure we end with the original color
-        imageBackground.color = backgroundColor;
-        blinkCoroutine = null;
     }
 }
