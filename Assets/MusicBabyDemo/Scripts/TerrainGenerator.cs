@@ -269,11 +269,11 @@ namespace MusicRun
             // Generate and place bonus.
             // When a chunk is re-generated (player return), no bonus are generated.
             // ---------------------------------------------------------------------
-            if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusMalusDensity > 0 && !spawnedBonus.ContainsKey(chunkCoord))
+            if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusMalusDensity > 0f && !spawnedBonus.ContainsKey(chunkCoord))
             {
                 AddBonusMalus(chunkCoord, chunk, currentLevel.bonusMalusDensity, currentLevel.bonusMalusRatio, currentLevel.bonusScorePrefab);
             }
-            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDensity > 0 && 
+            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDensity > 0f && 
                 gameManager.midiManager.InstrumentRestored < gameManager.midiManager.InstrumentFound)
             {
                 AddInstrument(chunkCoord, chunk, currentLevel.bonusInstrumentDensity, currentLevel.bonusInstrumentPrefab);

@@ -156,10 +156,10 @@ namespace MusicRun
         }
 
         /// <summary>
-        /// Start playing a MIDI from the Midi DB by index.
+        /// Load a MIDI from the Midi DB by index and build channel index.
         /// </summary>
         /// <param name="index">Index of the MIDI file in the Midi DB.</param>
-        public void StartPlayMIDI(int index)
+        public void LoadMIDI(TerrainLevel terrainLevel)
         {
             if (midiPlayer != null)
             {
@@ -168,13 +168,21 @@ namespace MusicRun
                 midiPlayer.MPTK_Stop();
 
                 // Select and load the MIDI file.
-                midiPlayer.MPTK_MidiIndex = index;
+                midiPlayer.MPTK_MidiIndex = terrainLevel.indexMIDI;
                 midiPlayer.MPTK_Load();
-                ClearMidiChannel();
-                // Play the already-loaded MIDI (avoid reloading).
-                midiPlayer.MPTK_Play(alreadyLoaded: true);
             }
         }
+
+        /// <summary>
+        /// PLay Load already loaded. OnEventStartPlayMidi will be trigger.
+        /// </summary>
+        /// <param name="index">Index of the MIDI file in the Midi DB.</param>
+        public void PlayMIDI()
+        {
+            // Play the already-loaded MIDI (avoid reloading).
+            midiPlayer.MPTK_Play(alreadyLoaded: true);
+        }
+
 
         /// <summary>
         /// Clears and initializes the MIDI channel data by identifying instruments (program changes) used on each channel.
@@ -183,8 +191,10 @@ namespace MusicRun
         /// This method resets the <see cref="ChannelPlayed"/> dictionary and populates it with
         /// instruments found in the loaded MIDI events. It logs the instruments found on each channel and updates the
         /// MIDI event value if the level requests a substitution instrument.
+        /// Only the first program change found in a channel is taken into account. The next will not be handled.
+        /// So, the first program change found will be restoread when an instrument is found by the player. 
         /// </remarks>
-        private void ClearMidiChannel()
+        public void BuildMidiChannel(TerrainLevel terrainLevel)
         {
             // Build a map of instruments played on each channel.
             ChannelPlayed = new Dictionary<int, ChannelInstrument>();
@@ -209,8 +219,8 @@ namespace MusicRun
                         Debug.Log($"MidiPlayer - Instrument already found on Channel {midiEvent.Channel} instrument: {midiEvent.Value}");
 
                     // If the current level asks to "SearchForInstrument", override the preset to the substitution instrument.
-                    if (gameManager.terrainGenerator.CurrentLevel.SearchForInstrument)
-                        midiEvent.Value = gameManager.terrainGenerator.CurrentLevel.SubstitutionInstrument;
+                    if (terrainLevel.SearchForInstrument)
+                        midiEvent.Value = terrainLevel.SubstitutionInstrument;
                 }
             InstrumentFound = ChannelPlayed.Count;
             InstrumentRestored = 0;

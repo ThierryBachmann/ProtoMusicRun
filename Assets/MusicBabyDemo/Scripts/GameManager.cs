@@ -395,6 +395,10 @@ namespace MusicRun
             actionLevel.Show();
             HideAllPopups();
 
+            // Need to get the level description before to get information about instrument in CreateLevel.
+            midiManager.LoadMIDI(terrainGenerator.levels[level]);
+            midiManager.BuildMidiChannel(terrainGenerator.levels[level]);
+
             if (restartSame)
             {
                 playerController.ResetPosition();
@@ -403,11 +407,13 @@ namespace MusicRun
             {
                 terrainGenerator.CreateLevel(level);
             }
-            terrainGenerator.CreateLevel(level);
+
+            // The scene must be loaded before playing the MIDI.
+            midiManager.PlayMIDI();
+
             goalHandler.gameObject.SetActive(true);
             goalHandler.NewLevel();
             goalReachedDisplay.NewLevel();
-            midiManager.StartPlayMIDI(terrainGenerator.CurrentLevel.indexMIDI);
             gameRunning = true;
             levelRunning = true;
             OnSwitchPause(true);
