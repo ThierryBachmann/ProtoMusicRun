@@ -108,10 +108,10 @@ namespace MusicRun
             Speed = MinSpeed;
         }
 
-        public void LevelCompleted()
-        {
-            Speed = MinSpeed;
-            gameManager.bonusManager.EndBonus();
+        public void LevelEnded()
+        { 
+        //    Speed = MinSpeed;
+        //    gameManager.bonusManager.EndBonus();
             HandleMovement(Vector3.zero);
         }
 

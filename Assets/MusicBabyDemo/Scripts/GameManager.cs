@@ -60,7 +60,8 @@ namespace MusicRun
             settingScreen.OnSettingChange += OnSettingChange;
             leaderboard.OnLeaderboardLoaded += OnDisplayLeaderboard;
             leaderboard.OnScoreSubmitted += OnScoreSubmissionResult;
-            goalHandler.OnLevelCompleted += OnLevelCompleted;
+            goalHandler.OnGoalReached  += OnLevelCompleted;
+            midiManager.OnMusicEnded  += OnLevelCompleted;
             leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
             leaderboard.OnScoreSubmitted += OnScoreSubmitted;
             Utilities.Init();
@@ -155,8 +156,40 @@ namespace MusicRun
 
         }
 
-        private void OnLevelCompleted(bool success)
+        /// <summary>
+        /// Handles the completion of a level, updating game state and UI elements accordingly.
+        /// Trigger from GoalHandler when player is close to the goal.
+        /// </summary>
+        /// <remarks>This method updates the game state to reflect that the level is no longer running,
+        /// hides all popups, and shows the level failed screen. It calculates the score for the completed level and
+        /// submits it to the leaderboard. Additionally, it clears terrain chunks to prevent collision issues in the
+        /// next level. If <paramref name="nextLevelAuto"/> is <see langword="true"/>, the next level is automatically
+        /// started after a delay; otherwise, the game actions are updated for manual progression.</remarks>
+        /// <param name="success">Indicates whether the level was completed successfully. If <see langword="true"/>, the level was completed
+        /// successfully; otherwise, it was not.</param>
+        private void OnLevelCompleted(LevelEndedReason reason)
         {
+            Debug.Log($"GameManager - OnLevelCompleted - {reason}");
+            // Check level failed: Music ended without reaching the goal.
+            levelRunning = false;
+            if (MusicPercentage >= 100f && GoalPercentage <= 98f)
+            {
+                levelFailed = true;
+                // Move player close to the goal to watch the failed concert!
+                Vector3  position = goalHandler.Goal.transform.position;
+                position -= Vector3.forward * 1.5f;
+                playerController.TeleportPlayer(position);
+            }
+            bonusManager.EndBonus();
+            goalReachedDisplay.LevelCompleted(levelFailed);
+            if (levelFailed)
+                levelFailedScreen.Show();
+            // When level 
+            actionLevel.Hide();
+            actionGame.Show();
+            actionGame.SelectActionsToShow();
+
+
             scoreManager.CalculateScoreLevel(MusicPercentage, GoalPercentage);
             LeaderboardPlayerScore playerScore = new LeaderboardPlayerScore(
                         leaderboard.firebaseAuth.GetUserId(),
@@ -168,21 +201,20 @@ namespace MusicRun
                         1
                         );
             leaderboard.SubmitScore(playerScore);
-            levelRunning = false;
 
-            // Clear chunk as sooner as posible to avoid collision meshes stay when building next level
-            terrainGenerator.ClearChunks(1);
-            if (nextLevelAuto)
-            {
-                StartCoroutine(Utilities.WaitAndCall(2500f, NextLevel));
-            }
-            else
-            {
-                actionLevel.Hide();
-                actionGame.Show();
-                actionGame.SelectActionsToShow();
-            }
-            playerController.LevelCompleted();
+            //// Clear chunk as sooner as posible to avoid collision meshes stay when building next level
+            //terrainGenerator.ClearChunks(1);
+            //if (nextLevelAuto)
+            //{
+            //    StartCoroutine(Utilities.WaitAndCall(2500f, NextLevel));
+            //}
+            //else
+            //{
+            //    actionLevel.Hide();
+            //    actionGame.Show();
+            //    actionGame.SelectActionsToShow();
+            //}
+            playerController.LevelEnded();
         }
 
         private void OnScoreSubmitted(bool success)
@@ -200,13 +232,13 @@ namespace MusicRun
 
         private void OnDisplayLeaderboard(List<LeaderboardPlayerScore> scores)
         {
-            Debug.Log($"=== LEADERBOARD {scores.Count} entries ===");
-            for (int i = 0; i < scores.Count; i++)
-            {
-                var score = scores[i];
-                Debug.Log($"{i + 1}. {score.playerName:20}: {score.score} pts " +
-                         $"(Time: {score.completionTime:F1}s, Efficiency: {score.pathEfficiency:F2})");
-            }
+            //Debug.Log($"=== LEADERBOARD {scores.Count} entries ===");
+            //for (int i = 0; i < scores.Count; i++)
+            //{
+            //    var score = scores[i];
+            //    Debug.Log($"{i + 1}. {score.playerName:20}: {score.score} pts " +
+            //             $"(Time: {score.completionTime:F1}s, Efficiency: {score.pathEfficiency:F2})");
+            //}
         }
 
         private void OnScoreSubmissionResult(bool success)
@@ -277,18 +309,6 @@ namespace MusicRun
                     GoalPercentage = 0f;
                 MusicPercentage = midiManager.Progress;
                 scoreManager.ScoreGoal = scoreManager.CalculateScoreGoal(MusicPercentage, GoalPercentage);
-
-                // Check level failed
-                if (MusicPercentage >= 100f && GoalPercentage <= 98f)
-                {
-                    levelFailed = true;
-                    levelRunning = false;
-                    HideAllPopups();
-                    levelFailedScreen.Show();
-                    actionLevel.Hide();
-                    actionGame.Show();
-                    actionGame.SelectActionsToShow();
-                }
             }
 
             CalculateFPS();

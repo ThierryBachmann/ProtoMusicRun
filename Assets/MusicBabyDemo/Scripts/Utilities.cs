@@ -8,6 +8,13 @@ namespace MusicRun
     /// <summary>
     /// Provides utility methods for common operations.
     /// </summary>
+    /// 
+    public enum LevelEndedReason
+    {
+        GoalReached = 1,
+        MusicEnded = 2,
+    }
+
     public class Utilities : MonoBehaviour
     {
         static public Color ColorGreen;

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static MusicRun.GameManager;
 
 namespace MusicRun
 {
@@ -37,6 +38,8 @@ namespace MusicRun
         public int InstrumentFound;
         /// <summary>Number of instruments restored so far (used when progressively restoring originals).</summary>
         public int InstrumentRestored;
+
+        public Action<LevelEndedReason> OnMusicEnded;
 
         /// <summary>
         /// Playback progress expressed as a percentage (0..100).
@@ -121,6 +124,32 @@ namespace MusicRun
         void Start()
         {
             // Intentionally left empty: initialization is handled in Awake and by event callbacks.
+        }
+
+        void Update()
+        {
+            float speedClamp = 1f;
+
+            // Calculate music playback speed from the player's speed when the level is active.
+            if (gameManager.levelRunning && !gameManager.levelPaused)
+            {
+                // Min and max music speed are defined by the current level.
+                TerrainLevel current = gameManager.terrainGenerator.CurrentLevel;
+                float speedMusic = player.Speed * current.RatioSpeedMusic;
+                speedClamp = Mathf.Clamp(speedMusic, current.MinSpeedMusic, current.MaxSpeedMusic);
+                if (Progress >= 100f)
+                {
+                    Debug.Log("MidiManager - OnMusicEnded");
+                    OnMusicEnded?.Invoke(LevelEndedReason.MusicEnded);
+                }
+            }
+
+            // Avoid updating the MIDI speed every frame: only apply an update when the change exceeds a small threshold.
+            if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speedClamp) > 0.1f)
+            {
+                midiPlayer.MPTK_Speed = speedClamp;
+                previousSpeed = speedClamp;
+            }
         }
 
         /// <summary>
@@ -404,27 +433,6 @@ namespace MusicRun
                     voice.VoiceAudio.Audiosource.pitch *= pitchFactor;
                 }
                 yield return Routine.WaitForSeconds(durationMilli);
-            }
-        }
-
-        void Update()
-        {
-            float speedClamp = 1f;
-
-            // Calculate music playback speed from the player's speed when the level is active.
-            if (gameManager.levelRunning && !gameManager.levelPaused)
-            {
-                // Min and max music speed are defined by the current level.
-                TerrainLevel current = gameManager.terrainGenerator.CurrentLevel;
-                float speedMusic = player.Speed * current.RatioSpeedMusic;
-                speedClamp = Mathf.Clamp(speedMusic, current.MinSpeedMusic, current.MaxSpeedMusic);
-            }
-
-            // Avoid updating the MIDI speed every frame: only apply an update when the change exceeds a small threshold.
-            if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speedClamp) > 0.1f)
-            {
-                midiPlayer.MPTK_Speed = speedClamp;
-                previousSpeed = speedClamp;
             }
         }
     }

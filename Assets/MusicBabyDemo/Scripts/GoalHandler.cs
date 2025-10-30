@@ -14,7 +14,7 @@ namespace MusicRun
         public float goalDirection;
         public float goalAngle;
         public bool goalReached;
-        public Action<bool> OnLevelCompleted;
+        public Action<LevelEndedReason> OnGoalReached;
 
         private GameManager gameManager;
         private PlayerController player;
@@ -89,10 +89,12 @@ namespace MusicRun
             // -----------------------
             if (distance <= goalRadius && !goalReached)
             {
-                Debug.Log("But atteint !");
+                Debug.Log("GoalHandler - Goal Reached");
                 goalReached = true;
                 goalSpotlightAnimator.TriggerGoal();
-                OnLevelCompleted?.Invoke(true);
+
+                // Will trigger action in GameManager
+                OnGoalReached?.Invoke(LevelEndedReason.GoalReached);
             }
         }
     }

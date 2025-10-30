@@ -2426,7 +2426,7 @@ MonoBehaviour:
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
     indexMIDI: 3
-    LoopsToGoal: 10
+    LoopsToGoal: 1
     SearchForInstrument: 1
     SubstitutionInstrument: 66
     RatioSpeedMusic: 3.91
@@ -2935,7 +2935,7 @@ MonoBehaviour:
   Goal: {fileID: 561529854}
   distance: 0
   distanceAtStart: 0
-  goalRadius: 3
+  goalRadius: 1.8
   goalDirection: 0
   goalAngle: 0
   goalReached: 0
@@ -2954,7 +2954,7 @@ MonoBehaviour:
   panel: {fileID: 341634020}
   duration: 1.5
   startY: -2
-  endY: 1
+  endY: 0.9
   riseCurve:
     serializedVersion: 2
     m_Curve:
@@ -2979,7 +2979,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  bestScoreText: {fileID: 338306001}
   midiInfoDisplayed: {fileID: 1851700645}
 --- !u!1 &284146615
 GameObject:
@@ -6830,7 +6829,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 793525433}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 9d81c716b8ddcad4fb35722f042adb9a, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: ace2acd13f95f7440b1e8e4c2e5037ad, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
@@ -6840,13 +6839,13 @@ VideoPlayer:
   m_TargetMaterialProperty: 
   m_RenderMode: 3
   m_AspectRatio: 2
-  m_DataSource: 0
+  m_DataSource: 1
   m_TimeUpdateMode: 2
   m_PlaybackSpeed: 1
   m_AudioOutputMode: 0
   m_TargetAudioSources: []
   m_DirectAudioVolumes: []
-  m_Url: 
+  m_Url: https://mptkapi.paxstellar.com/MusicRunBaby-L1-Success.mp4
   m_EnabledAudioTracks: 
   m_DirectAudioMutes: 
   m_ControlledAudioTrackCount: 0
@@ -9424,14 +9423,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1059807005}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2.2, y: 1.1891893, z: 0.0642805}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 793525434}
   m_Father: {fileID: 341634020}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!65 &1059807007
 BoxCollider:
   m_ObjectHideFlags: 0
