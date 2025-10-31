@@ -7,29 +7,18 @@ namespace MusicRun
 {
     public class GoalReachedDisplay : MonoBehaviour
     {
-        [Header("Main UI")]
-        public Transform panel;
-        public float duration = 1.5f;
-        public float startY = -1.5f;
-        public float endY = 0f;
-        // Animation curve for a smooth motion (starts fast, ends slow)
-        public AnimationCurve riseCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-
+       public ScreenDisplay display;
+         
         //public TMP_Text bestScoreText;
         public TMP_Text midiInfoDisplayed;
 
-
         private GameManager gameManager;
-        private GoalHandler goalHandler;
-        private PlayerController player;
 
         public void Awake()
         {
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
-            player = gameManager.playerController;
-            goalHandler = gameManager.goalHandler;
         }
 
         public void Start()
@@ -39,15 +28,13 @@ namespace MusicRun
 
         public void NewLevel()
         {
-            Vector3 pos = panel.position;
-            pos.y = startY;
-            panel.position = pos;
+            display.ResetPosition();
         }
 
         public void LevelCompleted(bool failed)
         {
             UpdateText();
-            ShowPanel();
+            display.ShowPanel();
         }
 
         private void UpdateText()
@@ -65,34 +52,6 @@ namespace MusicRun
             //    // SequenceTrackName ProgramName    TrackInstrumentName
             //}
             midiInfoDisplayed.text = midiInfo;
-        }
-
-        public void ShowPanel()
-        {
-            StartCoroutine(RiseCoroutine());
-        }
-        private IEnumerator RiseCoroutine()
-        {
-            float elapsed = 0f;
-            // Reminder,
-            // for child GameObjects, the "Position" field in the Unity Inspector shows the value of transform.localPosition, not transform.position.
-            // But World position (absolute in the scene) by script.
-            Vector3 pos = panel.position;
-            //Debug.Log($"RiseCoroutine {pos}");
-            while (elapsed < duration)
-            {
-                float t = elapsed / duration;
-                float easedT = riseCurve.Evaluate(t);
-
-                pos.y = startY + (endY - startY) * easedT;
-                panel.position = pos;
-
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            pos.y = endY;
-            panel.position = pos;
         }
     }
 }

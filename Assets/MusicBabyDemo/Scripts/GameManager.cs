@@ -54,14 +54,21 @@ namespace MusicRun
         public TouchEnabler touchEnabler;
         public SceneGoal sceneGoal;
 
+        [Header("Level end prefab")]
+        [Tooltip("Prefab instantiated in front of the player when the level fails.")]
+        public GameObject VideoScreenPrefab;
+
+        [Tooltip("Distance in meters in front of the player where the prefab will be spawned.")]
+        public float VideoScreenDistance = 1.5f;
+
         void Awake()
         {
             // Subscribe to events
             settingScreen.OnSettingChange += OnSettingChange;
             leaderboard.OnLeaderboardLoaded += OnDisplayLeaderboard;
             leaderboard.OnScoreSubmitted += OnScoreSubmissionResult;
-            goalHandler.OnGoalReached  += OnLevelCompleted;
-            midiManager.OnMusicEnded  += OnLevelCompleted;
+            goalHandler.OnGoalReached += OnLevelCompleted;
+            midiManager.OnMusicEnded += OnLevelCompleted;
             leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
             leaderboard.OnScoreSubmitted += OnScoreSubmitted;
             Utilities.Init();
@@ -175,15 +182,23 @@ namespace MusicRun
             if (MusicPercentage >= 100f && GoalPercentage <= 98f)
             {
                 levelFailed = true;
-                // Move player close to the goal to watch the failed concert!
-                Vector3  position = goalHandler.Goal.transform.position;
-                position -= Vector3.forward * 1.5f;
-                playerController.TeleportPlayer(position);
+
+                // instantiate prefab in front of the player at levelFailPrefabDistance
+                if (VideoScreenPrefab != null && playerController != null)
+                {
+                    Transform p = playerController.transform;
+                    Vector3 spawnPos = p.position + p.forward * VideoScreenDistance + p.up * -1f;
+                    // keep same up orientation as player
+                    Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
+                    GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
+                    ScreenDisplay sd = go.GetComponentInChildren<ScreenDisplay>();
+                    sd.ShowPanel();
+                }
             }
             bonusManager.EndBonus();
             goalReachedDisplay.LevelCompleted(levelFailed);
-            if (levelFailed)
-                levelFailedScreen.Show();
+            //if (levelFailed)
+            //    levelFailedScreen.Show();
             // When level 
             actionLevel.Hide();
             actionGame.Show();
