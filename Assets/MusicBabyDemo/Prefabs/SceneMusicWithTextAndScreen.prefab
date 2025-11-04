@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2798317510486761935}
   - component: {fileID: 5150155486716261083}
   - component: {fileID: 7595402508976505197}
-  - component: {fileID: 8568267057892588498}
   m_Layer: 0
   m_Name: Cylinder
   m_TagString: Untagged
@@ -32,7 +31,7 @@ Transform:
   m_LocalScale: {x: 0.09, y: 0.8, z: 0.08}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6136377413469653177}
+  m_Father: {fileID: 8597277756898101214}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5150155486716261083
 MeshFilter:
@@ -87,29 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &8568267057892588498
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 921767957935870180}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &2157826117173475498
 GameObject:
   m_ObjectHideFlags: 0
@@ -313,7 +289,7 @@ Transform:
   m_GameObject: {fileID: 4417953950710676440}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.75, z: 0}
+  m_LocalPosition: {x: 0, y: -1.07, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -336,8 +312,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   duration: 5
-  startY: -3
-  endY: 0.8
+  startY: -2
+  riseY: 2.8
+  playerVideo: {fileID: 8385156878515783374}
   riseCurve:
     serializedVersion: 2
     m_Curve:
@@ -373,7 +350,6 @@ GameObject:
   - component: {fileID: 7652580957747993712}
   - component: {fileID: 815554548408393158}
   - component: {fileID: 106560094535303380}
-  - component: {fileID: 7360948463466401423}
   m_Layer: 0
   m_Name: Sphere1
   m_TagString: Untagged
@@ -394,7 +370,7 @@ Transform:
   m_LocalScale: {x: 0.16500002, y: 0.16500002, z: 0.16500002}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 6136377413469653177}
+  m_Father: {fileID: 8597277756898101214}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &815554548408393158
 MeshFilter:
@@ -449,27 +425,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &7360948463466401423
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4758358398180646456}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4975112475512838614
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,7 +613,6 @@ GameObject:
   - component: {fileID: 123680330945903192}
   - component: {fileID: 6183006369716855791}
   - component: {fileID: 8956047861480508095}
-  - component: {fileID: 613948439473215550}
   m_Layer: 0
   m_Name: DisplayScreen WideScreen 35mm 1.85
   m_TagString: Untagged
@@ -735,27 +689,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &613948439473215550
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6129935383884850282}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6748009902193253373
 GameObject:
   m_ObjectHideFlags: 0
@@ -944,7 +877,6 @@ GameObject:
   - component: {fileID: 4401784895289861931}
   - component: {fileID: 648365383861299194}
   - component: {fileID: 3057730146919813319}
-  - component: {fileID: 5297274536186385506}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -965,7 +897,7 @@ Transform:
   m_LocalScale: {x: 0.16500002, y: 0.16500002, z: 0.16500002}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 6136377413469653177}
+  m_Father: {fileID: 8597277756898101214}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &648365383861299194
 MeshFilter:
@@ -1020,27 +952,82 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &5297274536186385506
-SphereCollider:
+--- !u!1 &7353123214061267562
+GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6766099081683232498}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8597277756898101214}
+  - component: {fileID: 5304957888248170137}
+  m_Layer: 0
+  m_Name: BorderScreen
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8597277756898101214
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7353123214061267562}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.78, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7652580957747993712}
+  - {fileID: 6618236351306216487}
+  - {fileID: 4401784895289861931}
+  - {fileID: 2798317510486761935}
+  m_Father: {fileID: 6136377413469653177}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5304957888248170137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7353123214061267562}
   m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39479ec0cd8c0ce4f8f382cc8697e5c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duration: 1.5
+  startY: -2
+  riseY: 2
+  playerVideo: {fileID: 0}
+  riseCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &7794113385521069697
 GameObject:
   m_ObjectHideFlags: 0
@@ -1051,6 +1038,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6136377413469653177}
   - component: {fileID: 6882653340520896632}
+  - component: {fileID: 2972620067221757585}
   m_Layer: 0
   m_Name: SceneMusicWithTextAndScreen
   m_TagString: Untagged
@@ -1071,10 +1059,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7652580957747993712}
-  - {fileID: 6618236351306216487}
-  - {fileID: 4401784895289861931}
-  - {fileID: 2798317510486761935}
+  - {fileID: 8597277756898101214}
   - {fileID: 5239356025199430820}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1091,6 +1076,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameObjectToFace: {fileID: 0}
+--- !u!114 &2972620067221757585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7794113385521069697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39b55ffa26616b844bab04c08c0edabe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScreenVideo: {fileID: 7859356094537635515}
+  BorderVideo: {fileID: 5304957888248170137}
+  midiInfoDisplayed: {fileID: 1796054689796793816}
+  bounciness: 1
+  friction: 1
+  colliderSize: {x: 2.5, y: 1.7, z: 0.5}
+  colliderCenter: {x: 0, y: -0.65, z: 0}
+  linearDamping: 1.2
+  angularDamping: 0.5
 --- !u!1 &8317750112853848049
 GameObject:
   m_ObjectHideFlags: 0
@@ -1102,7 +1108,6 @@ GameObject:
   - component: {fileID: 6618236351306216487}
   - component: {fileID: 30173620382643364}
   - component: {fileID: 7651456700983009338}
-  - component: {fileID: 5618459081546305611}
   m_Layer: 0
   m_Name: Cylinder1
   m_TagString: Untagged
@@ -1123,7 +1128,7 @@ Transform:
   m_LocalScale: {x: 0.09, y: 0.8, z: 0.08}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6136377413469653177}
+  m_Father: {fileID: 8597277756898101214}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &30173620382643364
 MeshFilter:
@@ -1178,29 +1183,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &5618459081546305611
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8317750112853848049}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &8926220680230356763
 GameObject:
   m_ObjectHideFlags: 0
@@ -1257,7 +1239,7 @@ VideoPlayer:
   m_AudioOutputMode: 0
   m_TargetAudioSources: []
   m_DirectAudioVolumes: []
-  m_Url: https://mptkapi.paxstellar.com/MusicRunBaby-L1-Success.mp4
+  m_Url: 
   m_EnabledAudioTracks: 
   m_DirectAudioMutes: 
   m_ControlledAudioTrackCount: 0

@@ -59,7 +59,7 @@ namespace MusicRun
         public GameObject VideoScreenPrefab;
 
         [Tooltip("Distance in meters in front of the player where the prefab will be spawned.")]
-        public float VideoScreenDistance = 1.5f;
+        public float VideoScreenDistance = 2.5f;
 
         void Awake()
         {
@@ -177,26 +177,33 @@ namespace MusicRun
         private void OnLevelCompleted(LevelEndedReason reason)
         {
             Debug.Log($"GameManager - OnLevelCompleted - {reason}");
+
             // Check level failed: Music ended without reaching the goal.
             levelRunning = false;
             if (MusicPercentage >= 100f && GoalPercentage <= 98f)
             {
+                Debug.Log($"GameManager - OnLevelCompleted - Music ended without reaching the goal.");
                 levelFailed = true;
 
                 // instantiate prefab in front of the player at levelFailPrefabDistance
-                if (VideoScreenPrefab != null && playerController != null)
-                {
-                    Transform p = playerController.transform;
-                    Vector3 spawnPos = p.position + p.forward * VideoScreenDistance + p.up * -1f;
-                    // keep same up orientation as player
-                    Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
-                    GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
-                    ScreenDisplay sd = go.GetComponentInChildren<ScreenDisplay>();
-                    sd.ShowPanel();
-                }
+                Transform p = playerController.transform;
+                Vector3 spawnPos = p.position + p.forward * VideoScreenDistance + p.up * 10f;
+
+                // keep same up orientation as player
+                Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
+                GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
+                GoalReachedDisplay goalReachedDisplayClone = go.GetComponent<GoalReachedDisplay>();
+                goalReachedDisplayClone.ScreenVideo.ApplyVideo(0);
+                goalReachedDisplayClone.SetItFalling();
+                goalReachedDisplayClone.UpdateText();
             }
+            else
+            {
+                goalReachedDisplay.RiseVideo(1);
+                goalReachedDisplay.UpdateText();
+            }
+
             bonusManager.EndBonus();
-            goalReachedDisplay.LevelCompleted(levelFailed);
             //if (levelFailed)
             //    levelFailedScreen.Show();
             // When level 
@@ -303,7 +310,18 @@ namespace MusicRun
                         if (c == 'h' || c == 'H') HelperScreenDisplay();
                         if (c == 'n' || c == 'N') StartCoroutine(ClearAndNextLevelTest());
                         if (c == 's' || c == 'S') StopGame();
-                        if (c == 'r' || c == 'R') StartGame();
+                        if (c == 'r' || c == 'R')
+                        {
+                            playerController.enableMovement = false;
+                            // instantiate prefab in front of the player at levelFailPrefabDistance
+                            Transform p = playerController.transform;
+                            Vector3 spawnPos = p.position + p.forward * VideoScreenDistance + p.up * 10f;
+
+                            // keep same up orientation as player
+                            Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
+                            GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
+                            go.GetComponent<GoalReachedDisplay>().SetItFalling();
+                        }
                         if (c == 'a' || c == 'A') actionGame.SwitchVisible();
                         if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
                         if (c == 'm' || c == 'M') midiManager.SoundOnOff();
@@ -448,7 +466,7 @@ namespace MusicRun
 
             goalHandler.gameObject.SetActive(true);
             goalHandler.NewLevel();
-            goalReachedDisplay.NewLevel();
+            goalReachedDisplay.HideVideo();
             gameRunning = true;
             levelRunning = true;
             OnSwitchPause(true);

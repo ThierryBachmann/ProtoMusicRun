@@ -131,7 +131,7 @@ namespace MusicRun
             transform.rotation = start.rotation;
             currentAngle = 0;
             targetAngle = 0;
-            TerrainGenerator.PlaceOnHighestTerrain(transform);
+            TerrainGenerator.PositionOnHighestTerrain(transform);
             Debug.Log($"Player ResetPosition from {previous} to {transform.position}");
             controller.enabled = true;
         }

@@ -7,13 +7,6 @@ namespace MusicRun
         public GameObject gameObjectToFace;
         private Transform cam;
 
-        void Awake()
-        {
-            if (gameObjectToFace == null)
-            {
-                gameObjectToFace= gameObject;
-            }
-        }
         void Start()
         {
             cam = Camera.main.transform;
@@ -23,6 +16,8 @@ namespace MusicRun
         {
             if (cam != null)
             {
+                if (gameObjectToFace == null)
+                    gameObjectToFace = gameObject;
                 Vector3 direction = gameObjectToFace.transform.position - cam.position;
                 direction.y = 0; // optional: only rotate on Y-axis
                 gameObjectToFace.transform.rotation = Quaternion.LookRotation(direction);

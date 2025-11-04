@@ -7,10 +7,29 @@ namespace MusicRun
 {
     public class GoalReachedDisplay : MonoBehaviour
     {
-       public ScreenDisplay display;
+       public ScreenDisplay ScreenVideo;
+       public ScreenDisplay BorderVideo;
          
         //public TMP_Text bestScoreText;
         public TMP_Text midiInfoDisplayed;
+
+        [Tooltip("Bounciness value (0-1) for the Physic Material.")]
+        public float bounciness = 0.5f;
+
+        [Tooltip("Friction value for the Physic Material.")]
+        public float friction = 0.6f;
+
+        [Tooltip("Size of the Box Collider.")]
+        public Vector3 colliderSize = new Vector3(2.5f, 1.7f, 0.5f);
+
+        [Tooltip("Center of the Box Collider.")]
+        public Vector3 colliderCenter = new Vector3(0f, -0.7f, 0f);
+
+        [Tooltip("Air resistance (slows down movement).")]
+        public float linearDamping = 0.5f;
+
+        [Tooltip("Rotational resistance")]
+        public float angularDamping = 0.5f;
 
         private GameManager gameManager;
 
@@ -21,23 +40,19 @@ namespace MusicRun
                 return;
         }
 
-        public void Start()
+
+        public void HideVideo()
         {
-            NewLevel();
+            ScreenVideo.ResetPosition();
         }
 
-        public void NewLevel()
+        public void RiseVideo(int indexVideo)
         {
-            display.ResetPosition();
+            ScreenVideo.ApplyVideo(indexVideo);
+            ScreenVideo.Rise();
         }
 
-        public void LevelCompleted(bool failed)
-        {
-            UpdateText();
-            display.ShowPanel();
-        }
-
-        private void UpdateText()
+        public void UpdateText()
         {
             //// "   9999         9999            999"
             //// "  9999       9999         9999
@@ -52,6 +67,50 @@ namespace MusicRun
             //    // SequenceTrackName ProgramName    TrackInstrumentName
             //}
             midiInfoDisplayed.text = midiInfo;
+        }
+
+       public void SetItFalling()
+        {
+            Debug.Log($"GoalReachedDisplay {gameObject.name}");
+            // Add a Box Collider if the parent doesn't have one
+            BoxCollider boxCollider = gameObject.GetComponent<BoxCollider>();
+            if (boxCollider == null)
+            {
+                boxCollider = gameObject.AddComponent<BoxCollider>();
+                // Set a default size (adjust as needed)
+                boxCollider.center= colliderCenter;
+                boxCollider.size = colliderSize;
+            }
+
+            // Add a Rigidbody to the parent GameObject
+            Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+            if (rb == null)
+            {
+                rb = gameObject.AddComponent<Rigidbody>();
+            }
+
+            // Configure the Rigidbody for realistic physics
+            rb.mass = 1f;                       // Mass of the object
+            rb.linearDamping = linearDamping;   // Air resistance (slows down movement)
+            rb.angularDamping = angularDamping; // Rotational resistance
+            rb.useGravity = true;          // Enable gravity
+            rb.isKinematic = false;        // Disable kinematic mode
+
+            // Optional: Freeze rotation to prevent unwanted tilting
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
+
+            // Create and assign a Physic Material for bounce
+            PhysicsMaterial physicMaterial = new PhysicsMaterial
+            {
+                bounciness = bounciness,
+                dynamicFriction = friction,
+                staticFriction = friction,
+                frictionCombine = PhysicsMaterialCombine.Average,
+                bounceCombine = PhysicsMaterialCombine.Average
+            };
+
+            // Apply the Physic Material to the collider
+            boxCollider.material = physicMaterial;
         }
     }
 }

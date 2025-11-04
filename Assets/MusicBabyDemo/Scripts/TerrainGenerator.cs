@@ -344,7 +344,7 @@ namespace MusicRun
                     float maxPos = chunkSize / 2f - 0.1f; // -0.1 to avoid border
                     Vector3 bonusPos = new Vector3(UnityEngine.Random.Range(-maxPos, maxPos), 5f, UnityEngine.Random.Range(-maxPos, maxPos));
                     bonus.transform.SetLocalPositionAndRotation(bonusPos, Quaternion.identity);
-                    PlaceOnHighestTerrain(bonus.transform, 100f);
+                    PositionOnHighestTerrain(bonus.transform, 100f);
                     bonus.name = $"Bonus - level: {currentIndexLevel} - chunk {chunkCoord} - localPosition: {bonus.transform.localPosition}";
                 }
 
@@ -379,7 +379,7 @@ namespace MusicRun
                     instrument.transform.SetParent(chunk.transform, false);
                     Vector3 instrumentPos = new Vector3(UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f), 5f, UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f));
                     instrument.transform.SetLocalPositionAndRotation(instrumentPos, Quaternion.identity);
-                    PlaceOnHighestTerrain(instrument.transform, 100f, 4f);
+                    PositionOnHighestTerrain(instrument.transform, 100f, 4f);
                     instrument.name = $"AddInstrument - level: {currentIndexLevel} - chunk {chunkCoord} - localPosition: {instrument.transform.localPosition}";
                 }
 
@@ -444,7 +444,7 @@ namespace MusicRun
                     childTransform.localPosition = localPosition;
 
                     // Search and apply the Y 
-                    if (!PlaceOnHighestTerrain(childTransform, 100f))
+                    if (!PositionOnHighestTerrain(childTransform, 100f))
                         Debug.LogWarning($"No hit, chunk: {chunkCoord} child: {childTransform.name} offsetX:{offsetX} offsetZ: {offsetZ} ");
                 }
             }
@@ -486,7 +486,7 @@ namespace MusicRun
 
                     vege.name = $"Vege - {vege.name} - coord: {localPosition.x} {localPosition.z}";
 
-                    if (!PlaceOnHighestTerrain(vege.transform, 100f))
+                    if (!PositionOnHighestTerrain(vege.transform, 100f))
                         Debug.LogWarning($"No hit, chunk: {chunkCoord} child: {vege.name} position:{vege.transform.localPosition} ");
 
 
@@ -509,12 +509,7 @@ namespace MusicRun
             }
         }
 
-        /// <summary>
-        /// Place un objet sur le terrain le plus haut sous sa position actuelle.
-        /// </summary>
-        /// <param name="obj">Objet à placer</param>
-        /// <param name="maxRayHeight">Hauteur max du rayon pour détecter le sol</param>
-        public static bool PlaceOnHighestTerrain(Transform obj, float maxRayHeight = 100f, float yShift = 0f)
+        public static bool PositionOnHighestTerrain(Transform obj, float maxRayHeight = 100f, float yShift = 0f)
         {
             Vector3 startPos = obj.position + Vector3.up * maxRayHeight;
             Ray ray = new Ray(startPos, Vector3.down);
@@ -523,7 +518,7 @@ namespace MusicRun
 
             if (hits.Length == 0)
             {
-                Debug.LogWarning($"    --> no hit. From position: {startPos}");
+                Debug.LogWarning($"PositionOnHighestTerrain    --> no hit. From position: {startPos} for {obj.name}");
                 return false;
             }
 
@@ -534,13 +529,13 @@ namespace MusicRun
 
             if (terrainHits.Length == 0)
             {
-                Debug.LogWarning($"    --> no terrain hit. All hits: {hits.Length} From position: {startPos}");
+                Debug.LogWarning($"PositionOnHighestTerrain    --> no terrain hit. All hits: {hits.Length} From position: {startPos} for {obj.name}");
                 return false;
             }
 
             RaycastHit topHit = terrainHits[0];
 
-            // Convert contact wold position to local Chunk
+            // Convert contact world position to local Chunk
             Transform chunk = obj;
             if (obj.parent != null)
                 chunk = obj.parent;
@@ -551,10 +546,47 @@ namespace MusicRun
             // Debug purpose ....
             //obj.name = obj.name.Substring(0, 6) + "_" + chunk.name + "_" + topHit.transform.name;
 
-            //Debug.Log($"    --> {terrainHits.Length} hit {terrainHits[0].transform.name} world: {topHit.point} local:{obj.localPosition} --> parent: {chunk.name}");
+            //Debug.Log($"PositionOnHighestTerrain    --> {terrainHits.Length} hit {terrainHits[0].transform.name} world: {topHit.point} local:{obj.localPosition} --> parent: {chunk.name}");
 
             return true;
         }
+
+        public static bool PositionWorldOnHighestTerrain(Transform obj, float maxRayHeight = 100f, float yShift = 0f)
+        {
+            Vector3 startPos = obj.position + Vector3.up * maxRayHeight;
+            Ray ray = new Ray(startPos, Vector3.down);
+
+            RaycastHit[] hits = Physics.RaycastAll(ray, maxRayHeight * 2f);
+
+            if (hits.Length == 0)
+            {
+                Debug.LogWarning($"PositionOnHighestTerrain    --> no hit. From position: {startPos} for {obj.name}");
+                return false;
+            }
+
+            var terrainHits = hits
+                .Where(h => h.collider.CompareTag("Terrain"))
+                .OrderByDescending(h => h.point.y)
+                .ToArray();
+
+            if (terrainHits.Length == 0)
+            {
+                Debug.LogWarning($"PositionOnHighestTerrain    --> no terrain hit. All hits: {hits.Length} From position: {startPos} for {obj.name}");
+                return false;
+            }
+
+            RaycastHit topHit = terrainHits[0];
+
+            obj.position = new Vector3(topHit.point.x, topHit.point.y + yShift, topHit.point.z);
+
+            // Debug purpose ....
+            //obj.name = obj.name.Substring(0, 6) + "_" + chunk.name + "_" + topHit.transform.name;
+
+            //Debug.Log($"PositionOnHighestTerrain    --> {terrainHits.Length} hit {terrainHits[0].transform.name} world: {topHit.point} local:{obj.localPosition} --> parent: {obj.name}");
+
+            return true;
+        }
+
         /// <summary>
         /// Clear chunks which are at a distance greater than the specified distance from the player.
         /// </summary>

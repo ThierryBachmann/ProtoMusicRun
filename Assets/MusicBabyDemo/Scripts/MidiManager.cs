@@ -98,7 +98,7 @@ namespace MusicRun
             midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
             {
                 // MIDI playback started.
-                Debug.Log($"MidiPlayer - Play MIDI '{name}' {goalHandler.distanceAtStart}");
+                //Debug.Log($"MidiPlayer - Play MIDI '{name}' {goalHandler.distanceAtStart}");
                 // Reset transient state that depends on playback start.
                 Reset();
                 StartCoroutine(UpdateMaxDistanceMPTK());
@@ -116,7 +116,7 @@ namespace MusicRun
 
             midiPlayer.OnEventEndPlayMidi.AddListener((name, endMidi) =>
             {
-                Debug.Log($"MidiPlayer - End MIDI '{name}' '{endMidi}' {goalHandler.distanceAtStart}");
+                //Debug.Log($"MidiPlayer - End MIDI '{name}' '{endMidi}' {goalHandler.distanceAtStart}");
                 // Additional logic can be triggered here when a MIDI finishes playing.
             });
         }

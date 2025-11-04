@@ -273,7 +273,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1855,7 +1855,7 @@ MonoBehaviour:
   playerController: {fileID: 256923874}
   actionGame: {fileID: 1397310892}
   actionLevel: {fileID: 105468824}
-  goalReachedDisplay: {fileID: 3314128782221706273}
+  goalReachedDisplay: {fileID: 7641254336402198555}
   terrainGenerator: {fileID: 240111797}
   midiManager: {fileID: 804034793}
   splashScreen: {fileID: 371084311}
@@ -2427,16 +2427,16 @@ MonoBehaviour:
     name: Flat Desert
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
-    indexMIDI: 3
-    LoopsToGoal: 1
+    indexMIDI: 1
+    LoopsToGoal: 5
     SearchForInstrument: 1
-    SubstitutionInstrument: 66
+    SubstitutionInstrument: 0
     RatioSpeedMusic: 1.45
     MinSpeedMusic: 0.4
     MaxSpeedMusic: 1.24
     startGO: {fileID: 883430262}
     goalGO: {fileID: 3029970166632757827}
-    deltaGoalChunk: {x: 0, y: 3}
+    deltaGoalChunk: {x: 0, y: 2}
     perlinVegetable: 0.3
     perlinChunk: 8
     minScaleVegetable: 0.71
@@ -2484,10 +2484,10 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: TEST_FLAT
     description: Low vegetation
-    Skybox: {fileID: 0}
+    Skybox: {fileID: 1193833017}
     indexMIDI: 50
     LoopsToGoal: 0
     SearchForInstrument: 1
@@ -3795,7 +3795,7 @@ GameObject:
   - component: {fileID: 360585398}
   - component: {fileID: 360585397}
   m_Layer: 5
-  m_Name: LevelFailedScreen & Script
+  m_Name: LevelFailedScreen & Script NO MORE USED
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14879,17 +14879,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8670151273213183110, guid: 8dac39f39d5b84e1d8f329cc59565290, type: 3}
---- !u!114 &2113999869472539234 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7859356094537635515, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-  m_PrefabInstance: {fileID: 5313090358334919216}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39479ec0cd8c0ce4f8f382cc8697e5c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2341327888735371138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14958,7 +14947,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1591330910964806950}
   - component: {fileID: 4193897857820983594}
-  - component: {fileID: 3314128782221706273}
   m_Layer: 0
   m_Name: Goal & MidiPlayer
   m_TagString: Goal
@@ -14966,20 +14954,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &3314128782221706273
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3029970166632757827}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39b55ffa26616b844bab04c08c0edabe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  display: {fileID: 2113999869472539234}
-  midiInfoDisplayed: {fileID: 6605503478541621718}
 --- !u!1 &3577193183768922465
 GameObject:
   m_ObjectHideFlags: 0
@@ -15235,7 +15209,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6136377413469653177, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.16
+      value: 1.6
       objectReference: {fileID: 0}
     - target: {fileID: 6136377413469653177, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -15271,19 +15245,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7794113385521069697, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
       propertyPath: m_Name
-      value: SceneMusicWithTextAndScreen
+      value: SceneMusicWithTextAndScreen1
       objectReference: {fileID: 0}
     - target: {fileID: 7859356094537635515, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
       propertyPath: endY
       value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 7859356094537635515, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: startY
-      value: -2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7859356094537635515, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: duration
-      value: 5
+      propertyPath: riseY
+      value: 0.55
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15401,17 +15371,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6312486766398216586}
   m_Mesh: {fileID: -8670151273213183110, guid: ec9db1146785d424e933ce621b74da8d, type: 3}
---- !u!114 &6605503478541621718 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1796054689796793816, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-  m_PrefabInstance: {fileID: 5313090358334919216}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &6611384934035215733
 Transform:
   m_ObjectHideFlags: 0
@@ -15671,6 +15630,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7794113385521069697, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
   m_PrefabInstance: {fileID: 5313090358334919216}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7641254336402198555 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2972620067221757585, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
+  m_PrefabInstance: {fileID: 5313090358334919216}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7641254336402198553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39b55ffa26616b844bab04c08c0edabe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!33 &7813604637013367504
 MeshFilter:
   m_ObjectHideFlags: 0
