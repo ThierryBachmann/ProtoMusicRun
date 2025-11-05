@@ -48,7 +48,7 @@ namespace MusicRun
 
         public void RiseVideo(int indexVideo)
         {
-            ScreenVideo.ApplyVideo(indexVideo);
+            ScreenVideo.PlayVideo(indexVideo);
             ScreenVideo.Rise();
         }
 

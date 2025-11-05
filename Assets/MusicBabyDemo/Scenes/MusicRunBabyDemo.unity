@@ -2427,13 +2427,13 @@ MonoBehaviour:
     name: Flat Desert
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
-    indexMIDI: 1
+    indexMIDI: 3
     LoopsToGoal: 5
     SearchForInstrument: 1
     SubstitutionInstrument: 0
     RatioSpeedMusic: 1.45
     MinSpeedMusic: 0.4
-    MaxSpeedMusic: 1.24
+    MaxSpeedMusic: 1.48
     startGO: {fileID: 883430262}
     goalGO: {fileID: 3029970166632757827}
     deltaGoalChunk: {x: 0, y: 2}

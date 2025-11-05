@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace MusicRun
@@ -42,6 +43,12 @@ namespace MusicRun
         public void Start()
         {
             Hide();
+            // Game logic from the gamepad
+            gameManager.touchEnabler.controls.Gameplay.Start.performed += (InputAction.CallbackContext context) =>
+            {
+                Hide();
+            };
+
         }
 
         public void Show()
@@ -79,7 +86,7 @@ namespace MusicRun
 
                 if (clicked != null && clicked.GetComponentInParent<Button>() != null)
                     return;
-               
+
 
                 Hide();
             }

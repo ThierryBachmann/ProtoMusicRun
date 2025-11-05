@@ -1,3 +1,5 @@
+// Display a popup screen before the player starts to run.
+// Some information about the level is provided from the TerrainGenerator.
 using TMPro;
 
 namespace MusicRun
@@ -18,6 +20,12 @@ namespace MusicRun
         {
             base.Start();
         }
+
+        /// <summary>
+        /// The gameManager is setting information when CreateAndStartLevel() is run.
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="info"></param>
         public void SetInfo(string title, string info)
         {
             titleText.text=title;

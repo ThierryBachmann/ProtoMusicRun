@@ -1,3 +1,4 @@
+using log4net.Core;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -60,6 +61,9 @@ namespace MusicRun
 
         [Tooltip("Distance in meters in front of the player where the prefab will be spawned.")]
         public float VideoScreenDistance = 2.5f;
+
+        // VideoScreenPrefab instance when the player failed to reaches the goal. 
+        private GoalReachedDisplay goalReachedDisplayClone;
 
         void Awake()
         {
@@ -192,8 +196,8 @@ namespace MusicRun
                 // keep same up orientation as player
                 Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
                 GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
-                GoalReachedDisplay goalReachedDisplayClone = go.GetComponent<GoalReachedDisplay>();
-                goalReachedDisplayClone.ScreenVideo.ApplyVideo(0);
+                goalReachedDisplayClone = go.GetComponent<GoalReachedDisplay>();
+                goalReachedDisplayClone.ScreenVideo.PlayVideo(0);
                 goalReachedDisplayClone.SetItFalling();
                 goalReachedDisplayClone.UpdateText();
             }
@@ -310,17 +314,19 @@ namespace MusicRun
                         if (c == 'h' || c == 'H') HelperScreenDisplay();
                         if (c == 'n' || c == 'N') StartCoroutine(ClearAndNextLevelTest());
                         if (c == 's' || c == 'S') StopGame();
-                        if (c == 'r' || c == 'R')
+                        if (c == 'r')
                         {
+                            Debug.Log($"-debug- Instantiate(goalReachedDisplayClone); ");
                             playerController.enableMovement = false;
                             // instantiate prefab in front of the player at levelFailPrefabDistance
                             Transform p = playerController.transform;
-                            Vector3 spawnPos = p.position + p.forward * VideoScreenDistance + p.up * 10f;
+                            Vector3 spawnPos = p.position + p.forward * VideoScreenDistance + p.up * 1f;
 
                             // keep same up orientation as player
                             Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
                             GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
-                            go.GetComponent<GoalReachedDisplay>().SetItFalling();
+                            goalReachedDisplayClone = go.GetComponent<GoalReachedDisplay>();
+                            goalReachedDisplayClone.SetItFalling();
                         }
                         if (c == 'a' || c == 'A') actionGame.SwitchVisible();
                         if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
@@ -330,6 +336,14 @@ namespace MusicRun
                             terrainGenerator.ClearChunks(0);
                             terrainGenerator.UpdateChunks(playerController.CurrentPlayerChunk);
                         }
+                        if (c == 'x')
+                            if (goalReachedDisplayClone != null)
+                            {
+                                Debug.Log($"-debug- Destroy(goalReachedDisplayClone); ");
+                                //goalReachedDisplayClone.ScreenVideo.StopVideo();
+                                Destroy(goalReachedDisplayClone.gameObject);
+                                //goalReachedDisplayClone = null;
+                            }
                     }
                 }
 
@@ -442,6 +456,16 @@ namespace MusicRun
         private void CreateAndStartLevel(int level, bool restartSame = false)
         {
             Debug.Log($"-level- CreateAndStartLevel {level}");
+
+            if (goalReachedDisplayClone != null)
+            {
+                Debug.Log($"-level- Destroy(goalReachedDisplayClone); {level}");
+                goalReachedDisplayClone.ScreenVideo.StopVideo();
+                Destroy(goalReachedDisplayClone.gameObject);
+                goalReachedDisplayClone = null;
+            }
+            goalReachedDisplay.ScreenVideo.StopVideo();
+
             scoreManager.ScoreLevel = 0;
             levelFailed = false;
             actionGame.Hide();
