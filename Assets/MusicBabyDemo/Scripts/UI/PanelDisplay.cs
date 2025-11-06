@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -12,7 +13,7 @@ namespace MusicRun
         public bool closeOnClick = true;
         public Vector3 startScale = new Vector3(0.5f, 0.5f, 0.5f);
         public Vector3 endScale = Vector3.one;
-        public System.Action<bool> OnClose;
+        public Action<bool> OnClose;
         public bool IsVisible;
 
         protected GameManager gameManager;
@@ -42,27 +43,23 @@ namespace MusicRun
 
         public void Start()
         {
+            //Debug.Log($"Panel Display {name} Start");
             Hide();
-            // Game logic from the gamepad
-            gameManager.touchEnabler.controls.Gameplay.Start.performed += (InputAction.CallbackContext context) =>
-            {
-                Hide();
-            };
-
         }
 
-        public void Show()
+        public void Show(Action<bool> onClose=null)
         {
-            Debug.Log($"Panel Display {name} Show - Visible: {IsVisible}");
+            //Debug.Log($"Panel Display {name} Show - Visible: {IsVisible}");
             if (!IsVisible)
             {
+                if (onClose != null) OnClose = onClose;
                 StartCoroutine(AnimateIn());
             }
         }
 
         public void Hide()
         {
-            Debug.Log($"Panel Display {name} Hide - Visible:{IsVisible}");
+            //Debug.Log($"Panel Display {name} Hide - Visible:{IsVisible}");
             if (IsVisible)
             {
                 StartCoroutine(AnimateOut());

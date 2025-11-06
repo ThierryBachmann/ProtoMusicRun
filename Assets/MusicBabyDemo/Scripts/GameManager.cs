@@ -10,6 +10,7 @@ namespace MusicRun
     public class GameManager : MonoBehaviour
     {
         public bool gameRunning;
+        public bool awaitingPlayerStart;
         public bool levelRunning;
         public bool levelPaused;
         public bool levelFailed;
@@ -52,8 +53,10 @@ namespace MusicRun
         public HelperScreen helperScreen;
         public SettingScreen settingScreen;
         public LevelFailedScreen levelFailedScreen;
-        public TouchEnabler touchEnabler;
         public SceneGoal sceneGoal;
+
+        // Provide the game logic from the gamepad, see ActionGameDisplay
+        public TouchEnabler touchEnabler;
 
         [Header("Level end prefab")]
         [Tooltip("Prefab instantiated in front of the player when the level fails.")]
@@ -75,6 +78,7 @@ namespace MusicRun
             midiManager.OnMusicEnded += OnLevelCompleted;
             leaderboard.OnLeaderboardLoaded += OnLeaderboardLoaded;
             leaderboard.OnScoreSubmitted += OnScoreSubmitted;
+            //sceneGoal.OnClose += (ok) => { OnSwitchPause(false); };
             Utilities.Init();
 
         }
@@ -82,9 +86,45 @@ namespace MusicRun
         void Start()
         {
             gameRunning = false;
+            awaitingPlayerStart = false;
             levelRunning = false;
             levelPaused = false;
             levelFailed = false;
+
+            // Game logic from the gamepad when the start button is activated.
+            touchEnabler.controls.Gameplay.Start.performed += (InputAction.CallbackContext context) =>
+            {
+                if (!gameRunning)
+                {
+                    // Game is not running
+                    StartGame();
+                }
+                else if (awaitingPlayerStart)
+                {
+                    // Will call StartLevel() when the scene goal is fully hidden.
+                    sceneGoal.Hide();
+                }
+                else if (!levelRunning)
+                {
+                    // Game running, level is not running : player at the goal or failed.
+                    if (levelFailed)
+                        RetryLevel();
+                    else
+                        NextLevel();
+                }
+                else
+                {
+                    // Game and level are running.
+                    if (levelPaused)
+                        // but paused, so un-pause
+                        OnSwitchPause(false);
+                    else
+                        // pause
+                        OnSwitchPause(true);
+                }
+
+            };
+
             if (startAuto)
                 StartGame();
             else
@@ -101,6 +141,111 @@ namespace MusicRun
             ////terrainGenerator.CreateLevel(0);
         }
 
+        public void StartGame()
+        {
+            Debug.Log("-level- StartGame Level 1");
+            goalHandler.gameObject.SetActive(true);
+            terrainGenerator.ResetTerrain();
+            levelFailedScreen.Hide();
+            currentLevelNumber = 1; // always increase along the game
+            currentLevelIndex = terrainGenerator.SelectNextLevel(-1); // cycling around the game
+            scoreManager.ScoreOverall = 0;
+            CreateAndStartLevel(currentLevelIndex);
+        }
+
+        /// <summary>
+        /// Restart the current level.
+        /// </summary>
+        public void RetryLevel()
+        {
+            Debug.Log("-level- RetryLevel");
+            CreateAndStartLevel(currentLevelIndex, restartSame: true);
+        }
+
+        public void NextLevel()
+        {
+            Debug.Log("-level- NextLevel");
+            currentLevelNumber++;
+            currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
+            CreateAndStartLevel(currentLevelIndex);
+        }
+
+        /// <summary>
+        /// Create and start a new level or restart the same level (preserve generated chunks).
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="restartSame"></param>
+        private void CreateAndStartLevel(int level, bool restartSame = false)
+        {
+            Debug.Log($"-level- CreateAndStartLevel {level}");
+            HideAllPopups();
+
+            if (goalReachedDisplayClone != null)
+            {
+                Debug.Log($"-level- Destroy(goalReachedDisplayClone); {level}");
+                goalReachedDisplayClone.ScreenVideo.StopVideo();
+                Destroy(goalReachedDisplayClone.gameObject);
+                goalReachedDisplayClone = null;
+            }
+            goalReachedDisplay.ScreenVideo.StopVideo();
+            goalReachedDisplay.HideVideo();
+
+            scoreManager.ScoreLevel = 0;
+            levelFailed = false;
+            actionGame.Hide();
+            actionLevel.Show();
+            HideAllPopups();
+
+            // Need to get the level description before to get information about instrument in CreateLevel.
+            midiManager.LoadMIDI(terrainGenerator.levels[level]);
+            midiManager.BuildMidiChannel(terrainGenerator.levels[level]);
+
+            if (restartSame)
+            {
+                playerController.ResetPosition();
+            }
+            else
+            {
+                terrainGenerator.CreateLevel(level);
+            }
+
+            // The scene must be loaded before playing the MIDI.
+            midiManager.PlayMIDI();
+
+            goalHandler.gameObject.SetActive(true);
+            goalHandler.NewLevel();
+            gameRunning = true;
+            OnSwitchPause(true);
+            playerController.LevelStarted();
+            sceneGoal.SetInfo(terrainGenerator.CurrentLevel.name, terrainGenerator.CurrentLevel.description);
+            awaitingPlayerStart = true;
+            sceneGoal.Show(StartLevel);
+        }
+
+        void StartLevel(bool unsused)
+        {
+            Debug.Log($"-level- StartLevel");
+            OnSwitchPause(false);
+            awaitingPlayerStart = false;
+            levelRunning = true;
+        }
+
+        public void StopGame()
+        {
+            Debug.Log($"-level- StopGame");
+            goalHandler.gameObject.SetActive(false);
+            gameRunning = false;
+            levelRunning = false;
+            levelPaused = false;
+            levelFailed = false;
+            actionLevel.Hide();
+            actionGame.Show();
+            SplashScreenDisplay();
+            actionGame.SelectActionsToShow();
+            actionGame.Show();
+            playerController.ResetPosition();
+            terrainGenerator.ResetTerrain();
+        }
 
         private void OnSettingChange()
         {
@@ -414,105 +559,6 @@ namespace MusicRun
         {
             HideAllPopups();
             leaderboardDisplay.SwitchVisible(playerController);
-        }
-
-        public void StartGame()
-        {
-            Debug.Log("-level- StartGame Level 1");
-            goalHandler.gameObject.SetActive(true);
-            terrainGenerator.ResetTerrain();
-            HideAllPopups();
-            levelFailedScreen.Hide();
-            currentLevelNumber = 1; // always increase along the game
-            currentLevelIndex = terrainGenerator.SelectNextLevel(-1); // cycling around the game
-            scoreManager.ScoreOverall = 0;
-            CreateAndStartLevel(currentLevelIndex);
-        }
-
-        /// <summary>
-        /// Restart the current level.
-        /// </summary>
-        public void RetryLevel()
-        {
-            Debug.Log("-level- RetryLevel");
-            HideAllPopups();
-            CreateAndStartLevel(currentLevelIndex, restartSame: true);
-        }
-
-        public void NextLevel()
-        {
-            Debug.Log("-level- NextLevel");
-            HideAllPopups();
-            currentLevelNumber++;
-            currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
-            CreateAndStartLevel(currentLevelIndex);
-        }
-
-        /// <summary>
-        /// Create and start a new level or restart the same level (preserve generated chunks).
-        /// </summary>
-        /// <param name="level"></param>
-        /// <param name="restartSame"></param>
-        private void CreateAndStartLevel(int level, bool restartSame = false)
-        {
-            Debug.Log($"-level- CreateAndStartLevel {level}");
-
-            if (goalReachedDisplayClone != null)
-            {
-                Debug.Log($"-level- Destroy(goalReachedDisplayClone); {level}");
-                goalReachedDisplayClone.ScreenVideo.StopVideo();
-                Destroy(goalReachedDisplayClone.gameObject);
-                goalReachedDisplayClone = null;
-            }
-            goalReachedDisplay.ScreenVideo.StopVideo();
-
-            scoreManager.ScoreLevel = 0;
-            levelFailed = false;
-            actionGame.Hide();
-            actionLevel.Show();
-            HideAllPopups();
-
-            // Need to get the level description before to get information about instrument in CreateLevel.
-            midiManager.LoadMIDI(terrainGenerator.levels[level]);
-            midiManager.BuildMidiChannel(terrainGenerator.levels[level]);
-
-            if (restartSame)
-            {
-                playerController.ResetPosition();
-            }
-            else
-            {
-                terrainGenerator.CreateLevel(level);
-            }
-
-            // The scene must be loaded before playing the MIDI.
-            midiManager.PlayMIDI();
-
-            goalHandler.gameObject.SetActive(true);
-            goalHandler.NewLevel();
-            goalReachedDisplay.HideVideo();
-            gameRunning = true;
-            levelRunning = true;
-            OnSwitchPause(true);
-            playerController.LevelStarted();
-            sceneGoal.OnClose += (ok) => { OnSwitchPause(false); };
-            sceneGoal.SetInfo(terrainGenerator.CurrentLevel.name, terrainGenerator.CurrentLevel.description);
-            sceneGoal.Show();
-        }
-
-        public void StopGame()
-        {
-            goalHandler.gameObject.SetActive(false);
-            gameRunning = false;
-            levelRunning = false;
-            levelPaused = false;
-            levelFailed = false;
-            actionLevel.Hide();
-            actionGame.Show();
-            SplashScreenDisplay();
-            actionGame.Show();
-            playerController.ResetPosition();
-            terrainGenerator.ResetTerrain();
         }
 
         public void HelperScreenDisplay()

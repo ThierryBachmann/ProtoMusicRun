@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace MusicRun
@@ -25,7 +26,6 @@ namespace MusicRun
                 settingButton.gameObject.SetActive(pause);
                 gameManager.OnSwitchPause(pause);
             };
-
             stopButton.onClick.AddListener(() => gameManager.StopGame());
             settingButton.onClick.AddListener(() => settingScreen.Show());
         }

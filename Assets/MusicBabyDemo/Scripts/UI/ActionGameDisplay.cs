@@ -27,33 +27,22 @@ namespace MusicRun
             leaderBoardButton.onClick.AddListener(() => gameManager.LeaderboardSwitchDisplay());
             helper.onClick.AddListener(() => gameManager.SplashScreenDisplay());
 
-            // Game logic from the gamepad
-            gameManager.touchEnabler.controls.Gameplay.Start.performed += (InputAction.CallbackContext context) =>
-            {
-                if (!gameManager.gameRunning)
-                    gameManager.StartGame();
-                else if (gameManager.levelPaused)
-                {
-                    if (gameManager.levelFailed)
-                        gameManager.RetryLevel();
-                    else
-                        gameManager.NextLevel();
-
-                }
-                else if (!gameManager.levelRunning)
-                {
-                    gameManager.NextLevel();
-                }
-            };
-
             base.Start();
         }
 
         public void SelectActionsToShow()
         {
-            if (gameManager.gameRunning && !gameManager.levelRunning)
+            if (!gameManager.gameRunning)
             {
-                Debug.Log("Waiting to start a level when game is running");
+                Debug.Log("Waiting to start a new game");
+                startGameButton.gameObject.SetActive(true);
+                retryLevelButton.gameObject.SetActive(false);
+                nextLevelButton.gameObject.SetActive(false);
+                stopButton.gameObject.SetActive(false);
+            }
+            else if (!gameManager.levelRunning)
+            {
+                Debug.Log("Waiting to start a level");
                 startGameButton.gameObject.SetActive(false);
                 if (gameManager.levelFailed)
                 {
@@ -68,14 +57,6 @@ namespace MusicRun
                 stopButton.gameObject.SetActive(true);
             }
 
-            if (!gameManager.gameRunning)
-            {
-                Debug.Log("Waiting to start a game");
-                startGameButton.gameObject.SetActive(true);
-                retryLevelButton.gameObject.SetActive(false);
-                nextLevelButton.gameObject.SetActive(false);
-                stopButton.gameObject.SetActive(false);
-            }
         }
     }
 }

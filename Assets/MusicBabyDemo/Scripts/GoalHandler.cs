@@ -48,7 +48,7 @@ namespace MusicRun
             Vector3 delta = Goal.transform.position - player.transform.position;
             delta.y = 0f; // Ignore height difference
             distance = delta.magnitude;
-            if (distanceAtStart < 0) 
+            if (distanceAtStart < 0)
                 distanceAtStart = distance;
 
             // Convert goal world position to player's local space
@@ -62,28 +62,6 @@ namespace MusicRun
 
             // Angle signé autour de l'axe vertical (Y)
             goalAngle = Mathf.Atan2(localToGoal.x, localToGoal.z) * Mathf.Rad2Deg;
-
-            ////  dans l’espace global mais projeté (just for fun)
-            //// -------------------------------------------------
-            //// Vecteur direction du joueur vers le but
-            //Vector3 toGoal = Goal.transform.position - player.transform.position;
-
-            //// Projeter dans le plan horizontal (XZ)
-            //Vector3 flatToGoal = toGoal;
-            //flatToGoal.y = 0f;
-
-            //// Distance horizontale
-            //distance = flatToGoal.magnitude;
-
-            //// Direction du joueur, projetée aussi
-            //Vector3 playerForward = player.transform.forward;
-            //playerForward.y = 0f;
-            //playerForward.Normalize();
-            //flatToGoal.Normalize();
-
-            //// Angle signé dans le plan horizontal
-            //goalAngle = Vector3.SignedAngle(playerForward, flatToGoal, Vector3.up);
-
 
             // Player reach the goal ?
             // -----------------------
