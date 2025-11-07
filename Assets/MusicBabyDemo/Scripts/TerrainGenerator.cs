@@ -187,7 +187,7 @@ namespace MusicRun
                 currentChunk = chunkUpdate;
 
                 // will contains new chunks coordinate around the player at a distance of -renderDistance to renderDistance
-                HashSet<Vector2Int> newChunks = new HashSet<Vector2Int>();
+                HashSet<Vector2Int> visibleChunks = new HashSet<Vector2Int>();
 
                 Debug.Log($"-terrain- create chunks around {currentChunk} start:{startChunkCoord} goal:{goalChunkCoord}  render: {renderDistance}");
 
@@ -217,10 +217,10 @@ namespace MusicRun
                                 //DateTime startCreate= DateTime.Now;
                                 chunkCreatedCount++;
                                 CreateChunk(chunkCoord);
-                                newChunks.Add(chunkCoord);
                             }
                             else
                                 Debug.Log($"-terrain- Already exist: {currentIndexLevel} {chunkCoord}  chunk: {spawnedChunks[chunkCoord].name}");
+                            visibleChunks.Add(chunkCoord);
                         }
                     }
                 }
@@ -234,9 +234,9 @@ namespace MusicRun
                 List<Vector2Int> chunksToRemove = new List<Vector2Int>();
                 foreach (var coord in spawnedChunks.Keys)
                 {
-                    if (!newChunks.Contains(coord))
+                    if (!visibleChunks.Contains(coord))
                     {
-                        Debug.Log($"-terrain- Destroy {coord} {spawnedChunks[coord].name}");
+                        /Debug.Log($"-terrain- Destroy {coord} {spawnedChunks[coord].name}");
                         Destroy(spawnedChunks[coord]);
                         chunksToRemove.Add(coord);
                     }
