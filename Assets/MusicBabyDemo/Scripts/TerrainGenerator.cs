@@ -236,7 +236,7 @@ namespace MusicRun
                 {
                     if (!visibleChunks.Contains(coord))
                     {
-                        /Debug.Log($"-terrain- Destroy {coord} {spawnedChunks[coord].name}");
+                        Debug.Log($"-terrain- Destroy {coord} {spawnedChunks[coord].name}");
                         Destroy(spawnedChunks[coord]);
                         chunksToRemove.Add(coord);
                     }
