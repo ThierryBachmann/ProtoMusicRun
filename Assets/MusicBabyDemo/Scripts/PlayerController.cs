@@ -18,7 +18,9 @@ namespace MusicRun
     [RequireComponent(typeof(CharacterController))]
     public class PlayerController : MonoBehaviour
     {
-        [Header("Debug")]
+        [Header("Current player chunk - for readonly.")]
+        public Vector2Int currentPlayerChunk;
+        [Header("Debug Player ")]
         public bool enableMovement = true;
         public bool isJumping;
         public Vector3 verticalVelocity;
@@ -56,9 +58,6 @@ namespace MusicRun
         private TouchEnabler touchEnabler;
 
         public DateTime timeStartLevel;
-
-        [Header("For readonly")]
-        private Vector2Int currentPlayerChunk;
 
         public Vector2Int CurrentPlayerChunk { get => currentPlayerChunk; }
 
@@ -163,7 +162,8 @@ namespace MusicRun
                 Vector2Int playerChunk = terrainGenerator.PositionToChunk(transform.position);
                 if (playerChunk != currentPlayerChunk)
                 {
-                    //Debug.Log($"Player enters in a chunk: x={transform.position.x} z={transform.position.z} --> playerChunk: {playerChunk}");
+                    // Player change to another chunk.
+                    Debug.Log($"Player enters in a chunk: x={transform.position.x} z={transform.position.z} --> playerChunk: {playerChunk}");
                     currentPlayerChunk = playerChunk;
                     terrainGenerator.UpdateChunks(currentPlayerChunk);
                 }

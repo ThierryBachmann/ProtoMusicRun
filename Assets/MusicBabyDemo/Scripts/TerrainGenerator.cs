@@ -10,8 +10,9 @@ namespace MusicRun
     public class TerrainGenerator : MonoBehaviour
     {
         public int chunkSize = 20;
-        public int renderDistance = 5;
+        public int renderDistance = 2;
         public bool disableObstacles = false;
+        public bool disableChunkUpdate = false;
 
         [Header("Defined Levels")]
         public TerrainLevel[] levels;
@@ -20,8 +21,8 @@ namespace MusicRun
         private int currentIndexLevel;
         private GameObject currentStart;
         private Vector2Int currentChunk;
-        private Vector2Int startChunkCoord;
-        private Vector2Int goalChunkCoord;
+        public Vector2Int startChunkCoord;
+        public Vector2Int goalChunkCoord;
         private GameObject currentGoal;
         private Dictionary<Vector2Int, GameObject> spawnedChunks;
         //private Dictionary<Vector2Int, GameObject> freeChunks;
@@ -79,7 +80,7 @@ namespace MusicRun
                 if (levelIndex < 0 || levelIndex >= levels.Length)
                 {
                     levelIndex = 0;
-                    Debug.LogWarning("Back to first level");
+                    Debug.LogWarning("-terrain- Back to first level");
                 }
                 if (levels[levelIndex].enabled)
                     break;
@@ -95,13 +96,13 @@ namespace MusicRun
         public void CreateLevel(int levelIndex)
         {
             currentLevel = levels[levelIndex];
-            Debug.Log($"Start Level: {currentLevel.name} - {currentLevel.description}");
+            Debug.Log($"-terrain- Start Level: {currentLevel.name} - {currentLevel.description}");
             gameManager.LiteModeApply();
             CreateStartAndGoalChunk();
             if (currentLevel.LoopsToGoal <= 0) currentLevel.LoopsToGoal = 1;
             // Force to update chunks with real position of the player
-            //currentPlayerChunk = new Vector2Int(-9999, -9999);
-            UpdateChunks(startChunkCoord);
+            gameManager.playerController.currentPlayerChunk = new Vector2Int(-9999, -9999);
+            //UpdateChunks(startChunkCoord);
         }
 
         /// <summary>
@@ -109,61 +110,54 @@ namespace MusicRun
         /// </summary>
         private void CreateStartAndGoalChunk()
         {
-            Debug.Log($"Create Start and Goal Chunk Delta={currentLevel.deltaGoalChunk}");
+            Debug.Log($"-terrain- Create Start and Goal Chunk Delta={currentLevel.deltaGoalChunk}");
+            disableChunkUpdate = true;
 
-            // Better to clear chunks before creating new ones (in a prvious Unity frame) 
-            // To be sure to remove all previous chunks when the level is changed (collider seems remained).
-            //ClearChunks(1);
-
-            // Create the start chunk
-            // ----------------------
-            if (currentLevel.startGO == null)
+            try
             {
-                Debug.LogError("Start game object is not set in the level configuration.");
-                return;
+                // Create the start chunk
+                // ----------------------
+                if (currentLevel.startGO == null)
+                {
+                    Debug.LogError("Start game object is not set in the level configuration.");
+                    return;
+                }
+
+                // Move the start chunk to the current player position (which is the current goal)
+                currentStart = currentLevel.startGO;
+                currentStart.SetActive(true);
+                startChunkCoord = currentChunk;
+                currentStart.name = $"start_{currentIndexLevel}_{startChunkCoord.x}_{startChunkCoord.y}";
+                currentStart.transform.position = ChunkToPosition(startChunkCoord);
+                currentStart.transform.rotation = Quaternion.identity;
+                Debug.Log($"-terrain- Add start chunk coord: {startChunkCoord} --> GO: {currentStart.name} {currentStart.transform.position}");
+
+
+                // Create the goal chunk
+                // ----------------------
+                if (currentLevel.goalGO == null)
+                {
+                    Debug.LogError("Goal game object is not set in the level configuration.");
+                    return;
+                }
+                currentGoal = currentLevel.goalGO;
+                goalChunkCoord = currentChunk + currentLevel.deltaGoalChunk;
+                currentGoal.name = $"goal_{currentIndexLevel}_{goalChunkCoord.x}_{goalChunkCoord.y}";
+                currentGoal.transform.position = ChunkToPosition(goalChunkCoord);
+                currentGoal.transform.rotation = Quaternion.identity;
+                Debug.Log($"-terrain- Add goal chunk coord: {goalChunkCoord} --> GO: {currentGoal.name} {currentGoal.transform.position}");
+
+                spawnedBonus = new Dictionary<Vector2Int, int>();
+                spawnedInstrument = new Dictionary<Vector2Int, int>();
             }
-
-            // Move the start chunk to the current player position (which is the current goal)
-            currentStart = currentLevel.startGO;
-            currentStart.SetActive(true);
-            startChunkCoord = currentChunk;
-            currentStart.name = $"start_{currentIndexLevel}_{startChunkCoord.x}_{startChunkCoord.y}";
-
-            // Remove existing chunk in the spawnedChunks dictionary if it exists
-            if (spawnedChunks.ContainsKey(startChunkCoord))
+            catch (Exception e)
             {
-                Debug.Log($"Destroy existing start chunk: {startChunkCoord} --> playerChunk: {spawnedChunks[startChunkCoord].name}");
-                Destroy(spawnedChunks[startChunkCoord]);
-                spawnedChunks.Remove(startChunkCoord);
+                Debug.LogException(e);
             }
-
-            currentStart.transform.position = ChunkToPosition(startChunkCoord);
-            currentStart.transform.rotation = Quaternion.identity;
-            Debug.Log($"Add start chunk coord: {startChunkCoord} --> GO: {currentStart.name} {currentStart.transform.position}");
-
-
-            // Create the goal chunk
-            // ----------------------
-            if (currentLevel.goalGO == null)
+            finally
             {
-                Debug.LogError("Goal game object is not set in the level configuration.");
-                return;
+                disableChunkUpdate = false;
             }
-            currentGoal = currentLevel.goalGO;
-            goalChunkCoord = currentChunk + currentLevel.deltaGoalChunk;
-            currentGoal.name = $"goal_{currentIndexLevel}_{goalChunkCoord.x}_{goalChunkCoord.y}";
-            if (spawnedChunks.ContainsKey(goalChunkCoord))
-            {
-                Debug.Log($"Destroy existing goal chunk: {goalChunkCoord} --> playerChunk: {spawnedChunks[goalChunkCoord].name}");
-                Destroy(spawnedChunks[goalChunkCoord]);
-                spawnedChunks.Remove(goalChunkCoord);
-            }
-            currentGoal.transform.position = ChunkToPosition(goalChunkCoord);
-            currentGoal.transform.rotation = Quaternion.identity;
-            Debug.Log($"Add goal chunk coord: {goalChunkCoord} --> GO: {currentGoal.name} {currentGoal.transform.position}");
-
-            spawnedBonus = new Dictionary<Vector2Int, int>();
-            spawnedInstrument = new Dictionary<Vector2Int, int>();
         }
 
         /// <summary>
@@ -186,56 +180,76 @@ namespace MusicRun
             return new Vector3(chunkCoord.x * chunkSize, 0, chunkCoord.y * chunkSize);
         }
 
-        public void UpdateChunks(Vector2Int currentChunk)
+        public void UpdateChunks(Vector2Int chunkUpdate)
         {
-            this.currentChunk = currentChunk;
-            // will contains chunks coord around the player at a distance of -renderDistance to renderDistance
-            HashSet<Vector2Int> newChunks = new HashSet<Vector2Int>();
-
-            DateTime startCreate = DateTime.Now;
-            chunkCreatedCount = 0;
-            for (int x = -renderDistance; x <= renderDistance; x++)
+            if (!disableChunkUpdate)
             {
-                for (int z = -renderDistance; z <= renderDistance; z++)
-                {
-                    Vector2Int chunkCoord = this.currentChunk + new Vector2Int(x, z);
-                    newChunks.Add(chunkCoord);
+                currentChunk = chunkUpdate;
 
-                    // Does the chunk dictionary already contains this chunk? Don't instantiate for start and goal chunks.
-                    if (!spawnedChunks.ContainsKey(chunkCoord) && chunkCoord != goalChunkCoord && chunkCoord != startChunkCoord)
+                // will contains new chunks coordinate around the player at a distance of -renderDistance to renderDistance
+                HashSet<Vector2Int> newChunks = new HashSet<Vector2Int>();
+
+                Debug.Log($"-terrain- create chunks around {currentChunk} start:{startChunkCoord} goal:{goalChunkCoord}  render: {renderDistance}");
+
+                DateTime startCreate = DateTime.Now;
+                chunkCreatedCount = 0;
+                for (int x = -renderDistance; x <= renderDistance; x++)
+                {
+                    for (int z = -renderDistance; z <= renderDistance; z++)
                     {
-                        //DateTime startCreate= DateTime.Now;
-                        chunkCreatedCount++;
-                        CreateChunk(chunkCoord);
+                        Vector2Int chunkCoord = currentChunk + new Vector2Int(x, z);
+
+                        if (chunkCoord.x == startChunkCoord.x && chunkCoord.y == startChunkCoord.y)
+                        {
+                            // Don't instantiate for start and goal chunks.
+                            Debug.Log($"-terrain- Don't instantiate for start {startChunkCoord}");
+                        }
+                        else if (chunkCoord == goalChunkCoord)
+                        {
+                            // Don't instantiate for start and goal chunks.
+                            Debug.Log($"-terrain- Don't instantiate for goal chunks {goalChunkCoord}");
+                        }
+                        else
+                        {
+                            // Does the chunk dictionary already contains this chunk? 
+                            if (!spawnedChunks.ContainsKey(chunkCoord))
+                            {
+                                //DateTime startCreate= DateTime.Now;
+                                chunkCreatedCount++;
+                                CreateChunk(chunkCoord);
+                                newChunks.Add(chunkCoord);
+                            }
+                            else
+                                Debug.Log($"-terrain- Already exist: {currentIndexLevel} {chunkCoord}  chunk: {spawnedChunks[chunkCoord].name}");
+                        }
                     }
                 }
-            }
 
-            timeCreateChunk = (float)(DateTime.Now - startCreate).TotalMilliseconds;
-            if (chunkCreatedCount != 0)
-                timeAverageCreate = timeCreateChunk / chunkCreatedCount;
-            Debug.Log($"{chunkCreatedCount} - {((chunkCreatedCount != 0) ? timeCreateChunk / chunkCreatedCount : "zero")} ms");
+                timeCreateChunk = (float)(DateTime.Now - startCreate).TotalMilliseconds;
+                if (chunkCreatedCount != 0)
+                    timeAverageCreate = timeCreateChunk / chunkCreatedCount;
+                Debug.Log($"{chunkCreatedCount} - {((chunkCreatedCount != 0) ? timeCreateChunk / chunkCreatedCount : "zero")} ms");
 
-            // Remove from chunk dictionary, chunk out of view which are not in newChunks but keep the goal chunk
-            List<Vector2Int> chunksToRemove = new List<Vector2Int>();
-            foreach (var coord in spawnedChunks.Keys)
-            {
-                if (!newChunks.Contains(coord))
+                // Remove from chunk dictionary, chunk out of view which are not in newChunks
+                List<Vector2Int> chunksToRemove = new List<Vector2Int>();
+                foreach (var coord in spawnedChunks.Keys)
                 {
-                    //if (spawnedChunks[coord].tag != "Goal")
+                    if (!newChunks.Contains(coord))
                     {
+                        Debug.Log($"-terrain- Destroy {coord} {spawnedChunks[coord].name}");
                         Destroy(spawnedChunks[coord]);
                         chunksToRemove.Add(coord);
                     }
-                    //else Debug.Log("Don't destroy chunk");
+                }
+                foreach (var coord in chunksToRemove)
+                {
+                    Debug.Log($"-terrain- Remove {coord} {spawnedChunks[coord].name}");
+                    spawnedChunks.Remove(coord);
                 }
             }
-            foreach (var coord in chunksToRemove)
-            {
-                //Debug.Log($"Remove {coord}");
-                spawnedChunks.Remove(coord);
-            }
         }
+
+
         private void CreateChunk(Vector2Int chunkCoord)
         {
             // No, add it
@@ -243,20 +257,20 @@ namespace MusicRun
 
             // Instantiate a random prefab from the current level's runChunks
             GameObject chunkPrefabRandom = currentLevel.runChunks[UnityEngine.Random.Range(0, currentLevel.runChunks.Length)];
-            GameObject chunk = Instantiate(chunkPrefabRandom, spawnPos, Quaternion.identity);
-            chunk.name = $"Chunk - Level: {currentIndexLevel} - coord: {chunkCoord.x} {chunkCoord.y}";
-            //Debug.Log($"Create chunk: {currentIndexLevel} {chunkCoord}  chunk: {chunk.name} prefab: {chunkPrefabRandom.name}");
+            GameObject chunkGO = Instantiate(chunkPrefabRandom, spawnPos, Quaternion.identity);
+            chunkGO.name = $"Chunk - Level: {currentIndexLevel} - coord: {chunkCoord.x} {chunkCoord.y}";
+            Debug.Log($"-terrain- Create chunk: {currentIndexLevel} {chunkCoord}  chunk: {chunkGO.name} prefab: {chunkPrefabRandom.name}");
 
             if (currentLevel.vegetables.Length == 0)
-                PlaceAndScaleExistingVege(chunkCoord, chunk);
+                PlaceAndScaleExistingVege(chunkCoord, chunkGO);
             else
-                CreateAndScaleVege(chunkCoord, chunk);
+                CreateAndScaleVege(chunkCoord, chunkGO);
 
-            spawnedChunks.Add(chunkCoord, chunk);
+            spawnedChunks.Add(chunkCoord, chunkGO);
 
             if (disableObstacles) // useful for test mode
             {
-                foreach (Collider col in chunk.GetComponentsInChildren<Collider>())
+                foreach (Collider col in chunkGO.GetComponentsInChildren<Collider>())
                 {
                     // keeps the GameObject visible, but disables any physical interaction.
                     // To disable collision detection, we can disable the collider component.
@@ -271,14 +285,15 @@ namespace MusicRun
             // ---------------------------------------------------------------------
             if (currentLevel.bonusScorePrefab.Length > 0 && currentLevel.bonusMalusDensity > 0f && !spawnedBonus.ContainsKey(chunkCoord))
             {
-                AddBonusMalus(chunkCoord, chunk, currentLevel.bonusMalusDensity, currentLevel.bonusMalusRatio, currentLevel.bonusScorePrefab);
+                AddBonusMalus(chunkCoord, chunkGO, currentLevel.bonusMalusDensity, currentLevel.bonusMalusRatio, currentLevel.bonusScorePrefab);
             }
-            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDensity > 0f && 
+            if (currentLevel.bonusInstrumentPrefab.Length > 0 && currentLevel.bonusInstrumentDensity > 0f &&
                 gameManager.midiManager.InstrumentRestored < gameManager.midiManager.InstrumentFound)
             {
-                AddInstrument(chunkCoord, chunk, currentLevel.bonusInstrumentDensity, currentLevel.bonusInstrumentPrefab);
+                AddInstrument(chunkCoord, chunkGO, currentLevel.bonusInstrumentDensity, currentLevel.bonusInstrumentPrefab);
             }
         }
+
         public void ModifyChunkMesh(GameObject chunkObject)
         {
             MeshFilter meshFilter = chunkObject.GetComponent<MeshFilter>();

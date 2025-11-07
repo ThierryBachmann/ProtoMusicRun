@@ -224,15 +224,21 @@ namespace MusicRun
 
         void StartLevel(bool unsused)
         {
-            Debug.Log($"-level- StartLevel");
-            OnSwitchPause(false);
-            awaitingPlayerStart = false;
-            levelRunning = true;
+            Debug.Log($"-level- StartLevel awaitingPlayerStart:{awaitingPlayerStart}");
+            if (awaitingPlayerStart)
+            {
+                OnSwitchPause(false);
+                awaitingPlayerStart = false;
+                levelRunning = true;
+            }
         }
 
         public void StopGame()
         {
             Debug.Log($"-level- StopGame");
+
+            // Cancel callback to StartLevel() when sceneGoal is closed
+            sceneGoal.OnClose = null;
             goalHandler.gameObject.SetActive(false);
             gameRunning = false;
             levelRunning = false;
@@ -261,16 +267,16 @@ namespace MusicRun
         {
             Debug.Log($"Lite mode: {liteMode}");
 
-            if (liteMode)
-            {
-                headerDisplay.LiteModeDisplay(true);
-                terrainGenerator.renderDistance = 1;
-            }
-            else
-            {
-                headerDisplay.LiteModeDisplay(false);
-                terrainGenerator.renderDistance = 5;
-            }
+            //if (liteMode)
+            //{
+            //    headerDisplay.LiteModeDisplay(true);
+            //    terrainGenerator.renderDistance = 1;
+            //}
+            //else
+            //{
+            //    headerDisplay.LiteModeDisplay(false);
+            //    terrainGenerator.renderDistance = 5;
+            //}
             SkyApply();
         }
 
