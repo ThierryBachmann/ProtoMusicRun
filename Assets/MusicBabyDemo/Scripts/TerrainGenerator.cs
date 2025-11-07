@@ -231,20 +231,17 @@ namespace MusicRun
                 Debug.Log($"{chunkCreatedCount} - {((chunkCreatedCount != 0) ? timeCreateChunk / chunkCreatedCount : "zero")} ms");
 
                 // Remove from chunk dictionary, chunk out of view which are not in newChunks
-                List<Vector2Int> chunksToRemove = new List<Vector2Int>();
-                foreach (var coord in spawnedChunks.Keys)
+                var keys = spawnedChunks.Keys.ToArray();
+                for (int i = 0; i < keys.Length; i++)
                 {
+                    var coord = keys[i];
                     if (!visibleChunks.Contains(coord))
                     {
-                        Debug.Log($"-terrain- Destroy {coord} {spawnedChunks[coord].name}");
-                        Destroy(spawnedChunks[coord]);
-                        chunksToRemove.Add(coord);
+                        var obj = spawnedChunks[coord];
+                        Debug.Log($"-terrain- Destroy {coord} {obj.name}");
+                        Destroy(obj);
+                        spawnedChunks.Remove(coord);
                     }
-                }
-                foreach (var coord in chunksToRemove)
-                {
-                    Debug.Log($"-terrain- Remove {coord} {spawnedChunks[coord].name}");
-                    spawnedChunks.Remove(coord);
                 }
             }
         }
