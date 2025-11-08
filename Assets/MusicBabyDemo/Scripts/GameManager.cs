@@ -555,6 +555,7 @@ namespace MusicRun
 
         public IEnumerator ClearAndNextLevelTest()
         {
+            terrainGenerator.ClearChunkPool();
             terrainGenerator.ClearChunks(0);
             currentLevelNumber++;
             currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
