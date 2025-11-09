@@ -1639,6 +1639,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7762111252373186686, guid: 0c222c68698265d40b68d29f17fbc120, type: 3}
+      propertyPath: m_TagString
+      value: Terrain
+      objectReference: {fileID: 0}
     - target: {fileID: 7969010532264824609, guid: 0c222c68698265d40b68d29f17fbc120, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2445,7 +2449,6 @@ MonoBehaviour:
     maxScaleVegetable: 1.09
     runChunks:
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
-    - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
     vegetables: []
     bonusMalusDensity: 1
     bonusMalusRatio: 0.485
@@ -2455,7 +2458,7 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: 'Desert Medium '
     description: More dune ...
     Skybox: {fileID: 1193833017}
@@ -2512,7 +2515,7 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: Random Vegetation
     description: Add random vegetation on each chunk
     Skybox: {fileID: 0}
@@ -2739,7 +2742,7 @@ MonoBehaviour:
   currentAngle: 0
   knockback: {x: 0, y: 0, z: 0}
   MinSpeed: 2
-  MaxSpeed: 4
+  MaxSpeed: 10
   Acceleration: 0.2
   Speed: 2
   TurnSpeed: 0.25
@@ -14811,7 +14814,7 @@ GameObject:
   - component: {fileID: 7115960260805071993}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

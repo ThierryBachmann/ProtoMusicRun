@@ -206,6 +206,7 @@ namespace MusicRun
             }
             else
             {
+                terrainGenerator.ClearChunks(1.5f);
                 terrainGenerator.CreateLevel(level);
             }
 
@@ -462,9 +463,9 @@ namespace MusicRun
                 {
                     foreach (char c in Input.inputString)
                     {
-                        if (c == 'h' || c == 'H') HelperScreenDisplay();
-                        if (c == 'n' || c == 'N') StartCoroutine(ClearAndNextLevelTest());
-                        if (c == 's' || c == 'S') StopGame();
+                        if (c == 'h') HelperScreenDisplay();
+                        if (c == 'n') StartCoroutine(ClearAndNextLevelTest());
+                        if (c == 's') StopGame();
                         if (c == 'r')
                         {
                             Debug.Log($"-debug- Instantiate(goalReachedDisplayClone); ");
@@ -479,10 +480,10 @@ namespace MusicRun
                             goalReachedDisplayClone = go.GetComponent<GoalReachedDisplay>();
                             goalReachedDisplayClone.SetItFalling();
                         }
-                        if (c == 'a' || c == 'A') actionGame.SwitchVisible();
-                        if (c == 'l' || c == 'L') LeaderboardSwitchDisplay();
-                        if (c == 'm' || c == 'M') midiManager.SoundOnOff();
-                        if (c == 'g' || c == 'G')
+                        if (c == 'a') actionGame.SwitchVisible();
+                        if (c == 'l') LeaderboardSwitchDisplay();
+                        if (c == 'm') midiManager.SoundOnOff();
+                        if (c == 'g')
                         {
                             terrainGenerator.ClearChunks(0);
                             terrainGenerator.UpdateChunks(playerController.CurrentPlayerChunk);
@@ -495,6 +496,9 @@ namespace MusicRun
                                 Destroy(goalReachedDisplayClone.gameObject);
                                 //goalReachedDisplayClone = null;
                             }
+                        if (c == 'p')
+                            StartCoroutine(playerController.TeleportPlayer(new Vector3(playerController.transform.position.x, -1, playerController.transform.position.z)));
+
                     }
                 }
 

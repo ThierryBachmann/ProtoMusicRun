@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7969010532264824609}
   m_Layer: 0
-  m_Name: DesertTESTMedium
+  m_Name: DesertTESTMediumNoVege
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

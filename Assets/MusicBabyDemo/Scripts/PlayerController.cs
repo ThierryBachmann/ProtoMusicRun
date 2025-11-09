@@ -123,16 +123,17 @@ namespace MusicRun
         {
             Speed = MinSpeed;
 
-            controller.enabled = false;
             Vector3 previous = transform.position;
             Transform start = gameManager.terrainGenerator.StartGO.transform;
             transform.position = start.position;
             transform.rotation = start.rotation;
-            currentAngle = 0;
-            targetAngle = 0;
-            TerrainGenerator.PositionOnHighestTerrain(transform);
-            Debug.Log($"Player ResetPosition from {previous} to {transform.position}");
-            controller.enabled = true;
+            if (TerrainGenerator.PositionOnHighestTerrain(transform))
+            {
+                Debug.Log($"Player ResetPosition from {previous} to {transform.position}");
+                StartCoroutine(TeleportPlayer(transform.position));
+            }
+            else
+                Debug.LogWarning($"No hit, player: {gameManager.terrainGenerator.StartGO.name} chunk: {gameManager.terrainGenerator.startChunkCoord} position: {transform.position}");
         }
 
         public IEnumerator TeleportPlayer(Vector3 targetPosition)
@@ -154,6 +155,10 @@ namespace MusicRun
                 forwardMove = transform.forward * Speed;
             }
             HandleInput();
+
+            if (transform.position.y < 0f)
+                StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, 0.5f, transform.position.z)));
+
             HandleRotation();
             HandleMovement(forwardMove);
 
@@ -194,14 +199,6 @@ namespace MusicRun
                     touchEnabler.ResetSwipeVertical();
                 }
             }
-
-
-            if (transform.position.y < 0f)
-                StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, 4, transform.position.z)));
-
-            // Pour tester 
-            if (Input.GetKeyDown(KeyCode.Delete))
-                StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, -1, transform.position.z)));
         }
 
         void HandleRotation()
