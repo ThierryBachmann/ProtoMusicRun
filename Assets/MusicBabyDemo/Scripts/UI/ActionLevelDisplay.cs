@@ -26,7 +26,7 @@ namespace MusicRun
                 settingButton.gameObject.SetActive(pause);
                 gameManager.OnSwitchPause(pause);
             };
-            stopButton.onClick.AddListener(() => gameManager.StopGame());
+            stopButton.onClick.AddListener(() => gameManager.GameStop());
             settingButton.onClick.AddListener(() => settingScreen.Show());
         }
 

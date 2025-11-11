@@ -78,7 +78,7 @@ namespace MusicRun
             if (gameManager.infoDebug)
             {
                 //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
-                infoText.text = $"Debug index level:{gameManager.currentLevelIndex} Speed:{player.Speed:F1} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} FPS:{gameManager.FramePerSecond} ";
+                infoText.text = $"Debug index level:{gameManager.levelIndex} Speed:{player.Speed:F1} Angle:{player.targetAngle:F0}/{player.currentAngle:F0} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} FPS:{gameManager.FramePerSecond} ";
             }
 
             directionButton.transform.localRotation = Quaternion.Euler(0f, 0f, -goalHandler.goalAngle);
@@ -87,7 +87,7 @@ namespace MusicRun
             if (gameManager.gameRunning)
             {
                 float score = scoreManager.CalculateScoreGoal(gameManager.MusicPercentage, gameManager.GoalPercentage);
-                itemLevel.SetValue(gameManager.currentLevelNumber.ToString());
+                itemLevel.SetValue(gameManager.levelNumber.ToString());
                 itemScore.SetValue(score.ToString());
                 itemBonus.SetValue((scoreManager.ScoreBonus + (int)bonusManager.bonusInProgress).ToString());
                 if (bonusManager.startBonus)

@@ -10,7 +10,6 @@ namespace MusicRun
         public TextMeshProUGUI titleText;
         public TextMeshProUGUI infoText;
 
-
         public new void Awake()
         {
             base.Awake();

@@ -25,7 +25,12 @@ namespace MusicRun
         public bool isJumping;
         public Vector3 verticalVelocity;
         public float targetAngle = 0f;
+
+        /// <summary>
+        /// Current player direction in degrees
+        /// </summary>
         public float currentAngle = 0f;
+
         public Vector3 knockback = Vector3.zero;
 
         [Header("Movement")]
@@ -81,7 +86,7 @@ namespace MusicRun
 
         void OnTriggerEnter(Collider collider)
         {
-            Debug.Log($"PlayerController trigger {collider.tag}");
+            Debug.Log($"-player- PlayerController trigger {collider.tag}");
             if (collider.CompareTag("Bonus") || collider.CompareTag("Malus"))
             {
                 gameManager.bonusManager.TriggerBonus(collider);
@@ -94,7 +99,7 @@ namespace MusicRun
 
         private void OnSettingChange()
         {
-            Debug.Log("PlayerController OnSettingChange");
+            Debug.Log("-player- PlayerController OnSettingChange");
             gameManager.headerDisplay.SetTitle();
             PlayerPrefs.SetString("player_name", playerName);
             PlayerPrefs.Save();
@@ -102,15 +107,15 @@ namespace MusicRun
 
         public void LevelStarted()
         {
-            ResetPosition();
+            //ResetPosition();
             timeStartLevel = DateTime.Now;
             Speed = MinSpeed;
         }
 
         public void LevelEnded()
-        { 
-        //    Speed = MinSpeed;
-        //    gameManager.bonusManager.EndBonus();
+        {
+            //    Speed = MinSpeed;
+            //    gameManager.bonusManager.EndBonus();
             HandleMovement(Vector3.zero);
         }
 
@@ -119,34 +124,44 @@ namespace MusicRun
             knockback = direction.normalized * strength;
         }
 
-        public void ResetPosition()
+        public void ResetGameStop()
         {
             Speed = MinSpeed;
-
-            Vector3 previous = transform.position;
-            Transform start = gameManager.terrainGenerator.StartGO.transform;
-            transform.position = start.position;
-            transform.rotation = start.rotation;
-            if (TerrainGenerator.PositionOnHighestTerrain(transform))
-            {
-                Debug.Log($"Player ResetPosition from {previous} to {transform.position}");
-                StartCoroutine(TeleportPlayer(transform.position));
-            }
-            else
-                Debug.LogWarning($"No hit, player: {gameManager.terrainGenerator.StartGO.name} chunk: {gameManager.terrainGenerator.startChunkCoord} position: {transform.position}");
+            transform.position = Vector3.zero + Vector3.up;
+            transform.rotation = Quaternion.identity;
+            StartCoroutine(TeleportPlayerRoutine(transform.position, Vector3.forward));
         }
 
-        public IEnumerator TeleportPlayer(Vector3 targetPosition)
+        public void TeleportToStart()
+        {
+            Vector3 directionToGoal = (terrainGenerator.currentGoal.transform.position - terrainGenerator.currentStart.transform.position).normalized;
+            Debug.Log($"-player- Teleport player from {transform.position} to {terrainGenerator.currentStart.transform.position} direction: {directionToGoal} ");
+            transform.position = terrainGenerator.currentStart.transform.position;
+
+            StartCoroutine(TeleportPlayerRoutine(
+                new Vector3(transform.position.x, 1, transform.position.z),
+                directionToGoal));
+        }
+
+        public IEnumerator TeleportPlayerRoutine(Vector3 targetPosition, Vector3 directionToFace)
         {
             controller.enabled = false;
             yield return null; // Wait one frame
             transform.position = targetPosition;
+            transform.rotation = Quaternion.LookRotation(directionToFace);
+            currentAngle = targetAngle = transform.eulerAngles.y;
             yield return null; // Wait one frame
             controller.enabled = true;
         }
 
         void Update()
         {
+            if (terrainGenerator != null && terrainGenerator.currentGoal != null)
+            {
+                Vector3 directionToGoal = (terrainGenerator.currentGoal.transform.position - transform.position).normalized;
+                Debug.DrawRay(transform.position, directionToGoal * 5f, Color.red, 2f);
+            }
+
             Vector3 forwardMove = Vector3.zero;
             if (enableMovement && gameManager.levelRunning && !gameManager.goalHandler.goalReached && !gameManager.levelPaused)
             {
@@ -157,7 +172,10 @@ namespace MusicRun
             HandleInput();
 
             if (transform.position.y < 0f)
-                StartCoroutine(TeleportPlayer(new Vector3(transform.position.x, 0.5f, transform.position.z)));
+                StartCoroutine(TeleportPlayerRoutine(
+                    new Vector3(transform.position.x, 0.5f, transform.position.z),
+                    //transform.rotation.y));
+                    new Vector3(Mathf.Cos(currentAngle * Mathf.Deg2Rad), 0f, Mathf.Sin(currentAngle * Mathf.Deg2Rad))));
 
             HandleRotation();
             HandleMovement(forwardMove);
@@ -168,7 +186,7 @@ namespace MusicRun
                 if (playerChunk != currentPlayerChunk)
                 {
                     // Player change to another chunk.
-                    Debug.Log($"Player enters in a chunk: x={transform.position.x} z={transform.position.z} --> playerChunk: {playerChunk}");
+                    Debug.Log($"-player- enters in a chunk: x={transform.position.x} z={transform.position.z} --> playerChunk: {playerChunk}");
                     currentPlayerChunk = playerChunk;
                     terrainGenerator.UpdateChunks(currentPlayerChunk);
                 }
@@ -203,7 +221,7 @@ namespace MusicRun
 
         void HandleRotation()
         {
-            //Smooth interpolation between the current angle and the target angle, with an adjustable smoothing factor.
+            //Smooth interpolation between the current angle and the target angle (degree), with an adjustable smoothing factor.
             currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * 5f);
             transform.rotation = Quaternion.Euler(0, currentAngle, 0);
         }

@@ -52,12 +52,12 @@ namespace MusicRun
             ScreenVideo.Rise();
         }
 
-        public void UpdateText()
+        public void UpdateText(string info=null)
         {
             //// "   9999         9999            999"
             //// "  9999       9999         9999
             //bestScoreText.text = $" {player.playerLastScore,4}       {player.playerBestScore,4}            {player.playerPosition,4}";
-            string midiInfo = $"{gameManager.midiManager.midiPlayer?.MPTK_MidiName}";
+            string midiInfo = info==null? $"{gameManager.midiManager.midiPlayer?.MPTK_MidiName}" : info;
             //if (gameManager.midiManager.midiPlayer.MPTK_MidiLoaded != null)
             //{
             //    if (!string.IsNullOrEmpty(gameManager.midiManager.midiPlayer.MPTK_MidiLoaded.TrackInstrumentName))

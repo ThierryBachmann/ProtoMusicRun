@@ -19,18 +19,17 @@ namespace MusicRun
 
         private TerrainLevel currentLevel;
         private int currentIndexLevel;
-        private GameObject currentStart;
+        public GameObject currentStart;
         private Vector2Int currentChunk;
         public Vector2Int startChunkCoord;
         public Vector2Int goalChunkCoord;
-        private GameObject currentGoal;
+        public GameObject currentGoal;
         private Dictionary<Vector2Int, GameObject> spawnedChunks;
         private Stack<GameObject> chunkPool = new Stack<GameObject>(20);
         private Dictionary<Vector2Int, int> spawnedBonus;
         private Dictionary<Vector2Int, int> spawnedInstrument;
         private GameManager gameManager;
 
-        public GameObject StartGO { get => currentStart; }
         public TerrainLevel CurrentLevel { get => currentLevel; }
 
         public float timeCreateChunk;
@@ -56,9 +55,10 @@ namespace MusicRun
             ClearChunks(0);
             ClearChunkPool();
             spawnedChunks = new Dictionary<Vector2Int, GameObject>();
-            //freeChunks = new Dictionary<Vector2Int, GameObject>();
             spawnedBonus = new Dictionary<Vector2Int, int>();
             spawnedInstrument = new Dictionary<Vector2Int, int>();
+            // Updated in UpdateChunks() from PlayerController.Update() but we can wait to reset position.
+            currentChunk = Vector2Int.zero;
         }
 
         /// <summary>
@@ -68,6 +68,8 @@ namespace MusicRun
         /// <returns></returns>
         public int SelectNextLevel(int levelIndex)
         {
+            Debug.LogWarning($"-terrain- SelectNextLevel from index {levelIndex}");
+
             bool oneLevelEnabledAtLeast = false;
             foreach (TerrainLevel level in levels) if (level.enabled) { oneLevelEnabledAtLeast = true; break; }
 
@@ -95,19 +97,19 @@ namespace MusicRun
         /// <summary>
         /// Creates a level based on the specified index.
         /// </summary>
-        /// <param name="levelIndex"></param>
-        public void CreateLevel(int levelIndex)
+        /// <param name="index"></param>
+        public void CreateLevel(int index)
         {
-            currentLevel = levels[levelIndex];
+            Debug.Log($"-terrain- CreateLevel index:{index}");
+            currentLevel = levels[index];
             gameManager.LiteModeApply();
             CreateStartAndGoalChunk();
 
             ClearChunkPool();
 
             if (currentLevel.LoopsToGoal <= 0) currentLevel.LoopsToGoal = 1;
-            // Force to update chunks with real position of the player
+            // Force to update chunks with real position of the player in the playerController update()
             gameManager.playerController.currentPlayerChunk = new Vector2Int(-9999, -9999);
-            //UpdateChunks(startChunkCoord);
         }
 
 
@@ -131,7 +133,7 @@ namespace MusicRun
 
                 // Move the start chunk to the current player position (which is the current goal)
                 currentStart = currentLevel.startGO;
-                currentStart.SetActive(true);
+                //currentStart.SetActive(true);
                 startChunkCoord = currentChunk;
                 currentStart.name = $"start_{currentIndexLevel}_{startChunkCoord.x}_{startChunkCoord.y}";
                 currentStart.transform.position = ChunkToPosition(startChunkCoord);

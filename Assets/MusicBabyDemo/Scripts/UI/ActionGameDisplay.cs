@@ -20,10 +20,10 @@ namespace MusicRun
         public new void Start()
         {
             // Game logic from the button on screen
-            startGameButton.onClick.AddListener(() => gameManager.StartGame());
-            retryLevelButton.onClick.AddListener(() => gameManager.RetryLevel());
-            nextLevelButton.onClick.AddListener(() => gameManager.NextLevel());
-            stopButton.onClick.AddListener(() => gameManager.StopGame());
+            startGameButton.onClick.AddListener(() => gameManager.GameStart());
+            retryLevelButton.onClick.AddListener(() => gameManager.LevelRetry());
+            nextLevelButton.onClick.AddListener(() => gameManager.LevelNext());
+            stopButton.onClick.AddListener(() => gameManager.GameStop());
             leaderBoardButton.onClick.AddListener(() => gameManager.LeaderboardSwitchDisplay());
             helper.onClick.AddListener(() => gameManager.SplashScreenDisplay());
 

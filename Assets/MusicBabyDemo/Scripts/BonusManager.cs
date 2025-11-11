@@ -73,6 +73,9 @@ namespace MusicRun
         /// </summary>
         public float valueBonus = 20f;
 
+        /// <summary>
+        /// game object goal, in fact the pyramid child of the goal (set in the inspector)
+        /// </summary>
         public GameObject goal;
 
         private GameManager gameManager;
