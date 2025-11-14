@@ -28,6 +28,7 @@ namespace MusicRun
         }
         void OnControllerColliderHit(ControllerColliderHit hit)
         {
+            //Debug.Log($"Obstacle hit by player : {hit.collider.name} {hit.collider.tag}");
 
             if (onCooldown) return;
 

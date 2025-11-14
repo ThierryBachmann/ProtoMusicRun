@@ -1,16 +1,17 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-public class DuneTerrainGenerator : MonoBehaviour
+public class xDuneTerrainGenerator : MonoBehaviour
 {
-    [Header("Dimensions du terrain")]
-    public int sizeX = 20;
-    public int sizeZ = 20;
-    public float scale = 1f;
+    [Header("Vertices")]
+    public int countX = 20;
+    public int countZ = 20;
+    public float size = 1f;
 
     [Header("Paramètres des dunes")]
-    [Range(1f, 30f)]
-    public float amplitude = 8f;
+    [Range(0.01f, 10f)]
+    public float amplitude = 3.5f;
     [Range(0.01f, 0.3f)]
     public float frequency = 0.1f;
     [Range(1, 8)]
@@ -20,14 +21,22 @@ public class DuneTerrainGenerator : MonoBehaviour
     [Range(1f, 4f)]
     public float lacunarity = 2f;
 
+    [Header("Border percentage")]
+    [Range(0f, 1f)]
+    public float edgeSize = 0.1f;
+
     [Header("Forme des dunes")]
     [Range(0f, 30f)]
     public float ridgeStrength = 4f;
     public Vector2 windDirection = new Vector2(0f, 0f);
 
+    [Header("Calculated min/max height and vertices count")]
+    public float minY, maxY;
+    public int verticesCount;
 
     private MeshFilter meshFilter;
     private Mesh mesh;
+    private MeshCollider meshCollider;
 
     void Awake()
     {
@@ -42,9 +51,12 @@ public class DuneTerrainGenerator : MonoBehaviour
             {
                 meshFilter = gameObject.AddComponent<MeshFilter>();
             }
+            meshCollider= GetComponent<MeshCollider>();
+            if (meshCollider == null)
+            {
+                meshCollider = gameObject.AddComponent<MeshCollider>();
+            }
         }
-
-        // S'assurer qu'on a aussi un MeshRenderer
         if (GetComponent<MeshRenderer>() == null)
         {
             gameObject.AddComponent<MeshRenderer>();
@@ -59,6 +71,7 @@ public class DuneTerrainGenerator : MonoBehaviour
     [ContextMenu("Générer Terrain")]
     public void GenerateTerrain()
     {
+        DateTime startGenerate = DateTime.Now;
         InitializeComponents();
 
         mesh = new Mesh();
@@ -74,22 +87,32 @@ public class DuneTerrainGenerator : MonoBehaviour
         mesh.RecalculateNormals();
 
         meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = null;
+        meshCollider.sharedMesh = mesh;
+        Debug.Log($"Generate terrain {verticesCount} vertices minY:{minY:F2} maxY:{maxY:F2} {(DateTime.Now-startGenerate).TotalMilliseconds:F2} ms");
     }
 
     Vector3[] GenerateVertices()
     {
-        Vector3[] vertices = new Vector3[(sizeX + 1) * (sizeZ + 1)];
+        Vector3[] vertices = new Vector3[(countX + 1) * (countZ + 1)];
 
-        // Normaliser la direction du vent
         windDirection = windDirection.normalized;
 
-        for (int i = 0, z = 0; z <= sizeZ; z++)
+        // Center the mesh
+        float centerX = (size * countX) / 2f;
+        float centerZ = (size * countZ) / 2f;
+        minY = float.MaxValue;
+        maxY = float.MinValue;
+        verticesCount = 0;
+        for (int z = 0; z <= countZ; z++)
         {
-            for (int x = 0; x <= sizeX; x++)
+            for (int x = 0; x <= countX; x++)
             {
                 float y = CalculateHeight(x, z);
-                vertices[i] = new Vector3(x * scale, y, z * scale);
-                i++;
+                vertices[verticesCount] = new Vector3(centerX - x * size, y, centerZ - z * size);
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+                verticesCount++;
             }
         }
 
@@ -98,9 +121,9 @@ public class DuneTerrainGenerator : MonoBehaviour
 
     float CalculateHeight(int x, int z)
     {
-        // Convertir en coordonnées normalisées
-        float xCoord = (float)x / sizeX;
-        float zCoord = (float)z / sizeZ;
+        // Normalize coordinate
+        float xCoord = (float)x / countX;
+        float zCoord = (float)z / countZ;
 
         // Bruit de Perlin multi-octaves pour la base
         float height = 0f;
@@ -115,7 +138,7 @@ public class DuneTerrainGenerator : MonoBehaviour
             currentFrequency *= lacunarity;
         }
 
-        // Créer des crêtes caractéristiques des dunes
+        // Create dunes
         float ridgeNoise = Mathf.PerlinNoise(xCoord * 5f + windDirection.x,
                                            zCoord * 5f + windDirection.y);
 
@@ -131,39 +154,35 @@ public class DuneTerrainGenerator : MonoBehaviour
         height += windEffect * 0.3f;
 
         // Adoucir les bords pour éviter les falaises
-        float edgeFactor = CalculateEdgeFactor(xCoord, zCoord);
-        height *= edgeFactor;
+        if (edgeSize > 0f)
+        {
+            // Distance minimale aux bords (0 = bord, 0.5 = centre)
+            float distanceFromEdge = Mathf.Min(xCoord, 1f - xCoord, zCoord, 1f - zCoord);
 
+            // Transition douce vers 0 près des bords
+            float edgeFactor = Mathf.SmoothStep(0f, edgeSize, distanceFromEdge);
+            height *= edgeFactor;
+        }
         return height;
-    }
-
-    float CalculateEdgeFactor(float x, float z)
-    {
-        // Distance minimale aux bords (0 = bord, 0.5 = centre)
-        float distanceFromEdge = Mathf.Min(x, 1f - x, z, 1f - z);
-
-        // Transition douce vers 0 près des bords
-        float edgeSize = 0.1f; // 10% de la taille pour la transition
-        return Mathf.SmoothStep(0f, edgeSize, distanceFromEdge);
     }
 
     int[] GenerateTriangles()
     {
-        int[] triangles = new int[sizeX * sizeZ * 6];
+        int[] triangles = new int[countX * countZ * 6];
 
         int vert = 0;
         int tris = 0;
 
-        for (int z = 0; z < sizeZ; z++)
+        for (int z = 0; z < countZ; z++)
         {
-            for (int x = 0; x < sizeX; x++)
+            for (int x = 0; x < countX; x++)
             {
                 triangles[tris + 0] = vert + 0;
-                triangles[tris + 1] = vert + sizeX + 1;
+                triangles[tris + 1] = vert + countX + 1;
                 triangles[tris + 2] = vert + 1;
                 triangles[tris + 3] = vert + 1;
-                triangles[tris + 4] = vert + sizeX + 1;
-                triangles[tris + 5] = vert + sizeX + 2;
+                triangles[tris + 4] = vert + countX + 1;
+                triangles[tris + 5] = vert + countX + 2;
 
                 vert++;
                 tris += 6;
@@ -176,13 +195,13 @@ public class DuneTerrainGenerator : MonoBehaviour
 
     Vector2[] GenerateUVs()
     {
-        Vector2[] uvs = new Vector2[(sizeX + 1) * (sizeZ + 1)];
+        Vector2[] uvs = new Vector2[(countX + 1) * (countZ + 1)];
 
-        for (int i = 0, z = 0; z <= sizeZ; z++)
+        for (int i = 0, z = 0; z <= countZ; z++)
         {
-            for (int x = 0; x <= sizeX; x++)
+            for (int x = 0; x <= countX; x++)
             {
-                uvs[i] = new Vector2((float)x / sizeX, (float)z / sizeZ);
+                uvs[i] = new Vector2((float)x / countX, (float)z / countZ);
                 i++;
             }
         }
@@ -195,6 +214,35 @@ public class DuneTerrainGenerator : MonoBehaviour
         if (/*Application.isPlaying && */meshFilter != null)
         {
             GenerateTerrain();
+        }
+    }
+
+
+    public void ModifyChunkMesh(GameObject chunkObject)
+    {
+        MeshFilter meshFilter = chunkObject.GetComponent<MeshFilter>();
+
+        if (meshFilter != null && meshFilter.sharedMesh != null)
+        {
+            // IMPORTANT : Créer une copie pour éviter de modifier l'asset original
+            Mesh mesh = Instantiate(meshFilter.sharedMesh);
+
+            // Modifier les vertices
+            Vector3[] vertices = mesh.vertices;
+
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                // Vos modifications ici
+                vertices[i].y += UnityEngine.Random.Range(-1f, 1f);
+            }
+
+            // Appliquer les changements
+            mesh.vertices = vertices;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+
+            // Assigner le mesh modifié
+            meshFilter.mesh = mesh;
         }
     }
 }

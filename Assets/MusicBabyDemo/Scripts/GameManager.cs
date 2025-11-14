@@ -1,4 +1,5 @@
 using log4net.Core;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -144,6 +145,7 @@ namespace MusicRun
                 actionLevel.Hide();
                 actionGame.Show();
                 actionGame.SelectActionsToShow();
+                GamePresentation();
             }
             leaderboardDisplay.Hide();
 
@@ -152,6 +154,10 @@ namespace MusicRun
             ////terrainGenerator.CreateLevel(0);
         }
 
+        public void GamePresentation()
+        {
+            Debug.Log("GameManger - arrival");
+        }
         public void GameStart()
         {
             Debug.Log("-level- StartGame levelNumber 1");

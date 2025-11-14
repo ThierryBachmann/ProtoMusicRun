@@ -94,6 +94,13 @@ namespace MusicRun
             return currentIndexLevel;
         }
 
+        public void CreateBigTerrain()
+        {
+            ResetTerrain();
+            CreateLevel(0);
+            UpdateChunks(Vector2Int.zero, 20);
+        }
+
         /// <summary>
         /// Creates a level based on the specified index.
         /// </summary>
@@ -188,23 +195,24 @@ namespace MusicRun
             return new Vector3(chunkCoord.x * chunkSize, 0, chunkCoord.y * chunkSize);
         }
 
-        public void UpdateChunks(Vector2Int chunkUpdate)
+        public void UpdateChunks(Vector2Int chunkUpdate, int render = 0)
         {
             if (!disableChunkUpdate)
             {
+                if (render <= 0) render = renderDistance;
                 currentChunk = chunkUpdate;
 
                 // will contains new chunks coordinate around the player at a distance of -renderDistance to renderDistance
                 HashSet<Vector2Int> visibleChunks = new HashSet<Vector2Int>();
 
-                Debug.Log($"-terrain- UpdateChunks around {currentChunk} start:{startChunkCoord} goal:{goalChunkCoord}  render: {renderDistance}");
+                Debug.Log($"-terrain- UpdateChunks around {currentChunk} start:{startChunkCoord} goal:{goalChunkCoord}  render: {render}");
 
                 DateTime startCreate = DateTime.Now;
                 chunkCreatedCount = 0;
                 chunkReusedCount = 0;
-                for (int x = -renderDistance; x <= renderDistance; x++)
+                for (int x = -render; x <= render; x++)
                 {
-                    for (int z = -renderDistance; z <= renderDistance; z++)
+                    for (int z = -render; z <= render; z++)
                     {
                         Vector2Int chunkCoord = currentChunk + new Vector2Int(x, z);
 
@@ -286,8 +294,8 @@ namespace MusicRun
             usedChunk.transform.position = spawnPos;
             usedChunk.name = $"Chunk - index: {currentIndexLevel} - at: {chunkCoord.x} {chunkCoord.y} (from pool)";
             if (gameManager.midiManager.InstrumentRestored >= gameManager.midiManager.InstrumentFound)
-                RemoveInstrument( usedChunk);
-            
+                RemoveInstrument(usedChunk);
+
             spawnedChunks.Add(chunkCoord, usedChunk);
             //Debug.Log($"-terrain- Reused pooled chunk {usedChunk.name}");
             return usedChunk;
@@ -340,33 +348,6 @@ namespace MusicRun
             return createdChunk;
         }
 
-        public void ModifyChunkMesh(GameObject chunkObject)
-        {
-            MeshFilter meshFilter = chunkObject.GetComponent<MeshFilter>();
-
-            if (meshFilter != null && meshFilter.sharedMesh != null)
-            {
-                // IMPORTANT : Créer une copie pour éviter de modifier l'asset original
-                Mesh mesh = Instantiate(meshFilter.sharedMesh);
-
-                // Modifier les vertices
-                Vector3[] vertices = mesh.vertices;
-
-                for (int i = 0; i < vertices.Length; i++)
-                {
-                    // Vos modifications ici
-                    vertices[i].y += UnityEngine.Random.Range(-1f, 1f);
-                }
-
-                // Appliquer les changements
-                mesh.vertices = vertices;
-                mesh.RecalculateNormals();
-                mesh.RecalculateBounds();
-
-                // Assigner le mesh modifié
-                meshFilter.mesh = mesh;
-            }
-        }
         // 
         private void AddBonusMalus(Vector2Int chunkCoord, GameObject chunk, float density, float ratio, GameObject[] prefab)
         {
@@ -453,7 +434,7 @@ namespace MusicRun
         {
             foreach (Transform childTransform in chunk.transform)
             {
-                if (childTransform.CompareTag("Instrument") )
+                if (childTransform.CompareTag("Instrument"))
                 {
                     Destroy(childTransform.gameObject);
                 }
