@@ -118,7 +118,7 @@ public class DuneTerrainGenerator : MonoBehaviour
         {
             for (int x = 0; x <= countX; x++)
             {
-                float y = CalculateHeight(x, z);
+                float y = CalculateHeightBorderAtZero(x, z);
                 vertices[verticesCount] = new Vector3(centerX - x * size, y, centerZ - z * size);
 
                 if (y < minY) minY = y;
@@ -140,6 +140,81 @@ public class DuneTerrainGenerator : MonoBehaviour
         }
 
         return vertices;
+    }
+    float CalculateHeightBorderAtZero(int x, int z)
+    {
+        // Normalize grid coordinates to [0,1]
+        float xCoord = (float)x / countX;
+        float zCoord = (float)z / countZ;
+
+        // --- Base multi-octave Perlin noise (always ≥ 0) ---
+        // We keep Perlin in [0,1] and sum only positive contributions.
+        // The total vertical range from this fBM stack is roughly:
+        //   amplitude * (1 - persistence^octaves) / (1 - persistence)
+        float height = 0f;
+        float currentAmplitude = amplitude;
+        float currentFrequency = frequency;
+
+        for (int i = 0; i < octaves; i++)
+        {
+            float p = Mathf.PerlinNoise(xCoord * currentFrequency * 10f,
+                                        zCoord * currentFrequency * 10f); // p ∈ [0,1]
+            height += p * currentAmplitude; // always ≥ 0
+
+            currentAmplitude *= persistence;
+            currentFrequency *= lacunarity;
+        }
+
+        // --- Ridge term (creates dune crests, also ≥ 0) ---
+        // ridgeNoise ∈ [0,1], peaked near 0.5, squared to sharpen crests.
+        float ridgeNoise = Mathf.PerlinNoise(xCoord * 5f + windDirection.x,
+                                             zCoord * 5f + windDirection.y);
+        ridgeNoise = 1f - Mathf.Abs(ridgeNoise - 0.5f) * 2f; // triangular peak in [0,1]
+        ridgeNoise = ridgeNoise * ridgeNoise;                // sharper crests, still ≥ 0
+
+        // We no longer subtract the mean; this only adds a positive bump.
+        height += ridgeStrength * ridgeNoise; // still ≥ 0
+
+        // --- Wind asymmetry (multiplicative, never negative) ---
+        // We turn wind into a factor in [1 - windFactor, 1 + windFactor],
+        // so the final height stays ≥ 0.
+        float windDot = Vector2.Dot(new Vector2(xCoord - 0.5f, zCoord - 0.5f),
+                                    windDirection.normalized);
+
+        // windDot is roughly in [-0.5, 0.5] over the grid; remap to [0,1]
+        float windMask = Mathf.InverseLerp(-0.5f, 0.5f, windDot);
+
+        // Tune this if you want more or less wind effect (0.0–0.5 is reasonable)
+        const float windFactor = 0.3f;
+
+        // Factor is in [1 - windFactor, 1 + windFactor] = [0.7, 1.3] here, always > 0
+        float windScale = Mathf.Lerp(1f - windFactor, 1f + windFactor, windMask);
+        height *= windScale; // still ≥ 0
+
+        // --- Edge softening ---
+        // Fade heights near borders to avoid cliffs.
+        if (edgeSize > 0f)
+        {
+            // Minimal distance to a border (0 at the border, ~0.5 at the center)
+            float distanceFromEdge = Mathf.Min(xCoord, 1f - xCoord, zCoord, 1f - zCoord);
+
+            // edgeSize is the border band width in [0..0.5]. Inside this band we fade to 0, outside we keep 1.
+            float t = Mathf.InverseLerp(0f, edgeSize, distanceFromEdge);
+
+            // Smooth transition from 0 (edge) to 1 (interior)
+            float edgeFactor = Mathf.SmoothStep(0f, 1f, t);
+
+            height *= edgeFactor; // product of ≥ 0 terms → still ≥ 0
+        }
+
+        // At this point, analytically:
+        // - Base fBM ≥ 0
+        // - Ridge ≥ 0
+        // - windScale > 0
+        // - edgeFactor ∈ [0,1]
+        // ⇒ height ≥ 0 everywhere, and exactly 0 at the very border (edgeFactor = 0).
+
+        return height;
     }
 
     float CalculateHeight(int x, int z)
