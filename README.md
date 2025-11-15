@@ -23,11 +23,11 @@ A quick look at the demo in action:
   <em>Level 2 — Variant</em>
 </p>
 
-<h3 align="center">Some setting with lite mode and Firebase Leaderboards name</h3>
+<h3 align="center">Some Information</h3>
 <p align="center">
   <img src="Screenshots/Setting.png" width="500">
   <br>
-  <em>Settings Menu</em>
+  <em>Settings Menu: Lite mode and Firebase Leaderboards name</em>
 </p>
 
 <p align="center">
@@ -40,19 +40,19 @@ A quick look at the demo in action:
 <p align="center">
   <img src="Screenshots/Terrain_designer_1.png" width="600">
   <br>
-  <em>Terrain Designer — View 1</em>
+  <em>Terrain Designer — View 1 - with MIDI settings</em>
 </p>
 
 <p align="center">
   <img src="Screenshots/Terrain_designer_2.png" width="600">
   <br>
-  <em>Terrain Designer — View 2</em>
+  <em>Terrain Designer — View 2 - Vegetation and Terrain</em>
 </p>
 
 <p align="center">
   <img src="Screenshots/Terrain_designer_3.png" width="600">
   <br>
-  <em>Terrain Designer — View 3</em>
+  <em>Terrain Designer — View 3 - Bonus & Instrument</em>
 </p>
 
 ---
