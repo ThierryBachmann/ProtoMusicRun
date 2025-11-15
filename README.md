@@ -66,7 +66,12 @@ It showcases:
 - **Pitch-bend** effects  
 - **Spatial audio** features  
 
-For the best experience, use a good stereo audio setup.
+A rhythm game built with Unity and powered by the Maestro MIDI Player Tool Kit.
+**What’s the purpose of this demo?**
+To show how interactive MIDI music can shape gameplay — and how gameplay can, in turn, transform the music. Explore dynamic tempo changes, realtime instrument swaps, pitch-based cues, expressive pitch-bend effects, and spatialized audio.
+**It's a Demo**
+- Minimal visuals, simple terrain, and a few example levels to get you started.
+- WebGL compliant — for the best sound, build for desktop or smartphone - and use a good stereo audio setup.
 
 ---
 
@@ -74,8 +79,8 @@ For the best experience, use a good stereo audio setup.
 Beyond the musical system, this demo includes several essential components of a functional game:  
 - Gamepad support  
 - Touchscreen-friendly controls  
-- Algorithmic terrain generation  
-- Integration with Firebase Leaderboards  
+- Terrain editor + algorithmic generator (POC level !)
+- Integration with Firebase Leaderboards  (Hall Of Fame)
 - Example levels built with simple terrain and minimal visuals  
 
 ---
