@@ -103,7 +103,9 @@ namespace MusicRun
             levelPaused = false;
             levelFailed = false;
 
+            //
             // Game logic from the gamepad when the start button is activated.
+            //
             touchEnabler.controls.Gameplay.Start.performed += (InputAction.CallbackContext context) =>
             {
                 if (!gameRunning)
@@ -157,6 +159,9 @@ namespace MusicRun
         public void GamePresentation()
         {
             Debug.Log("GameManger - arrival");
+            // Now presentation until now, just generate terrain
+            //GameStart();
+
         }
         public void GameStart()
         {

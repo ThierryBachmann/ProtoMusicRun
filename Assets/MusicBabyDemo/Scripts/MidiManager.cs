@@ -128,27 +128,32 @@ namespace MusicRun
 
         void Update()
         {
-            float speedClamp = 1f;
+            float musicSpeedClamp = 1f;
 
-            // Calculate music playback speed from the player's speed when the level is active.
             if (gameManager.levelRunning && !gameManager.levelPaused)
             {
-                // Min and max music speed are defined by the current level.
-                TerrainLevel current = gameManager.terrainGenerator.CurrentLevel;
-                float speedMusic = player.Speed * current.RatioSpeedMusic;
-                speedClamp = Mathf.Clamp(speedMusic, current.MinSpeedMusic, current.MaxSpeedMusic);
                 if (Progress >= 100f)
                 {
+                    // GameManager .OnLevelCompleted() will decide if the level is failed or not. 
                     Debug.Log("MidiManager - OnMusicEnded");
                     OnMusicEnded?.Invoke(LevelEndedReason.MusicEnded);
                 }
+
+                // Calculate music playback speed from the player's speed when the level is active.
+            
+                // Min and max music speed are defined by the current level.
+                TerrainLevel current = gameManager.terrainGenerator.CurrentLevel;
+                
+                // Apply ratio (defined by level) between the player speed and the music speed
+                float speedMusic = player.Speed * current.RatioSpeedMusic;
+                musicSpeedClamp = Mathf.Clamp(speedMusic, current.MinSpeedMusic, current.MaxSpeedMusic);
             }
 
             // Avoid updating the MIDI speed every frame: only apply an update when the change exceeds a small threshold.
-            if (previousSpeed < 0f || Mathf.Abs(previousSpeed - speedClamp) > 0.1f)
+            if (previousSpeed < 0f || Mathf.Abs(previousSpeed - musicSpeedClamp) > 0.1f)
             {
-                midiPlayer.MPTK_Speed = speedClamp;
-                previousSpeed = speedClamp;
+                midiPlayer.MPTK_Speed = musicSpeedClamp;
+                previousSpeed = musicSpeedClamp;
             }
         }
 

@@ -1,12 +1,4 @@
-﻿/*
- * Prototype Unity 3D : Scène "forêt musicale"
- * Objectifs :
- * - Génération dynamique de terrain
- * - Joueur en vue subjective
- * - Synchronisation musique MIDI avec Maestro MPTK
- * - Obstacles + système de score
- */
-
+﻿
 // === PlayerController.cs ===
 using System;
 using System.Collections;
