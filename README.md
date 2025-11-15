@@ -60,18 +60,15 @@ A quick look at the demo in action:
 ## 🎯 Purpose of this Demo  
 This project demonstrates how **MIDI data can shape gameplay** — and how gameplay can dynamically influence the music.  
 It showcases:  
-- Dynamic **tempo changes**  
-- **Instrument transitions**  
-- **Sound cues** with pitch shifts  
-- **Pitch-bend** effects  
-- **Spatial audio** features  
+- Dynamic **tempo changes** related to the Player speed.  
+- **Realtime Instrument swaps**.  
+- **Sound cues** with pitch shifts.
+- **Pitch-bend cues** effects for bonus.
+- **Spatial audio** features is helping searching the goal. 
 
-A rhythm game built with Unity and powered by the Maestro MIDI Player Tool Kit.
-**What’s the purpose of this demo?**
-To show how interactive MIDI music can shape gameplay — and how gameplay can, in turn, transform the music. Explore dynamic tempo changes, realtime instrument swaps, pitch-based cues, expressive pitch-bend effects, and spatialized audio.
 **It's a Demo**
 - Minimal visuals, simple terrain, and a few example levels to get you started.
-- WebGL compliant — for the best sound, build for desktop or smartphone - and use a good stereo audio setup.
+- WebGL compliant — but for the best sound, build for desktop or smartphone - and use a good stereo audio setup.
 
 ---
 
@@ -79,7 +76,7 @@ To show how interactive MIDI music can shape gameplay — and how gameplay can, 
 Beyond the musical system, this demo includes several essential components of a functional game:  
 - Gamepad support  
 - Touchscreen-friendly controls  
-- Terrain editor + algorithmic generator (POC level !)
+- Terrain editor + algorithmic generator (POC level!)
 - Integration with Firebase Leaderboards  (Hall Of Fame)
 - Example levels built with simple terrain and minimal visuals  
 
@@ -91,7 +88,7 @@ This project is provided as a **complete, open-source Unity demo** to help devel
 - Maestro MIDI Player Tool Kit  
 - Gameplay logic driven by MIDI  
 - Procedural content  
-- Online leaderboards  
+- Online leaderboards, to resuse create your account with your secret key.  
 
 **Source code included — customize it and make it your own!**
 
