@@ -8,13 +8,13 @@
 ## 📸 Screenshot  
 A quick look at the demo in action:
 
-![Gameplay Screenshot](Screenshots/Level 2.png)
-![Gameplay Screenshot](Screenshots/Level 2-1.png)
+![Gameplay Screenshot](Screenshots/Level_2.png)
+![Gameplay Screenshot](Screenshots/Level_2-1.png)
 ![Gameplay Screenshot](Screenshots/Setting.png)
 ![Gameplay Screenshot](Screenshots/what.png)
-![Gameplay Screenshot](Screenshots/Terrain designer 1.png)
-![Gameplay Screenshot](Screenshots/Terrain designer 2.png)
-![Gameplay Screenshot](Screenshots/Terrain designer 3.png)
+![Gameplay Screenshot](Screenshots/Terrain_designer_1.png)
+![Gameplay Screenshot](Screenshots/Terrain_designer_2.png)
+![Gameplay Screenshot](Screenshots/Terrain_designer_3.png)
 
 ## 🎯 Purpose of this Demo  
 This project demonstrates how **MIDI data can shape gameplay** — and how gameplay can dynamically influence the music.  
