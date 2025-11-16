@@ -72,12 +72,18 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /[Aa]ssets/Tutorial/
+
+# useless, available as Unity package or just for internal tests
+BillingMode.json
+TestTerrain.unity
+TestTerrain.unity.meta
+ViewShader.unity
+ViewShader.unity.meta
 *GitIgnore.cs
 *GitIgnore.cs.meta
 /BuildWebGL/
 /BuildWebGLTest/
-
-# useless, available as Unity package
+/[Aa]ssets/MusicRun/
 /[Aa]ssets/MidiPlayer/
 /[Aa]ssets/MidiPlayer.meta 
 /[Aa]ssets/TutorialInfo/
@@ -95,12 +101,12 @@ crashlytics-build.properties
 /[Aa]ssets/YughuesFreeConcreteMaterials.meta
 /[Aa]ssets/Scenes/
 /[Aa]ssets/Scenes.meta
-/[Aa]ssets/Settings/
-/[Aa]ssets/Settings.meta
+# /[Aa]ssets/Settings/
+# /[Aa]ssets/Settings.meta
 /ProjectSettings
 /[Aa]ssets/PlayerControls.cs
 /[Aa]ssets/PlayerControls.cs.meta
-/[Aa]ssets/Resources.meta
-/[Aa]ssets/ProjectSettings
+# /[Aa]ssets/Resources.meta
+# /[Aa]ssets/ProjectSettings
 *.csproj
 *.sln

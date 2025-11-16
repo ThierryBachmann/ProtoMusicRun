@@ -76,9 +76,10 @@ It showcases:
 Beyond the musical system, this demo includes several essential components of a functional game:  
 - Gamepad support  
 - Touchscreen-friendly controls  
-- Terrain editor + algorithmic generator (POC level!)
+- Terrain editor + algorithmic generator (POC level, not yet used in the demo!)
 - Integration with Firebase Leaderboards  (Hall Of Fame)
-- Example levels built with simple terrain and minimal visuals  
+- Shaders exploration for tiny effects  
+- Example levels built with simple terrain and minimal visuals
 
 ---
 
@@ -105,6 +106,7 @@ This project is provided as a **complete, open-source Unity demo** to help devel
 ## 🚀 Getting Started  
 1. Clone or download this repository  
 2. Open the project in **Unity 6**  
+3. Ignore compilation errors (Maestro package is missing)
 3. Import the Maestro package (Free or Pro) from the Asset Store  
 4. Press **Play** and explore the demo levels  
 5. Modify, extend, and experiment freely  

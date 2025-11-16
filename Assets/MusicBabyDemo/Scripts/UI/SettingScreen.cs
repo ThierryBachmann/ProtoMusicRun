@@ -46,7 +46,7 @@ namespace MusicRun
             base.Start();
         }
 
-        public new void Show()
+        public void Show()
         {
             gameManager.enableShortcutKeys = false;
             base.Show();
