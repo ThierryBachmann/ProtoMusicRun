@@ -103,7 +103,7 @@ ViewShader.unity.meta
 /[Aa]ssets/Scenes.meta
 # /[Aa]ssets/Settings/
 # /[Aa]ssets/Settings.meta
-/ProjectSettings
+# /ProjectSettings
 /[Aa]ssets/PlayerControls.cs
 /[Aa]ssets/PlayerControls.cs.meta
 # /[Aa]ssets/Resources.meta
