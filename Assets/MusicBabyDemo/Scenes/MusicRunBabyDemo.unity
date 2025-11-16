@@ -274,7 +274,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2467,7 +2467,7 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 0
+  - enabled: 1
     name: 'Desert Medium '
     description: More dune ...
     Skybox: {fileID: 1193833017}
@@ -2496,7 +2496,7 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 0
+  - enabled: 1
     name: TEST_FLAT
     description: Low vegetation
     Skybox: {fileID: 1193833017}
@@ -2804,6 +2804,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.8, z: 0.53}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1193833013}
   - {fileID: 327158883}
   - {fileID: 330585546}
   m_Father: {fileID: 0}
@@ -3179,8 +3180,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1193833013}
+  m_Children: []
   m_Father: {fileID: 256923878}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!45 &327158884
@@ -9417,7 +9417,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 327158883}
+  m_Father: {fileID: 256923878}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!45 &1193833014
 Skybox:
