@@ -78,10 +78,10 @@ crashlytics-build.properties
 /BuildWebGLTest/
 
 # useless, available as Unity package
-/[Aa]ssets/MidiPlayer/ xx 
+/[Aa]ssets/MidiPlayer/
 /[Aa]ssets/MidiPlayer.meta 
 /[Aa]ssets/TutorialInfo/
-/[Aa]ssets/AllSkyFree/ xx
+/[Aa]ssets/AllSkyFree/
 /[Aa]ssets/AllSkyFree.meta
 /[Aa]ssets/ResonanceAudio
 /[Aa]ssets/ResonanceAudio.meta
