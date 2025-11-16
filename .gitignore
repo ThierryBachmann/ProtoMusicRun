@@ -100,5 +100,7 @@ crashlytics-build.properties
 /ProjectSettings
 /[Aa]ssets/PlayerControls.cs
 /[Aa]ssets/PlayerControls.meta
+/[Aa]ssets/Assets/Resources.meta
+/[Aa]ssets/ProjectSettings
 *.csproj
 *.sln
