@@ -60,10 +60,10 @@ A quick look at the demo in action:
 ## 🎯 Purpose of this Demo  
 This project demonstrates how **MIDI data can shape gameplay** — and how gameplay can dynamically influence the music.  
 It showcases:  
-- Dynamic **tempo changes** related to the Player speed.  
+- Dynamic **tempo changes** related to the player speed.  
 - **Realtime Instrument swaps**.  
-- **Sound cues** with pitch shifts.
-- **Pitch-bend cues** effects for bonus.
+- **Sound cues** with pitch shifts effects for bonus.
+- **Pitch-bend cues** efffect when player collide ab obstacle.
 - **Spatial audio** features is helping searching the goal. 
 
 **It's a Demo**
