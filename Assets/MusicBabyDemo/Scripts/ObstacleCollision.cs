@@ -1,6 +1,4 @@
-﻿using MidiPlayerTK;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine;
 
 namespace MusicRun
 {
@@ -23,9 +21,6 @@ namespace MusicRun
 
         }
 
-        void Start()
-        {
-        }
         void OnControllerColliderHit(ControllerColliderHit hit)
         {
             //Debug.Log($"Obstacle hit by player : {hit.collider.name} {hit.collider.tag}");

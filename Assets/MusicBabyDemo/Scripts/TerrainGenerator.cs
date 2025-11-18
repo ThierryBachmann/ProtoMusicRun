@@ -419,9 +419,9 @@ namespace MusicRun
                     GameObject instrumentPrefabRandom = prefab[indexPrefab];
                     GameObject instrument = Instantiate(instrumentPrefabRandom);
                     instrument.transform.SetParent(chunk.transform, false);
-                    Vector3 instrumentPos = new Vector3(UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f), 5f, UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f));
+                    Vector3 instrumentPos = new Vector3(UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f), 3f, UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f));
                     instrument.transform.SetLocalPositionAndRotation(instrumentPos, Quaternion.identity);
-                    PositionOnHighestTerrain(instrument.transform, 100f, 4f);
+                    PositionOnHighestTerrain(instrument.transform, 100f, 3f);
                     instrument.name = $"AddInstrument - level: {currentIndexLevel} - chunk {chunkCoord} - localPosition: {instrument.transform.localPosition}";
                 }
 

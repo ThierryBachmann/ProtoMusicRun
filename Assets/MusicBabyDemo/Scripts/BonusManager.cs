@@ -181,18 +181,19 @@ namespace MusicRun
 
         private IEnumerator MoveTowardGoal(Collider collider)
         {
-            float speed = 15f; // Units per second
+            float speed = 12f; // Units per second
             float stopDistance = 1f;
             Rigidbody rb = collider.attachedRigidbody;
             GameObject obj = collider.gameObject;
 
 
-            // Direction from player to the instrument (horizontal only).
+            // First move the game object forward to the player
+            // -----------------------------------------------
             Vector3 kickDir = (obj.transform.position - gameManager.playerController.transform.position).normalized;
             kickDir.y = 0;
 
-            // Add a gentle forward + slight upward impulse and keep the object floating (no gravity).
-            Vector3 force = kickDir * gameManager.playerController.Speed * 3f + Vector3.up;
+            // Add a gentle forward + slight downward impulse and keep the object floating (no gravity).
+            Vector3 force = kickDir * gameManager.playerController.Speed * 3f - Vector3.up;
             rb.AddForce(force, ForceMode.Impulse);
             
             // Disable gravity so the object moves in a controlled straight line
@@ -201,7 +202,10 @@ namespace MusicRun
             // Add spin for visual effect. Finally, better without ...
             //rb.AddTorque(UnityEngine.Random.insideUnitSphere * 5f, ForceMode.Impulse);
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1.5f);
+
+            // Now move the game object to the goal
+            // -----------------------------------
 
             // Disable any residual movement from physics before starting
             rb.linearVelocity = Vector3.zero;
