@@ -57,6 +57,16 @@ A quick look at the demo in action:
 
 ---
 
+## 🎭 Story
+
+A famous music group known across the galaxy travels from planet to planet to perform concerts.
+When they land on a harsh, arid world, they suddenly lose all their instruments.
+
+While the band starts their rehearsal — not an easy task without instruments — you step in as the technical crew member responsible for preparing the show. Your mission: explore the area and recover every instrument before the rehearsal ends.
+If you can gather everything in time, the concert can begin!
+
+---
+
 ## 🎯 Purpose of this Demo  
 This project demonstrates how **MIDI data can shape gameplay** — and how gameplay can dynamically influence the music.  
 It showcases:  
@@ -67,8 +77,11 @@ It showcases:
 - **Spatial audio** features is helping searching the goal. 
 
 **It's a Demo**
-- Minimal visuals, simple terrain, and a few example levels to get you started.
+- Minimal visuals, simple terrain generator quite repetitive ;-) and a few example levels to get you started.
+- Always in progress, for example score calculation need to be reviewed.
 - WebGL compliant — but for the best sound, build for desktop or smartphone - and use a good stereo audio setup.
+- Works partially on mobile with a browser ... but FPS very deceptive although a mow level of visuals.
+- Any advice to help improve mobile browser performance is very welcome!
 
 ---
 
@@ -76,9 +89,10 @@ It showcases:
 Beyond the musical system, this demo includes several essential components of a functional game:  
 - Gamepad support  
 - Touchscreen-friendly controls  
-- Terrain editor + algorithmic generator (POC level, not yet used in the demo!)
-- Integration with Firebase Leaderboards  (Hall Of Fame)
-- Shaders exploration for tiny effects  
+- Terrain editor based on chunks for infinite world creation  
+- Algorithmic generator (POC level, not yet used in the demo!)  
+- Integration with Firebase Leaderboards (Hall of Fame)  
+- Shader exploration for small effects  
 - Example levels built with simple terrain and minimal visuals
 
 ---
@@ -107,7 +121,8 @@ This project is provided as a **complete, open-source Unity demo** to help devel
 1. Clone or download this repository  
 2. Open the project in **Unity 6**  
 3. Ignore compilation errors (Maestro package is missing)
-3. Import the Maestro package (Free or Pro) from the Asset Store  
+4. Import the Maestro package (Free or Pro) from the Asset Store  
+5. Open the scene MusicBabyDemo/Scenes/MusicRunBabyDemo
 4. Press **Play** and explore the demo levels  
 5. Modify, extend, and experiment freely  
 
