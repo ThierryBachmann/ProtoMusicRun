@@ -69,7 +69,7 @@ namespace MusicRun
             midiInfoDisplayed.text = midiInfo;
         }
 
-       public void SetItFalling()
+       public void FallingVideo(int indexVideo)
         {
             Debug.Log($"GoalReachedDisplay {gameObject.name}");
             // Add a Box Collider if the parent doesn't have one
@@ -111,6 +111,7 @@ namespace MusicRun
 
             // Apply the Physic Material to the collider
             boxCollider.material = physicMaterial;
+            ScreenVideo.PlayVideo(indexVideo);
         }
     }
 }

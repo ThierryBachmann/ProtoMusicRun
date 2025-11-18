@@ -170,9 +170,9 @@ namespace MusicRun
             terrainGenerator.ResetTerrain();
             levelFailedScreen.Hide();
             // always increase along the game
-            levelNumber = 1; 
+            levelNumber = 1;
             // cycling around the game, but start at -1 to get level index 0
-            levelIndex = terrainGenerator.SelectNextLevel(-1); 
+            levelIndex = terrainGenerator.SelectNextLevel(-1);
             scoreManager.ScoreOverall = 0;
             LevelCreate(levelIndex);
         }
@@ -393,11 +393,17 @@ namespace MusicRun
                 Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
                 GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
                 goalReachedClone = go.GetComponent<GoalReachedDisplay>();
-                goalReachedClone.ScreenVideo.PlayVideo(0);
-                goalReachedClone.SetItFalling();
+                goalReachedClone.FallingVideo(0);
                 goalReachedClone.UpdateText("Level Failed");
             }
+            else if (midiManager.InstrumentRestored < midiManager.InstrumentFound)
+            {
+                Debug.Log($"GameManager - OnLevelCompleted - Music ended without reaching the goal.");
+                levelFailed = true;
+
+            }
             else
+
             {
                 goalReachedDisplay.RiseVideo(1);
                 goalReachedDisplay.UpdateText();
@@ -523,7 +529,7 @@ namespace MusicRun
                             Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
                             GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
                             goalReachedClone = go.GetComponent<GoalReachedDisplay>();
-                            goalReachedClone.SetItFalling();
+                            goalReachedClone.FallingVideo(0);
                         }
                         if (c == 'a') actionGame.SwitchVisible();
                         if (c == 'l') LeaderboardSwitchDisplay();
