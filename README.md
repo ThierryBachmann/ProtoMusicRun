@@ -93,7 +93,7 @@ It showcases:
 
 ## 🕹️ Gameplay & Features  
 Beyond the musical system, this demo includes several essential components of a functional game:  
-- Gamepad support  
+- New input system with gamepad support  
 - Touchscreen-friendly controls  
 - Terrain editor based on chunks for infinite world creation  
 - Algorithmic generator (POC level, not yet used in the demo!)  
