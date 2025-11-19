@@ -59,11 +59,16 @@ A quick look at the demo in action:
 
 ## 🎭 Story
 
-A famous music group known across the galaxy travels from planet to planet to perform concerts.
-When they land on a harsh, arid world, they suddenly lose all their instruments.
+A legendary music group **Animals Disturbance**, famous across the galaxy, travels from planet to planet to perform their concerts.
+After landing on a remote and arid world, disaster strikes: all of their instruments mysteriously vanish.
 
-While the band starts their rehearsal — not an easy task without instruments — you step in as the technical crew member responsible for preparing the show. Your mission: explore the area and recover every instrument before the rehearsal ends.
-If you can gather everything in time, the concert can begin!
+While the band begins their rehearsal — not an easy task without instruments — you, a member of the technical crew, rush out to recover everything before the session ends.
+
+There is just one problem.
+Right before landing, you drank a cup of TurboCafé-7, a hyper-caffeinated alien beverage known for its “You won’t stop. Literally.” effect.
+Now your body keeps accelerating on its own, and the only way to slow down is to crash into vegetation, rocks, or anything solid enough to absorb the momentum.
+
+Find the instruments, control your speed the hard way, and save the concert!
 
 ---
 
@@ -79,8 +84,9 @@ It showcases:
 **It's a Demo**
 - Minimal visuals, simple terrain generator quite repetitive ;-) and a few example levels to get you started.
 - Always in progress, for example score calculation need to be reviewed.
-- WebGL compliant — but for the best sound, build for desktop or smartphone - and use a good stereo audio setup.
-- Works partially on mobile with a browser ... but FPS very deceptive although a mow level of visuals.
+- Code comments are also to be improved.
+- WebGL compliant — but for the best sound, build for desktop or smartphone. WebGL is not good for sound generation.
+- Works partially on mobile with a browser ... but FPS very deceptive although a low level of visuals.
 - Any advice to help improve mobile browser performance is very welcome!
 
 ---
@@ -97,10 +103,30 @@ Beyond the musical system, this demo includes several essential components of a 
 
 ---
 
+## 🎮 Game Input  
+The demo supports multiple input methods so you can play almost anywhere:
+
+### 📱 Touchscreen
+- Tap to **jump**  
+- Swipe or hold left/right to **turn**
+
+### 🕹️ Gamepad
+Standard gamepad buttons are supported:
+- **Start** → Start the run  
+- **A / Cross** → Jump  
+- **Left Stick / D-Pad** → Turn left or right  
+
+### ⌨️ Keyboard
+- **Enter** → Start the game  
+- **Right / Left Arrow** *or* **A / D** → Turn  
+- **Space** → Jump  
+
+---
+
 ## 📦 About This Repository  
 This project is provided as a **complete, open-source Unity demo** to help developers understand how to combine:  
 - Unity 6  
-- Maestro MIDI Player Tool Kit  
+- Maestro MIDI Player Tool Kit
 - Gameplay logic driven by MIDI  
 - Procedural content  
 - Online leaderboards, to resuse create your account with your secret key.  
@@ -121,10 +147,10 @@ This project is provided as a **complete, open-source Unity demo** to help devel
 1. Clone or download this repository  
 2. Open the project in **Unity 6**  
 3. Ignore compilation errors (Maestro package is missing)
-4. Import the Maestro package (Free or Pro) from the Asset Store  
+4. Import the Maestro package (Free or Pro) from the Asset Store, **minimum version 1.6.2**
 5. Open the scene MusicBabyDemo/Scenes/MusicRunBabyDemo
-4. Press **Play** and explore the demo levels  
-5. Modify, extend, and experiment freely  
+6. Press **Play** and explore the demo levels  
+7. Modify, extend, and experiment freely - And, Use a good stereo audio setup!
 
 ---
 
