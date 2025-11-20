@@ -181,7 +181,7 @@ namespace MusicRun
 
         private IEnumerator MoveTowardGoal(Collider collider)
         {
-            float speed = 12f; // Units per second
+            float speed = gameManager.playerController.Speed * 3f; // Units per second
             float stopDistance = 1f;
             Rigidbody rb = collider.attachedRigidbody;
             GameObject obj = collider.gameObject;
@@ -193,7 +193,7 @@ namespace MusicRun
             kickDir.y = 0;
 
             // Add a gentle forward + slight downward impulse and keep the object floating (no gravity).
-            Vector3 force = kickDir * gameManager.playerController.Speed * 3f - Vector3.up;
+            Vector3 force = kickDir * speed - Vector3.up;
             rb.AddForce(force, ForceMode.Impulse);
             
             // Disable gravity so the object moves in a controlled straight line

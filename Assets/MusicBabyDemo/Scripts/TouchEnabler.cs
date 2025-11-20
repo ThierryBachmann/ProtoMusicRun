@@ -63,7 +63,7 @@ namespace MusicRun
                         {
                             Vector2 endPos = t.screenPosition;
                             Vector2 delta = endPos - startPos;
-                            Debug.Log(delta);
+                            //Debug.Log(delta);
                             if (Mathf.Abs(delta.x) > minSwipeDistanceX)
                             {
                                 SwipeHorizontalValue = delta.x;

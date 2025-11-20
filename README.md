@@ -107,19 +107,18 @@ Beyond the musical system, this demo includes several essential components of a 
 The demo supports multiple input methods so you can play almost anywhere:
 
 ### 📱 Touchscreen
-- Tap to **jump**  
-- Swipe or hold left/right to **turn**
+- **Tap** → jump
+- **Swipe** → turn
 
 ### 🕹️ Gamepad
-Standard gamepad buttons are supported:
 - **Start** → Start the run  
-- **A / Cross** → Jump  
-- **Left Stick / D-Pad** → Turn left or right  
+- **A** → Jump  
+- **Left Stick** → Turn left or right  
 
 ### ⌨️ Keyboard
-- **Enter** → Start the game  
-- **Right / Left Arrow** *or* **A / D** → Turn  
+- **Enter** → Start the run  
 - **Space** → Jump  
+- **Right / Left Arrow** *or* **A / D** → Turn  
 
 ---
 
