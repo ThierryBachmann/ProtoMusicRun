@@ -2555,7 +2555,7 @@ MonoBehaviour:
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
     indexMIDI: 3
-    LoopsToGoal: 3
+    LoopsToGoal: 1
     SearchForInstrument: 1
     SubstitutionInstrument: 123
     RatioSpeedMusic: 0.77
@@ -16809,38 +16809,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1591330910964806950}
     m_Modifications:
-    - target: {fileID: 1796054689796793816, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: m_text
-      value: "Information about the MIDI played \nscore info"
-      objectReference: {fileID: 0}
-    - target: {fileID: 1796054689796793816, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: m_fontColor.b
-      value: 0.254717
-      objectReference: {fileID: 0}
-    - target: {fileID: 1796054689796793816, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: m_fontColor.g
-      value: 0.254717
-      objectReference: {fileID: 0}
-    - target: {fileID: 1796054689796793816, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: m_fontColor.r
-      value: 0.254717
-      objectReference: {fileID: 0}
-    - target: {fileID: 1796054689796793816, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: m_TextWrappingMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1796054689796793816, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: m_fontColor32.rgba
-      value: 4282466625
-      objectReference: {fileID: 0}
-    - target: {fileID: 1994895951894790549, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 1.21
-      objectReference: {fileID: 0}
-    - target: {fileID: 1994895951894790549, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -0.46
-      objectReference: {fileID: 0}
     - target: {fileID: 6136377413469653177, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -16884,10 +16852,6 @@ PrefabInstance:
     - target: {fileID: 7794113385521069697, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
       propertyPath: m_Name
       value: SceneMusicWithTextAndScreen1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7859356094537635515, guid: d7de26d8249e38e409a985c3c7c241a2, type: 3}
-      propertyPath: endY
-      value: 0.6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

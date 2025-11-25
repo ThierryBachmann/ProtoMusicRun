@@ -33,6 +33,9 @@ namespace MusicRun
 
         private GameManager gameManager;
 
+        private Color colorTextGreen = new Color(0.07843138f, 0.5960785f, 0.1607843f, 1f);
+        private Color colorTextGray = new Color(0.1764706f, 0.1764706f, 0.1764706f, 1f);
+
         public void Awake()
         {
             gameManager = Utilities.FindGameManager();
@@ -61,7 +64,13 @@ namespace MusicRun
             if (gameManager.midiManager.midiPlayer != null)
                 midiInfo = gameManager.midiManager.midiPlayer.MPTK_MidiName;
             if (!gameManager.levelFailed)
+            {
+                midiInfoDisplayed.color = colorTextGreen;
                 midiInfo += $" Score: {gameManager.playerController.playerLastScore,4}";
+            }
+            else
+                midiInfoDisplayed.color = colorTextGray;
+
             if (info != null)
                 midiInfo += "\n" + info;
 

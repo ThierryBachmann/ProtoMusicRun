@@ -380,6 +380,7 @@ namespace MusicRun
             Debug.Log($"GameManager - OnLevelCompleted - {reason}");
 
             // Check level failed: Music ended without reaching the goal.
+            playerController.enableMovement = false;
             levelRunning = false;
             if (MusicPercentage >= 100f && GoalPercentage <= 98f)
             {
@@ -431,20 +432,10 @@ namespace MusicRun
                         1
                         );
             leaderboard.SubmitScore(playerScore);
-
-            //// Clear chunk as sooner as possible to avoid collision meshes stay when building next level
-            //terrainGenerator.ClearChunks(1);
-            //if (nextLevelAuto)
-            //{
-            //    StartCoroutine(Utilities.WaitAndCall(2500f, NextLevel));
-            //}
-            //else
-            //{
-            //    actionLevel.Hide();
-            //    actionGame.Show();
-            //    actionGame.SelectActionsToShow();
-            //}
             playerController.LevelEnded();
+            StartCoroutine(Utilities.WaitAndCall(2000f, () => { playerController.enableMovement = true; }));
+
+
         }
 
         private void OnScoreSubmitted(bool success)

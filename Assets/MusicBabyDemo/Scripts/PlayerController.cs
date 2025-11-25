@@ -161,7 +161,9 @@ namespace MusicRun
                 Speed = Mathf.MoveTowards(Speed, MaxSpeed, Time.deltaTime * Acceleration);
                 forwardMove = transform.forward * Speed;
             }
-            HandleInput();
+
+            if (enableMovement)
+                HandleInput();
 
             if (transform.position.y < 0f)
                 StartCoroutine(TeleportPlayerRoutine(
@@ -169,8 +171,11 @@ namespace MusicRun
                     //transform.rotation.y));
                     new Vector3(Mathf.Cos(currentAngle * Mathf.Deg2Rad), 0f, Mathf.Sin(currentAngle * Mathf.Deg2Rad))));
 
-            HandleRotation();
-            HandleMovement(forwardMove);
+            if (enableMovement)
+            {
+                HandleRotation();
+                HandleMovement(forwardMove);
+            }
 
             if (gameManager.gameRunning)
             {
