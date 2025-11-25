@@ -7,9 +7,9 @@ namespace MusicRun
 {
     public class GoalReachedDisplay : MonoBehaviour
     {
-       public ScreenDisplay ScreenVideo;
-       public ScreenDisplay BorderVideo;
-         
+        public ScreenDisplay ScreenVideo;
+        public ScreenDisplay BorderVideo;
+
         //public TMP_Text bestScoreText;
         public TMP_Text midiInfoDisplayed;
 
@@ -52,12 +52,19 @@ namespace MusicRun
             ScreenVideo.Rise();
         }
 
-        public void UpdateText(string info=null)
+        public void UpdateText(string info = null)
         {
             //// "   9999         9999            999"
             //// "  9999       9999         9999
             //bestScoreText.text = $" {player.playerLastScore,4}       {player.playerBestScore,4}            {player.playerPosition,4}";
-            string midiInfo = info==null? $"{gameManager.midiManager.midiPlayer?.MPTK_MidiName}" : info;
+            string midiInfo = "";
+            if (gameManager.midiManager.midiPlayer != null)
+                midiInfo = gameManager.midiManager.midiPlayer.MPTK_MidiName;
+            if (!gameManager.levelFailed)
+                midiInfo += $" Score: {gameManager.playerController.playerLastScore,4}";
+            if (info != null)
+                midiInfo += "\n" + info;
+
             //if (gameManager.midiManager.midiPlayer.MPTK_MidiLoaded != null)
             //{
             //    if (!string.IsNullOrEmpty(gameManager.midiManager.midiPlayer.MPTK_MidiLoaded.TrackInstrumentName))
@@ -69,7 +76,7 @@ namespace MusicRun
             midiInfoDisplayed.text = midiInfo;
         }
 
-       public void FallingVideo(int indexVideo)
+        public void FallingVideo(int indexVideo)
         {
             Debug.Log($"GoalReachedDisplay {gameObject.name}");
             // Add a Box Collider if the parent doesn't have one
@@ -78,7 +85,7 @@ namespace MusicRun
             {
                 boxCollider = gameObject.AddComponent<BoxCollider>();
                 // Set a default size (adjust as needed)
-                boxCollider.center= colliderCenter;
+                boxCollider.center = colliderCenter;
                 boxCollider.size = colliderSize;
             }
 

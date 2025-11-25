@@ -166,7 +166,7 @@ namespace MusicRun
         public void GameStart()
         {
             Debug.Log("-level- StartGame levelNumber 1");
-            goalHandler.gameObject.SetActive(true);
+            //goalHandler.gameObject.SetActive(true);
             terrainGenerator.ResetTerrain();
             levelFailedScreen.Hide();
             // always increase along the game
@@ -183,7 +183,8 @@ namespace MusicRun
 
             // Cancel callback to StartLevel() when sceneGoal is closed
             sceneGoal.OnClose = null;
-            goalHandler.gameObject.SetActive(false);
+            // No, video issue if disabled
+            //goalHandler.gameObject.SetActive(false);
             goalHandler.name = "Goal";
             startGameObject.transform.position = Vector3.zero;
             startGameObject.name = "Start";
@@ -260,7 +261,7 @@ namespace MusicRun
             // The scene must be loaded before playing the MIDI.
             midiManager.PlayMIDI();
 
-            goalHandler.gameObject.SetActive(true);
+            //goalHandler.gameObject.SetActive(true);
             goalHandler.NewLevel();
             gameRunning = true;
             OnSwitchPause(true);
@@ -394,17 +395,18 @@ namespace MusicRun
                 GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
                 goalReachedClone = go.GetComponent<GoalReachedDisplay>();
                 goalReachedClone.FallingVideo(0);
-                goalReachedClone.UpdateText("Level Failed");
+                goalReachedClone.UpdateText("Level Failed - Music Ended");
             }
             else if (midiManager.InstrumentRestored < midiManager.InstrumentFound)
             {
                 Debug.Log($"GameManager - OnLevelCompleted - Music ended without reaching the goal.");
                 levelFailed = true;
-
+                goalReachedDisplay.RiseVideo(0);
+                goalReachedDisplay.UpdateText("Level Failed - Instruments Missing");
             }
             else
-
             {
+                levelFailed = false;
                 goalReachedDisplay.RiseVideo(1);
                 goalReachedDisplay.UpdateText();
             }
