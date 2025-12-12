@@ -2555,7 +2555,7 @@ MonoBehaviour:
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
     indexMIDI: 3
-    LoopsToGoal: 1
+    LoopsToGoal: 5
     SearchForInstrument: 1
     SubstitutionInstrument: 123
     RatioSpeedMusic: 0.77
@@ -2587,7 +2587,7 @@ MonoBehaviour:
     indexMIDI: 80
     LoopsToGoal: 0
     SearchForInstrument: 1
-    SubstitutionInstrument: 0
+    SubstitutionInstrument: 122
     RatioSpeedMusic: 0.47
     MinSpeedMusic: 0.55
     MaxSpeedMusic: 1.28
@@ -2616,7 +2616,7 @@ MonoBehaviour:
     indexMIDI: 50
     LoopsToGoal: 0
     SearchForInstrument: 1
-    SubstitutionInstrument: 0
+    SubstitutionInstrument: 121
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
     MaxSpeedMusic: 2.98
@@ -17500,8 +17500,6 @@ MonoBehaviour:
   indexBuffSize: -1
   MPTK_DirectSendToPlayer: 1
   MPTK_EnableChangeTempo: 1
-  MPTK_PauseOnMaxDistance: 0
-  maxDistance: 1200
   MPTK_EnablePanChange: 1
   volumeGlobal: 0.801
   dsp_64: 1
@@ -17549,7 +17547,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   showMidiInfo: 0
-  showSynthParameter: 1
+  showSynthParameter: 0
   showSpatialization: 1
   showUnitySynthParameter: 1
   showUnityPerformanceParameter: 0
@@ -17557,13 +17555,17 @@ MonoBehaviour:
   showMidiPerformanceParameter: 0
   showSoundFontEffect: 0
   showVerbose: 0
-  showUnitySynthEffect: 1
-  showMidiParameter: 1
+  showUnitySynthEffect: 0
+  showMidiParameter: 0
   showMidiPlaying: 0
   showSynthEvents: 0
   showEvents: 0
   showDefault: 0
-  spatialize: 1
+  distanceAttenuation: 1
+  MPTK_PauseOnMaxDistance: 0
+  minDistance: 0
+  maxDistance: 1200
+  minSoundAttenuation: 0.048
   midiNameToPlay: Take 5 - by Paul Desmond
   MPTK_StartPlayAtFirstNote: 1
   MPTK_StopPlayOnLastNote: 1

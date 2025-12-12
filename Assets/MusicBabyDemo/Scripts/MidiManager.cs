@@ -208,11 +208,13 @@ namespace MusicRun
         }
 
         /// <summary>
-        /// PLay Load already loaded. OnEventStartPlayMidi will be trigger.
+        /// Play Load already loaded. OnEventStartPlayMidi will be trigger.
         /// </summary>
         /// <param name="index">Index of the MIDI file in the Midi DB.</param>
         public void PlayMIDI()
         {
+            // When game pause has been activated, the MIDI is paused and will not play.
+            // Useless to call MPTK_UnPause from v2.17.1 - midiPlayer.MPTK_UnPause();
             // Play the already-loaded MIDI (avoid reloading).
             midiPlayer.MPTK_Play(alreadyLoaded: true);
         }

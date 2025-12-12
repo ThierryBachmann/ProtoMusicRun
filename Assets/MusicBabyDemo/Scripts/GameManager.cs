@@ -258,8 +258,6 @@ namespace MusicRun
             // Player move to start terrain facing to goal terrain
             //playerController.ResetPosition();
 
-            // The scene must be loaded before playing the MIDI.
-            midiManager.PlayMIDI();
 
             //goalHandler.gameObject.SetActive(true);
             goalHandler.NewLevel();
@@ -269,6 +267,11 @@ namespace MusicRun
             sceneGoal.SetInfo(terrainGenerator.CurrentLevel.name, terrainGenerator.CurrentLevel.description);
             awaitingPlayerStart = true;
             sceneGoal.Show(LevelStart);
+
+            // The scene must be loaded before playing the MIDI.
+            // PlayMIDI will also trigger midiPlayer.OnEventStartPlayMidi
+            // which will set midiPlayer.MPTK_MaxDistance (applu volume attenuation with distance)
+            midiManager.PlayMIDI();
         }
 
         private void GoalScreenHide()

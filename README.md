@@ -96,7 +96,7 @@ Beyond the musical system, this demo includes several essential components of a 
 - New input system with gamepad support  
 - Touchscreen-friendly controls  
 - Terrain editor based on chunks for infinite world creation  
-- Algorithmic generator (POC level, not yet used in the demo!)  
+- Algorithmic terrain generator (POC level, not yet used in the demo!)  
 - Integration with Firebase Leaderboards (Hall of Fame)  
 - Shader exploration for small effects  
 - Example levels built with simple terrain and minimal visuals
