@@ -17563,7 +17563,7 @@ MonoBehaviour:
   showDefault: 0
   distanceAttenuation: 1
   MPTK_PauseOnMaxDistance: 0
-  minDistance: 0
+  minDistance: 15
   maxDistance: 1200
   minSoundAttenuation: 0.048
   midiNameToPlay: Take 5 - by Paul Desmond
