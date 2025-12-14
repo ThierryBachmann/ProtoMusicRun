@@ -36,8 +36,9 @@ namespace MusicRun
         [Header("Debug")]
         public bool startAuto;
         public bool nextLevelAuto;
-        public bool infoDebug = false;
-        public bool enableShortcutKeys = false;
+        public bool infoDebug;
+        public bool enableShortcutKeys;
+        public bool alwaysSucceed;
         public int FramePerSecond;
         private float deltaTimeFPS = 0.0f;
         public int LowerThresholdFPS = 28;
@@ -385,7 +386,7 @@ namespace MusicRun
             // Check level failed: Music ended without reaching the goal.
             playerController.enableMovement = false;
             levelRunning = false;
-            if (MusicPercentage >= 100f && GoalPercentage <= 98f)
+            if (MusicPercentage >= 100f && GoalPercentage <= 98f && !alwaysSucceed)
             {
                 Debug.Log($"GameManager - OnLevelCompleted - Music ended without reaching the goal.");
                 levelFailed = true;
@@ -401,7 +402,7 @@ namespace MusicRun
                 goalReachedClone.FallingVideo(0);
                 goalReachedClone.UpdateText("Level Failed - Music Ended");
             }
-            else if (midiManager.InstrumentRestored < midiManager.InstrumentFound)
+            else if (midiManager.InstrumentRestored < midiManager.InstrumentFound && !alwaysSucceed)
             {
                 Debug.Log($"GameManager - OnLevelCompleted - Music ended without reaching the goal.");
                 levelFailed = true;
@@ -511,7 +512,13 @@ namespace MusicRun
                     foreach (char c in Input.inputString)
                     {
                         if (c == 'h') HelperScreenDisplay();
-                        if (c == 'n') StartCoroutine(ClearAndNextLevelTest());
+                        if (c == 'n')
+                        {
+                            //midiManager.countLoop = terrainGenerator.CurrentLevel.LoopsToGoal + 1; 
+                            midiManager.InstrumentRestored = midiManager.InstrumentFound;
+                            playerController.TeleportToGoal();
+                        }
+                        ;
                         if (c == 's') GameStop();
                         if (c == 'r')
                         {
@@ -554,7 +561,7 @@ namespace MusicRun
             if (gameRunning && levelRunning && !levelPaused)
             {
                 if (goalHandler.distanceAtStart > 0)
-                    GoalPercentage = 100f - (goalHandler.distance / goalHandler.distanceAtStart * 100f);
+                    GoalPercentage = 100f - (goalHandler.distancePlayerGoal / goalHandler.distanceAtStart * 100f);
                 else
                     GoalPercentage = 0f;
                 MusicPercentage = midiManager.Progress;

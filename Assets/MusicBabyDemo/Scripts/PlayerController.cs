@@ -130,9 +130,15 @@ namespace MusicRun
             Debug.Log($"-player- Teleport player from {transform.position} to {terrainGenerator.currentStart.transform.position} direction: {directionToGoal} ");
             transform.position = terrainGenerator.currentStart.transform.position;
 
-            StartCoroutine(TeleportPlayerRoutine(
-                new Vector3(transform.position.x, 1, transform.position.z),
-                directionToGoal));
+            StartCoroutine(TeleportPlayerRoutine(new Vector3(transform.position.x, 1, transform.position.z), directionToGoal));
+        }
+        public void TeleportToGoal()
+        {
+            transform.position = terrainGenerator.currentGoal.transform.position - Vector3.back * 2f;
+            Vector3 directionToGoal = (terrainGenerator.currentGoal.transform.position - transform.position).normalized;
+            Debug.Log($"-player- Teleport player from {transform.position} to {terrainGenerator.currentStart.transform.position} direction: {directionToGoal} ");
+
+            StartCoroutine(TeleportPlayerRoutine(new Vector3(transform.position.x, 1, transform.position.z), directionToGoal));
         }
 
         public IEnumerator TeleportPlayerRoutine(Vector3 targetPosition, Vector3 directionToFace)

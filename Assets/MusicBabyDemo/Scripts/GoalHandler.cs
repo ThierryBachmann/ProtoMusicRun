@@ -8,9 +8,9 @@ namespace MusicRun
         public GoalSpotlightAnimator goalSpotlightAnimator;
         public GameObject Pyramid;
         public GameObject Goal;
-        public float distance;            // (debug) distance actuelle
-        public float distanceAtStart;            // (debug) distance actuelle
-        public float goalRadius = 1.5f;   // rayon d’arrivée (en mètres)
+        public float distancePlayerGoal;
+        public float distanceAtStart;
+        public float goalRadius = 1.5f;
         public float goalDirection;
         public float goalAngle;
         public bool goalReached;
@@ -47,9 +47,9 @@ namespace MusicRun
             // Get planar distance (ignores height difference)
             Vector3 delta = Goal.transform.position - player.transform.position;
             delta.y = 0f; // Ignore height difference
-            distance = delta.magnitude;
+            distancePlayerGoal = delta.magnitude;
             if (distanceAtStart < 0)
-                distanceAtStart = distance;
+                distanceAtStart = distancePlayerGoal;
 
             // Convert goal world position to player's local space
             Vector3 localToGoal = player.transform.InverseTransformPoint(Goal.transform.position);
@@ -65,7 +65,7 @@ namespace MusicRun
 
             // Player reach the goal ?
             // -----------------------
-            if (distance <= goalRadius && !goalReached)
+            if (distancePlayerGoal <= goalRadius && !goalReached)
             {
                 Debug.Log("GoalHandler - Goal Reached");
                 goalReached = true;
