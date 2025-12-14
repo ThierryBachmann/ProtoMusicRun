@@ -24,7 +24,7 @@ namespace MusicRun
             if (Input.GetKeyDown(KeyCode.LeftControl)|| Input.GetKeyDown(KeyCode.RightControl))
             {
                 terrainGenerator.ClearChunks(0);
-                currentLevelIndex = terrainGenerator.SelectNextLevel(currentLevelIndex);
+                currentLevelIndex = terrainGenerator.CalculateNextLevel(currentLevelIndex);
                 terrainGenerator.CreateLevel(currentLevelIndex);
             }
         }

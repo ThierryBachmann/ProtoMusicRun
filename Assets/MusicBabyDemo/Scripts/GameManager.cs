@@ -173,7 +173,7 @@ namespace MusicRun
             // always increase along the game
             levelNumber = 1;
             // cycling around the game, but start at -1 to get level index 0
-            levelIndex = terrainGenerator.SelectNextLevel(-1);
+            levelIndex = terrainGenerator.CalculateNextLevel(-1);
             scoreManager.ScoreOverall = 0;
             LevelCreate(levelIndex);
         }
@@ -218,7 +218,7 @@ namespace MusicRun
         {
             Debug.Log("-level- NextLevel");
             levelNumber++;
-            levelIndex = terrainGenerator.SelectNextLevel(levelIndex);
+            levelIndex = terrainGenerator.CalculateNextLevel(levelIndex);
             LevelCreate(levelIndex);
         }
 
@@ -618,7 +618,7 @@ namespace MusicRun
             terrainGenerator.ClearChunkPool();
             terrainGenerator.ClearChunks(0);
             levelNumber++;
-            levelIndex = terrainGenerator.SelectNextLevel(levelIndex);
+            levelIndex = terrainGenerator.CalculateNextLevel(levelIndex);
             yield return null; // Wait one frame
             LevelCreate(levelIndex);
         }

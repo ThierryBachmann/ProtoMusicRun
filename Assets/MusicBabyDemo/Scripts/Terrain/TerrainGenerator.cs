@@ -66,7 +66,7 @@ namespace MusicRun
         /// </summary>
         /// <param name="levelIndex"></param>
         /// <returns></returns>
-        public int SelectNextLevel(int levelIndex)
+        public int CalculateNextLevel(int levelIndex)
         {
             Debug.LogWarning($"-terrain- SelectNextLevel from index {levelIndex}");
 
