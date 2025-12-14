@@ -1,0 +1,12 @@
+﻿<Solution>
+  <Project Path="UltimateProceduralPrimitives.csproj" />
+  <Project Path="geometry3Sharp.csproj" />
+  <Project Path="PrimitivesPro.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="MusicRun.csproj" />
+  <Project Path="MidiPlayer.Editor.csproj" />
+  <Project Path="MidiPlayer.Demo.csproj" />
+  <Project Path="MidiPlayer.Run.csproj" />
+  <Project Path="Tests.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+</Solution>

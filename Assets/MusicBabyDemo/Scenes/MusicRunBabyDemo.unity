@@ -2546,8 +2546,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chunkSize: 20
-  renderDistance: 2
-  disableObstacles: 1
+  renderDistance: 5
+  disableObstacles: 0
   disableChunkUpdate: 0
   levels:
   - enabled: 1
