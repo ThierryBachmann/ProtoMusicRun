@@ -273,7 +273,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1929,6 +1929,7 @@ MonoBehaviour:
   nextLevelAuto: 0
   infoDebug: 1
   enableShortcutKeys: 1
+  alwaysSucceed: 1
   FramePerSecond: 0
   LowerThresholdFPS: 28
   HysteresisBandFPS: 4
@@ -2547,10 +2548,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkSize: 20
   renderDistance: 5
-  disableObstacles: 0
+  disableObstacles: 1
   disableChunkUpdate: 0
   levels:
-  - enabled: 1
+  - enabled: 0
     name: Flat Desert
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
@@ -2580,7 +2581,7 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: 'Desert Medium '
     description: More dune ...
     Skybox: {fileID: 1193833017}
@@ -2614,7 +2615,7 @@ MonoBehaviour:
     description: Low vegetation
     Skybox: {fileID: 1193833017}
     indexMIDI: 50
-    LoopsToGoal: 0
+    LoopsToGoal: 1
     SearchForInstrument: 1
     SubstitutionInstrument: 121
     RatioSpeedMusic: 0.2
@@ -2622,7 +2623,35 @@ MonoBehaviour:
     MaxSpeedMusic: 2.98
     startGO: {fileID: 883430262}
     goalGO: {fileID: 3029970166632757827}
-    deltaGoalChunk: {x: 0, y: 5}
+    deltaGoalChunk: {x: 0, y: 2}
+    perlinVegetable: 0.3
+    perlinChunk: 10
+    minScaleVegetable: 0.5
+    maxScaleVegetable: 2
+    runChunks:
+    - {fileID: 3245006867922576827, guid: 9017a3995fcc81049952ec486ec63b50, type: 3}
+    vegetables: []
+    bonusMalusDensity: 1
+    bonusMalusRatio: 0.5
+    bonusScorePrefab:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
+    bonusInstrumentDensity: 1
+    bonusInstrumentPrefab:
+    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
+  - enabled: 1
+    name: TEST_FLAT
+    description: Low vegetation
+    Skybox: {fileID: 1193833017}
+    indexMIDI: 50
+    LoopsToGoal: 1
+    SearchForInstrument: 1
+    SubstitutionInstrument: 121
+    RatioSpeedMusic: 0.2
+    MinSpeedMusic: 0.31
+    MaxSpeedMusic: 2.98
+    startGO: {fileID: 883430262}
+    goalGO: {fileID: 3029970166632757827}
+    deltaGoalChunk: {x: 0, y: 2}
     perlinVegetable: 0.3
     perlinChunk: 10
     minScaleVegetable: 0.5
@@ -2637,8 +2666,8 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
-    name: Random Vegetation
+  - enabled: 0
+    name: Random Vegetation - not working
     description: Add random vegetation on each chunk
     Skybox: {fileID: 0}
     indexMIDI: 80
@@ -2679,6 +2708,8 @@ MonoBehaviour:
   timeAverageCreate: 0
   chunkCreatedCount: 0
   chunkReusedCount: 0
+  chunkDeletedCount: 0
+  chunkPooledCount: 0
 --- !u!4 &240111798
 Transform:
   m_ObjectHideFlags: 0
@@ -9486,7 +9517,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.3176219
+  m_Size: 0.17536865
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -12433,7 +12464,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1479057135}
   m_HandleRect: {fileID: 1479057134}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -13920,7 +13951,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1770975909
 RectTransform:
   m_ObjectHideFlags: 0
@@ -16717,7 +16748,7 @@ MonoBehaviour:
   goalSpotlightAnimator: {fileID: 4573862071752608062}
   Pyramid: {fileID: 728865489}
   Goal: {fileID: 7641254336402198553}
-  distance: 0
+  distancePlayerGoal: 0
   distanceAtStart: 0
   goalRadius: 2.5
   goalDirection: 0
