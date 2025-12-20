@@ -575,6 +575,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_TagString
+      value: Terrain
+      objectReference: {fileID: 0}
     - target: {fileID: 6192882257131800624, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_IsTrigger
       value: 1
@@ -1157,6 +1161,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_TagString
+      value: Terrain
+      objectReference: {fileID: 0}
     - target: {fileID: 6192882257131800624, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_IsTrigger
       value: 1
@@ -1324,6 +1332,10 @@ PrefabInstance:
     - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4638313246795740894, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
+      propertyPath: m_TagString
+      value: Terrain
       objectReference: {fileID: 0}
     - target: {fileID: 6192882257131800624, guid: 5b3541b2a6ff88547bd4903a1989af1a, type: 3}
       propertyPath: m_IsTrigger
