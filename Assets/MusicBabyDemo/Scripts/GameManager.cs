@@ -8,7 +8,6 @@ using static Codice.Client.Common.Connection.AskCredentialsToUser;
 
 namespace MusicRun
 {
-
     public class GameManager : MonoBehaviour
     {
         public bool gameRunning;
@@ -381,7 +380,7 @@ namespace MusicRun
         /// successfully; otherwise, it was not.</param>
         private void OnLevelCompleted(LevelEndedReason reason)
         {
-            Debug.Log($"GameManager - OnLevelCompleted - {reason}");
+            Debug.Log($"GameManager - OnLevelCompleted - {reason} alwaysSucceed:{alwaysSucceed}");
 
             // Check level failed: Music ended without reaching the goal.
             playerController.enableMovement = false;
@@ -424,7 +423,6 @@ namespace MusicRun
             actionGame.Show();
             actionGame.SelectActionsToShow();
 
-
             scoreManager.CalculateScoreLevel(MusicPercentage, GoalPercentage);
             LeaderboardPlayerScore playerScore = new LeaderboardPlayerScore(
                         leaderboard.firebaseAuth.GetUserId(),
@@ -438,8 +436,6 @@ namespace MusicRun
             leaderboard.SubmitScore(playerScore);
             playerController.LevelEnded();
             StartCoroutine(Utilities.WaitAndCall(2000f, () => { playerController.enableMovement = true; }));
-
-
         }
 
         private void OnScoreSubmitted(bool success)
@@ -493,8 +489,8 @@ namespace MusicRun
             }
             // Toggling the visibility and state of related UI elements. 
             actionLevel.ActivatePause(pause);
-
         }
+
         public void OnExitGame()
         {
             Debug.Log($"GameManager - OnExitGame");
@@ -571,7 +567,6 @@ namespace MusicRun
             CalculateFPS();
             CalculateLiteMode();
         }
-
 
         public void CalculateFPS()
         {

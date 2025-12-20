@@ -288,10 +288,11 @@ namespace MusicRun
                     {
                         var obj = spawnedChunks[coord];
 
-                        // If pool not full and not a chunk from previous level
-                        // then push to pool.
-                        // otherwise destroy
-                        if (chunkPool.Count < 100 && obj.GetComponent<ChunkInfo>().Level == currentIndexLevel)
+                        // If pool not full and not a chunk from previous level then push to pool otherwise destroy
+                        // With 5 render chunk distance we have a 21 x 21 chunks overhall (2 x 5 + 1)
+                        // So 221 chunks visible, but at each update we can have only 11 new chunks (when player move by one chunk).
+                        // Normally a pool of 15 chunks is enough.
+                        if (chunkPool.Count < 15 && obj.GetComponent<ChunkInfo>().Level == currentIndexLevel)
                         {
                             //Debug.Log($"terrain_pool_push pool:{chunkPool.Count} level:{obj.GetComponent<ChunkInfo>().Level} {coord} {obj.name}");
                             chunkPooledCount++;
@@ -316,7 +317,7 @@ namespace MusicRun
                     timeAverageCreate = timeCreateChunk / chunkCreatedCount;
                 else
                     timeAverageCreate = 0;
-                Debug.Log($"terrain_created:{chunkCreatedCount,3} reused:{chunkReusedCount,3} pooled:{chunkPooledCount,3} del:{chunkDeletedCount,3} inPool:{chunkPool.Count,3} inSpawn:{spawnedChunks.Count,3} - overall time:{timeCreateChunk,4:F2} ms timeAverageCreate:{timeAverageCreate,4:F2}");
+                Debug.Log($"terrain_created:{chunkCreatedCount,3} reused:{chunkReusedCount,3} pooled:{chunkPooledCount,3} del:{chunkDeletedCount,3} inPool:{chunkPool.Count,3} inSpawn:{spawnedChunks.Count,3} - overall time:{timeCreateChunk,6:F2} ms timeAverageCreate:{timeAverageCreate,6:F2}");
             }
         }
 

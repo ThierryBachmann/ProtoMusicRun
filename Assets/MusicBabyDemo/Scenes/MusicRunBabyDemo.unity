@@ -1929,7 +1929,7 @@ MonoBehaviour:
   nextLevelAuto: 0
   infoDebug: 1
   enableShortcutKeys: 1
-  alwaysSucceed: 1
+  alwaysSucceed: 0
   FramePerSecond: 0
   LowerThresholdFPS: 28
   HysteresisBandFPS: 4
@@ -2556,7 +2556,7 @@ MonoBehaviour:
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
     indexMIDI: 3
-    LoopsToGoal: 1
+    LoopsToGoal: 5
     SearchForInstrument: 1
     SubstitutionInstrument: 123
     RatioSpeedMusic: 0.77
@@ -2564,7 +2564,7 @@ MonoBehaviour:
     MaxSpeedMusic: 1.87
     startGO: {fileID: 883430262}
     goalGO: {fileID: 3029970166632757827}
-    deltaGoalChunk: {x: 0, y: 2}
+    deltaGoalChunk: {x: 0, y: 10}
     perlinVegetable: 0.3
     perlinChunk: 8
     minScaleVegetable: 0.71
@@ -2572,13 +2572,14 @@ MonoBehaviour:
     runChunks:
     - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
     - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
+    - {fileID: 3245006867922576827, guid: 9c2ca546d963105488d81316fde6d802, type: 3}
     vegetables: []
-    bonusMalusDensity: 1
-    bonusMalusRatio: 0.485
+    bonusMalusDensity: 0.43
+    bonusMalusRatio: 0.203
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
-    bonusInstrumentDensity: 1
+    bonusInstrumentDensity: 0.27
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 1
@@ -17594,9 +17595,9 @@ MonoBehaviour:
   showDefault: 0
   distanceAttenuation: 1
   MPTK_PauseOnMaxDistance: 0
-  minDistance: 15
+  minDistance: 20
   maxDistance: 1200
-  minSoundAttenuation: 0.048
+  minSoundAttenuation: 0.1
   midiNameToPlay: Take 5 - by Paul Desmond
   MPTK_StartPlayAtFirstNote: 1
   MPTK_StopPlayOnLastNote: 1
