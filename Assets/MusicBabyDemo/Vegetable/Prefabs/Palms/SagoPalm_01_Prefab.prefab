@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4757536846812030867}
   m_Layer: 0
   m_Name: CollisionObject1
-  m_TagString: Obstacle
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -81,8 +81,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.472313, z: -0, w: 0.8814309}
   m_LocalPosition: {x: -24.6, y: -4.87, z: -7.82}
-  m_LocalScale: {x: 2.2066684, y: 2.2066684, z: 2.2066684}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.20000002, y: 0.20000002, z: 0.20000002}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1674391676089011460}
   - {fileID: 5909992457244244130}
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 6277618725343348239}
   m_Layer: 0
   m_Name: CollisionObject0
-  m_TagString: Obstacle
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
