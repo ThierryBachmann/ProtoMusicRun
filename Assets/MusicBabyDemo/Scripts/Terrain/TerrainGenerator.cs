@@ -251,13 +251,13 @@ namespace MusicRun
                             {
                                 GameObject newChunk;
 
-                                if (chunkPool.Count > 0)
-                                {
-                                    // Reuse old one
-                                    chunkReusedCount++;
-                                    newChunk = ReuseChunk(chunkCoord);
-                                }
-                                else
+                                //if (chunkPool.Count > 0)
+                                //{
+                                //    // Reuse old one
+                                //    chunkReusedCount++;
+                                //    newChunk = ReuseChunk(chunkCoord);
+                                //}
+                                //else
                                 {
                                     // No available chunk — create a new one
                                     chunkCreatedCount++;
@@ -358,6 +358,7 @@ namespace MusicRun
             }
 
             PlaceAndScaleExistingVege(chunkCoord, createdChunk);
+
             // Experimentale, to be done: create specific scale and random position in Vegetable class
             // CreateAndScaleVege(chunkCoord, createdChunk);
 
@@ -431,7 +432,8 @@ namespace MusicRun
                     float maxPos = chunkSize / 2f - 0.1f; // -0.1 to avoid border
                     Vector3 bonusPos = new Vector3(UnityEngine.Random.Range(-maxPos, maxPos), 5f, UnityEngine.Random.Range(-maxPos, maxPos));
                     bonus.transform.SetLocalPositionAndRotation(bonusPos, Quaternion.identity);
-                    PositionOnHighestTerrain(bonus.transform, 100f);
+                    if (!PositionOnHighestTerrain(bonus.transform, 100f))
+                        Debug.LogWarning($"No hit bonus, chunk: {chunkCoord} '{chunk.name}' child: {bonus.name} at {bonusPos}");
                     //bonus.name = $"Bonus-L:{currentIndexLevel}-chunk:{chunkCoord}-localPosition: {bonus.transform.localPosition}";
                 }
 
@@ -466,7 +468,8 @@ namespace MusicRun
                     instrument.transform.SetParent(chunk.transform, false);
                     Vector3 instrumentPos = new Vector3(UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f), 3f, UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f));
                     instrument.transform.SetLocalPositionAndRotation(instrumentPos, Quaternion.identity);
-                    PositionOnHighestTerrain(instrument.transform, 100f, 3f);
+                    if (!PositionOnHighestTerrain(instrument.transform, 100f, 3f))
+                        Debug.LogWarning($"No hit instrument, chunk: {chunkCoord} '{chunk.name}' child: {instrument.name} at {instrumentPos}");
                     //instrument.name = $"Instr-L:{currentIndexLevel}-chunk:{chunkCoord}-localPosition:{instrument.transform.localPosition}";
                 }
 
@@ -514,8 +517,8 @@ namespace MusicRun
 
 
                     // Position between -chunkSize/2 and chunkSize/2
-                    offsetX = offsetX * 1f * chunkSize - chunkSize / 2f;
-                    offsetZ = offsetZ * 1f * chunkSize - chunkSize / 2f;
+                    offsetX = offsetX * chunkSize - chunkSize / 2f;
+                    offsetZ = offsetZ * chunkSize - chunkSize / 2f;
 
                     //if (Mathf.Abs(offsetX) > 9f || Mathf.Abs(offsetZ) > 9f)
                     //    Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
@@ -631,7 +634,7 @@ namespace MusicRun
             RaycastHit topHit;
             if (!Physics.Raycast(startPos, Vector3.down, out topHit, maxRayHeight * 2f, TerrainLayer.TerrainCurrentBit))
             {
-                Debug.LogWarning($"PositionOnHighestTerrain    --> no hit. From position: {startPos} for '{objTransform.name}'");
+                //Debug.LogWarning($"PositionOnHighestTerrain    --> no hit. From position: {startPos} for '{objTransform.name}'");
                 return false;
             }
             else
