@@ -2551,7 +2551,7 @@ MonoBehaviour:
   disableObstacles: 0
   disableChunkUpdate: 0
   levels:
-  - enabled: 0
+  - enabled: 1
     name: Flat Desert
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
@@ -9518,7 +9518,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2947036
+  m_Size: 0.20020697
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

@@ -1,10 +1,7 @@
-using log4net.Core;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static Codice.Client.Common.Connection.AskCredentialsToUser;
 
 namespace MusicRun
 {
