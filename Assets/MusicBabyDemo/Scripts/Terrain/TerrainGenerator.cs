@@ -340,10 +340,10 @@ namespace MusicRun
             // Instantiate a random prefab from the current level's runChunks
             GameObject chunkPrefabRandom = currentLevel.runChunks[UnityEngine.Random.Range(0, currentLevel.runChunks.Length)];
             GameObject createdChunk = Instantiate(chunkPrefabRandom, spawnPos, Quaternion.identity);
-            //createdChunk.name = $"Chunk-L:{currentIndexLevel}-at:{chunkCoord.x}/{chunkCoord.y}";
+            createdChunk.name = $"Chunk-L:{currentIndexLevel}-at:{chunkCoord.x}/{chunkCoord.y}-{chunkPrefabRandom.name}";
             createdChunk.GetComponent<ChunkInfo>().Level = currentIndexLevel;
             SetLTerrainLayerRecursively(createdChunk, TerrainLayer.TerrainCurrent);
-            //Debug.Log($"terrain_create IndexLevel: {currentIndexLevel} chunkCoord: {chunkCoord} name: '{createdChunk.name}' prefab: '{chunkPrefabRandom.name}'");
+            Debug.Log($"terrain_create IndexLevel: {currentIndexLevel} chunkCoord: {chunkCoord} name: '{createdChunk.name}' prefab: '{chunkPrefabRandom.name}'");
 
             if (disableObstacles) // useful for test mode
             {
@@ -514,8 +514,8 @@ namespace MusicRun
 
 
                     // Position between -chunkSize/2 and chunkSize/2
-                    offsetX = offsetX * 1.1f * chunkSize - chunkSize / 2f;
-                    offsetZ = offsetZ * 1.1f * chunkSize - chunkSize / 2f;
+                    offsetX = offsetX * 1f * chunkSize - chunkSize / 2f;
+                    offsetZ = offsetZ * 1f * chunkSize - chunkSize / 2f;
 
                     //if (Mathf.Abs(offsetX) > 9f || Mathf.Abs(offsetZ) > 9f)
                     //    Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
@@ -543,7 +543,7 @@ namespace MusicRun
 
                     // Search and apply the Y 
                     if (!PositionOnHighestTerrain(childTransform, 100f))
-                        Debug.LogWarning($"No hit, chunk: {chunkCoord} child: {childTransform.name} offsetX:{offsetX} offsetZ: {offsetZ} ");
+                        Debug.LogWarning($"No hit, chunk: {chunkCoord} '{chunk.name}' child: {childTransform.name} offsetX:{offsetX} offsetZ: {offsetZ} ");
                 }
             }
         }
@@ -630,7 +630,10 @@ namespace MusicRun
 
             RaycastHit topHit;
             if (!Physics.Raycast(startPos, Vector3.down, out topHit, maxRayHeight * 2f, TerrainLayer.TerrainCurrentBit))
+            {
                 Debug.LogWarning($"PositionOnHighestTerrain    --> no hit. From position: {startPos} for '{objTransform.name}'");
+                return false;
+            }
             else
             {
                 // Convert contact world position to local Chunk
