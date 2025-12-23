@@ -2551,10 +2551,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkSize: 20
   renderDistance: 5
-  disableObstacles: 1
+  disableObstacles: 0
   disableChunkUpdate: 0
+  disableChunkPool: 0
+  enableLogAndRename: 0
   levels:
-  - enabled: 1
+  - enabled: 0
     name: Flat Desert
     description: A very short level to understand the principles of the game.
     Skybox: {fileID: 327158888}
@@ -2656,8 +2658,8 @@ MonoBehaviour:
     startGO: {fileID: 883430262}
     goalGO: {fileID: 3029970166632757827}
     deltaGoalChunk: {x: 0, y: 2}
-    perlinVegetable: 0.3
-    perlinChunk: 10
+    perlinVegetable: 0.01
+    perlinChunk: 6.67
     minScaleVegetable: 0.5
     maxScaleVegetable: 2
     runChunks:
@@ -9578,7 +9580,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2193713
+  m_Size: 0.3071531
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

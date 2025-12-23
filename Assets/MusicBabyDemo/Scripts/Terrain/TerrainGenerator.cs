@@ -10,8 +10,11 @@ namespace MusicRun
     {
         public int chunkSize = 20;
         public int renderDistance = 2;
+        [Header("Debug Options")]
         public bool disableObstacles = false;
         public bool disableChunkUpdate = false;
+        public bool disableChunkPool = false;
+        public bool enableLogAndRename = false;
 
         [Header("Defined Levels")]
         public TerrainLevel[] levels;
@@ -251,13 +254,13 @@ namespace MusicRun
                             {
                                 GameObject newChunk;
 
-                                //if (chunkPool.Count > 0)
-                                //{
-                                //    // Reuse old one
-                                //    chunkReusedCount++;
-                                //    newChunk = ReuseChunk(chunkCoord);
-                                //}
-                                //else
+                                if (!disableChunkPool && chunkPool.Count > 0)
+                                {
+                                    // Reuse old one
+                                    chunkReusedCount++;
+                                    newChunk = ReuseChunk(chunkCoord);
+                                }
+                                else
                                 {
                                     // No available chunk — create a new one
                                     chunkCreatedCount++;
@@ -289,7 +292,7 @@ namespace MusicRun
                         // With 5 render chunk distance we have a 21 x 21 chunks overhall (2 x 5 + 1)
                         // So 221 chunks visible, but at each update we can have only 11 new chunks (when player move by one chunk).
                         // Normally a pool of 15 chunks is enough.
-                        if (chunkPool.Count < 15 && obj.GetComponent<ChunkInfo>().Level == currentIndexLevel)
+                        if (!disableChunkPool && chunkPool.Count < 15 && obj.GetComponent<ChunkInfo>().Level == currentIndexLevel)
                         {
                             //Debug.Log($"terrain_pool_push pool:{chunkPool.Count} level:{obj.GetComponent<ChunkInfo>().Level} {coord} {obj.name}");
                             chunkPooledCount++;
@@ -309,12 +312,15 @@ namespace MusicRun
                     }
                 }
 
-                timeCreateChunk = (float)(DateTime.Now - startCreate).TotalMilliseconds;
-                if (chunkCreatedCount != 0)
-                    timeAverageCreate = timeCreateChunk / chunkCreatedCount;
-                else
-                    timeAverageCreate = 0;
-                Debug.Log($"terrain_created:{chunkCreatedCount,3} reused:{chunkReusedCount,3} pooled:{chunkPooledCount,3} del:{chunkDeletedCount,3} inPool:{chunkPool.Count,3} inSpawn:{spawnedChunks.Count,3} - overall time:{timeCreateChunk,6:F2} ms timeAverageCreate:{timeAverageCreate,6:F2}");
+                if (enableLogAndRename)
+                {
+                    timeCreateChunk = (float)(DateTime.Now - startCreate).TotalMilliseconds;
+                    if (chunkCreatedCount != 0)
+                        timeAverageCreate = timeCreateChunk / chunkCreatedCount;
+                    else
+                        timeAverageCreate = 0;
+                    Debug.Log($"terrain_created:{chunkCreatedCount,3} reused:{chunkReusedCount,3} pooled:{chunkPooledCount,3} del:{chunkDeletedCount,3} inPool:{chunkPool.Count,3} inSpawn:{spawnedChunks.Count,3} - overall time:{timeCreateChunk,6:F2} ms timeAverageCreate:{timeAverageCreate,6:F2}");
+                }
             }
         }
 
@@ -343,7 +349,8 @@ namespace MusicRun
             createdChunk.name = $"Chunk-L:{currentIndexLevel}-at:{chunkCoord.x}/{chunkCoord.y}-{chunkPrefabRandom.name}";
             createdChunk.GetComponent<ChunkInfo>().Level = currentIndexLevel;
             SetLTerrainLayerRecursively(createdChunk, TerrainLayer.TerrainCurrent);
-            Debug.Log($"terrain_create IndexLevel: {currentIndexLevel} chunkCoord: {chunkCoord} name: '{createdChunk.name}' prefab: '{chunkPrefabRandom.name}'");
+            if (enableLogAndRename)
+                Debug.Log($"terrain_create IndexLevel: {currentIndexLevel} chunkCoord: {chunkCoord} name: '{createdChunk.name}' prefab: '{chunkPrefabRandom.name}'");
 
             if (disableObstacles) // useful for test mode
             {
@@ -491,6 +498,29 @@ namespace MusicRun
 
         private void PlaceAndScaleExistingVege(Vector2Int chunkCoord, GameObject chunk)
         {
+            // Perlin noise test - return not strictly between 0 and 1
+            //int count=0;
+            //const float EPS = 1e-6f;
+            //for (int i = 0; i < 100000; i++)
+            //{
+            //    float x = UnityEngine.Random.value * 100f;
+            //    float y = UnityEngine.Random.value * 100f;
+
+            //    float n = UnityEngine.Mathf.PerlinNoise(x, y);
+
+            //    if (n < -EPS || n > 1f + EPS)
+            //    {
+            //        count++;
+            //        Debug.LogError(
+            //            $"[PerlinTest] " +
+            //            $"count={count} " +
+            //            $"x={x:F6} " +
+            //            $"y={y:F6} " +
+            //            $"n={n:F9}"
+            //        );
+            //    }
+            //}
+
 
             // Build vegetable. Get list of gameobject exiting in the prefab chunk and apply random or perlin change
             foreach (Transform childTransform in chunk.transform)
@@ -511,20 +541,21 @@ namespace MusicRun
                     float offsetX = Mathf.PerlinNoise(
                         childPosition.x * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
                         childPosition.z * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk);
+                    offsetX = Mathf.Clamp(offsetX, 0f, 1f);
                     float offsetZ = Mathf.PerlinNoise(
                         childPosition.z * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
                         childPosition.x * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk);
-
+                    offsetZ = Mathf.Clamp(offsetZ, 0f, 1f);
 
                     // Position between -chunkSize/2 and chunkSize/2
-                    offsetX = offsetX * chunkSize - chunkSize / 2f;
-                    offsetZ = offsetZ * chunkSize - chunkSize / 2f;
+                    float scaledOffsetX = offsetX * chunkSize - chunkSize / 2f;
+                    float scaledOffsetZ = offsetZ * chunkSize - chunkSize / 2f;
 
-                    //if (Mathf.Abs(offsetX) > 9f || Mathf.Abs(offsetZ) > 9f)
-                    //    Debug.Log($"Chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} ");
+                    if (Mathf.Abs(scaledOffsetX) > 10f || Mathf.Abs(scaledOffsetZ) > 10f)
+                        Debug.Log($"No hit, out of the chunk: {chunkCoord} Child: {childTransform.name} {childTransform.tag} offset:{offsetX} {offsetZ} scaled:{scaledOffsetX} {scaledOffsetZ}");
 
                     // Define position and place to the terrain
-                    Vector3 localPosition = new Vector3(offsetX, 5f, offsetZ);
+                    Vector3 localPosition = new Vector3(scaledOffsetX, 5f, scaledOffsetZ);
                     //Debug.Log($"Chunk: {chunkCoord} Vege: {childTransform.name} localPosition: {localPosition} ");
                     if (childTransform.CompareTag("TreeScalable") || childTransform.CompareTag("Grass"))
                     {
@@ -546,7 +577,11 @@ namespace MusicRun
 
                     // Search and apply the Y 
                     if (!PositionOnHighestTerrain(childTransform, 100f))
-                        Debug.LogWarning($"No hit, chunk: {chunkCoord} '{chunk.name}' child: {childTransform.name} offsetX:{offsetX} offsetZ: {offsetZ} ");
+                        Debug.LogWarning($"No hit, chunk: {chunkCoord} '{chunk.name}' child: {childTransform.name} offsetX:{scaledOffsetX} offsetZ: {scaledOffsetZ} ");
+
+                    if (enableLogAndRename)
+                        Debug.Log($"Add Vege at {chunkCoord} '{childTransform.name}' '{childTransform.tag}' offset:{childTransform.localPosition} {childTransform.position}");
+
                 }
             }
         }
@@ -626,12 +661,16 @@ namespace MusicRun
             }
             return true;
         }
-        public static bool PositionOnHighestTerrain(Transform objTransform, float maxRayHeight = 100f, float yShift = 0f)
+        public bool PositionOnHighestTerrain(Transform objTransform, float maxRayHeight = 100f, float yShift = 0f)
         {
             Vector3 startPos = objTransform.position + Vector3.up * maxRayHeight;
             Ray ray = new Ray(startPos, Vector3.down);
 
             RaycastHit topHit;
+            // **** Warning ****
+            // Don't forget to set the tag 'Terrain' to the objects which holds a mesh (or other) collider.
+            // Object with tag 'Terrain' will be set to the layer 'TerrainCurrent' when the chunk is created or reused.
+            // If not, no hit will be detected.
             if (!Physics.Raycast(startPos, Vector3.down, out topHit, maxRayHeight * 2f, TerrainLayer.TerrainCurrentBit))
             {
                 //Debug.LogWarning($"PositionOnHighestTerrain    --> no hit. From position: {startPos} for '{objTransform.name}'");
@@ -647,8 +686,9 @@ namespace MusicRun
 
                 objTransform.localPosition = new Vector3(localPos.x, localPos.y + yShift, localPos.z);
 
-                // Debug purpose ....
-                //objTransform.name = $"{objTransform.name.Substring(0, 6)}_{chunk.name}_{localPos.y:F1}_{topHit.transform.name}";
+                if (enableLogAndRename)
+                    // Debug purpose ....
+                    objTransform.name = $"{objTransform.name.Substring(0, 15)}_{chunk.name}_{localPos.y:F1}_{topHit.transform.name}";
                 //Debug.Log($"terrain_hits hit:'{topHit.transform.name}' world:{topHit.point} for:'{objTransform.name}' posW:{objTransform.position} --> parent: '{chunk.name}' {chunk.gameObject.activeInHierarchy} {chunk.gameObject.activeSelf}");
             }
             return true;
