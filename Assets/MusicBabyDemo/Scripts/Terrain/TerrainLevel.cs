@@ -61,9 +61,9 @@ namespace MusicRun
 
         [Header("Vegetation Spread")]
         [Tooltip("Controls how much vegetation is distributed within each chunk.")]
-        [Range(0f, 10f)]
+        [Range(0f, 1f)]
         public float perlinVegetable = 0.3f;
-        [Tooltip("Controls how vegetation density changes between chunks.")]
+        [Tooltip("NOT USED. Controls how vegetation density changes between chunks.")]
         [Range(0f, 10f)]
         public float perlinChunk = 100f;
 

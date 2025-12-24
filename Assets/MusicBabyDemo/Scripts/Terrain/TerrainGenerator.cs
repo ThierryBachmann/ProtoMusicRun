@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace MusicRun
 {
@@ -436,8 +437,8 @@ namespace MusicRun
                     GameObject bonusPrefabRandom = prefab[indexPrefab];
                     GameObject bonus = Instantiate(bonusPrefabRandom);
                     bonus.transform.SetParent(chunk.transform, false);
-                    float maxPos = chunkSize / 2f - 0.1f; // -0.1 to avoid border
-                    Vector3 bonusPos = new Vector3(UnityEngine.Random.Range(-maxPos, maxPos), 5f, UnityEngine.Random.Range(-maxPos, maxPos));
+                    float maxPos = chunkSize / 2f;// - 0.1f; // -0.1 to avoid border
+                    Vector3 bonusPos = new Vector3(Random.Range(-maxPos, maxPos), 5f, Random.Range(-maxPos, maxPos));
                     bonus.transform.SetLocalPositionAndRotation(bonusPos, Quaternion.identity);
                     if (!PositionOnHighestTerrain(bonus.transform, 100f))
                         Debug.LogWarning($"No hit bonus, chunk: {chunkCoord} '{chunk.name}' child: {bonus.name} at {bonusPos}");
@@ -473,7 +474,8 @@ namespace MusicRun
                     GameObject instrumentPrefabRandom = prefab[indexPrefab];
                     GameObject instrument = Instantiate(instrumentPrefabRandom);
                     instrument.transform.SetParent(chunk.transform, false);
-                    Vector3 instrumentPos = new Vector3(UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f), 3f, UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f));
+                    float maxPos = chunkSize / 2f;// - 0.1f; // -0.1 to avoid border
+                    Vector3 instrumentPos = new Vector3(Random.Range(-maxPos, maxPos), 5f, Random.Range(-maxPos, maxPos));
                     instrument.transform.SetLocalPositionAndRotation(instrumentPos, Quaternion.identity);
                     if (!PositionOnHighestTerrain(instrument.transform, 100f, 3f))
                         Debug.LogWarning($"No hit instrument, chunk: {chunkCoord} '{chunk.name}' child: {instrument.name} at {instrumentPos}");
@@ -535,16 +537,21 @@ namespace MusicRun
                         It’s not random white noise (which changes abruptly each sample), but a continuous, smooth function that produces “organic” patterns.
                     */
 
-                    // Perlin generator for vegetable -  return a value between 0 and 1
+                    // Perlin generator for vegetable -  return a value between 0 and 1 (at 0.05% near 0 or 1, so 1.06 is possible)
                     //  perlinVegetable: how much position are spread on the chunk. 0: all vegetables are at the same place on the current chunk.
                     //  perlinChunk:  how much position are modified between chunk. 0: all vegetables are at the same place for each chunk.
-                    float offsetX = Mathf.PerlinNoise(
-                        childPosition.x * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
-                        childPosition.z * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk);
+                    //float offsetX = Mathf.PerlinNoise(
+                    //    childPosition.x * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
+                    //    childPosition.z * currentLevel.perlinVegetable+ chunkCoord.y * currentLevel.perlinChunk);
+                    //float offsetZ = Mathf.PerlinNoise(
+                    //    childPosition.z * currentLevel.perlinVegetable+ chunkCoord.x * currentLevel.perlinChunk,
+                    //    childPosition.x * currentLevel.perlinVegetable+ chunkCoord.y * currentLevel.perlinChunk);
+
+                    // Original position + random value between 0 and perlinVegetable
+                    float offsetX = childPosition.x + currentLevel.perlinVegetable * Random.value;
+                    float offsetZ = childPosition.z + currentLevel.perlinVegetable * Random.value;
+
                     offsetX = Mathf.Clamp(offsetX, 0f, 1f);
-                    float offsetZ = Mathf.PerlinNoise(
-                        childPosition.z * currentLevel.perlinVegetable + chunkCoord.x * currentLevel.perlinChunk,
-                        childPosition.x * currentLevel.perlinVegetable + chunkCoord.y * currentLevel.perlinChunk);
                     offsetZ = Mathf.Clamp(offsetZ, 0f, 1f);
 
                     // Position between -chunkSize/2 and chunkSize/2

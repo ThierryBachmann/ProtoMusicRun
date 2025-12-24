@@ -2657,19 +2657,19 @@ MonoBehaviour:
     MaxSpeedMusic: 2.98
     startGO: {fileID: 883430262}
     goalGO: {fileID: 3029970166632757827}
-    deltaGoalChunk: {x: 0, y: 2}
-    perlinVegetable: 0.01
+    deltaGoalChunk: {x: 0, y: 20}
+    perlinVegetable: 0.182
     perlinChunk: 6.67
     minScaleVegetable: 0.5
     maxScaleVegetable: 2
     runChunks:
     - {fileID: 3245006867922576827, guid: e39c3cc76c59f8e4fb711a59fa8378e9, type: 3}
     vegetables: []
-    bonusMalusDensity: 1
+    bonusMalusDensity: 2.67
     bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
-    bonusInstrumentDensity: 1
+    bonusInstrumentDensity: 3.86
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 0
@@ -9580,7 +9580,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.3071531
+  m_Size: 0.15141614
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
