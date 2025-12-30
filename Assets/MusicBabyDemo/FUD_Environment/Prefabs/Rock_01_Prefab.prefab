@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 599465214307944399}
   m_Layer: 0
   m_Name: Rock_01_Prefab
-  m_TagString: Untagged
+  m_TagString: TreeScalable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647

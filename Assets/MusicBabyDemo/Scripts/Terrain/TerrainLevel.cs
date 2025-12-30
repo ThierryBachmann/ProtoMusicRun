@@ -69,11 +69,11 @@ namespace MusicRun
 
         [Header("Vegetation Scale")]
         [Tooltip("Minimum scale factor applied to random vegetation instances.")]
-        [Range(0.1f, 15f)]
+        [Range(0.01f, 5f)]
         public float minScaleVegetable = 0.5f;
 
         [Tooltip("Maximum scale factor applied to random vegetation instances.")]
-        [Range(0.1f, 15f)]
+        [Range(0.01f, 5f)]
         public float maxScaleVegetable = 0.5f;
 
         [Header("Run Chunks")]

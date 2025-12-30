@@ -273,7 +273,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2644,9 +2644,9 @@ MonoBehaviour:
     bonusInstrumentDensity: 1
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
-    name: Test with al vegetable
-    description: Test with al vegetable
+  - enabled: 0
+    name: Test vegetable
+    description: Test with all vegetable
     Skybox: {fileID: 1193833017}
     indexMIDI: 50
     LoopsToGoal: 1
@@ -2663,6 +2663,34 @@ MonoBehaviour:
     minScaleVegetable: 0.5
     maxScaleVegetable: 2
     runChunks:
+    - {fileID: 3245006867922576827, guid: f5f89aeafa0ca2640a5c84019379e5f9, type: 3}
+    vegetables: []
+    bonusMalusDensity: 2.67
+    bonusMalusRatio: 0.5
+    bonusScorePrefab:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
+    bonusInstrumentDensity: 3.86
+    bonusInstrumentPrefab:
+    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
+  - enabled: 1
+    name: Test with rocks
+    description: Test with all rocks available
+    Skybox: {fileID: 1193833017}
+    indexMIDI: 50
+    LoopsToGoal: 1
+    SearchForInstrument: 1
+    SubstitutionInstrument: 121
+    RatioSpeedMusic: 0.2
+    MinSpeedMusic: 0.31
+    MaxSpeedMusic: 2.98
+    startGO: {fileID: 883430262}
+    goalGO: {fileID: 3029970166632757827}
+    deltaGoalChunk: {x: 0, y: 2}
+    perlinVegetable: 0.182
+    perlinChunk: 6.67
+    minScaleVegetable: 0.1
+    maxScaleVegetable: 0.9
+    runChunks:
     - {fileID: 3245006867922576827, guid: e39c3cc76c59f8e4fb711a59fa8378e9, type: 3}
     vegetables: []
     bonusMalusDensity: 2.67
@@ -2677,7 +2705,7 @@ MonoBehaviour:
     description: Add random vegetation on each chunk
     Skybox: {fileID: 0}
     indexMIDI: 80
-    LoopsToGoal: 0
+    LoopsToGoal: 1
     SearchForInstrument: 0
     SubstitutionInstrument: 0
     RatioSpeedMusic: 0.25
@@ -2686,7 +2714,7 @@ MonoBehaviour:
     startGO: {fileID: 883430262}
     goalGO: {fileID: 3029970166632757827}
     deltaGoalChunk: {x: 0, y: 5}
-    perlinVegetable: 2.33
+    perlinVegetable: 1
     perlinChunk: 2.3
     minScaleVegetable: 0.2
     maxScaleVegetable: 0.97
@@ -9580,7 +9608,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.15141614
+  m_Size: 0.1824178
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
