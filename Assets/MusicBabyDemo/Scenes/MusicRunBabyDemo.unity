@@ -2672,7 +2672,7 @@ MonoBehaviour:
     bonusInstrumentDensity: 3.86
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: Test with rocks
     description: Test with all rocks available
     Skybox: {fileID: 1193833017}
@@ -2698,6 +2698,36 @@ MonoBehaviour:
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDensity: 3.86
+    bonusInstrumentPrefab:
+    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
+  - enabled: 1
+    name: Test with cliffs
+    description: Test with all cliffs available
+    Skybox: {fileID: 1193833017}
+    indexMIDI: 50
+    LoopsToGoal: 1
+    SearchForInstrument: 1
+    SubstitutionInstrument: 121
+    RatioSpeedMusic: 0.2
+    MinSpeedMusic: 0.31
+    MaxSpeedMusic: 2.98
+    startGO: {fileID: 883430262}
+    goalGO: {fileID: 3029970166632757827}
+    deltaGoalChunk: {x: 0, y: 2}
+    perlinVegetable: 1
+    perlinChunk: 6.67
+    minScaleVegetable: 0.63
+    maxScaleVegetable: 0.83
+    runChunks:
+    - {fileID: 3245006867922576827, guid: 60217ff2f6dff804884b194b38ad653a, type: 3}
+    - {fileID: 3245006867922576827, guid: 04253429b9a794948bb88724a5400b45, type: 3}
+    - {fileID: 3245006867922576827, guid: 5b19200a2aa41b14ab7ec1b1413b7f2d, type: 3}
+    vegetables: []
+    bonusMalusDensity: 0.82
+    bonusMalusRatio: 0.317
+    bonusScorePrefab:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
+    bonusInstrumentDensity: 0.91
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 0

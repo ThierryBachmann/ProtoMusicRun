@@ -574,12 +574,12 @@ namespace MusicRun
                         currentLevel.minScaleVegetable = currentLevel.maxScaleVegetable;
                     
                     // Random scale variation
-                    float randomScale = UnityEngine.Random.Range(currentLevel.minScaleVegetable, currentLevel.maxScaleVegetable);
+                    float randomScale = Random.Range(currentLevel.minScaleVegetable, currentLevel.maxScaleVegetable);
                     childTransform.localScale = childTransform.localScale * randomScale;
 
                     // Random Y rotation (0–360 degrees)
-                    float randomRotY = UnityEngine.Random.Range(0f, 360f);
-                    childTransform.localRotation = Quaternion.Euler(0f, randomRotY, 0f);
+                    float randomRotY = Random.Range(0f, 360f);
+                    childTransform.localRotation = Quaternion.Euler(childTransform.localRotation.eulerAngles.x , randomRotY, childTransform.localRotation.eulerAngles.z);
 
                     // Set the local position 
                     childTransform.localPosition = localPosition;
