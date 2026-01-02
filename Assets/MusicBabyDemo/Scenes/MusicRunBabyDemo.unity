@@ -273,8 +273,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1772,9 +1772,6 @@ PrefabInstance:
       addedObject: {fileID: 1213716470}
     - targetCorrespondingSourceObject: {fileID: 7969010532264824609, guid: 0c222c68698265d40b68d29f17fbc120, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1221808317}
-    - targetCorrespondingSourceObject: {fileID: 7969010532264824609, guid: 0c222c68698265d40b68d29f17fbc120, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 241303494}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0c222c68698265d40b68d29f17fbc120, type: 3}
@@ -1932,7 +1929,7 @@ MonoBehaviour:
   nextLevelAuto: 0
   infoDebug: 1
   enableShortcutKeys: 1
-  alwaysSucceed: 0
+  alwaysSucceed: 1
   FramePerSecond: 0
   LowerThresholdFPS: 28
   HysteresisBandFPS: 4
@@ -2558,7 +2555,7 @@ MonoBehaviour:
   levels:
   - enabled: 0
     name: Flat Desert
-    description: A very short level to understand the principles of the game.
+    description: A very short level to understand the principle of the game.
     Skybox: {fileID: 327158888}
     indexMIDI: 3
     LoopsToGoal: 5
@@ -2579,7 +2576,7 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
     - {fileID: 3245006867922576827, guid: 9c2ca546d963105488d81316fde6d802, type: 3}
     vegetables: []
-    bonusMalusDensity: 0.43
+    bonusMalusDensity: 0.42
     bonusMalusRatio: 0.203
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
@@ -2592,7 +2589,7 @@ MonoBehaviour:
     description: More dune ...
     Skybox: {fileID: 1193833017}
     indexMIDI: 80
-    LoopsToGoal: 0
+    LoopsToGoal: 2
     SearchForInstrument: 1
     SubstitutionInstrument: 122
     RatioSpeedMusic: 0.47
@@ -2600,24 +2597,26 @@ MonoBehaviour:
     MaxSpeedMusic: 1.28
     startGO: {fileID: 883430262}
     goalGO: {fileID: 3029970166632757827}
-    deltaGoalChunk: {x: 0, y: 3}
-    perlinVegetable: 0.3
+    deltaGoalChunk: {x: 0, y: 15}
+    perlinVegetable: 1
     perlinChunk: 7.15
     minScaleVegetable: 0.4
     maxScaleVegetable: 1.28
     runChunks:
+    - {fileID: 3245006867922576827, guid: d257fd70d558df447966de0ec7f9a08a, type: 3}
     - {fileID: 3245006867922576827, guid: 9017a3995fcc81049952ec486ec63b50, type: 3}
+    - {fileID: 3245006867922576827, guid: f5f89aeafa0ca2640a5c84019379e5f9, type: 3}
     vegetables: []
-    bonusMalusDensity: 1
+    bonusMalusDensity: 0.84
     bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
-    bonusInstrumentDensity: 1
+    bonusInstrumentDensity: 0.42
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 0
-    name: DesetHighSimple
+    name: Low vegetation
     description: Low vegetation
     Skybox: {fileID: 1193833017}
     indexMIDI: 50
@@ -2630,18 +2629,48 @@ MonoBehaviour:
     startGO: {fileID: 883430262}
     goalGO: {fileID: 3029970166632757827}
     deltaGoalChunk: {x: 0, y: 2}
-    perlinVegetable: 0.3
+    perlinVegetable: 1
     perlinChunk: 10
     minScaleVegetable: 0.5
     maxScaleVegetable: 2
     runChunks:
     - {fileID: 3245006867922576827, guid: 9017a3995fcc81049952ec486ec63b50, type: 3}
     vegetables: []
-    bonusMalusDensity: 1
+    bonusMalusDensity: 0.61
     bonusMalusRatio: 0.5
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
-    bonusInstrumentDensity: 1
+    bonusInstrumentDensity: 0.7
+    bonusInstrumentPrefab:
+    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
+  - enabled: 1
+    name: Labyrinthic cliff
+    description: Labyrinthic cliff
+    Skybox: {fileID: 702951230}
+    indexMIDI: 52
+    LoopsToGoal: 2
+    SearchForInstrument: 0
+    SubstitutionInstrument: 122
+    RatioSpeedMusic: 0.2
+    MinSpeedMusic: 0.31
+    MaxSpeedMusic: 2.98
+    startGO: {fileID: 883430262}
+    goalGO: {fileID: 3029970166632757827}
+    deltaGoalChunk: {x: 0, y: 20}
+    perlinVegetable: 1
+    perlinChunk: 6.67
+    minScaleVegetable: 0.63
+    maxScaleVegetable: 0.83
+    runChunks:
+    - {fileID: 3245006867922576827, guid: 60217ff2f6dff804884b194b38ad653a, type: 3}
+    - {fileID: 3245006867922576827, guid: 04253429b9a794948bb88724a5400b45, type: 3}
+    - {fileID: 3245006867922576827, guid: 5b19200a2aa41b14ab7ec1b1413b7f2d, type: 3}
+    vegetables: []
+    bonusMalusDensity: 0.82
+    bonusMalusRatio: 0.317
+    bonusScorePrefab:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
+    bonusInstrumentDensity: 0.91
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 0
@@ -2698,36 +2727,6 @@ MonoBehaviour:
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDensity: 3.86
-    bonusInstrumentPrefab:
-    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
-    name: Test with cliffs
-    description: Test with all cliffs available
-    Skybox: {fileID: 1193833017}
-    indexMIDI: 50
-    LoopsToGoal: 1
-    SearchForInstrument: 1
-    SubstitutionInstrument: 121
-    RatioSpeedMusic: 0.2
-    MinSpeedMusic: 0.31
-    MaxSpeedMusic: 2.98
-    startGO: {fileID: 883430262}
-    goalGO: {fileID: 3029970166632757827}
-    deltaGoalChunk: {x: 0, y: 2}
-    perlinVegetable: 1
-    perlinChunk: 6.67
-    minScaleVegetable: 0.63
-    maxScaleVegetable: 0.83
-    runChunks:
-    - {fileID: 3245006867922576827, guid: 60217ff2f6dff804884b194b38ad653a, type: 3}
-    - {fileID: 3245006867922576827, guid: 04253429b9a794948bb88724a5400b45, type: 3}
-    - {fileID: 3245006867922576827, guid: 5b19200a2aa41b14ab7ec1b1413b7f2d, type: 3}
-    vegetables: []
-    bonusMalusDensity: 0.82
-    bonusMalusRatio: 0.317
-    bonusScorePrefab:
-    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
-    bonusInstrumentDensity: 0.91
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 0
@@ -2922,63 +2921,6 @@ MonoBehaviour:
   rotationSpeedX: 0
   rotationSpeedY: 180
   rotationSpeedZ: 0
---- !u!1001 &250549742
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 182037369}
-    m_Modifications:
-    - target: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 10.31153
-      objectReference: {fileID: 0}
-    - target: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.49199
-      objectReference: {fileID: 0}
-    - target: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3377503523583007885, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-      propertyPath: m_Name
-      value: Water_Prefab
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
 --- !u!1 &256923873
 GameObject:
   m_ObjectHideFlags: 0
@@ -3070,6 +3012,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1193833013}
+  - {fileID: 702951226}
   - {fileID: 327158883}
   - {fileID: 330585546}
   m_Father: {fileID: 0}
@@ -5337,6 +5280,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 463026706}
   m_CullTransparentMesh: 1
+--- !u!1 &468896155
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 468896157}
+  - component: {fileID: 468896156}
+  m_Layer: 0
+  m_Name: RoutineTimingController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &468896156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 468896155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 754970a73e201694787a76901341dc92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MidiPlayer.Run::MidiPlayerTK.Routine
+  TimeBetweenSlowUpdateCalls: 0.14285715
+  ProfilerDebugAmount: 0
+  AutoTriggerManualTimeframe: 1
+  UpdateCoroutines: 0
+  FixedUpdateCoroutines: 0
+  LateUpdateCoroutines: 0
+  SlowUpdateCoroutines: 0
+  RealtimeUpdateCoroutines: 0
+  EditorUpdateCoroutines: 0
+  EditorSlowUpdateCoroutines: 0
+  EndOfFrameCoroutines: 0
+  ManualTimeframeCoroutines: 0
+  _instanceID: 1
+--- !u!4 &468896157
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 468896155}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &474558910
 GameObject:
   m_ObjectHideFlags: 0
@@ -6490,6 +6490,157 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 684999079}
   m_CullTransparentMesh: 1
+--- !u!1 &702951225
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 702951226}
+  - component: {fileID: 702951230}
+  - component: {fileID: 702951229}
+  - component: {fileID: 702951228}
+  - component: {fileID: 702951227}
+  m_Layer: 0
+  m_Name: Main Camera Space_AnotherPlanet
+  m_TagString: MainCamera
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &702951226
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 702951225}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 256923878}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!45 &702951227
+Skybox:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 702951225}
+  m_Enabled: 1
+  m_CustomSkybox: {fileID: 2100000, guid: 13f6e5eed33d84c76979f1ec06b5e48c, type: 2}
+--- !u!114 &702951228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 702951225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59de8498704ea26479626a6602b51e03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &702951229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 702951225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 1
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
+--- !u!20 &702951230
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 702951225}
+  m_Enabled: 0
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: -1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
 --- !u!1 &703117532
 GameObject:
   m_ObjectHideFlags: 0
@@ -9638,7 +9789,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.1824178
+  m_Size: 0.22985557
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10893,11 +11044,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2648a77fb4c70b44b4ee7bb71b512ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &1221808317 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1928567686329856043, guid: cc12c32b927da45c0b072b1ccc10e04c, type: 3}
-  m_PrefabInstance: {fileID: 250549742}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1233092760
 GameObject:
   m_ObjectHideFlags: 0
@@ -17919,3 +18065,4 @@ SceneRoots:
   - {fileID: 1489650626}
   - {fileID: 804034794}
   - {fileID: 1930568709}
+  - {fileID: 468896157}

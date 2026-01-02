@@ -36,10 +36,21 @@ namespace MusicRun
 
         /// <summary>Number of distinct instruments found in the currently loaded MIDI.</summary>
         public int InstrumentFound;
+
         /// <summary>Number of instruments restored so far (used when progressively restoring originals).</summary>
         public int InstrumentRestored;
 
+        /// <summary> Number of times the MIDI has looped during playback.</summary>
+        public int countLoop = 0;
+
         public Action<LevelEndedReason> OnMusicEnded;
+
+        private float previousSpeed = -1;
+        private GameManager gameManager;
+        private PlayerController player;
+        private GoalHandler goalHandler;
+        private float savedVolume;
+        private bool mute = false;
 
         /// <summary>
         /// Playback progress expressed as a percentage (0..100).
@@ -49,24 +60,17 @@ namespace MusicRun
         {
             get
             {
+                float progress;
                 // If loop count exceeded goal loops, consider playback complete.
                 if (countLoop > gameManager.terrainGenerator.CurrentLevel.LoopsToGoal)
-                    return 100f;
+                    progress = 100f;
                 else
-                    return
-                        (float)(midiPlayer.MPTK_TickCurrent + ((countLoop - 1) * midiPlayer.MPTK_TickLastNote)) /
+                    progress = (float)(midiPlayer.MPTK_TickCurrent + ((countLoop - 1) * midiPlayer.MPTK_TickLastNote)) /
                         (float)(midiPlayer.MPTK_TickLastNote * gameManager.terrainGenerator.CurrentLevel.LoopsToGoal) * 100f;
+                //Debug.Log($"MidiManager - Progress {progress} % MPTK_TickCurrent:{midiPlayer.MPTK_TickCurrent} MPTK_TickLastNote:{midiPlayer.MPTK_TickLastNote} {countLoop}/{gameManager.terrainGenerator.CurrentLevel.LoopsToGoal}");
+                return progress;
             }
         }
-
-
-        private float previousSpeed = -1;
-        private GameManager gameManager;
-        private PlayerController player;
-        private GoalHandler goalHandler;
-        private float savedVolume;
-        private bool mute = false;
-        public int countLoop = 0;
 
         /// <summary>
         /// Initialize references and configure the MidiFilePlayer.
@@ -95,23 +99,23 @@ namespace MusicRun
             midiPlayer.MPTK_PauseOnMaxDistance = false;
             midiPlayer.MPTK_MaxDistance = 0;
 
+            // Register event listeners for MIDI playback events.
             midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
             {
                 // MIDI playback started.
-                //Debug.Log($"MidiPlayer - Play MIDI '{name}' {goalHandler.distanceAtStart}");
-                // Reset transient state that depends on playback start.
-                Reset();
+                // Reset transient state that depends on playback start.                Reset();
                 StartCoroutine(UpdateMaxDistanceMPTK());
                 countLoop++;
                 midiPlayer.MPTK_Transpose = 0;
                 // Enable auto-restart only if the level requires multiple loops to reach the goal.
                 midiPlayer.MPTK_MidiAutoRestart = gameManager.terrainGenerator.CurrentLevel.LoopsToGoal == 1 ? false : true;
+                //Debug.Log($"MidiPlayer - Play MIDI '{name}' {goalHandler.distanceAtStart} countLoop:{countLoop}");
             });
 
             midiPlayer.OnEventNotesMidi.AddListener((midiEvents) =>
             {
                 // MIDI events callback (notes are being delivered). Kept for debugging or future handling.
-                // Debug.Log($"MidiPlayer Notes: {midiEvents.Count}");
+                //Debug.Log($"MidiPlayer Notes: {midiEvents.Count}");
             });
 
             midiPlayer.OnEventEndPlayMidi.AddListener((name, endMidi) =>
@@ -130,7 +134,7 @@ namespace MusicRun
         {
             float musicSpeedClamp = 1f;
 
-            if (gameManager.levelRunning && !gameManager.levelPaused)
+            if (gameManager.levelRunning && !gameManager.levelPaused && !gameManager.awaitingPlayerStart)
             {
                 if (Progress >= 100f)
                 {
@@ -140,20 +144,29 @@ namespace MusicRun
                 }
 
                 // Calculate music playback speed from the player's speed when the level is active.
-            
+                // --------------------------------------------------------------------------------
+
                 // Min and max music speed are defined by the current level.
                 TerrainLevel current = gameManager.terrainGenerator.CurrentLevel;
-                
+
                 // Apply ratio (defined by level) between the player speed and the music speed
                 float speedMusic = player.Speed * current.RatioSpeedMusic;
                 musicSpeedClamp = Mathf.Clamp(speedMusic, current.MinSpeedMusic, current.MaxSpeedMusic);
-            }
 
-            // Avoid updating the MIDI speed every frame: only apply an update when the change exceeds a small threshold.
-            if (previousSpeed < 0f || Mathf.Abs(previousSpeed - musicSpeedClamp) > 0.1f)
+                // Avoid updating the MIDI speed every frame: only apply an update when the change exceeds a small threshold.
+                if (previousSpeed < 0f || Mathf.Abs(previousSpeed - musicSpeedClamp) > 0.1f)
+                {
+                    midiPlayer.MPTK_Speed = musicSpeedClamp;
+                    previousSpeed = musicSpeedClamp;
+                }
+            }
+            else
             {
-                midiPlayer.MPTK_Speed = musicSpeedClamp;
-                previousSpeed = musicSpeedClamp;
+                if (midiPlayer.MPTK_Speed != 1f)
+                {
+                    midiPlayer.MPTK_Speed = 1f;
+                    previousSpeed = 1f;
+                }
             }
         }
 
@@ -173,21 +186,21 @@ namespace MusicRun
             Debug.Log($"MidiPlayer - MaxDistance set {midiPlayer.MPTK_MaxDistance}");
         }
 
-        /// <summary>
-        /// Reset transient state tracked by MidiManager (for example when playback restarts).
-        /// </summary>
-        public void Reset()
-        {
-            previousSpeed = -1;
-        }
+        /////// <summary>
+        /////// Reset transient state tracked by MidiManager (for example when playback restarts).
+        /////// </summary>
+        ////public void Reset()
+        ////{
+        ////    previousSpeed = -1;
+        ////}
 
-        /// <summary>
-        /// Restore default transient state. Alias for Reset to express intent.
-        /// </summary>
-        public void Default()
-        {
-            previousSpeed = -1;
-        }
+        /////// <summary>
+        /////// Restore default transient state. Alias for Reset to express intent.
+        /////// </summary>
+        ////public void Default()
+        ////{
+        ////    previousSpeed = -1;
+        ////}
 
         /// <summary>
         /// Load a MIDI from the Midi DB by index and build channel index.
@@ -197,11 +210,13 @@ namespace MusicRun
         {
             if (midiPlayer != null)
             {
+                Debug.Log($"MidiPlayer - Load MIDI index {terrainLevel.indexMIDI}");
+
                 countLoop = 0;
                 // Ensure the player is stopped before loading a new file.
                 midiPlayer.MPTK_Stop();
 
-                // Select and load the MIDI file.
+                // Select and load the MIDI file but not play it.
                 midiPlayer.MPTK_MidiIndex = terrainLevel.indexMIDI;
                 midiPlayer.MPTK_Load();
             }
@@ -213,6 +228,7 @@ namespace MusicRun
         /// <param name="index">Index of the MIDI file in the Midi DB.</param>
         public void PlayMIDI()
         {
+            Debug.Log($"MidiPlayer - Play MIDI already laoaded {midiPlayer.MPTK_MidiIndex}");
             // When game pause has been activated, the MIDI is paused and will not play.
             // Useless to call MPTK_UnPause from v2.17.1 - midiPlayer.MPTK_UnPause();
             // Play the already-loaded MIDI (avoid reloading).
@@ -236,6 +252,7 @@ namespace MusicRun
             ChannelPlayed = new Dictionary<int, ChannelInstrument>();
 
             foreach (MPTKEvent midiEvent in midiPlayer.MPTK_MidiLoaded.MPTK_MidiEvents)
+            {
                 if (midiEvent.Command == MPTKCommand.PatchChange)
                 {
                     if (!ChannelPlayed.ContainsKey(midiEvent.Channel))
@@ -258,6 +275,8 @@ namespace MusicRun
                     if (terrainLevel.SearchForInstrument)
                         midiEvent.Value = terrainLevel.SubstitutionInstrument;
                 }
+            }
+            Debug.Log($"MidiPlayer - BuildMidiChannel found {ChannelPlayed.Count} instruments");
             InstrumentFound = ChannelPlayed.Count;
             InstrumentRestored = 0;
         }
@@ -272,6 +291,7 @@ namespace MusicRun
         public void RestoreMidiChannel()
         {
             foreach (ChannelInstrument instrument in ChannelPlayed.Values)
+            {
                 if (!instrument.Restored)
                 {
                     midiPlayer.MPTK_Channels[instrument.Channel].PresetNum = instrument.Preset;
@@ -281,6 +301,7 @@ namespace MusicRun
                     Debug.Log($"MidiPlayer - Restore instrument {instrument.Preset} on channel {instrument.Channel} ");
                     break;
                 }
+            }
         }
 
         /// <summary>
