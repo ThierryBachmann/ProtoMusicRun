@@ -110,3 +110,4 @@ ViewShader.unity.meta
 # /[Aa]ssets/ProjectSettings
 *.csproj
 *.sln
+/BuildWindows/

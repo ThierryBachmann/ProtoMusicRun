@@ -274,7 +274,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2553,7 +2553,7 @@ MonoBehaviour:
   disableChunkPool: 0
   enableLogAndRename: 0
   levels:
-  - enabled: 0
+  - enabled: 1
     name: Flat Desert
     description: A very short level to understand the principle of the game.
     Skybox: {fileID: 327158888}
@@ -2615,7 +2615,7 @@ MonoBehaviour:
     bonusInstrumentDensity: 0.42
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 0
+  - enabled: 1
     name: Low vegetation
     description: Low vegetation
     Skybox: {fileID: 1193833017}
@@ -9789,7 +9789,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.22985557
+  m_Size: 0.20211343
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15521,7 +15521,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1179939235}
   m_HandleRect: {fileID: 1179939234}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
