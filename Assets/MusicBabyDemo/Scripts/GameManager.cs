@@ -5,7 +5,13 @@ using UnityEngine.InputSystem;
 
 namespace MusicRun
 {
-    public class GameManager : MonoBehaviour
+    /*
+     * FILE ROLE
+     * - Main orchestration part of GameManager (partial class).
+     * - Holds shared state, scene references, and core game flow entry points.
+     * - Other concerns are split into companion files (for example RuntimeHelpers).
+     */
+    public partial class GameManager : MonoBehaviour
     {
         public bool gameRunning;
         public bool awaitingPlayerStart;
@@ -218,87 +224,6 @@ namespace MusicRun
             LevelCreate(levelIndex);
         }
 
-        /// <summary>
-        /// Create and start a new level or restart the same level (preserve generated chunks).
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="restartSame"></param>
-        private void LevelCreate(int index, bool restartSame = false)
-        {
-            Debug.Log($"-level- LevelCreate index:{index}");
-            HideAllPopups();
-
-            GoalScreenHide();
-
-            scoreManager.ScoreLevel = 0;
-            levelFailed = false;
-            actionGame.Hide();
-            HideAllPopups();
-
-            // Need to get the level description before to get information about instrument in CreateLevel.
-            midiManager.LoadMIDI(terrainGenerator.levels[index]);
-            midiManager.BuildMidiChannel(terrainGenerator.levels[index]);
-
-            if (restartSame)
-            {
-                // No terrain created, reuse same but teleport player to the start
-                playerController.TeleportToStart();
-            }
-            else
-            {
-                // Player continue at the same place,
-                // but new terrain is created. Keep previous terrain at a distance to 1.5 chunk
-                terrainGenerator.ClearChunks(1.5f);
-                terrainGenerator.CreateLevel(index);
-            }
-
-            // Player move to start terrain facing to goal terrain
-            //playerController.ResetPosition();
-
-
-            //goalHandler.gameObject.SetActive(true);
-            goalHandler.NewLevel();
-            gameRunning = true;
-            OnSwitchPause(true);
-            playerController.LevelStarted();
-            sceneGoal.SetInfo(terrainGenerator.CurrentLevel.name, terrainGenerator.CurrentLevel.description);
-            awaitingPlayerStart = true;
-            sceneGoal.Show(LevelStart);
-
-            // The scene must be loaded before playing the MIDI.
-            // PlayMIDI will also trigger midiPlayer.OnEventStartPlayMidi
-            // which will set midiPlayer.MPTK_MaxDistance (applu volume attenuation with distance)
-            midiManager.PlayMIDI();
-        }
-
-        private void GoalScreenHide()
-        {
-            if (goalReachedClone != null)
-            {
-                Debug.Log($"-level- Destroy(goalReachedDisplayClone)");
-                Destroy(goalReachedClone.gameObject);
-                goalReachedClone = null;
-            }
-            else
-            {
-                Debug.Log($"-level- goalReachedDisplay.HideVideo");
-                goalReachedDisplay.ScreenVideo.StopVideo();
-                goalReachedDisplay.HideVideo();
-            }
-        }
-
-        void LevelStart(bool unsused)
-        {
-            Debug.Log($"-level- StartLevel awaitingPlayerStart:{awaitingPlayerStart}");
-            if (awaitingPlayerStart)
-            {
-                actionLevel.Show();
-                OnSwitchPause(false);
-                awaitingPlayerStart = false;
-                levelRunning = true;
-            }
-        }
-
         private void OnSettingChange()
         {
             Debug.Log("GameManager OnSettingChange");
@@ -364,77 +289,6 @@ namespace MusicRun
 
         }
 
-        /// <summary>
-        /// Handles the completion of a level, updating game state and UI elements accordingly.
-        /// Trigger from GoalHandler when player is close to the goal.
-        /// </summary>
-        /// <remarks>This method updates the game state to reflect that the level is no longer running,
-        /// hides all popups, and shows the level failed screen. It calculates the score for the completed level and
-        /// submits it to the leaderboard. Additionally, it clears terrain chunks to prevent collision issues in the
-        /// next level. If <paramref name="nextLevelAuto"/> is <see langword="true"/>, the next level is automatically
-        /// started after a delay; otherwise, the game actions are updated for manual progression.</remarks>
-        /// <param name="success">Indicates whether the level was completed successfully. If <see langword="true"/>, the level was completed
-        /// successfully; otherwise, it was not.</param>
-        private void OnLevelCompleted(LevelEndedReason reason)
-        {
-            Debug.Log($"GameManager - OnLevelCompleted - {reason} alwaysSucceed:{alwaysSucceed}");
-
-            // Check level failed: Music ended without reaching the goal.
-            playerController.enableMovement = false;
-            levelRunning = false;
-            if (MusicPercentage >= 100f && GoalPercentage <= 98f && !alwaysSucceed)
-            {
-                Debug.Log($"GameManager - OnLevelCompleted - Music ended without reaching the goal.");
-                levelFailed = true;
-
-                // instantiate prefab in front of the player at levelFailPrefabDistance
-                Transform p = playerController.transform;
-                Vector3 spawnPos = p.position + p.forward * VideoScreenDistance + p.up * 10f;
-
-                // keep same up orientation as player
-                Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
-                GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
-                goalReachedClone = go.GetComponent<GoalReachedDisplay>();
-                goalReachedClone.FallingVideo(0);
-                goalReachedClone.UpdateText("Level Failed - Music Ended");
-            }
-            else if (midiManager.InstrumentRestored < midiManager.InstrumentFound && !alwaysSucceed)
-            {
-                Debug.Log($"GameManager - OnLevelCompleted - Music ended without reaching the goal.");
-                levelFailed = true;
-                goalReachedDisplay.RiseVideo(0);
-                goalReachedDisplay.UpdateText("Level Failed - Instruments Missing");
-            }
-            else
-            {
-                levelFailed = false;
-                goalReachedDisplay.RiseVideo(1);
-                goalReachedDisplay.UpdateText();
-            }
-
-            bonusManager.EndBonus();
-            //if (levelFailed)
-            //    levelFailedScreen.Show();
-            // When level 
-            actionLevel.Hide();
-            actionGame.Show();
-            actionGame.SelectActionsToShow();
-
-            scoreManager.CalculateScoreLevel(MusicPercentage, GoalPercentage);
-            LeaderboardPlayerScore playerScore = new LeaderboardPlayerScore(
-                        leaderboard.firebaseAuth.GetUserId(),
-                        playerController.playerName,
-                        scoreManager.ScoreLevel,
-                        999,
-                        999,
-                        999,
-                        1
-                        );
-            leaderboard.SubmitScore(playerScore);
-            playerController.LevelEnded();
-            StartCoroutine(Utilities.WaitAndCall(2000f, () => { playerController.enableMovement = true; }));
-        }
-
         private void OnScoreSubmitted(bool success)
         {
             leaderboard.GetPlayerRank((s) =>
@@ -492,75 +346,10 @@ namespace MusicRun
         {
             Debug.Log($"GameManager - OnExitGame");
             GameStop();
-        }
-
-        void Update()
+        }        void Update()
         {
-            // Exemple : touche R pour redémarrer la partie
-            //if (Input.GetKeyDown(KeyCode.H)) HelperScreenDisplay();
-
-            if (enableShortcutKeys)
-                if (Input.anyKeyDown)
-                {
-                    foreach (char c in Input.inputString)
-                    {
-                        if (c == 'h') HelperScreenDisplay();
-                        if (c == 'n')
-                        {
-                            //midiManager.countLoop = terrainGenerator.CurrentLevel.LoopsToGoal + 1; 
-                            midiManager.InstrumentRestored = midiManager.InstrumentFound;
-                            playerController.TeleportToGoal();
-                        }
-                        ;
-                        if (c == 's') GameStop();
-                        if (c == 'r')
-                        {
-                            Debug.Log($"-debug- Instantiate(goalReachedDisplayClone); ");
-                            playerController.enableMovement = false;
-                            // instantiate prefab in front of the player at levelFailPrefabDistance
-                            Transform p = playerController.transform;
-                            Vector3 spawnPos = p.position + p.forward * VideoScreenDistance + p.up * 1f;
-
-                            // keep same up orientation as player
-                            Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
-                            GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
-                            goalReachedClone = go.GetComponent<GoalReachedDisplay>();
-                            goalReachedClone.FallingVideo(0);
-                        }
-                        if (c == 'a') actionGame.SwitchVisible();
-                        if (c == 'l') LeaderboardSwitchDisplay();
-                        if (c == 'm') midiManager.SoundOnOff();
-                        if (c == 'g')
-                        {
-                            terrainGenerator.ClearChunks(0);
-                            terrainGenerator.UpdateChunks(playerController.CurrentPlayerChunk);
-                        }
-                        if (c == 'x')
-                            if (goalReachedClone != null)
-                            {
-                                Debug.Log($"-debug- Destroy(goalReachedDisplayClone); ");
-                                //goalReachedDisplayClone.ScreenVideo.StopVideo();
-                                Destroy(goalReachedClone.gameObject);
-                                //goalReachedDisplayClone = null;
-                            }
-                        if (c == 'p')
-                        {
-                            playerController.TeleportToStart();
-                        }
-                    }
-                }
-
-            // Calculate level progression and intermediary score
-            if (gameRunning && levelRunning && !levelPaused)
-            {
-                if (goalHandler.distanceAtStart > 0)
-                    GoalPercentage = 100f - (goalHandler.distancePlayerGoal / goalHandler.distanceAtStart * 100f);
-                else
-                    GoalPercentage = 0f;
-                MusicPercentage = midiManager.Progress;
-                scoreManager.ScoreGoal = scoreManager.CalculateScoreGoal(MusicPercentage, GoalPercentage);
-            }
-
+            HandleDebugShortcuts();
+            UpdateLevelProgressAndScore();
             CalculateFPS();
             CalculateLiteMode();
         }
@@ -594,17 +383,6 @@ namespace MusicRun
             }
         }
 
-        public void HideAllPopups()
-        {
-            splashScreen.Hide();
-            helperScreen.Hide();
-            settingScreen.Hide();
-            levelFailedScreen.Hide();
-            levelFailedScreen.Hide();
-            leaderboardDisplay.Hide();
-            sceneGoal.Hide();
-        }
-
         public IEnumerator ClearAndNextLevelTest()
         {
             terrainGenerator.ClearChunkPool();
@@ -613,22 +391,6 @@ namespace MusicRun
             levelIndex = terrainGenerator.CalculateNextLevel(levelIndex);
             yield return null; // Wait one frame
             LevelCreate(levelIndex);
-        }
-        public void LeaderboardSwitchDisplay()
-        {
-            HideAllPopups();
-            leaderboardDisplay.SwitchVisible(playerController);
-        }
-
-        public void HelperScreenDisplay()
-        {
-            HideAllPopups();
-            helperScreen.SwitchVisible();
-        }
-        public void SplashScreenDisplay()
-        {
-            HideAllPopups();
-            splashScreen.SwitchVisible();
         }
     }
 }
