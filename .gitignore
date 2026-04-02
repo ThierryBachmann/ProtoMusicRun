@@ -111,3 +111,4 @@ ViewShader.unity.meta
 *.csproj
 *.sln
 /BuildWindows/
+Assets/Resources/MetaXRA*
