@@ -5,23 +5,30 @@ using UnityEditor;
 using UnityEngine;
 namespace MusicRun
 {
-    class InfoTerrain : Editor
+    class TerrainInfo : Editor
     {
         [MenuItem("Tools/Display all terrains", false, 71)]
         static void DisplayAllTerrains(MenuCommand menuCommand)
         {
             var tg = Object.FindFirstObjectByType<TerrainGenerator>();
-            Display(tg, true);
+            Display(tg);
         }
 
-        [MenuItem("Tools/Display terrains enabled", false, 72)]
+        [MenuItem("Tools/Display active terrains", false, 72)]
         static void DisplayEnabledTerrains(MenuCommand menuCommand)
         {
             var tg = Object.FindFirstObjectByType<TerrainGenerator>();
             Display(tg, false);
         }
 
-        private static void Display(TerrainGenerator tg, bool all)
+        [MenuItem("Tools/Display detailed terrains", false, 72)]
+        static void DisplayDetailedTerrains(MenuCommand menuCommand)
+        {
+            var tg = Object.FindFirstObjectByType<TerrainGenerator>();
+            Display(tg, false, true);
+        }
+
+        private static void Display(TerrainGenerator tg, bool all = true, bool displayChunk = false)
         {
             ImBank bnk = null;
             if (tg == null)
@@ -44,10 +51,12 @@ namespace MusicRun
                     ToolsEditor.LoadMidiSet();
                     ToolsEditor.CheckMidiSet();
                 }
-
+                // Exec after Refresh, either cause errror
+                if (MidiPlayerGlobal.ImSFCurrent == null)
+                    MidiPlayerGlobal.LoadCurrentSF();
                 bnk = MidiPlayerGlobal.ImSFCurrent.Banks[0];
-
             }
+
             for (int i = 0; i < tg.levels.Length; i++)
             {
                 var lvl = tg.levels[i];
@@ -61,14 +70,19 @@ namespace MusicRun
                     }
                     info += $"name:{Fixed(lvl.name, 15)} ";
 
-                    string substInstr = Fixed(bnk.defpresets[lvl.SubstitutionInstrument].Name, 10);
+                    string substInstr = lvl.SearchForInstrument ? Fixed(bnk.defpresets[lvl.SubstitutionInstrument].Name, 18) : "'No instr. search'";
                     string midiFile = Fixed(MidiPlayerGlobal.CurrentMidiSet.MidiFiles[lvl.indexMIDI], 15);
                     info +=
                         $"MIDI:{lvl.indexMIDI,2} " + $"{midiFile} " +
                         $"loop:{lvl.LoopsToGoal} {lvl.SubstitutionInstrument} {substInstr} " +
-                        $"speed:{lvl.MinSpeedMusic:F2} - {lvl.MaxSpeedMusic:F2} ratio:{lvl.RatioSpeedMusic:F2} " +
-                        $"Delta Goal:{lvl.deltaGoalChunk} Sky:{Fixed(lvl.Skybox.name, 15)} ";
+                        $"speed:{lvl.MinSpeedMusic:F2}-{lvl.MaxSpeedMusic:F2} ratio:{lvl.RatioSpeedMusic:F2} " +
+                        $"Goal:{lvl.deltaGoalChunk} Sky:{Fixed(lvl.Skybox.name, 20)} ";
                     Debug.Log(info);
+                    if (displayChunk)
+                    {
+                        foreach (GameObject chunk in lvl.runChunks)
+                            Debug.Log($"   {chunk.name}");
+                    }
                 }
             }
         }

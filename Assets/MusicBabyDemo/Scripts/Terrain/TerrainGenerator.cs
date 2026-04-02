@@ -527,7 +527,7 @@ namespace MusicRun
             // Build vegetable. Get list of gameobject exiting in the prefab chunk and apply random or perlin change
             foreach (Transform childTransform in chunk.transform)
             {
-                if (childTransform.CompareTag("TreeScalable") || childTransform.CompareTag("Grass"))
+                if (childTransform.CompareTag("TreeScalable") || childTransform.CompareTag("Grass") || childTransform.CompareTag("Cliff"))
                 {
                     Vector3 childPosition = childTransform.localPosition;
 
@@ -568,18 +568,21 @@ namespace MusicRun
                     Vector3 localPosition = new Vector3(scaledOffsetX, 5f, scaledOffsetZ);
                     //Debug.Log($"Chunk: {chunkCoord} Vege: {childTransform.name} localPosition: {localPosition} ");
 
-                    //currentLevel.maxScaleVegetable = Mathf.Clamp(currentLevel.maxScaleVegetable, 0.01f, 5f);
-                    //currentLevel.minScaleVegetable = Mathf.Clamp(currentLevel.minScaleVegetable, 0.01f, 5f);
-                    if (currentLevel.minScaleVegetable > currentLevel.maxScaleVegetable)
-                        currentLevel.minScaleVegetable = currentLevel.maxScaleVegetable;
-                    
-                    // Random scale variation
-                    float randomScale = Random.Range(currentLevel.minScaleVegetable, currentLevel.maxScaleVegetable);
-                    childTransform.localScale = childTransform.localScale * randomScale;
+                    float randomScale = 0;
+                    if (childTransform.CompareTag("TreeScalable") || childTransform.CompareTag("Grass"))
+                    {
+                        //currentLevel.maxScaleVegetable = Mathf.Clamp(currentLevel.maxScaleVegetable, 0.01f, 5f);
+                        //currentLevel.minScaleVegetable = Mathf.Clamp(currentLevel.minScaleVegetable, 0.01f, 5f);
+                        if (currentLevel.minScaleVegetable > currentLevel.maxScaleVegetable)
+                            currentLevel.minScaleVegetable = currentLevel.maxScaleVegetable;
+                        // Random scale variation
+                        randomScale = Random.Range(currentLevel.minScaleVegetable, currentLevel.maxScaleVegetable);
+                        childTransform.localScale = childTransform.localScale * randomScale;
+                    }
 
                     // Random Y rotation (0–360 degrees)
                     float randomRotY = Random.Range(0f, 360f);
-                    childTransform.localRotation = Quaternion.Euler(childTransform.localRotation.eulerAngles.x , randomRotY, childTransform.localRotation.eulerAngles.z);
+                    childTransform.localRotation = Quaternion.Euler(childTransform.localRotation.eulerAngles.x, randomRotY, childTransform.localRotation.eulerAngles.z);
 
                     // Set the local position 
                     childTransform.localPosition = localPosition;

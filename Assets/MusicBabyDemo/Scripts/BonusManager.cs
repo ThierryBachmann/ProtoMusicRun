@@ -268,9 +268,9 @@ namespace MusicRun
         {
             Debug.Log($"Bonus - start Trans {valueBonus}");
             if (valueBonus > 0)
-                midiManager.TransposeAdd(6); // transpose up one octave (approx. 6 semitones * 2 = octave depending on game convention)
+                midiManager.TransposeAdd(18); // transpose up (6 semitones = 1/2 octave)
             else
-                midiManager.TransposeAdd(-6); // transpose down
+                midiManager.TransposeAdd(-18); // transpose down
             startBonusDateTime = DateTime.Now;
             startBonus = true;
         }

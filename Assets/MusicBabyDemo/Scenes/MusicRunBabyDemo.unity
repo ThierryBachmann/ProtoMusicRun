@@ -274,7 +274,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1929,7 +1929,7 @@ MonoBehaviour:
   nextLevelAuto: 0
   infoDebug: 1
   enableShortcutKeys: 1
-  alwaysSucceed: 1
+  alwaysSucceed: 0
   FramePerSecond: 0
   LowerThresholdFPS: 28
   HysteresisBandFPS: 4
@@ -2553,7 +2553,7 @@ MonoBehaviour:
   disableChunkPool: 0
   enableLogAndRename: 0
   levels:
-  - enabled: 1
+  - enabled: 0
     name: Flat Desert
     description: A very short level to understand the principle of the game.
     Skybox: {fileID: 327158888}
@@ -2576,7 +2576,7 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
     - {fileID: 3245006867922576827, guid: 9c2ca546d963105488d81316fde6d802, type: 3}
     vegetables: []
-    bonusMalusDensity: 0.42
+    bonusMalusDensity: 0
     bonusMalusRatio: 0.203
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
@@ -2591,7 +2591,7 @@ MonoBehaviour:
     indexMIDI: 80
     LoopsToGoal: 2
     SearchForInstrument: 1
-    SubstitutionInstrument: 122
+    SubstitutionInstrument: 120
     RatioSpeedMusic: 0.47
     MinSpeedMusic: 0.55
     MaxSpeedMusic: 1.28
@@ -2608,14 +2608,14 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: f5f89aeafa0ca2640a5c84019379e5f9, type: 3}
     vegetables: []
     bonusMalusDensity: 0.84
-    bonusMalusRatio: 0.5
+    bonusMalusRatio: 0
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
     bonusInstrumentDensity: 0.42
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: Low vegetation
     description: Low vegetation
     Skybox: {fileID: 1193833017}
@@ -2643,13 +2643,13 @@ MonoBehaviour:
     bonusInstrumentDensity: 0.7
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
-  - enabled: 1
+  - enabled: 0
     name: Labyrinthic cliff
     description: Labyrinthic cliff
     Skybox: {fileID: 702951230}
     indexMIDI: 52
     LoopsToGoal: 2
-    SearchForInstrument: 0
+    SearchForInstrument: 1
     SubstitutionInstrument: 122
     RatioSpeedMusic: 0.2
     MinSpeedMusic: 0.31
@@ -2667,10 +2667,46 @@ MonoBehaviour:
     - {fileID: 3245006867922576827, guid: 5b19200a2aa41b14ab7ec1b1413b7f2d, type: 3}
     vegetables: []
     bonusMalusDensity: 0.82
-    bonusMalusRatio: 0.317
+    bonusMalusRatio: 0.483
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     bonusInstrumentDensity: 0.91
+    bonusInstrumentPrefab:
+    - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
+  - enabled: 1
+    name: Jungle
+    description: High vegetable
+    Skybox: {fileID: 1193833017}
+    indexMIDI: 80
+    LoopsToGoal: 2
+    SearchForInstrument: 1
+    SubstitutionInstrument: 120
+    RatioSpeedMusic: 0.47
+    MinSpeedMusic: 0.55
+    MaxSpeedMusic: 1.28
+    startGO: {fileID: 883430262}
+    goalGO: {fileID: 3029970166632757827}
+    deltaGoalChunk: {x: 0, y: 15}
+    perlinVegetable: 0.664
+    perlinChunk: 7.15
+    minScaleVegetable: 3.57
+    maxScaleVegetable: 5
+    runChunks:
+    - {fileID: 3245006867922576827, guid: 5b19200a2aa41b14ab7ec1b1413b7f2d, type: 3}
+    - {fileID: 3245006867922576827, guid: f5f89aeafa0ca2640a5c84019379e5f9, type: 3}
+    - {fileID: 3245006867922576827, guid: f5f89aeafa0ca2640a5c84019379e5f9, type: 3}
+    - {fileID: 3245006867922576827, guid: f5f89aeafa0ca2640a5c84019379e5f9, type: 3}
+    - {fileID: 3245006867922576827, guid: f5f89aeafa0ca2640a5c84019379e5f9, type: 3}
+    - {fileID: 3245006867922576827, guid: f5f89aeafa0ca2640a5c84019379e5f9, type: 3}
+    - {fileID: 3245006867922576827, guid: f5f89aeafa0ca2640a5c84019379e5f9, type: 3}
+    - {fileID: 3245006867922576827, guid: f5f89aeafa0ca2640a5c84019379e5f9, type: 3}
+    vegetables: []
+    bonusMalusDensity: 0.84
+    bonusMalusRatio: 0.358
+    bonusScorePrefab:
+    - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
+    - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
+    bonusInstrumentDensity: 0.42
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 0
@@ -3370,7 +3406,7 @@ GameObject:
   - component: {fileID: 327158885}
   - component: {fileID: 327158884}
   m_Layer: 0
-  m_Name: Main Camera EpicBlueSunset
+  m_Name: EpicBlueSunset
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3520,7 +3556,7 @@ GameObject:
   - component: {fileID: 330585547}
   - component: {fileID: 330585548}
   m_Layer: 0
-  m_Name: Main Camera Solid Color
+  m_Name: Solid Color
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6504,7 +6540,7 @@ GameObject:
   - component: {fileID: 702951228}
   - component: {fileID: 702951227}
   m_Layer: 0
-  m_Name: Main Camera Space_AnotherPlanet
+  m_Name: Space_AnotherPlanet
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9789,7 +9825,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.20211343
+  m_Size: 0.18336487
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10300,7 +10336,7 @@ GameObject:
   - component: {fileID: 1193833015}
   - component: {fileID: 1193833014}
   m_Layer: 0
-  m_Name: Main Camera Night_MoonBurst
+  m_Name: Night_MoonBurst
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12736,7 +12772,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1479057135}
   m_HandleRect: {fileID: 1479057134}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -15521,7 +15557,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1179939235}
   m_HandleRect: {fileID: 1179939234}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -17851,12 +17887,12 @@ MonoBehaviour:
       m_Calls: []
   showMidiInfo: 0
   showSynthParameter: 0
-  showSpatialization: 1
+  showSpatialization: 0
   showUnitySynthParameter: 1
   showUnityPerformanceParameter: 0
   showExperimentalFeature: 1
   showMidiPerformanceParameter: 0
-  showSoundFontEffect: 0
+  showSoundFontEffect: 1
   showVerbose: 0
   showUnitySynthEffect: 0
   showMidiParameter: 0

@@ -39,9 +39,9 @@ namespace MusicRun
         /// <param name="delay">The delay, in seconds, before the action is executed. Must be non-negative.</param>
         /// <param name="action">The action to execute after the delay. If null, no action is performed.</param>
         /// <returns>An enumerator that can be used to control the delay and execution of the action.</returns>
-        static public IEnumerator WaitAndCall(float delay, Action action)
+        static public IEnumerator WaitAndCall(float delay_seconds, Action action)
         {
-            yield return new WaitForSeconds(delay / 1000f);
+            yield return new WaitForSeconds(delay_seconds / 1000f);
             action?.Invoke();
         }
 
@@ -66,8 +66,5 @@ namespace MusicRun
             }
             return gos[0];
         }
-
-
-
     }
 }

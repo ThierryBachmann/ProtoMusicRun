@@ -7,7 +7,7 @@
 
 ---
 
-## 📸 Screenshots  
+## Screenshots  
 A quick look at the demo in action:
 
 <h3 align="center">Level 2</h3>
@@ -57,7 +57,7 @@ A quick look at the demo in action:
 
 ---
 
-## 🎭 Story
+## Story
 
 A legendary music group **Animals Disturbance**, famous across the galaxy, travels from planet to planet to perform their concerts.
 After landing on a remote and arid world, disaster strikes: all of their instruments mysteriously vanish.
@@ -72,7 +72,7 @@ Find the instruments, control your speed the hard way, and save the concert!
 
 ---
 
-## 🎯 Purpose of this Demo  
+## Purpose of this Demo  
 This project demonstrates how **MIDI data can shape gameplay** — and how gameplay can dynamically influence the music.  
 It showcases:  
 - Dynamic **tempo changes** related to the player speed.  
@@ -91,7 +91,7 @@ It showcases:
 
 ---
 
-## 🕹️ Gameplay & Features  
+## Gameplay & Features  
 Beyond the musical system, this demo includes several essential components of a functional game:  
 - New input system with gamepad support  
 - Touchscreen-friendly controls  
@@ -103,26 +103,26 @@ Beyond the musical system, this demo includes several essential components of a 
 
 ---
 
-## 🎮 Game Input  
+## Game Input  
 The demo supports multiple input methods so you can play almost anywhere:
 
-### 📱 Touchscreen
+### Touchscreen
 - **Tap** → jump
 - **Swipe** → turn
 
-### 🕹️ Gamepad
+### Gamepad
 - **Start** → Start the run  
 - **A** → Jump  
 - **Left Stick** → Turn left or right  
 
-### ⌨️ Keyboard
+### Keyboard
 - **Enter** → Start the run  
 - **Space** → Jump  
 - **Right / Left Arrow** *or* **A / D** → Turn  
 
 ---
 
-## 📦 About This Repository  
+## About This Repository  
 This project is provided as a **complete, open-source Unity demo** to help developers understand how to combine:  
 - Unity 6  
 - Maestro MIDI Player Tool Kit
@@ -134,7 +134,7 @@ This project is provided as a **complete, open-source Unity demo** to help devel
 
 ---
 
-## 🔗 Important Links  
+## Important Links  
 - Free version: [Maestro – Midi Player Tool Kit – Free](https://assetstore.unity.com/packages/tools/audio/maestro-midi-player-tool-kit-free-107994)  
 - Pro version: [Maestro – Midi Player Tool Kit – Pro](https://assetstore.unity.com/packages/tools/audio/maestro-midi-player-tool-kit-pro-115331)  
 
@@ -142,18 +142,17 @@ This project is provided as a **complete, open-source Unity demo** to help devel
 
 ---
 
-## 🚀 Getting Started  
+## Getting Started  
 1. Clone or download this repository  
 2. Open the project in **Unity 6**  
-3. Ignore compilation errors (Maestro package is missing)
-4. Import the Maestro package (Free or Pro) from the Asset Store, **minimum version 1.6.2**
+4. Import the Maestro package (Free or Pro) from the Asset Store, **minimum version 1.9.0**
 5. Open the scene MusicBabyDemo/Scenes/MusicRunBabyDemo
 6. Press **Play** and explore the demo levels  
 7. Modify, extend, and experiment freely - And, Use a good stereo audio setup!
 
 ---
 
-## 🧩 Requirements  
+## Requirements  
 - Unity 6  
 - Maestro MIDI Player Tool Kit (Free or Pro)  
 - Optional: Firebase setup for leaderboard posting  
@@ -166,12 +165,12 @@ This project is provided as a **complete, open-source Unity demo** to help devel
 
 ---
 
-## 🤝 Contributing  
+## Contributing  
 Contributions are welcome!  
 Feel free to open issues, submit pull requests, or propose improvements.
 
 ---
 
-## 📄 License  
+## License  
 This project is licensed under the **MIT License**.  
 See the file [LICENSE](LICENSE) for more details.

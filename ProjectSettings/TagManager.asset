@@ -13,6 +13,8 @@ TagManager:
   - TreeScalable
   - Instrument
   - Malus
+  - Undefined
+  - Cliff
   layers:
   - Default
   - TransparentFX
