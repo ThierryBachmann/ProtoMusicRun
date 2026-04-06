@@ -1,4 +1,4 @@
-# ProtoMusicRun - Maestro MIDI Gameplay Demo
+# Music Run Baby - Maestro MIDI Gameplay Demo
 *A Unity game demo showing how MIDI can drive gameplay with Maestro MPTK.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -150,13 +150,11 @@ If you explore this repo as a learning project, you can study:
 
 ## Demo Scenes
 - `MusicRunBabyDemo.unity` -> Main playable demo
-- `TestTerrain.unity` -> Terrain/debug experimentation
-- `ViewShader.unity` -> Shader/material experimentation
 
 ---
 
 ## Project Structure
-- `Assets/MusicBabyDemo/Scenes` -> Demo scenes
+- `Assets/MusicBabyDemo/Scenes` -> Demo scene
 - `Assets/MusicBabyDemo/Scripts` -> Gameplay code
 - `Assets/MusicBabyDemo/Scripts/Terrain` -> Chunk generation and placement logic
 - `Assets/MusicBabyDemo/Chunks` -> Chunk prefabs

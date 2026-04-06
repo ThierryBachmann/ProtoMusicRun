@@ -8,7 +8,6 @@ namespace MusicRun
     public class GoalReachedDisplay : MonoBehaviour
     {
         public ScreenDisplay ScreenVideo;
-        public ScreenDisplay BorderVideo;
 
         //public TMP_Text bestScoreText;
         public TMP_Text midiInfoDisplayed;
@@ -87,7 +86,7 @@ namespace MusicRun
 
         public void FallingVideo(int indexVideo)
         {
-            Debug.Log($"GoalReachedDisplay {gameObject.name}");
+            Debug.Log($"FallingVideo start object '{gameObject.name}' ");
             // Add a Box Collider if the parent doesn't have one
             BoxCollider boxCollider = gameObject.GetComponent<BoxCollider>();
             if (boxCollider == null)

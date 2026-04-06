@@ -32,7 +32,6 @@ namespace MusicRun
         /// </summary>
         public int levelNumber;
 
-        public float MusicPercentage;
         public float GoalPercentage;
 
         [Header("Debug")]

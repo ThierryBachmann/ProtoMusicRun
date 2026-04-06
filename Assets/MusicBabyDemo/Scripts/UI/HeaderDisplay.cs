@@ -78,7 +78,12 @@ namespace MusicRun
             if (gameManager.infoDebug)
             {
                 //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
-                infoText.text = $"Debug index level:{gameManager.levelIndex} Player at {gameManager.playerController.CurrentPlayerChunk}Speed:{player.Speed:F1} Angle:{player.targetAngle:F0}/{player.currentAngle:F0} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} FPS:{gameManager.FramePerSecond} ";
+                infoText.text = 
+                    $"level:{gameManager.levelIndex} " +
+                    $"player:{gameManager.playerController.CurrentPlayerChunk} speed:{player.Speed:F1} angle:{player.targetAngle:F0}/{player.currentAngle:F0} " +
+                    $"music:{gameManager.midiManager.countLoop}/{gameManager.terrainGenerator.CurrentLevel?.LoopsToGoal} {gameManager.midiManager.Progress:F0}% " +
+                    $"chunk:{gameManager.terrainGenerator.chunkCreatedCount} " +
+                    $"FPS:{gameManager.FramePerSecond} ";
             }
 
             directionButton.transform.localRotation = Quaternion.Euler(0f, 0f, -goalHandler.goalAngle);
@@ -86,7 +91,7 @@ namespace MusicRun
             //            scoreText.text = $"Level: {gameManager.currentLevelNumber} Score:{score:N0} Bonus: {scoreManager.ScoreBonus+(int)scoreManager.bonusInProgress} Game Score:{scoreManager.ScoreOverall:N0}";
             if (gameManager.gameRunning)
             {
-                float score = scoreManager.CalculateScoreGoal(gameManager.MusicPercentage, gameManager.GoalPercentage);
+                float score = scoreManager.CalculateScoreGoal(gameManager.midiManager.Progress, gameManager.GoalPercentage);
                 itemLevel.SetValue(gameManager.levelNumber.ToString());
                 itemScore.SetValue(score.ToString());
                 itemBonus.SetValue((scoreManager.ScoreBonus + (int)bonusManager.bonusInProgress).ToString());

@@ -274,7 +274,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1923,7 +1923,6 @@ MonoBehaviour:
   liteForceSetting: 0
   levelIndex: 0
   levelNumber: 0
-  MusicPercentage: 0
   GoalPercentage: 0
   startAuto: 0
   nextLevelAuto: 0
@@ -2557,9 +2556,9 @@ MonoBehaviour:
     name: Flat Desert
     description: A very short level to understand the principle of the game.
     Skybox: {fileID: 327158888}
-    indexMIDI: 3
-    LoopsToGoal: 6
-    SearchForInstrument: 1
+    indexMIDI: 98
+    LoopsToGoal: 4
+    SearchForInstrument: 0
     SubstitutionInstrument: 123
     RatioSpeedMusic: 0.77
     MinSpeedMusic: 0.4
@@ -2588,9 +2587,9 @@ MonoBehaviour:
     name: 'Desert Medium '
     description: More dune ...
     Skybox: {fileID: 1193833017}
-    indexMIDI: 80
-    LoopsToGoal: 2
-    SearchForInstrument: 1
+    indexMIDI: 99
+    LoopsToGoal: 4
+    SearchForInstrument: 0
     SubstitutionInstrument: 120
     RatioSpeedMusic: 0.47
     MinSpeedMusic: 0.55
@@ -5316,63 +5315,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 463026706}
   m_CullTransparentMesh: 1
---- !u!1 &468896155
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 468896157}
-  - component: {fileID: 468896156}
-  m_Layer: 0
-  m_Name: RoutineTimingController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &468896156
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 468896155}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754970a73e201694787a76901341dc92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: MidiPlayer.Run::MidiPlayerTK.Routine
-  TimeBetweenSlowUpdateCalls: 0.14285715
-  ProfilerDebugAmount: 0
-  AutoTriggerManualTimeframe: 1
-  UpdateCoroutines: 0
-  FixedUpdateCoroutines: 0
-  LateUpdateCoroutines: 0
-  SlowUpdateCoroutines: 0
-  RealtimeUpdateCoroutines: 0
-  EditorUpdateCoroutines: 0
-  EditorSlowUpdateCoroutines: 0
-  EndOfFrameCoroutines: 0
-  ManualTimeframeCoroutines: 0
-  _instanceID: 1
---- !u!4 &468896157
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 468896155}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &474558910
 GameObject:
   m_ObjectHideFlags: 0
@@ -9825,7 +9767,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.18336487
+  m_Size: 0.1842556
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -12772,7 +12714,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1479057135}
   m_HandleRect: {fileID: 1479057134}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -15557,7 +15499,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1179939235}
   m_HandleRect: {fileID: 1179939234}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -18114,4 +18056,3 @@ SceneRoots:
   - {fileID: 1489650626}
   - {fileID: 804034794}
   - {fileID: 1930568709}
-  - {fileID: 468896157}

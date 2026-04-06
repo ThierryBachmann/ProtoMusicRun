@@ -189,7 +189,7 @@ namespace MusicRun
                 if (playerChunk != currentPlayerChunk)
                 {
                     // Player change to another chunk.
-                    Debug.Log($"-player- enters in a chunk: x={transform.position.x} z={transform.position.z} --> playerChunk: {playerChunk}");
+                    //Debug.Log($"-player- enters in a chunk: x={transform.position.x} z={transform.position.z} --> playerChunk: {playerChunk}");
                     currentPlayerChunk = playerChunk;
                     terrainGenerator.UpdateChunks(currentPlayerChunk);
                 }

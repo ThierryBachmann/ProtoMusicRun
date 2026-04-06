@@ -28,7 +28,7 @@ namespace MusicRun
         {
             if (gameManager.gameRunning)
             {
-                musicSlider.value = gameManager.MusicPercentage;
+                musicSlider.value = gameManager.midiManager.Progress;
                 musicText.text = $"Music {midiManager.Progress:F0} %";
             }
             else

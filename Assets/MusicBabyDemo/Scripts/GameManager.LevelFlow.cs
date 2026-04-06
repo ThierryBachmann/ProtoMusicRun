@@ -81,21 +81,22 @@ namespace MusicRun
         /// <param name="reason">Reason why the level flow reached completion.</param>
         private void OnLevelCompleted(LevelEndedReason reason)
         {
-            Debug.Log($"GameManager - OnLevelCompleted - {reason} alwaysSucceed:{alwaysSucceed}");
+            Debug.Log($"GameManager - OnLevelCompleted - '{reason}' MusicPercentage:{midiManager.Progress:F1} GoalPercentage:{GoalPercentage:F0} alwaysSucceed:{alwaysSucceed} ");
 
             // Check level failed: Music ended without reaching the goal.
             playerController.enableMovement = false;
             levelRunning = false;
-            if (MusicPercentage >= 100f && GoalPercentage <= 98f && !alwaysSucceed)
+            if (midiManager.Progress >= 100f && GoalPercentage <= 98f && !alwaysSucceed)
             {
-                Debug.Log("GameManager - OnLevelCompleted - Music ended without reaching the goal.");
                 levelFailed = true;
 
                 // Instantiate prefab in front of the player.
                 Transform p = playerController.transform;
                 Vector3 spawnPos = p.position + p.forward * VideoScreenDistance + p.up * 10f;
                 Quaternion rot = Quaternion.LookRotation(p.forward, Vector3.up);
+                //Debug.Log($"GameManager - OnLevelCompleted - Music ended without reaching the goal. Instanciate from prefab {VideoScreenPrefab.name} pos:{spawnPos}");
                 GameObject go = Instantiate(VideoScreenPrefab, spawnPos, rot);
+                // Get script associated to the prefab and call method to start the video and update text.
                 goalReachedClone = go.GetComponent<GoalReachedDisplay>();
                 goalReachedClone.FallingVideo(0);
                 goalReachedClone.UpdateText("Level Failed - Music Ended");
@@ -119,7 +120,7 @@ namespace MusicRun
             actionGame.Show();
             actionGame.SelectActionsToShow();
 
-            scoreManager.CalculateScoreLevel(MusicPercentage, GoalPercentage);
+            scoreManager.CalculateScoreLevel(midiManager.Progress, GoalPercentage);
             LeaderboardPlayerScore playerScore = new LeaderboardPlayerScore(
                         leaderboard.firebaseAuth.GetUserId(),
                         playerController.playerName,

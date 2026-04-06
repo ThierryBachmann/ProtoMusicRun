@@ -61,8 +61,10 @@ namespace MusicRun
             get
             {
                 float progress;
-                // If loop count exceeded goal loops, consider playback complete.
-                if (countLoop > gameManager.terrainGenerator.CurrentLevel.LoopsToGoal)
+                if (gameManager.terrainGenerator.CurrentLevel == null)
+                    progress = 0;
+                else if (countLoop > gameManager.terrainGenerator.CurrentLevel.LoopsToGoal)
+                    // If loop count exceeded goal loops, consider playback complete.
                     progress = 100f;
                 else
                     progress = (float)(midiPlayer.MPTK_TickCurrent + ((countLoop - 1) * midiPlayer.MPTK_TickLastNote)) /
@@ -78,6 +80,8 @@ namespace MusicRun
         /// </summary>
         void Awake()
         {
+            //Debug.Log("MidiManager - Awake");
+
             gameManager = Utilities.FindGameManager();
             if (gameManager == null)
                 return;
@@ -100,29 +104,44 @@ namespace MusicRun
             midiPlayer.MPTK_MaxDistance = 0;
 
             // Register event listeners for MIDI playback events.
-            midiPlayer.OnEventStartPlayMidi.AddListener((name) =>
-            {
-                // MIDI playback started.
-                // Reset transient state that depends on playback start.                Reset();
-                StartCoroutine(UpdateMaxDistanceMPTK());
-                countLoop++;
-                midiPlayer.MPTK_Transpose = 0;
-                // Enable auto-restart only if the level requires multiple loops to reach the goal.
-                midiPlayer.MPTK_MidiAutoRestart = gameManager.terrainGenerator.CurrentLevel.LoopsToGoal == 1 ? false : true;
-                //Debug.Log($"MidiPlayer - Play MIDI '{name}' {goalHandler.distanceAtStart} countLoop:{countLoop}");
-            });
+            midiPlayer.OnEventStartPlayMidi.RemoveListener(OnStartMidi);
+            midiPlayer.OnEventStartPlayMidi.AddListener(OnStartMidi);
+             
+            //midiPlayer.OnEventNotesMidi.RemoveListener(OnNotesMidi);
+            //midiPlayer.OnEventNotesMidi.AddListener(OnNotesMidi);
 
-            midiPlayer.OnEventNotesMidi.AddListener((midiEvents) =>
-            {
-                // MIDI events callback (notes are being delivered). Kept for debugging or future handling.
-                //Debug.Log($"MidiPlayer Notes: {midiEvents.Count}");
-            });
+            midiPlayer.OnEventEndPlayMidi.RemoveListener(OnEndMidi);
+            midiPlayer.OnEventEndPlayMidi.AddListener(OnEndMidi);
+        }
 
-            midiPlayer.OnEventEndPlayMidi.AddListener((name, endMidi) =>
-            {
-                //Debug.Log($"MidiPlayer - End MIDI '{name}' '{endMidi}' {goalHandler.distanceAtStart}");
-                // Additional logic can be triggered here when a MIDI finishes playing.
-            });
+        private void OnStartMidi(string name)
+        {
+            // MIDI playback started.
+            // Reset transient state that depends on playback start.                Reset();
+            StartCoroutine(UpdateMaxDistanceMPTK());
+            countLoop++;
+            midiPlayer.MPTK_Transpose = 0;
+            // Enable auto-restart only if the level requires multiple loops to reach the goal.
+            midiPlayer.MPTK_MidiAutoRestart = gameManager.terrainGenerator.CurrentLevel.LoopsToGoal == 1 ? false : true;
+            Debug.Log($"MidiManager - OnEventStartPlayMidi '{name}' {goalHandler.distanceAtStart} countLoop:{countLoop}");
+        }
+
+        private void OnNotesMidi(List<MPTKEvent> midiEvents)
+        {
+            // MIDI events callback (notes are being delivered). Kept for debugging or future handling.
+            Debug.Log($"MidiManager Notes: {midiEvents.Count}");
+        }
+
+        private void OnEndMidi(string name, EventEndMidiEnum eventEndMidiEnum)
+        {
+            Debug.Log($"MidiManager - OnEventEndPlayMidi '{name}' endMidi:'{eventEndMidiEnum}' distance:{goalHandler.distanceAtStart}");
+            // Additional logic can be triggered here when a MIDI finishes playing.
+        }
+
+        private void OnDestroy()
+        {
+            if (midiPlayer != null)
+                midiPlayer.OnEventStartPlayMidi.RemoveListener(OnStartMidi);
         }
 
         void Start()
@@ -139,7 +158,7 @@ namespace MusicRun
                 if (Progress >= 100f)
                 {
                     // GameManager .OnLevelCompleted() will decide if the level is failed or not. 
-                    Debug.Log("MidiManager - OnMusicEnded");
+                    //Debug.Log($"MidiManager - Raise OnMusicEnded countLoop:{countLoop} LoopsToGoal:{gameManager.terrainGenerator.CurrentLevel.LoopsToGoal}");
                     OnMusicEnded?.Invoke(LevelEndedReason.MusicEnded);
                 }
 
@@ -183,24 +202,8 @@ namespace MusicRun
             // Set the max distance used for volume attenuation. When the player is at the start,
             // the volume at the listener will be slightly lower than at the goal.
             midiPlayer.MPTK_MaxDistance = goalHandler.distanceAtStart * 1.05f;
-            Debug.Log($"MidiPlayer - MaxDistance set {midiPlayer.MPTK_MaxDistance}");
+            //Debug.Log($"MidiManager - MaxDistance set {midiPlayer.MPTK_MaxDistance}");
         }
-
-        /////// <summary>
-        /////// Reset transient state tracked by MidiManager (for example when playback restarts).
-        /////// </summary>
-        ////public void Reset()
-        ////{
-        ////    previousSpeed = -1;
-        ////}
-
-        /////// <summary>
-        /////// Restore default transient state. Alias for Reset to express intent.
-        /////// </summary>
-        ////public void Default()
-        ////{
-        ////    previousSpeed = -1;
-        ////}
 
         /// <summary>
         /// Load a MIDI from the Midi DB by index and build channel index.
@@ -228,7 +231,8 @@ namespace MusicRun
         /// <param name="index">Index of the MIDI file in the Midi DB.</param>
         public void PlayMIDI()
         {
-            Debug.Log($"MidiPlayer - Play MIDI already laoaded {midiPlayer.MPTK_MidiIndex}");
+            Debug.Log($"MidiManager - Play MIDI already loaded {midiPlayer.MPTK_MidiIndex}");
+
             // When game pause has been activated, the MIDI is paused and will not play.
             // Useless to call MPTK_UnPause from v2.17.1 - midiPlayer.MPTK_UnPause();
             // Play the already-loaded MIDI (avoid reloading).

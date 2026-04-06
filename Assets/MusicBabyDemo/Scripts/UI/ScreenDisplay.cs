@@ -93,7 +93,7 @@ namespace MusicRun
 
             // Warning: world position is modified. If during the rise, a parent is moved, strange thing occurs for the screen position.
             Vector3 pos = gameObject.transform.localPosition;
-            Debug.Log($"RiseCoroutine Start {gameObject.name} at {pos} from: {startY} to: {riseY}");
+            Debug.Log($"RiseCoroutine start object '{gameObject.name}' at {pos} from Y: {startY} to: {riseY} duration:{duration}");
             while (elapsed < duration && stopRising == false)
             {
                 float t = elapsed / duration;

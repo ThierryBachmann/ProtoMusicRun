@@ -96,8 +96,7 @@ namespace MusicRun
             else
                 GoalPercentage = 0f;
 
-            MusicPercentage = midiManager.Progress;
-            scoreManager.ScoreGoal = scoreManager.CalculateScoreGoal(MusicPercentage, GoalPercentage);
+            scoreManager.ScoreGoal = scoreManager.CalculateScoreGoal(midiManager.Progress, GoalPercentage);
         }
     }
 }
