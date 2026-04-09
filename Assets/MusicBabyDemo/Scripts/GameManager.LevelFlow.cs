@@ -21,6 +21,8 @@ namespace MusicRun
             HideAllPopups();
 
             GoalScreenHide();
+            if (creatureController != null)
+                creatureController.PrepareForLevel();
 
             scoreManager.ScoreLevel = 0;
             levelFailed = false;
@@ -71,6 +73,8 @@ namespace MusicRun
                 OnSwitchPause(false);
                 awaitingPlayerStart = false;
                 levelRunning = true;
+                if (creatureController != null)
+                    creatureController.NotifyLevelStarted();
             }
         }
 
@@ -82,6 +86,8 @@ namespace MusicRun
         private void OnLevelCompleted(LevelEndedReason reason)
         {
             Debug.Log($"GameManager - OnLevelCompleted - '{reason}' MusicPercentage:{midiManager.Progress:F1} GoalPercentage:{GoalPercentage:F0} alwaysSucceed:{alwaysSucceed} ");
+            if (creatureController != null)
+                creatureController.NotifyLevelStopped();
 
             // Check level failed: Music ended without reaching the goal.
             playerController.enableMovement = false;

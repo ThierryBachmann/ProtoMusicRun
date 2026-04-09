@@ -63,6 +63,7 @@ namespace MusicRun
         public GoalReachedDisplay goalReachedDisplay;
         public TerrainGenerator terrainGenerator;
         public MidiManager midiManager;
+        public CreatureController creatureController;
         public SplashScreen splashScreen;
         public HelperScreen helperScreen;
         public SettingScreen settingScreen;
@@ -202,6 +203,8 @@ namespace MusicRun
             actionGame.Show();
             playerController.ResetGameStop();
             terrainGenerator.ResetTerrain();
+            if (creatureController != null)
+                creatureController.PrepareForLevel();
             GoalScreenHide();
         }
 

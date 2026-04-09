@@ -79,11 +79,12 @@ namespace MusicRun
             {
                 //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
                 infoText.text = 
-                    $"level:{gameManager.levelIndex} " +
-                    $"player:{gameManager.playerController.CurrentPlayerChunk} speed:{player.Speed:F1} angle:{player.targetAngle:F0}/{player.currentAngle:F0} " +
-                    $"music:{gameManager.midiManager.countLoop}/{gameManager.terrainGenerator.CurrentLevel?.LoopsToGoal} {gameManager.midiManager.Progress:F0}% " +
-                    $"chunk:{gameManager.terrainGenerator.chunkCreatedCount} " +
-                    $"FPS:{gameManager.FramePerSecond} ";
+                    $"level: {gameManager.levelIndex} " +
+                    $"player: {gameManager.playerController.CurrentPlayerChunk} speed:{player.Speed:F1} angle:{player.targetAngle:F0}/{player.currentAngle:F0} " +
+                    $"creature: {gameManager.creatureController.State} {gameManager.creatureController.desiredFollowDistance:F1} " +
+                    $"music: {gameManager.midiManager.countLoop}/{gameManager.terrainGenerator.CurrentLevel?.LoopsToGoal} {gameManager.midiManager.Progress:F0}% " +
+                    //$"chunk:{gameManager.terrainGenerator.chunkCreatedCount} " +
+                    $"FPS: {gameManager.FramePerSecond} ";
             }
 
             directionButton.transform.localRotation = Quaternion.Euler(0f, 0f, -goalHandler.goalAngle);

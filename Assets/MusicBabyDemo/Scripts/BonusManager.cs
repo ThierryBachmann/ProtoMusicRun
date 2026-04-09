@@ -171,12 +171,32 @@ namespace MusicRun
                 // Start coroutine to move toward the goal
                 StartCoroutine(MoveTowardGoal(collider));
 
-                // Restore one MIDI channel's original instrument preset.
-                gameManager.midiManager.RestoreMidiChannel();
-
-                // Provide UI feedback: blink the instrument item background in green.
-                gameManager.headerDisplay.itemInstrument.BlinkBackground(Utilities.ColorGreen, 3f, 0.3f);
+                RestoreMidiAndInstrumentUi();
             }
+        }
+
+        /// <summary>
+        /// Triggered when an instrument is consumed directly by a creature.
+        /// Restores one MIDI channel and removes the object immediately.
+        /// </summary>
+        /// <param name="collider">Collider of the consumed instrument.</param>
+        public void TriggerInstrumentByCreature(Collider collider)
+        {
+            if (collider == null)
+                return;
+
+            Debug.Log($"Bonus - TriggerInstrumentByCreature:{collider.transform.name}");
+            //RestoreMidiAndInstrumentUi();
+            Destroy(collider.gameObject);
+        }
+
+        private void RestoreMidiAndInstrumentUi()
+        {
+            // Restore one MIDI channel's original instrument preset.
+            gameManager.midiManager.RestoreMidiChannel();
+
+            // Provide UI feedback: blink the instrument item background in green.
+            gameManager.headerDisplay.itemInstrument.BlinkBackground(Utilities.ColorGreen, 3f, 0.3f);
         }
 
         private IEnumerator MoveTowardGoal(Collider collider)
