@@ -50,7 +50,7 @@ namespace MusicRun
             midiPlayer.MPTK_StopPlayOnLastNote = true;
 
             //// When the MIDI reaches the end, we do not auto-restart by default.
-            midiPlayer.MPTK_MidiAutoRestart = true;
+            //midiPlayer.MPTK_MidiAutoRestart = true;
 
             // Continue playback even if the AudioListener moves too far from the AudioSource.
             // The volume may become zero due to attenuation, but the MIDI sequencer will keep running.
@@ -118,8 +118,8 @@ namespace MusicRun
                 countLoop = 0;
                 // Ensure the player is stopped before loading a new file.
                 //midiPlayer.MPTK_ModeStopVoice = MidiFilePlayer.ModeStopPlay.StopNoWaiting;
+                midiPlayer.MPTK_MidiAutoRestart = false;
                 midiPlayer.MPTK_Stop();
-                // midiPlayer.MPTK_MidiAutoRestart = false;
 
                 //DateTime startTime = DateTime.Now;
                 //float wait = 1000f;
@@ -151,7 +151,7 @@ namespace MusicRun
             // When game pause has been activated, the MIDI is paused and will not play.
             // Useless to call MPTK_UnPause from v2.17.1 - midiPlayer.MPTK_UnPause();
             // Play the already-loaded MIDI (avoid reloading).
-            //midiPlayer.MPTK_MidiAutoRestart = true;
+            midiPlayer.MPTK_MidiAutoRestart = true;
             midiPlayer.MPTK_Play(alreadyLoaded: true);
         }
 
