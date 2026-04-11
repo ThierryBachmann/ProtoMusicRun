@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Text;
+using System.Collections.Generic;
 
 namespace MusicRun
 {
@@ -13,6 +14,7 @@ namespace MusicRun
     }
 
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(CharacterController))]
     public class CreatureController : MonoBehaviour
     {
         [Header("Spawn")]
@@ -50,6 +52,10 @@ namespace MusicRun
 
         [Header("Eat")]
         public float eatDuration = 0.6f;
+        [Tooltip("Vertical height of the creature jump while eating an instrument.")]
+        public float eatJumpHeight = 1.8f;
+        [Tooltip("Extra distance used as a fallback for collision detection at end of jump.")]
+        public float eatContactDistance = 0.35f;
 
         [Header("Movement")]
         public float kp = 0.9f;
@@ -63,6 +69,27 @@ namespace MusicRun
         public float catchupBoostDistance = 20f;
         public float catchupBoost = 3f;
         public float turnRateDegPerSec = 360f;
+        [Tooltip("Gravity applied to creature when airborne.")]
+        public float gravity = 18f;
+        [Tooltip("Small negative velocity to keep controller grounded.")]
+        public float groundedStickVelocity = -1f;
+
+        [Header("Vegetation Knockdown")]
+        public bool enableVegetationKnockdown = true;
+        [Tooltip("Tags that can be knocked down by the creature.")]
+        public string[] vegetationKnockTags = { "TreeScalable", "Grass" };
+        [Tooltip("Impulse applied to vegetation in movement direction.")]
+        public float vegetationKnockForce = 6f;
+        [Tooltip("Vertical impulse applied when knocking vegetation.")]
+        public float vegetationKnockUpwardForce = 2f;
+        [Tooltip("Torque applied to topple vegetation.")]
+        public float vegetationKnockTorque = 4f;
+        [Tooltip("Mass assigned to generated rigidbody when needed.")]
+        public float vegetationRigidbodyMass = 10f;
+        [Tooltip("Cooldown to avoid repeated knockdown on same object.")]
+        public float vegetationKnockCooldown = 0.5f;
+        [Tooltip("Destroy knocked vegetation after delay. <= 0 keeps it in scene.")]
+        public float vegetationDestroyDelay = 8f;
 
         [Header("Target Score")]
         public float targetWeightDistance = 1f;
@@ -83,6 +110,7 @@ namespace MusicRun
         private PlayerController playerController;
         private TerrainGenerator terrainGenerator;
         private BonusManager bonusManager;
+        private CharacterController characterController;
 
         private CreatureState state = CreatureState.RETURN;
         public float stateTime;
@@ -97,11 +125,14 @@ namespace MusicRun
         private bool isSpawned;
         private bool hasSpawnedThisLevel;
         private bool eatTriggered;
+        private bool eatJumpStarted;
+        private float verticalVelocity;
 
         private Collider currentTarget;
         private readonly Collider[] instrumentScanBuffer = new Collider[64];
         private Renderer[] cachedRenderers;
         private Collider[] cachedColliders;
+        private readonly Dictionary<int, float> knockedVegetationCooldowns = new Dictionary<int, float>();
 
         private Vector3 desiredMovePoint;
         private float desiredSpeed;
@@ -109,8 +140,8 @@ namespace MusicRun
 
         private void Awake()
         {
-            CacheVisibilityComponents();
             ResolveReferences();
+            CacheVisibilityComponents();
             PrepareForLevel();
         }
 
@@ -148,6 +179,9 @@ namespace MusicRun
             previousGapError = 0f;
             currentTarget = null;
             eatTriggered = false;
+            eatJumpStarted = false;
+            verticalVelocity = groundedStickVelocity;
+            knockedVegetationCooldowns.Clear();
             ChangeState(CreatureState.RETURN, force: true);
             SetCreatureVisible(false);
         }
@@ -176,6 +210,7 @@ namespace MusicRun
             currentTarget = null;
             desiredSpeed = 0f;
             currentSpeed = 0f;
+            verticalVelocity = groundedStickVelocity;
         }
 
         private void UpdateSpawn(float dt)
@@ -213,12 +248,18 @@ namespace MusicRun
             }
 
             spawnPos.y += spawnHeightOffset;
+            bool restoreController = characterController != null && characterController.enabled;
+            if (restoreController)
+                characterController.enabled = false;
             transform.SetPositionAndRotation(spawnPos, spawnRot);
+            if (restoreController)
+                characterController.enabled = true;
 
             isSpawned = true;
             spawnPending = false;
             hasSpawnedThisLevel = true;
             desiredMovePoint = transform.position;
+            verticalVelocity = groundedStickVelocity;
             nextOvertakeCheckTime = Time.time + UnityEngine.Random.Range(0f, overtakeRandomCheckInterval);
             ChangeState(CreatureState.RETURN, force: true);
             SetCreatureVisible(true);
@@ -340,17 +381,27 @@ namespace MusicRun
 
         private void TickEat()
         {
-            if (!eatTriggered)
+            if (currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
             {
-                ConsumeCurrentTarget();
-                eatTriggered = true;
+                ChangeState(CreatureState.RETURN);
+                return;
             }
 
-            desiredMovePoint = transform.position;
-            desiredSpeed = 0f;
+            Vector3 targetCenter = currentTarget.bounds.center;
+            desiredMovePoint = targetCenter;
+            desiredSpeed = Mathf.Clamp(GetPlayerSpeed() + 5f, 0f, maxSpeedHunt);
+
+            if (TryConsumeCurrentTargetOnCollision())
+            {
+                ChangeState(CreatureState.RETURN);
+                return;
+            }
 
             if (stateTime >= eatDuration)
+            {
+                TryConsumeCurrentTargetByDistanceFallback();
                 ChangeState(CreatureState.RETURN);
+            }
         }
 
         private void TickReturn()
@@ -406,6 +457,9 @@ namespace MusicRun
 
         private void ApplyMovement(float dt)
         {
+            if (characterController == null || !characterController.enabled)
+                return;
+
             Vector3 toTarget = desiredMovePoint - transform.position;
             toTarget.y = 0f;
             float distance = toTarget.magnitude;
@@ -415,16 +469,41 @@ namespace MusicRun
             float accel = desiredSpeed >= currentSpeed ? accelMax : brakeMax;
             currentSpeed = Mathf.MoveTowards(currentSpeed, desiredSpeed, accel * dt);
 
-            float moveDistance = currentSpeed * dt;
-            if (moveDistance > distance)
-                moveDistance = distance;
-            transform.position += moveDir * moveDistance;
-            //Debug.Log(transform.position);  
-            if (moveDir.sqrMagnitude > 0.0001f)
+            if (state == CreatureState.EAT && !eatJumpStarted)
             {
-                Quaternion look = Quaternion.LookRotation(moveDir, Vector3.up);
+                verticalVelocity = ComputeEatJumpUpVelocity();
+                eatJumpStarted = true;
+            }
+            else
+            {
+                if (characterController.isGrounded && verticalVelocity <= 0f)
+                    verticalVelocity = groundedStickVelocity;
+                verticalVelocity -= gravity * dt;
+            }
+
+            Vector3 horizontalVelocity = moveDir * currentSpeed;
+            float maxHorizontalDistance = horizontalVelocity.magnitude * dt;
+            if (distance < maxHorizontalDistance && maxHorizontalDistance > 0.0001f)
+                horizontalVelocity = moveDir * (distance / dt);
+
+            Vector3 velocity = horizontalVelocity;
+            velocity.y = verticalVelocity;
+            characterController.Move(velocity * dt);
+
+            Vector3 lookDir = horizontalVelocity;
+            lookDir.y = 0f;
+            if (lookDir.sqrMagnitude > 0.0001f)
+            {
+                Quaternion look = Quaternion.LookRotation(lookDir.normalized, Vector3.up);
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, look, turnRateDegPerSec * dt);
             }
+        }
+
+        private float ComputeEatJumpUpVelocity()
+        {
+            float clampedHeight = Mathf.Max(0.01f, eatJumpHeight);
+            float clampedGravity = Mathf.Max(0.01f, gravity);
+            return Mathf.Sqrt(2f * clampedGravity * clampedHeight);
         }
 
         private bool CanStartOpportunisticOvertake()
@@ -542,7 +621,6 @@ namespace MusicRun
             if (candidate.CompareTag("Instrument"))
             {
                 resolvedInstrumentCollider = candidate;
-                Debug.Log($"1 - {candidate.name}");
                 return true;
             }
 
@@ -551,7 +629,6 @@ namespace MusicRun
             {
                 Collider bodyCollider = attachedBody.GetComponent<Collider>();
                 resolvedInstrumentCollider = bodyCollider != null ? bodyCollider : candidate;
-                Debug.Log($"2 - {candidate.name}");
                 return true;
             }
 
@@ -564,87 +641,12 @@ namespace MusicRun
                     if (parentCollider == null)
                         parentCollider = parent.GetComponentInChildren<Collider>();
                     resolvedInstrumentCollider = parentCollider != null ? parentCollider : candidate;
-                    Debug.Log($"3    - {candidate.name}");
                     return true;
                 }
                 parent = parent.parent;
             }
 
             return false;
-        }
-
-        private void LogClosestScanColliders(int count)
-        {
-            if (count <= 0)
-            {
-                Debug.Log($"Creature scan: no collider in radius {huntSearchRadius:F1}.");
-                return;
-            }
-
-            int topCount = Mathf.Min(10, count);
-            int[] topIndices = new int[topCount];
-            float[] topDistances = new float[topCount];
-            for (int i = 0; i < topCount; i++)
-            {
-                topIndices[i] = -1;
-                topDistances[i] = float.MaxValue;
-            }
-
-            for (int i = 0; i < count; i++)
-            {
-                Collider c = instrumentScanBuffer[i];
-                if (c == null)
-                    continue;
-
-                float dist = Vector3.Distance(transform.position, c.bounds.center);
-                for (int slot = 0; slot < topCount; slot++)
-                {
-                    if (dist >= topDistances[slot])
-                        continue;
-
-                    for (int shift = topCount - 1; shift > slot; shift--)
-                    {
-                        topDistances[shift] = topDistances[shift - 1];
-                        topIndices[shift] = topIndices[shift - 1];
-                    }
-
-                    topDistances[slot] = dist;
-                    topIndices[slot] = i;
-                    break;
-                }
-            }
-
-            StringBuilder sb = new StringBuilder(512);
-            sb.Append("Creature scan top colliders: total=").Append(count)
-                .Append(" radius=").Append(huntSearchRadius.ToString("F1"))
-                .Append(" pos=").Append(transform.position);
-
-            for (int rank = 0; rank < topCount; rank++)
-            {
-                int idx = topIndices[rank];
-                if (idx < 0)
-                    continue;
-
-                Collider c = instrumentScanBuffer[idx];
-                if (c == null)
-                    continue;
-
-                bool isInstrument = TryResolveInstrumentCollider(c, out Collider resolved);
-                string resolvedName = resolved != null ? resolved.name : "-";
-                string resolvedTag = resolved != null ? resolved.tag : "-";
-
-                sb.Append("\n#").Append(rank + 1)
-                  .Append(" dist=").Append(topDistances[rank].ToString("F2"))
-                  .Append(" name=").Append(c.name)
-                  .Append(" tag=").Append(c.tag)
-                  .Append(" layer=").Append(LayerMask.LayerToName(c.gameObject.layer))
-                  .Append(" active=").Append(c.gameObject.activeInHierarchy)
-                  .Append(" instrument=").Append(isInstrument)
-                  .Append(" resolved=").Append(resolvedName)
-                  .Append(" resolvedTag=").Append(resolvedTag);
-            }
-
-            Debug.Log(sb.ToString());
         }
 
         private void ConsumeCurrentTarget()
@@ -659,6 +661,208 @@ namespace MusicRun
                 bonusManager.TriggerInstrumentByCreature(target);
             else if (target != null)
                 Destroy(target.gameObject);
+        }
+
+        private bool TryConsumeCurrentTargetOnCollision()
+        {
+            if (eatTriggered || currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
+                return false;
+
+            if (characterController == null || !characterController.enabled)
+                return false;
+
+            bool hasCollision = characterController.bounds.Intersects(currentTarget.bounds);
+
+            if (!hasCollision)
+                return false;
+
+            ConsumeCurrentTarget();
+            eatTriggered = true;
+            return true;
+        }
+
+        private void TryConsumeCurrentTargetByDistanceFallback()
+        {
+            if (eatTriggered || currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
+                return;
+
+            Vector3 delta = currentTarget.bounds.center - transform.position;
+            float maxDistance = eatContactDistance;
+            if (characterController != null)
+                maxDistance += characterController.radius;
+            maxDistance += currentTarget.bounds.extents.magnitude * 0.5f;
+
+            if (delta.sqrMagnitude > maxDistance * maxDistance)
+                return;
+
+            ConsumeCurrentTarget();
+            eatTriggered = true;
+        }
+
+        private bool IsCurrentTargetCollider(Collider other)
+        {
+            if (other == null || currentTarget == null)
+                return false;
+
+            if (other == currentTarget)
+                return true;
+            if (other.transform == currentTarget.transform)
+                return true;
+            if (other.transform.IsChildOf(currentTarget.transform) || currentTarget.transform.IsChildOf(other.transform))
+                return true;
+
+            Rigidbody otherBody = other.attachedRigidbody;
+            Rigidbody targetBody = currentTarget.attachedRigidbody;
+            if (otherBody != null && targetBody != null && otherBody == targetBody)
+                return true;
+
+            if (TryResolveInstrumentCollider(other, out Collider resolved))
+                return resolved == currentTarget;
+
+            return false;
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (state != CreatureState.EAT || eatTriggered)
+                return;
+            if (!IsCurrentTargetCollider(other))
+                return;
+
+            ConsumeCurrentTarget();
+            eatTriggered = true;
+            ChangeState(CreatureState.RETURN);
+        }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            if (hit.collider == null)
+                return;
+
+            if (state == CreatureState.EAT && !eatTriggered && IsCurrentTargetCollider(hit.collider))
+            {
+                ConsumeCurrentTarget();
+                eatTriggered = true;
+                ChangeState(CreatureState.RETURN);
+                return;
+            }
+
+            if (!enableVegetationKnockdown)
+                return;
+
+            if (!TryResolveKnockableVegetationTransform(hit.collider, out Transform vegetationTransform))
+                return;
+
+            KnockdownVegetation(vegetationTransform, hit.moveDirection);
+        }
+
+        private bool TryResolveKnockableVegetationTransform(Collider candidate, out Transform vegetationTransform)
+        {
+            vegetationTransform = null;
+            if (candidate == null)
+                return false;
+
+            Transform current = candidate.transform;
+            while (current != null)
+            {
+                if (HasKnockableVegetationTag(current))
+                {
+                    vegetationTransform = current;
+                    return true;
+                }
+                current = current.parent;
+            }
+
+            return false;
+        }
+
+        private bool HasKnockableVegetationTag(Transform target)
+        {
+            if (target == null || vegetationKnockTags == null)
+                return false;
+
+            for (int i = 0; i < vegetationKnockTags.Length; i++)
+            {
+                string tag = vegetationKnockTags[i];
+                if (string.IsNullOrWhiteSpace(tag))
+                    continue;
+                if (target.tag == tag)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void KnockdownVegetation(Transform vegetationTransform, Vector3 moveDirection)
+        {
+            if (vegetationTransform == null)
+                return;
+            if (!vegetationTransform.gameObject.activeInHierarchy)
+                return;
+
+            PruneKnockdownCooldowns();
+            int key = vegetationTransform.GetInstanceID();
+            if (knockedVegetationCooldowns.TryGetValue(key, out float nextAllowedTime) && Time.time < nextAllowedTime)
+                return;
+
+            knockedVegetationCooldowns[key] = Time.time + Mathf.Max(0.05f, vegetationKnockCooldown);
+
+            Collider[] vegetationColliders = vegetationTransform.GetComponentsInChildren<Collider>();
+            for (int i = 0; i < vegetationColliders.Length; i++)
+            {
+                if (vegetationColliders[i] == null)
+                    continue;
+                vegetationColliders[i].enabled = false;
+            }
+
+            Rigidbody rb = vegetationTransform.GetComponent<Rigidbody>();
+            if (rb == null)
+                rb = vegetationTransform.gameObject.AddComponent<Rigidbody>();
+
+            rb.mass = Mathf.Max(0.1f, vegetationRigidbodyMass);
+            rb.useGravity = true;
+            rb.isKinematic = false;
+
+            Vector3 pushDir = Vector3.ProjectOnPlane(moveDirection, Vector3.up);
+            if (pushDir.sqrMagnitude < 0.001f)
+            {
+                pushDir = vegetationTransform.position - transform.position;
+                pushDir.y = 0f;
+            }
+            if (pushDir.sqrMagnitude < 0.001f)
+                pushDir = transform.forward;
+            pushDir.Normalize();
+
+            rb.AddForce(pushDir * vegetationKnockForce + Vector3.up * vegetationKnockUpwardForce, ForceMode.Impulse);
+            Vector3 torqueAxis = Vector3.Cross(Vector3.up, pushDir);
+            if (torqueAxis.sqrMagnitude < 0.001f)
+                torqueAxis = Vector3.right;
+            rb.AddTorque(torqueAxis.normalized * vegetationKnockTorque, ForceMode.Impulse);
+
+            if (vegetationDestroyDelay > 0f)
+                Destroy(vegetationTransform.gameObject, vegetationDestroyDelay);
+        }
+
+        private void PruneKnockdownCooldowns()
+        {
+            if (knockedVegetationCooldowns.Count < 64)
+                return;
+
+            List<int> toRemove = null;
+            foreach (KeyValuePair<int, float> kv in knockedVegetationCooldowns)
+            {
+                if (Time.time <= kv.Value)
+                    continue;
+                if (toRemove == null)
+                    toRemove = new List<int>(16);
+                toRemove.Add(kv.Key);
+            }
+
+            if (toRemove == null)
+                return;
+
+            for (int i = 0; i < toRemove.Count; i++)
+                knockedVegetationCooldowns.Remove(toRemove[i]);
         }
 
         private void ChangeState(CreatureState nextState, bool force = false)
@@ -680,6 +884,7 @@ namespace MusicRun
             else if (state == CreatureState.EAT)
             {
                 eatTriggered = false;
+                eatJumpStarted = false;
             }
             else if (state == CreatureState.RETURN)
             {
@@ -752,6 +957,11 @@ namespace MusicRun
             if (gameManager == null)
                 return false;
 
+            if (characterController == null)
+                characterController = GetComponent<CharacterController>();
+            if (characterController == null)
+                characterController = gameObject.AddComponent<CharacterController>();
+
             if (playerController == null)
                 playerController = gameManager.playerController;
             if (terrainGenerator == null)
@@ -759,7 +969,7 @@ namespace MusicRun
             if (bonusManager == null)
                 bonusManager = gameManager.bonusManager;
 
-            return playerController != null;
+            return playerController != null && characterController != null;
         }
 
         private void OnDrawGizmosSelected()

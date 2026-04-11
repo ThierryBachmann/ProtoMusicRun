@@ -2059,6 +2059,7 @@ GameObject:
   m_Component:
   - component: {fileID: 206414650}
   - component: {fileID: 206414649}
+  - component: {fileID: 206414651}
   m_Layer: 0
   m_Name: Creature
   m_TagString: Untagged
@@ -2082,7 +2083,7 @@ MonoBehaviour:
   spawnDelay: 1
   spawnOncePerRun: 1
   spawnStartOverride: {fileID: 0}
-  spawnHeightOffset: 1.5
+  spawnHeightOffset: 0
   desiredFollowDistance: 12
   followDeadZone: 2
   returnDistance: 12
@@ -2098,7 +2099,12 @@ MonoBehaviour:
   huntSearchRadius: 28
   huntReachDistance: 1.6
   huntMaxDuration: 10
+  instrumentScanLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
   eatDuration: 0.6
+  eatJumpHeight: 1.8
+  eatContactDistance: 0.35
   kp: 0.9
   kd: 0.25
   accelMax: 20
@@ -2110,12 +2116,24 @@ MonoBehaviour:
   catchupBoostDistance: 20
   catchupBoost: 3
   turnRateDegPerSec: 360
+  gravity: 18
+  groundedStickVelocity: -1
+  enableVegetationKnockdown: 1
+  vegetationKnockTags:
+  - TreeScalable
+  - Grass
+  vegetationKnockForce: 6
+  vegetationKnockUpwardForce: 2
+  vegetationKnockTorque: 4
+  vegetationRigidbodyMass: 10
+  vegetationKnockCooldown: 0.5
+  vegetationDestroyDelay: 8
   targetWeightDistance: 1
   targetWeightAngle: 0.35
   targetWeightBehindPlayer: 0.5
   debugLogs: 0
   drawDebugGizmos: 1
-  debugTargetScanLogs: 1
+  debugTargetScanLogs: 0
   debugTargetScanLogInterval: 1
   stateTime: 0
   currentSpeed: 0
@@ -2135,6 +2153,31 @@ Transform:
   - {fileID: 369412314}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!143 &206414651
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206414648}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &211374105
 GameObject:
   m_ObjectHideFlags: 0
@@ -2658,7 +2701,7 @@ MonoBehaviour:
     minScaleVegetable: 0.71
     maxScaleVegetable: 1.09
     runChunks:
-    - {fileID: 3245006867922576827, guid: fca89e42ba1338a42ba2fd915aeda739, type: 3}
+    - {fileID: 3245006867922576827, guid: 073d80ae2c5c30840ae81cbd3b6be993, type: 3}
     vegetables: []
     bonusMalusDensity: 0
     bonusMalusRatio: 0.203
