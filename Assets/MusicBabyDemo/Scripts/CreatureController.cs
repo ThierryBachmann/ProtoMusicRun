@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Text;
 
 namespace MusicRun
 {
@@ -21,26 +22,31 @@ namespace MusicRun
         public bool spawnOncePerRun = true;
         [Tooltip("Optional explicit spawn point. When empty, terrainGenerator.currentStart is used.")]
         public Transform spawnStartOverride;
-        public float spawnHeightOffset = 0f;
+        public float spawnHeightOffset = 1.5f;
 
         [Header("Follow")]
         public float desiredFollowDistance = 12f;
         public float followDeadZone = 2f;
         public float returnDistance = 12f;
-        public float maxLeashDistance = 35f;
+        public float maxLeashDistance = 20;
 
         [Header("Overtake")]
-        public float overtakeLeadDistance = 5f;
+        public float overtakeLeadDistance = 12f;
         public float overtakeLateralOffset = 2.5f;
-        public float overtakeCooldown = 2f;
-        public float overtakeNoTargetTimeout = 1.2f;
+        public float overtakeCooldown = 5f;
+        public float overtakeNoTargetTimeout = 10f;
         public float overtakeRandomCheckInterval = 0.3f;
-        [Range(0f, 1f)] public float overtakeChancePerCheck = 0.25f;
+        public float overtakeSpeedMinOpportunistic = 3.5f;
+        public float overtakeDistMinOpportunistic = 18f;
+        
+        [Range(0f, 1f)] public float overtakeChancePerCheck = 0.36f;
 
         [Header("Hunt")]
         public float huntSearchRadius = 28f;
         public float huntReachDistance = 1.6f;
-        public float huntMaxDuration = 4f;
+        public float huntMaxDuration = 10f;
+        [Tooltip("Physics layers included when scanning for instrument colliders.")]
+        public LayerMask instrumentScanLayerMask = ~0;
 
         [Header("Eat")]
         public float eatDuration = 0.6f;
@@ -66,6 +72,8 @@ namespace MusicRun
         [Header("Debug")]
         public bool debugLogs;
         public bool drawDebugGizmos = true;
+        public bool debugTargetScanLogs = false;
+        public float debugTargetScanLogInterval = 1f;
 
         public CreatureState State => state;
         public bool IsSpawned => isSpawned;
@@ -77,9 +85,9 @@ namespace MusicRun
         private BonusManager bonusManager;
 
         private CreatureState state = CreatureState.RETURN;
-        private float stateTime;
+        public float stateTime;
         private float spawnTimer;
-        private float currentSpeed;
+        public float currentSpeed;
         private float previousGapError;
         private float lastOvertakeTime = -999f;
         private float nextOvertakeCheckTime;
@@ -97,6 +105,7 @@ namespace MusicRun
 
         private Vector3 desiredMovePoint;
         private float desiredSpeed;
+        private float nextTargetScanLogTime;
 
         private void Awake()
         {
@@ -276,7 +285,9 @@ namespace MusicRun
 
         private void TickOvertake()
         {
-            if (TryAcquireInstrumentTarget())
+            // OVERTAKE is only the "pass player" phase.
+            // As soon as the creature is in front, switch to hunt mode.
+            if (GetPlayerOffsetAlongForward() > 0.5f)
             {
                 ChangeState(CreatureState.HUNT_INSTRUMENT);
                 return;
@@ -294,20 +305,23 @@ namespace MusicRun
 
         private void TickHuntInstrument()
         {
-            if (currentTarget == null)
-            {
-                ChangeState(CreatureState.RETURN);
-                return;
-            }
-            if (!currentTarget.gameObject.activeInHierarchy)
-            {
-                currentTarget = null;
-                ChangeState(CreatureState.RETURN);
-                return;
-            }
             if (stateTime >= huntMaxDuration)
             {
                 ChangeState(CreatureState.RETURN);
+                return;
+            }
+
+            if (currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
+            {
+                currentTarget = null;
+                TryAcquireInstrumentTarget();
+            }
+
+            if (currentTarget == null)
+            {
+                // No target yet: stay in hunt mode while moving ahead and scanning.
+                desiredMovePoint = GetPointRelativeToPlayer(overtakeLeadDistance, overtakeSideSign * overtakeLateralOffset);
+                desiredSpeed = Mathf.Clamp(GetPlayerSpeed() + 2f, 0f, maxSpeedHunt);
                 return;
             }
 
@@ -417,9 +431,9 @@ namespace MusicRun
         {
             if (Time.time < lastOvertakeTime + overtakeCooldown)
                 return false;
-            if (GetPlayerSpeed() <= 1.5f)
+            if (GetPlayerSpeed() >= overtakeSpeedMinOpportunistic)
                 return false;
-            if (GetDistanceToPlayer() >= 18f)
+            if (GetDistanceToPlayer() >= overtakeDistMinOpportunistic)
                 return false;
             if (Time.time < nextOvertakeCheckTime)
                 return false;
@@ -430,9 +444,59 @@ namespace MusicRun
 
         private bool TryAcquireInstrumentTarget()
         {
-            int count = Physics.OverlapSphereNonAlloc(transform.position, huntSearchRadius, instrumentScanBuffer);
+            Collider[] scanColliders = instrumentScanBuffer;
+            int count = Physics.OverlapSphereNonAlloc(
+                transform.position,
+                huntSearchRadius,
+                instrumentScanBuffer,
+                instrumentScanLayerMask,
+                QueryTriggerInteraction.Collide);
+
+            if (count >= instrumentScanBuffer.Length)
+            {
+                // Non-alloc scan can drop colliders when the buffer is full. Fallback once to avoid missing instruments.
+                Collider[] expandedScan = Physics.OverlapSphere(
+                    transform.position,
+                    huntSearchRadius,
+                    instrumentScanLayerMask,
+                    QueryTriggerInteraction.Collide);
+
+                if (expandedScan != null && expandedScan.Length > count)
+                {
+                    scanColliders = expandedScan;
+                    count = expandedScan.Length;
+                }
+            }
+
+            if (debugTargetScanLogs && Time.time >= nextTargetScanLogTime)
+            {
+                //LogClosestScanColliders(count);
+                for (int i = 0; i < count; i++)
+                {
+                    Collider candidate = scanColliders[i];
+                    if (candidate == null)
+                        continue;
+
+                    StringBuilder sb = new StringBuilder(512);
+                    sb.Append("#").Append(i)
+                        .Append(" radius=").Append(huntSearchRadius.ToString("F1"))
+                        .Append(" candidate: ").Append(candidate.name)
+                        .Append(" ").Append(candidate.tag);
+                    if (candidate.transform.parent!=null)
+                        sb.Append(" parent: ").Append(candidate.name).Append(candidate.transform.parent.tag);
+
+                    Debug.Log(sb.ToString());
+                }
+                    nextTargetScanLogTime = Time.time + Mathf.Max(0.1f, debugTargetScanLogInterval);
+            }
+
             if (count <= 0)
                 return false;
+
+            if (count >= instrumentScanBuffer.Length && debugLogs)
+            {
+                Debug.LogWarning($"Creature scan buffer full ({instrumentScanBuffer.Length}). Consider narrowing instrumentScanLayerMask to instrument layers.");
+            }
 
             Collider best = null;
             float bestScore = float.MaxValue;
@@ -442,11 +506,11 @@ namespace MusicRun
 
             for (int i = 0; i < count; i++)
             {
-                Collider candidate = instrumentScanBuffer[i];
-                if (candidate == null || !candidate.gameObject.activeInHierarchy || !candidate.CompareTag("Instrument"))
+                Collider candidate = scanColliders[i];
+                if (!TryResolveInstrumentCollider(candidate, out Collider resolvedInstrumentCollider))
                     continue;
 
-                Vector3 candidatePos = candidate.transform.position;
+                Vector3 candidatePos = resolvedInstrumentCollider.bounds.center;
                 Vector3 toCandidate = candidatePos - transform.position;
                 toCandidate.y = 0f;
                 float dist = toCandidate.magnitude;
@@ -461,12 +525,126 @@ namespace MusicRun
                 if (score < bestScore)
                 {
                     bestScore = score;
-                    best = candidate;
+                    best = resolvedInstrumentCollider;
                 }
             }
 
             currentTarget = best;
             return currentTarget != null;
+        }
+
+        private bool TryResolveInstrumentCollider(Collider candidate, out Collider resolvedInstrumentCollider)
+        {
+            resolvedInstrumentCollider = null;
+            if (candidate == null || !candidate.gameObject.activeInHierarchy)
+                return false;
+
+            if (candidate.CompareTag("Instrument"))
+            {
+                resolvedInstrumentCollider = candidate;
+                Debug.Log($"1 - {candidate.name}");
+                return true;
+            }
+
+            Rigidbody attachedBody = candidate.attachedRigidbody;
+            if (attachedBody != null && attachedBody.gameObject.CompareTag("Instrument"))
+            {
+                Collider bodyCollider = attachedBody.GetComponent<Collider>();
+                resolvedInstrumentCollider = bodyCollider != null ? bodyCollider : candidate;
+                Debug.Log($"2 - {candidate.name}");
+                return true;
+            }
+
+            Transform parent = candidate.transform.parent;
+            while (parent != null)
+            {
+                if (parent.CompareTag("Instrument"))
+                {
+                    Collider parentCollider = parent.GetComponent<Collider>();
+                    if (parentCollider == null)
+                        parentCollider = parent.GetComponentInChildren<Collider>();
+                    resolvedInstrumentCollider = parentCollider != null ? parentCollider : candidate;
+                    Debug.Log($"3    - {candidate.name}");
+                    return true;
+                }
+                parent = parent.parent;
+            }
+
+            return false;
+        }
+
+        private void LogClosestScanColliders(int count)
+        {
+            if (count <= 0)
+            {
+                Debug.Log($"Creature scan: no collider in radius {huntSearchRadius:F1}.");
+                return;
+            }
+
+            int topCount = Mathf.Min(10, count);
+            int[] topIndices = new int[topCount];
+            float[] topDistances = new float[topCount];
+            for (int i = 0; i < topCount; i++)
+            {
+                topIndices[i] = -1;
+                topDistances[i] = float.MaxValue;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                Collider c = instrumentScanBuffer[i];
+                if (c == null)
+                    continue;
+
+                float dist = Vector3.Distance(transform.position, c.bounds.center);
+                for (int slot = 0; slot < topCount; slot++)
+                {
+                    if (dist >= topDistances[slot])
+                        continue;
+
+                    for (int shift = topCount - 1; shift > slot; shift--)
+                    {
+                        topDistances[shift] = topDistances[shift - 1];
+                        topIndices[shift] = topIndices[shift - 1];
+                    }
+
+                    topDistances[slot] = dist;
+                    topIndices[slot] = i;
+                    break;
+                }
+            }
+
+            StringBuilder sb = new StringBuilder(512);
+            sb.Append("Creature scan top colliders: total=").Append(count)
+                .Append(" radius=").Append(huntSearchRadius.ToString("F1"))
+                .Append(" pos=").Append(transform.position);
+
+            for (int rank = 0; rank < topCount; rank++)
+            {
+                int idx = topIndices[rank];
+                if (idx < 0)
+                    continue;
+
+                Collider c = instrumentScanBuffer[idx];
+                if (c == null)
+                    continue;
+
+                bool isInstrument = TryResolveInstrumentCollider(c, out Collider resolved);
+                string resolvedName = resolved != null ? resolved.name : "-";
+                string resolvedTag = resolved != null ? resolved.tag : "-";
+
+                sb.Append("\n#").Append(rank + 1)
+                  .Append(" dist=").Append(topDistances[rank].ToString("F2"))
+                  .Append(" name=").Append(c.name)
+                  .Append(" tag=").Append(c.tag)
+                  .Append(" layer=").Append(LayerMask.LayerToName(c.gameObject.layer))
+                  .Append(" active=").Append(c.gameObject.activeInHierarchy)
+                  .Append(" instrument=").Append(isInstrument)
+                  .Append(" resolved=").Append(resolvedName)
+                  .Append(" resolvedTag=").Append(resolvedTag);
+            }
+
+            Debug.Log(sb.ToString());
         }
 
         private void ConsumeCurrentTarget()
@@ -529,7 +707,7 @@ namespace MusicRun
             return forward.normalized;
         }
 
-        private float GetDistanceToPlayer()
+        public float GetDistanceToPlayer()
         {
             if (playerController == null)
                 return float.MaxValue;
@@ -539,7 +717,7 @@ namespace MusicRun
             return delta.magnitude;
         }
 
-        private float GetPlayerOffsetAlongForward()
+        public float GetPlayerOffsetAlongForward()
         {
             if (playerController == null)
                 return 0f;

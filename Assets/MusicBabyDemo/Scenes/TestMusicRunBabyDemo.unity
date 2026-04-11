@@ -273,7 +273,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1948,6 +1948,7 @@ MonoBehaviour:
   goalReachedDisplay: {fileID: 7641254336402198555}
   terrainGenerator: {fileID: 240111797}
   midiManager: {fileID: 804034793}
+  creatureController: {fileID: 206414649}
   splashScreen: {fileID: 371084311}
   helperScreen: {fileID: 431561426}
   settingScreen: {fileID: 97862051}
@@ -2048,6 +2049,92 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7969010532264824609, guid: 0c222c68698265d40b68d29f17fbc120, type: 3}
   m_PrefabInstance: {fileID: 129832321}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &206414648
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 206414650}
+  - component: {fileID: 206414649}
+  m_Layer: 0
+  m_Name: Creature
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &206414649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206414648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e368d50bb32a79241a187f89b2601d24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MusicRun::MusicRun.CreatureController
+  enableDelayedSpawn: 1
+  spawnDelay: 1
+  spawnOncePerRun: 1
+  spawnStartOverride: {fileID: 0}
+  spawnHeightOffset: 1.5
+  desiredFollowDistance: 12
+  followDeadZone: 2
+  returnDistance: 12
+  maxLeashDistance: 20
+  overtakeLeadDistance: 12
+  overtakeLateralOffset: 2.5
+  overtakeCooldown: 5
+  overtakeNoTargetTimeout: 10
+  overtakeRandomCheckInterval: 0.3
+  overtakeSpeedMinOpportunistic: 3.5
+  overtakeDistMinOpportunistic: 18
+  overtakeChancePerCheck: 0.36
+  huntSearchRadius: 28
+  huntReachDistance: 1.6
+  huntMaxDuration: 10
+  eatDuration: 0.6
+  kp: 0.9
+  kd: 0.25
+  accelMax: 20
+  brakeMax: 24
+  maxSpeedChase: 16
+  maxSpeedOvertake: 20
+  maxSpeedHunt: 22
+  maxSpeedReturn: 18
+  catchupBoostDistance: 20
+  catchupBoost: 3
+  turnRateDegPerSec: 360
+  targetWeightDistance: 1
+  targetWeightAngle: 0.35
+  targetWeightBehindPlayer: 0.5
+  debugLogs: 0
+  drawDebugGizmos: 1
+  debugTargetScanLogs: 1
+  debugTargetScanLogInterval: 1
+  stateTime: 0
+  currentSpeed: 0
+--- !u!4 &206414650
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206414648}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 113.03349, y: 3.90115, z: 3.2258}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 369412314}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &211374105
 GameObject:
   m_ObjectHideFlags: 0
@@ -2556,8 +2643,8 @@ MonoBehaviour:
     name: Flat Desert
     description: A very short level to understand the principle of the game.
     Skybox: {fileID: 327158888}
-    indexMIDI: 98
-    LoopsToGoal: 4
+    indexMIDI: 3
+    LoopsToGoal: 10
     SearchForInstrument: 0
     SubstitutionInstrument: 123
     RatioSpeedMusic: 0.77
@@ -2571,16 +2658,14 @@ MonoBehaviour:
     minScaleVegetable: 0.71
     maxScaleVegetable: 1.09
     runChunks:
-    - {fileID: 3245006867922576827, guid: 5bb220d0ff9d1054085ca18663eec33d, type: 3}
-    - {fileID: 3245006867922576827, guid: 6c39054fbaf07a341bd46566a34d3322, type: 3}
-    - {fileID: 3245006867922576827, guid: 9c2ca546d963105488d81316fde6d802, type: 3}
+    - {fileID: 3245006867922576827, guid: fca89e42ba1338a42ba2fd915aeda739, type: 3}
     vegetables: []
     bonusMalusDensity: 0
     bonusMalusRatio: 0.203
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
-    bonusInstrumentDensity: 0.27
+    bonusInstrumentDensity: 2.31
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 1
@@ -4154,6 +4239,117 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 360585395}
   m_CullTransparentMesh: 1
+--- !u!1 &369412313
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 369412314}
+  - component: {fileID: 369412317}
+  - component: {fileID: 369412316}
+  - component: {fileID: 369412315}
+  m_Layer: 0
+  m_Name: Sphere
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &369412314
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 369412313}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 206414650}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &369412315
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 369412313}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &369412316
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 369412313}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &369412317
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 369412313}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &371084306
 GameObject:
   m_ObjectHideFlags: 0
@@ -9767,7 +9963,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.1842556
+  m_Size: 0.21842115
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15499,7 +15695,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1179939235}
   m_HandleRect: {fileID: 1179939234}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -17894,6 +18090,7 @@ MonoBehaviour:
   MPTK_LogLoadEvents: 0
   MPTK_StatusLastMidiLoaded: 0
   MPTK_WebRequestError: 
+  PlayerIsRunning: 0
 --- !u!4 &8306508308230084382
 Transform:
   m_ObjectHideFlags: 0
@@ -18056,3 +18253,4 @@ SceneRoots:
   - {fileID: 1489650626}
   - {fileID: 804034794}
   - {fileID: 1930568709}
+  - {fileID: 206414650}

@@ -123,7 +123,7 @@ namespace MusicRun
             midiPlayer.MPTK_Transpose = 0;
             // Enable auto-restart only if the level requires multiple loops to reach the goal.
             midiPlayer.MPTK_MidiAutoRestart = gameManager.terrainGenerator.CurrentLevel.LoopsToGoal == 1 ? false : true;
-            Debug.Log($"MidiManager - OnEventStartPlayMidi '{name}' {goalHandler.distanceAtStart} countLoop:{countLoop}");
+            //Debug.Log($"MidiManager - OnEventStartPlayMidi '{name}' {goalHandler.distanceAtStart} countLoop:{countLoop}");
         }
 
         private void OnNotesMidi(List<MPTKEvent> midiEvents)
@@ -134,7 +134,7 @@ namespace MusicRun
 
         private void OnEndMidi(string name, EventEndMidiEnum eventEndMidiEnum)
         {
-            Debug.Log($"MidiManager - OnEventEndPlayMidi '{name}' endMidi:'{eventEndMidiEnum}' distance:{goalHandler.distanceAtStart}");
+            //Debug.Log($"MidiManager - OnEventEndPlayMidi '{name}' endMidi:'{eventEndMidiEnum}' distance:{goalHandler.distanceAtStart}");
             // Additional logic can be triggered here when a MIDI finishes playing.
         }
 

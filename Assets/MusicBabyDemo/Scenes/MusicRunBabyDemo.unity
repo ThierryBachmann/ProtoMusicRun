@@ -273,7 +273,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2581,7 +2581,7 @@ MonoBehaviour:
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
-    bonusInstrumentDensity: 0.27
+    bonusInstrumentDensity: 3.97
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 1
@@ -9513,22 +9513,24 @@ MonoBehaviour:
   desiredFollowDistance: 12
   followDeadZone: 2
   returnDistance: 12
-  maxLeashDistance: 35
+  maxLeashDistance: 20
   overtakeLeadDistance: 12
   overtakeLateralOffset: 2.5
-  overtakeCooldown: 2
+  overtakeCooldown: 5
   overtakeNoTargetTimeout: 10
   overtakeRandomCheckInterval: 0.3
-  overtakeChancePerCheck: 0.25
+  overtakeSpeedMinOpportunistic: 3.5
+  overtakeDistMinOpportunistic: 18
+  overtakeChancePerCheck: 0.364
   huntSearchRadius: 28
-  huntReachDistance: 10
+  huntReachDistance: 1.6
   huntMaxDuration: 10
   eatDuration: 0.6
   kp: 0.9
   kd: 0.25
   accelMax: 20
   brakeMax: 24
-  maxSpeedChase: 16
+  maxSpeedChase: 3
   maxSpeedOvertake: 20
   maxSpeedHunt: 22
   maxSpeedReturn: 18
@@ -9540,6 +9542,10 @@ MonoBehaviour:
   targetWeightBehindPlayer: 0.5
   debugLogs: 0
   drawDebugGizmos: 1
+  debugTargetScanLogs: 0
+  debugTargetScanLogInterval: 1
+  stateTime: 0
+  currentSpeed: 0
 --- !u!4 &981443300
 Transform:
   m_ObjectHideFlags: 0
@@ -9905,7 +9911,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2151341
+  m_Size: 0.21842115
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -12852,7 +12858,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1479057135}
   m_HandleRect: {fileID: 1479057134}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -15748,7 +15754,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1179939235}
   m_HandleRect: {fileID: 1179939234}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

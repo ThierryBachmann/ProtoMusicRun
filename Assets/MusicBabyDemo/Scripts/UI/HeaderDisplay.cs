@@ -78,13 +78,13 @@ namespace MusicRun
             if (gameManager.infoDebug)
             {
                 //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
-                infoText.text = 
-                    $"level: {gameManager.levelIndex} " +
-                    $"player: {gameManager.playerController.CurrentPlayerChunk} speed:{player.Speed:F1} angle:{player.targetAngle:F0}/{player.currentAngle:F0} " +
-                    $"creature: {gameManager.creatureController.State} {gameManager.creatureController.desiredFollowDistance:F1} " +
-                    $"music: {gameManager.midiManager.countLoop}/{gameManager.terrainGenerator.CurrentLevel?.LoopsToGoal} {gameManager.midiManager.Progress:F0}% " +
+                infoText.text =
+                    $"level: {gameManager.levelIndex} FPS: {gameManager.FramePerSecond}\n" +
+                    $"player: {gameManager.playerController.CurrentPlayerChunk} speed:{player.Speed:F1} angle:{player.targetAngle:F0}/{player.currentAngle:F0}\n" +
+                    $"creature: {gameManager.creatureController.State} speed: {gameManager.creatureController.currentSpeed:F1} dist:{gameManager.creatureController.GetDistanceToPlayer():F1} offset:{gameManager.creatureController.GetPlayerOffsetAlongForward():F1} time:{gameManager.creatureController.stateTime:F1}\n"
+                    //$"music: {gameManager.midiManager.countLoop}/{gameManager.terrainGenerator.CurrentLevel?.LoopsToGoal} {gameManager.midiManager.Progress:F0}%\n" +
                     //$"chunk:{gameManager.terrainGenerator.chunkCreatedCount} " +
-                    $"FPS: {gameManager.FramePerSecond} ";
+                    ;
             }
 
             directionButton.transform.localRotation = Quaternion.Euler(0f, 0f, -goalHandler.goalAngle);
