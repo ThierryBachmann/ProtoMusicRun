@@ -6,7 +6,7 @@ namespace MusicRun
 {
     public enum CreatureState
     {
-        CHASE = 0,
+        FOLLOW = 0,
         OVERTAKE = 1,
         HUNT_INSTRUMENT = 2,
         EAT = 3,
@@ -18,39 +18,60 @@ namespace MusicRun
     public class CreatureController : MonoBehaviour
     {
         [Header("Spawn")]
+        [Tooltip("Enable delayed apparition of the creature after level start.")]
         public bool enableDelayedSpawn = true;
         [Tooltip("Delay in seconds before the creature appears after level start.")]
         public float spawnDelay = 2f;
+        [Tooltip("Spawn creature only once per run.")]
         public bool spawnOncePerRun = true;
         [Tooltip("Optional explicit spawn point. When empty, terrainGenerator.currentStart is used.")]
         public Transform spawnStartOverride;
+        [Tooltip("Vertical offset applied when spawning the creature.")]
         public float spawnHeightOffset = 1.5f;
 
         [Header("Follow")]
+        [Tooltip("Desired distance behind the player.")]
         public float desiredFollowDistance = 12f;
+        [Tooltip("Tolerance around desired follow distance to avoid jitter.")]
         public float followDeadZone = 2f;
+        [Tooltip("Target distance behind the player when returning.")]
         public float returnDistance = 12f;
+        [Tooltip("Maximum allowed distance from player before forcing RETURN state.")]
         public float maxLeashDistance = 20;
 
         [Header("Overtake")]
+        [Tooltip("Forward distance aimed during overtake maneuver.")]
         public float overtakeLeadDistance = 12f;
+        [Tooltip("Lateral side offset used during overtake.")]
         public float overtakeLateralOffset = 2.5f;
+        [Tooltip("Cooldown between overtake attempts.")]
         public float overtakeCooldown = 5f;
+        [Tooltip("Maximum duration in overtake state before giving up.")]
         public float overtakeNoTargetTimeout = 10f;
+        [Tooltip("Interval between random opportunistic overtake checks.")]
         public float overtakeRandomCheckInterval = 0.3f;
+        [Tooltip("Maximum player speed to allow opportunistic overtake.")]
         public float overtakeSpeedMinOpportunistic = 3.5f;
+        [Tooltip("Maximum creature-player distance to allow opportunistic overtake.")]
         public float overtakeDistMinOpportunistic = 18f;
         
+        [Tooltip("Probability to trigger an opportunistic overtake at each check.")]
         [Range(0f, 1f)] public float overtakeChancePerCheck = 0.36f;
 
         [Header("Hunt")]
+        [Tooltip("Search radius to find nearby instruments.")]
         public float huntSearchRadius = 28f;
+        [Tooltip("Distance threshold to switch from HUNT to EAT.")]
         public float huntReachDistance = 1.6f;
+        [Tooltip("Maximum time allowed in HUNT before returning.")]
         public float huntMaxDuration = 10f;
+        [Tooltip("Minimum delay before EAT can start after entering HUNT (from OVERTAKE or EAT).")]
+        public float huntMinDelayBetweenEat = 1.0f;
         [Tooltip("Physics layers included when scanning for instrument colliders.")]
         public LayerMask instrumentScanLayerMask = ~0;
 
         [Header("Eat")]
+        [Tooltip("Duration of the EAT state.")]
         public float eatDuration = 0.6f;
         [Tooltip("Vertical height of the creature jump while eating an instrument.")]
         public float eatJumpHeight = 1.8f;
@@ -58,16 +79,27 @@ namespace MusicRun
         public float eatContactDistance = 0.35f;
 
         [Header("Movement")]
+        [Tooltip("Proportional gain for follow speed controller.")]
         public float kp = 0.9f;
+        [Tooltip("Derivative gain for follow speed controller.")]
         public float kd = 0.25f;
+        [Tooltip("Maximum acceleration.")]
         public float accelMax = 20f;
+        [Tooltip("Maximum deceleration.")]
         public float brakeMax = 24f;
+        [Tooltip("Speed cap in FOLLOW.")]
         public float maxSpeedChase = 16f;
+        [Tooltip("Speed cap in OVERTAKE.")]
         public float maxSpeedOvertake = 20f;
+        [Tooltip("Speed cap in HUNT and EAT approach.")]
         public float maxSpeedHunt = 22f;
+        [Tooltip("Speed cap in RETURN.")]
         public float maxSpeedReturn = 18f;
+        [Tooltip("Distance above which catch-up boost is added.")]
         public float catchupBoostDistance = 20f;
+        [Tooltip("Extra speed boost when far from player.")]
         public float catchupBoost = 3f;
+        [Tooltip("Maximum turning speed in degrees per second.")]
         public float turnRateDegPerSec = 360f;
         [Tooltip("Gravity applied to creature when airborne.")]
         public float gravity = 18f;
@@ -75,6 +107,7 @@ namespace MusicRun
         public float groundedStickVelocity = -1f;
 
         [Header("Vegetation Knockdown")]
+        [Tooltip("Enable creature collisions that can knock down vegetation.")]
         public bool enableVegetationKnockdown = true;
         [Tooltip("Tags that can be knocked down by the creature.")]
         public string[] vegetationKnockTags = { "TreeScalable", "Grass" };
@@ -92,18 +125,36 @@ namespace MusicRun
         public float vegetationDestroyDelay = 8f;
 
         [Header("Target Score")]
+        [Tooltip("Weight of distance in instrument target scoring.")]
         public float targetWeightDistance = 1f;
+        [Tooltip("Weight of angle to player forward in target scoring.")]
         public float targetWeightAngle = 0.35f;
+        [Tooltip("Penalty weight when target is behind player.")]
         public float targetWeightBehindPlayer = 0.5f;
 
         [Header("Debug")]
+        [Tooltip("Enable verbose creature state logs.")]
         public bool debugLogs;
+        [Tooltip("Draw debug gizmos for creature state and targets.")]
         public bool drawDebugGizmos = true;
+        [Tooltip("Enable detailed logs for hunt scan candidates.")]
         public bool debugTargetScanLogs = false;
+        [Tooltip("Interval between detailed hunt scan logs.")]
         public float debugTargetScanLogInterval = 1f;
+        [Tooltip("When enabled, transitions out of HUNT are blocked except toward EAT.")]
+        public bool debugForceHuntMode = false;
 
+        /// <summary>
+        /// Current state of the creature finite state machine.
+        /// </summary>
         public CreatureState State => state;
+        /// <summary>
+        /// True when creature visuals/collisions are active in the scene.
+        /// </summary>
         public bool IsSpawned => isSpawned;
+        /// <summary>
+        /// Current resolved instrument collider targeted by the creature.
+        /// </summary>
         public Collider CurrentTarget => currentTarget;
 
         private GameManager gameManager;
@@ -113,8 +164,10 @@ namespace MusicRun
         private CharacterController characterController;
 
         private CreatureState state = CreatureState.RETURN;
+        [Tooltip("Elapsed time in current creature state (debug display).")]
         public float stateTime;
         private float spawnTimer;
+        [Tooltip("Current horizontal speed used by creature movement (debug display).")]
         public float currentSpeed;
         private float previousGapError;
         private float lastOvertakeTime = -999f;
@@ -127,6 +180,7 @@ namespace MusicRun
         private bool eatTriggered;
         private bool eatJumpStarted;
         private float verticalVelocity;
+        private float nextEatAllowedTime;
 
         private Collider currentTarget;
         private readonly Collider[] instrumentScanBuffer = new Collider[64];
@@ -181,6 +235,7 @@ namespace MusicRun
             eatTriggered = false;
             eatJumpStarted = false;
             verticalVelocity = groundedStickVelocity;
+            nextEatAllowedTime = 0f;
             knockedVegetationCooldowns.Clear();
             ChangeState(CreatureState.RETURN, force: true);
             SetCreatureVisible(false);
@@ -211,6 +266,7 @@ namespace MusicRun
             desiredSpeed = 0f;
             currentSpeed = 0f;
             verticalVelocity = groundedStickVelocity;
+            nextEatAllowedTime = 0f;
         }
 
         private void UpdateSpawn(float dt)
@@ -260,6 +316,7 @@ namespace MusicRun
             hasSpawnedThisLevel = true;
             desiredMovePoint = transform.position;
             verticalVelocity = groundedStickVelocity;
+            nextEatAllowedTime = 0f;
             nextOvertakeCheckTime = Time.time + UnityEngine.Random.Range(0f, overtakeRandomCheckInterval);
             ChangeState(CreatureState.RETURN, force: true);
             SetCreatureVisible(true);
@@ -282,7 +339,9 @@ namespace MusicRun
             if (playerController == null)
                 return;
 
-            if (state != CreatureState.RETURN && GetDistanceToPlayer() > maxLeashDistance)
+            float distanceToPlayer = GetDistanceToPlayer();
+
+            if (state != CreatureState.RETURN && distanceToPlayer > maxLeashDistance)
             {
                 ChangeState(CreatureState.RETURN);
             }
@@ -292,7 +351,7 @@ namespace MusicRun
 
             switch (state)
             {
-                case CreatureState.CHASE:
+                case CreatureState.FOLLOW:
                     TickChase();
                     break;
                 case CreatureState.OVERTAKE:
@@ -374,7 +433,8 @@ namespace MusicRun
             toTarget.y = 0f;
             if (toTarget.magnitude <= huntReachDistance)
             {
-                ChangeState(CreatureState.EAT);
+                if (Time.time >= nextEatAllowedTime)
+                    ChangeState(CreatureState.EAT);
                 return;
             }
         }
@@ -383,7 +443,7 @@ namespace MusicRun
         {
             if (currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
             {
-                ChangeState(CreatureState.RETURN);
+                ChangeState(CreatureState.HUNT_INSTRUMENT);
                 return;
             }
 
@@ -393,14 +453,14 @@ namespace MusicRun
 
             if (TryConsumeCurrentTargetOnCollision())
             {
-                ChangeState(CreatureState.RETURN);
+                ChangeState(CreatureState.HUNT_INSTRUMENT);
                 return;
             }
 
             if (stateTime >= eatDuration)
             {
                 TryConsumeCurrentTargetByDistanceFallback();
-                ChangeState(CreatureState.RETURN);
+                ChangeState(CreatureState.HUNT_INSTRUMENT);
             }
         }
 
@@ -411,7 +471,7 @@ namespace MusicRun
 
             if (offset < 0f && Mathf.Abs(offset - desiredOffset) <= followDeadZone)
             {
-                ChangeState(CreatureState.CHASE);
+                ChangeState(CreatureState.FOLLOW);
                 return;
             }
 
@@ -731,7 +791,7 @@ namespace MusicRun
 
             ConsumeCurrentTarget();
             eatTriggered = true;
-            ChangeState(CreatureState.RETURN);
+            ChangeState(CreatureState.HUNT_INSTRUMENT);
         }
 
         private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -743,7 +803,7 @@ namespace MusicRun
             {
                 ConsumeCurrentTarget();
                 eatTriggered = true;
-                ChangeState(CreatureState.RETURN);
+                ChangeState(CreatureState.HUNT_INSTRUMENT);
                 return;
             }
 
@@ -869,30 +929,39 @@ namespace MusicRun
         {
             if (!force && state == nextState)
                 return;
+            if (!force && debugForceHuntMode && state == CreatureState.HUNT_INSTRUMENT && nextState != CreatureState.EAT)
+            {
+                // Always alternate between HUNT and EAT when debugForceHuntMode is enabled, to help testing hunt behavior without leaving it.
+                return;
+            }
 
-            CreatureState previous = state;
-            state = nextState;
+            //CreatureState previous = state;
             stateTime = 0f;
             previousGapError = 0f;
+            if (nextState == CreatureState.HUNT_INSTRUMENT)// && (previous == CreatureState.OVERTAKE || previous == CreatureState.EAT))
+            {
+                nextEatAllowedTime = Time.time + Mathf.Max(0f, huntMinDelayBetweenEat);
+            }
 
-            if (state == CreatureState.OVERTAKE)
+            if (nextState == CreatureState.OVERTAKE)
             {
                 lastOvertakeTime = Time.time;
                 overtakeSideSign = UnityEngine.Random.value < 0.5f ? -1 : 1;
                 currentTarget = null;
             }
-            else if (state == CreatureState.EAT)
+            else if (nextState == CreatureState.EAT)
             {
                 eatTriggered = false;
                 eatJumpStarted = false;
             }
-            else if (state == CreatureState.RETURN)
+            else if (nextState == CreatureState.RETURN)
             {
                 currentTarget = null;
             }
 
             if (debugLogs)
-                Debug.Log($"Creature state: {previous} -> {state}");
+                Debug.Log($"Creature state: {state} -> {nextState}");
+            state = nextState;
         }
 
         private float GetPlayerSpeed()
@@ -912,6 +981,9 @@ namespace MusicRun
             return forward.normalized;
         }
 
+        /// <summary>
+        /// Returns current horizontal distance between creature and player.
+        /// </summary>
         public float GetDistanceToPlayer()
         {
             if (playerController == null)
@@ -922,6 +994,10 @@ namespace MusicRun
             return delta.magnitude;
         }
 
+        /// <summary>
+        /// Returns creature offset projected on player forward axis.
+        /// Positive means creature is in front of player.
+        /// </summary>
         public float GetPlayerOffsetAlongForward()
         {
             if (playerController == null)
@@ -980,7 +1056,7 @@ namespace MusicRun
             Color stateColor;
             switch (state)
             {
-                case CreatureState.CHASE:
+                case CreatureState.FOLLOW:
                     stateColor = Color.green;
                     break;
                 case CreatureState.OVERTAKE:

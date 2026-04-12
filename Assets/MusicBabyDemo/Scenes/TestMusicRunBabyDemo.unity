@@ -273,8 +273,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001079913}
   m_HandleRect: {fileID: 1001079912}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1928,7 +1928,7 @@ MonoBehaviour:
   nextLevelAuto: 0
   infoDebug: 1
   enableShortcutKeys: 1
-  alwaysSucceed: 0
+  alwaysSucceed: 1
   FramePerSecond: 0
   LowerThresholdFPS: 28
   HysteresisBandFPS: 4
@@ -2105,6 +2105,7 @@ MonoBehaviour:
   eatDuration: 0.6
   eatJumpHeight: 1.8
   eatContactDistance: 0.35
+  eatReengageCooldown: 1
   kp: 0.9
   kd: 0.25
   accelMax: 20
@@ -2135,6 +2136,8 @@ MonoBehaviour:
   drawDebugGizmos: 1
   debugTargetScanLogs: 0
   debugTargetScanLogInterval: 1
+  debugForceHuntMode: 0
+  debugForceHuntDelay: 0.75
   stateTime: 0
   currentSpeed: 0
 --- !u!4 &206414650
@@ -10006,7 +10009,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.21842115
+  m_Size: 0.18396704
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -12953,7 +12956,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1479057135}
   m_HandleRect: {fileID: 1479057134}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -17985,7 +17988,7 @@ MonoBehaviour:
   MPTK_DirectSendToPlayer: 1
   MPTK_EnableChangeTempo: 1
   MPTK_EnablePanChange: 1
-  volumeGlobal: 0.801
+  volumeGlobal: 0.175
   MPTK_WeakDevice: 0
   MPTK_ReleaseTimeMin: 50
   DampVolume: 5
