@@ -33,7 +33,7 @@ namespace MusicRun
         [Tooltip("Desired distance behind the player.")]
         public float desiredFollowDistance = 12f;
         [Tooltip("Speed cap in FOLLOW.")]
-        public float maxSpeedChase = 16f;
+        public float maxSpeedFollow = 16f;
 
         [Tooltip("Player speed threshold for FOLLOW -> OVERTAKE transition.")]
         [FormerlySerializedAs("PlayerSpeedThresholdForOvertake")]
@@ -67,6 +67,9 @@ namespace MusicRun
 
         [Tooltip("Speed cap in HUNT and EAT approach.")]
         public float maxSpeedHunt = 22f;
+
+        [Tooltip("Maximum forward lead allowed in HUNT before speed is reduced to keep pressure on player.")]
+        public float huntMaxLeadDistance = 10f;
 
         [Tooltip("Player speed threshold for HUNT -> FOLLOW transition.")]
         [FormerlySerializedAs("huntExitToFollowPlayerSpeed")]
@@ -370,12 +373,11 @@ namespace MusicRun
                 return;
             }
 
-            SetFollowMotion(-desiredFollowDistance, maxSpeedChase);
+            SetFollowMotion(-desiredFollowDistance, maxSpeedFollow);
         }
 
         private void TickOvertake()
         {
-            // OVERTAKE is only the "pass player" phase.
             // As soon as the creature is in front, switch to hunt mode.
             if (GetPlayerOffsetAlongForward() > 0.5f)
             {
@@ -411,13 +413,15 @@ namespace MusicRun
             {
                 // No target yet: stay in hunt mode while moving ahead and scanning.
                 desiredMovePoint = GetPointRelativeToPlayer(overtakeLeadDistance, overtakeSideSign * overtakeLateralOffset);
-                desiredSpeed = Mathf.Clamp(GetPlayerSpeed() + 2f, 0f, maxSpeedHunt);
+                float baselineHuntSpeed = Mathf.Clamp(GetPlayerSpeed() + 2f, 0f, maxSpeedHunt);
+                desiredSpeed = ComputeHuntSpeedWithLeadLimit(baselineHuntSpeed);
                 return;
             }
 
             Vector3 targetPos = currentTarget.transform.position;
             desiredMovePoint = targetPos;
-            desiredSpeed = Mathf.Clamp(GetPlayerSpeed() + 4f, 0f, maxSpeedHunt);
+            float baselineTargetHuntSpeed = Mathf.Clamp(GetPlayerSpeed() + 4f, 0f, maxSpeedHunt);
+            desiredSpeed = ComputeHuntSpeedWithLeadLimit(baselineTargetHuntSpeed);
 
             Vector3 toTarget = targetPos - transform.position;
             toTarget.y = 0f;
@@ -460,6 +464,13 @@ namespace MusicRun
             desiredSpeed = ComputeGapSpeed(desiredOffset, speedLimit, additiveBoost);
         }
 
+        private float ComputeHuntSpeedWithLeadLimit(float baselineSpeed)
+        {
+            float desiredLead = Mathf.Max(0f, huntMaxLeadDistance);
+            float gapLimitedSpeed = ComputeGapSpeed(desiredLead, maxSpeedHunt);
+            return Mathf.Min(baselineSpeed, gapLimitedSpeed);
+        }
+
         private Vector3 GetPointRelativeToPlayer(float forwardOffset, float lateralOffset)
         {
             Vector3 playerPos = playerController.transform.position;
@@ -470,8 +481,18 @@ namespace MusicRun
             return point;
         }
 
-        // PD gap controller: tracks desired longitudinal offset relative to the player.
+        //
+        /// Computes desired speed to maintain a target offset from the player using 
+        /// a proportional-derivative controller.
+        /// Calcule la vitesse cible de la créature pour tenir un écart voulu avec 
+        /// le joueur (contrôle type PD), puis la borne à une limite max.
+        /// </summary>
+        /// <param name="desiredOffset"></param>
+        /// <param name="speedLimit"></param>
+        /// <param name="additiveBoost"></param>
+        /// <returns></returns>
         private float ComputeGapSpeed(float desiredOffset, float speedLimit, float additiveBoost = 0f)
+
         {
             float dt = Mathf.Max(0.0001f, Time.deltaTime);
             float currentOffset = GetPlayerOffsetAlongForward();
