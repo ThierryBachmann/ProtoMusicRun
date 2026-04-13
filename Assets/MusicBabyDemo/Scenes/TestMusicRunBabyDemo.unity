@@ -2085,39 +2085,35 @@ MonoBehaviour:
   spawnStartOverride: {fileID: 0}
   spawnHeightOffset: 0
   desiredFollowDistance: 12
-  followDeadZone: 2
-  returnDistance: 12
-  maxLeashDistance: 20
+  maxSpeedFollow: 16
+  followToOvertakePlayerSpeedThreshold: 3
   overtakeLeadDistance: 12
   overtakeLateralOffset: 2.5
+  maxSpeedOvertake: 20
   overtakeCooldown: 5
   overtakeNoTargetTimeout: 10
-  overtakeRandomCheckInterval: 0.3
-  overtakeSpeedMinOpportunistic: 3.5
-  overtakeDistMinOpportunistic: 18
-  overtakeChancePerCheck: 0.36
   huntSearchRadius: 28
   huntReachDistance: 1.6
-  huntMaxDuration: 10
+  maxSpeedHunt: 22
+  huntMaxLeadDistance: 10
+  huntRecenterHeadingAngleThreshold: 15
+  huntRecenterPointSmoothing: 10
+  huntToFollowPlayerSpeedThreshold: 20.14
+  huntMinDelayBetweenEat: 5
   instrumentScanLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
   eatDuration: 0.6
   eatJumpHeight: 1.8
   eatContactDistance: 0.35
-  eatReengageCooldown: 1
   kp: 0.9
   kd: 0.25
   accelMax: 20
   brakeMax: 24
-  maxSpeedChase: 16
-  maxSpeedOvertake: 20
-  maxSpeedHunt: 22
-  maxSpeedReturn: 18
   catchupBoostDistance: 20
   catchupBoost: 3
   turnRateDegPerSec: 360
-  gravity: 18
+  gravity: 10.4
   groundedStickVelocity: -1
   enableVegetationKnockdown: 1
   vegetationKnockTags:
@@ -2132,12 +2128,10 @@ MonoBehaviour:
   targetWeightDistance: 1
   targetWeightAngle: 0.35
   targetWeightBehindPlayer: 0.5
-  debugLogs: 0
+  debugLogs: 1
   drawDebugGizmos: 1
   debugTargetScanLogs: 0
   debugTargetScanLogInterval: 1
-  debugForceHuntMode: 0
-  debugForceHuntDelay: 0.75
   stateTime: 0
   currentSpeed: 0
 --- !u!4 &206414650
@@ -2174,8 +2168,8 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
+  m_Height: 1
+  m_Radius: 0.56
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
@@ -3127,7 +3121,7 @@ MonoBehaviour:
   currentAngle: 0
   knockback: {x: 0, y: 0, z: 0}
   MinSpeed: 1
-  MaxSpeed: 10
+  MaxSpeed: 4.12
   Acceleration: 0.2
   Speed: 1
   TurnSpeed: 0.25
@@ -10009,7 +10003,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.18396704
+  m_Size: 0.23241113
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15741,7 +15735,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1179939235}
   m_HandleRect: {fileID: 1179939234}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

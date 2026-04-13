@@ -71,6 +71,12 @@ namespace MusicRun
         [Tooltip("Maximum forward lead allowed in HUNT before speed is reduced to keep pressure on player.")]
         public float huntMaxLeadDistance = 10f;
 
+        [Tooltip("Enter recenter mode when angle between player and creature headings exceeds this value (degrees). Exit at half this angle.")]
+        public float huntRecenterHeadingAngleThreshold = 30f;
+
+        [Tooltip("Smoothing applied to recenter target updates (higher is snappier, lower is smoother).")]
+        public float huntRecenterPointSmoothing = 10f;
+
         [Tooltip("Player speed threshold for HUNT -> FOLLOW transition.")]
         [FormerlySerializedAs("huntExitToFollowPlayerSpeed")]
         public float huntToFollowPlayerSpeedThreshold = 3.5f;
@@ -183,6 +189,8 @@ namespace MusicRun
         private bool hasSpawnedThisLevel;
         private bool eatTriggered;
         private bool eatJumpStarted;
+        private bool huntRecenterActive;
+        private bool huntRecenterPointInitialized;
         private float verticalVelocity;
         private float nextEatAllowedTime;
 
@@ -193,6 +201,7 @@ namespace MusicRun
         private readonly Dictionary<int, float> knockedVegetationCooldowns = new Dictionary<int, float>();
 
         private Vector3 desiredMovePoint;
+        private Vector3 huntRecenterPoint;
         private float desiredSpeed;
         private float nextTargetScanLogTime;
 
@@ -238,6 +247,8 @@ namespace MusicRun
             currentTarget = null;
             eatTriggered = false;
             eatJumpStarted = false;
+            huntRecenterActive = false;
+            huntRecenterPointInitialized = false;
             verticalVelocity = groundedStickVelocity;
             nextEatAllowedTime = 0f;
             knockedVegetationCooldowns.Clear();
@@ -269,6 +280,8 @@ namespace MusicRun
             currentTarget = null;
             desiredSpeed = 0f;
             currentSpeed = 0f;
+            huntRecenterActive = false;
+            huntRecenterPointInitialized = false;
             verticalVelocity = groundedStickVelocity;
             nextEatAllowedTime = 0f;
         }
@@ -403,6 +416,41 @@ namespace MusicRun
                 return;
             }
 
+            if (Time.time < nextEatAllowedTime)
+            {
+                // During HUNT cooldown, keep pressure by staying in front of the player
+                // and skip instrument target acquisition.
+                currentTarget = null;
+                huntRecenterActive = false;
+                Vector3 rawCooldownPoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f);
+                desiredMovePoint = GetSmoothedHuntRecenterPoint(rawCooldownPoint);
+                float baselineCooldownSpeed = Mathf.Clamp(GetPlayerSpeed() + 2f, 0f, maxSpeedHunt);
+                desiredSpeed = ComputeHuntSpeedWithLeadLimit(baselineCooldownSpeed);
+                return;
+            }
+
+            bool wasRecenterActive = huntRecenterActive;
+            float headingAngle = GetHeadingAngleToPlayerForward();
+            UpdateHuntRecenterMode(headingAngle);
+            if (!wasRecenterActive && huntRecenterActive)
+            {
+                currentTarget = null;
+                huntRecenterPointInitialized = false;
+            }
+            else if (wasRecenterActive && !huntRecenterActive)
+            {
+                huntRecenterPointInitialized = false;
+            }
+
+            if (huntRecenterActive)
+            {
+                Vector3 rawRecenterPoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f);
+                desiredMovePoint = GetSmoothedHuntRecenterPoint(rawRecenterPoint);
+                float baselineRecenterSpeed = Mathf.Clamp(GetPlayerSpeed() + 3f, 0f, maxSpeedHunt);
+                desiredSpeed = ComputeHuntSpeedWithLeadLimit(baselineRecenterSpeed);
+                return;
+            }
+
             if (currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
             {
                 currentTarget = null;
@@ -469,6 +517,52 @@ namespace MusicRun
             float desiredLead = Mathf.Max(0f, huntMaxLeadDistance);
             float gapLimitedSpeed = ComputeGapSpeed(desiredLead, maxSpeedHunt);
             return Mathf.Min(baselineSpeed, gapLimitedSpeed);
+        }
+
+        private void UpdateHuntRecenterMode(float headingAngleDeg)
+        {
+            float enterThreshold = Mathf.Max(0f, huntRecenterHeadingAngleThreshold);
+            float exitThreshold = enterThreshold * 0.5f;
+
+            if (!huntRecenterActive)
+            {
+                huntRecenterActive = headingAngleDeg > enterThreshold;
+            }
+            else if (headingAngleDeg <= exitThreshold)
+            {
+                huntRecenterActive = false;
+            }
+        }
+
+        private float GetHeadingAngleToPlayerForward()
+        {
+            Vector3 creatureForward = transform.forward;
+            creatureForward.y = 0f;
+            if (creatureForward.sqrMagnitude < 0.0001f)
+                return 0f;
+
+            return Vector3.Angle(creatureForward.normalized, GetPlayerForward());
+        }
+
+        private Vector3 GetSmoothedHuntRecenterPoint(Vector3 rawPoint)
+        {
+            if (!huntRecenterPointInitialized)
+            {
+                huntRecenterPoint = rawPoint;
+                huntRecenterPointInitialized = true;
+                return huntRecenterPoint;
+            }
+
+            float smoothing = Mathf.Max(0f, huntRecenterPointSmoothing);
+            if (smoothing <= 0f)
+            {
+                huntRecenterPoint = rawPoint;
+                return huntRecenterPoint;
+            }
+
+            float t = 1f - Mathf.Exp(-smoothing * Time.deltaTime);
+            huntRecenterPoint = Vector3.Lerp(huntRecenterPoint, rawPoint, t);
+            return huntRecenterPoint;
         }
 
         private Vector3 GetPointRelativeToPlayer(float forwardOffset, float lateralOffset)
@@ -913,6 +1007,7 @@ namespace MusicRun
             if (nextState == CreatureState.HUNT_INSTRUMENT)// && (previous == CreatureState.OVERTAKE || previous == CreatureState.EAT))
             {
                 nextEatAllowedTime = Time.time + Mathf.Max(0f, huntMinDelayBetweenEat);
+                Debug.Log($"Creature entered HUNT_INSTRUMENT state, next eat allowed at {nextEatAllowedTime:F2}");
             }
 
             if (nextState == CreatureState.OVERTAKE)
@@ -920,15 +1015,26 @@ namespace MusicRun
                 lastOvertakeTime = Time.time;
                 overtakeSideSign = UnityEngine.Random.value < 0.5f ? -1 : 1;
                 currentTarget = null;
+                huntRecenterActive = false;
+                huntRecenterPointInitialized = false;
             }
             else if (nextState == CreatureState.EAT)
             {
                 eatTriggered = false;
                 eatJumpStarted = false;
+                huntRecenterActive = false;
+                huntRecenterPointInitialized = false;
             }
             else if (nextState == CreatureState.FOLLOW)
             {
                 currentTarget = null;
+                huntRecenterActive = false;
+                huntRecenterPointInitialized = false;
+            }
+            else if (nextState == CreatureState.HUNT_INSTRUMENT)
+            {
+                huntRecenterActive = false;
+                huntRecenterPointInitialized = false;
             }
 
             if (debugLogs)
@@ -1048,7 +1154,7 @@ namespace MusicRun
             Gizmos.color = stateColor;
             Gizmos.DrawWireSphere(transform.position, 0.6f);
             Gizmos.DrawLine(transform.position, desiredMovePoint);
-            Gizmos.DrawWireSphere(desiredMovePoint, 0.25f);
+            Gizmos.DrawWireCube(desiredMovePoint, Vector3.one * 0.3f);
 
             if (state == CreatureState.OVERTAKE || state == CreatureState.HUNT_INSTRUMENT)
             {
