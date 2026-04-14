@@ -87,6 +87,9 @@ namespace MusicRun
         [Tooltip("Duration of inertial recovery after EAT -> HUNT before fully restoring normal HUNT steering.")]
         public float huntPostEatRecoveryDuration = 0.45f;
 
+        [Tooltip("Reaction time used to update perceived player heading in HUNT (higher = slower creature response).")]
+        public float huntPlayerHeadingReactionTime = 0.55f;
+
         [Tooltip("Physics layers included when scanning for instrument colliders.")]
         public LayerMask instrumentScanLayerMask = ~0;
 
@@ -196,8 +199,10 @@ namespace MusicRun
         private bool eatPostConsumeCarryWasAirborne;
         private bool huntRecenterActive;
         private bool huntRecenterPointInitialized;
+        private bool huntPerceivedPlayerForwardInitialized;
         private bool huntPostEatRecoveryActive;
         private Vector3 eatPostConsumeCarryDirection;
+        private Vector3 huntPerceivedPlayerForward;
         private Vector3 huntPostEatRecoveryDirection;
         private float huntPostEatRecoveryStartSpeed;
         private float huntPostEatRecoveryElapsed;
@@ -262,6 +267,7 @@ namespace MusicRun
             ResetHuntPostEatRecovery();
             huntRecenterActive = false;
             huntRecenterPointInitialized = false;
+            ResetHuntPerceivedPlayerForward();
             verticalVelocity = groundedStickVelocity;
             nextEatAllowedTime = 0f;
             knockedVegetationCooldowns.Clear();
@@ -297,6 +303,7 @@ namespace MusicRun
             ResetHuntPostEatRecovery();
             huntRecenterActive = false;
             huntRecenterPointInitialized = false;
+            ResetHuntPerceivedPlayerForward();
             verticalVelocity = groundedStickVelocity;
             nextEatAllowedTime = 0f;
         }
@@ -382,6 +389,7 @@ namespace MusicRun
                     TickOvertake();
                     break;
                 case CreatureState.HUNT_INSTRUMENT:
+                    UpdateHuntPerceivedPlayerForward(Time.deltaTime);
                     TickHuntInstrument();
                     break;
                 case CreatureState.EAT:
@@ -408,6 +416,7 @@ namespace MusicRun
                 ResetEatPostConsumeCarry();
                 huntRecenterActive = false;
                 huntRecenterPointInitialized = false;
+                InitializeHuntPerceivedPlayerForward();
                 nextEatAllowedTime = Time.time + Mathf.Max(0f, huntMinDelayBetweenEat);
                 if (debugLogs)
                     Debug.Log($"Creature entered HUNT_INSTRUMENT state, next eat allowed at {nextEatAllowedTime:F2}");
@@ -427,6 +436,7 @@ namespace MusicRun
                 ResetHuntPostEatRecovery();
                 huntRecenterActive = false;
                 huntRecenterPointInitialized = false;
+                ResetHuntPerceivedPlayerForward();
             }
             else if (nextState == CreatureState.EAT)
             {
@@ -436,6 +446,7 @@ namespace MusicRun
                 ResetHuntPostEatRecovery();
                 huntRecenterActive = false;
                 huntRecenterPointInitialized = false;
+                ResetHuntPerceivedPlayerForward();
             }
             else if (nextState == CreatureState.FOLLOW)
             {
@@ -444,6 +455,7 @@ namespace MusicRun
                 ResetHuntPostEatRecovery();
                 huntRecenterActive = false;
                 huntRecenterPointInitialized = false;
+                ResetHuntPerceivedPlayerForward();
             }
 
             if (debugLogs)
@@ -499,7 +511,8 @@ namespace MusicRun
                 // During HUNT cooldown and without a locked target, keep pressure by
                 // staying in front of the player and skip instrument acquisition.
                 huntRecenterActive = false;
-                Vector3 rawCooldownPoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f);
+                Vector3 huntForward = GetHuntReferenceForward();
+                Vector3 rawCooldownPoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f, huntForward);
                 desiredMovePoint = GetSmoothedHuntRecenterPoint(rawCooldownPoint);
                 float baselineCooldownSpeed = Mathf.Clamp(GetPlayerSpeed() + 2f, 0f, maxSpeedHunt);
                 desiredSpeed = ComputeHuntSpeedWithLeadLimit(baselineCooldownSpeed);
@@ -512,7 +525,8 @@ namespace MusicRun
             if (currentTarget == null)
             {
                 bool wasRecenterActive = huntRecenterActive;
-                float headingAngle = GetHeadingAngleToPlayerForward();
+                Vector3 huntForward = GetHuntReferenceForward();
+                float headingAngle = GetHeadingAngleToForward(huntForward);
                 UpdateHuntRecenterMode(headingAngle);
                 if (!wasRecenterActive && huntRecenterActive)
                 {
@@ -525,7 +539,7 @@ namespace MusicRun
 
                 if (huntRecenterActive)
                 {
-                    Vector3 rawRecenterPoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f);
+                    Vector3 rawRecenterPoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f, huntForward);
                     desiredMovePoint = GetSmoothedHuntRecenterPoint(rawRecenterPoint);
                     float baselineRecenterSpeed = Mathf.Clamp(GetPlayerSpeed() + 3f, 0f, maxSpeedHunt);
                     desiredSpeed = ComputeHuntSpeedWithLeadLimit(baselineRecenterSpeed);
@@ -533,7 +547,7 @@ namespace MusicRun
                 }
 
                 // No target yet: stay in hunt mode while moving ahead and scanning.
-                desiredMovePoint = GetPointRelativeToPlayer(overtakeLeadDistance, overtakeSideSign * overtakeLateralOffset);
+                desiredMovePoint = GetPointRelativeToPlayer(overtakeLeadDistance, overtakeSideSign * overtakeLateralOffset, huntForward);
                 float baselineHuntSpeed = Mathf.Clamp(GetPlayerSpeed() + 2f, 0f, maxSpeedHunt);
                 desiredSpeed = ComputeHuntSpeedWithLeadLimit(baselineHuntSpeed);
                 return;
@@ -611,7 +625,8 @@ namespace MusicRun
 
         private void BeginEatPostConsumeCarry()
         {
-            Debug.Log($"Target {currentTarget?.name} consumed by creature at time {Time.time:F2}, starting post-eat carry with speed {currentSpeed:F1}");    
+            if (debugLogs)
+                Debug.Log($"Target {currentTarget?.name} consumed by creature at time {Time.time:F2}, starting post-eat carry with speed {currentSpeed:F1}");
             Vector3 carryDirection = transform.forward;
             carryDirection.y = 0f;
             if (carryDirection.sqrMagnitude < 0.0001f)
@@ -715,14 +730,18 @@ namespace MusicRun
             }
         }
 
-        private float GetHeadingAngleToPlayerForward()
+        private float GetHeadingAngleToForward(Vector3 referenceForward)
         {
             Vector3 creatureForward = transform.forward;
             creatureForward.y = 0f;
             if (creatureForward.sqrMagnitude < 0.0001f)
                 return 0f;
 
-            return Vector3.Angle(creatureForward.normalized, GetPlayerForward());
+            referenceForward.y = 0f;
+            if (referenceForward.sqrMagnitude < 0.0001f)
+                referenceForward = GetPlayerForward();
+
+            return Vector3.Angle(creatureForward.normalized, referenceForward.normalized);
         }
 
         private Vector3 GetSmoothedHuntRecenterPoint(Vector3 rawPoint)
@@ -746,10 +765,69 @@ namespace MusicRun
             return huntRecenterPoint;
         }
 
+        private void UpdateHuntPerceivedPlayerForward(float dt)
+        {
+            if (playerController == null)
+                return;
+
+            Vector3 actualForward = GetPlayerForward();
+            if (!huntPerceivedPlayerForwardInitialized || huntPerceivedPlayerForward.sqrMagnitude < 0.0001f)
+            {
+                InitializeHuntPerceivedPlayerForward();
+                return;
+            }
+
+            float reactionTime = Mathf.Max(0.01f, huntPlayerHeadingReactionTime);
+            float blend = 1f - Mathf.Exp(-Mathf.Max(0f, dt) / reactionTime);
+            huntPerceivedPlayerForward = Vector3.Slerp(huntPerceivedPlayerForward, actualForward, blend);
+            huntPerceivedPlayerForward.y = 0f;
+            if (huntPerceivedPlayerForward.sqrMagnitude < 0.0001f)
+                huntPerceivedPlayerForward = actualForward;
+            else
+                huntPerceivedPlayerForward.Normalize();
+        }
+
+        private Vector3 GetHuntReferenceForward()
+        {
+            if (huntPerceivedPlayerForwardInitialized && huntPerceivedPlayerForward.sqrMagnitude > 0.0001f)
+                return huntPerceivedPlayerForward;
+            return GetPlayerForward();
+        }
+
+        private void InitializeHuntPerceivedPlayerForward()
+        {
+            Vector3 initialForward = transform.forward;
+            initialForward.y = 0f;
+            if (initialForward.sqrMagnitude < 0.0001f)
+                initialForward = GetPlayerForward();
+            if (initialForward.sqrMagnitude < 0.0001f)
+                initialForward = Vector3.forward;
+
+            huntPerceivedPlayerForward = initialForward.normalized;
+            huntPerceivedPlayerForwardInitialized = true;
+        }
+
+        private void ResetHuntPerceivedPlayerForward()
+        {
+            huntPerceivedPlayerForwardInitialized = false;
+            huntPerceivedPlayerForward = Vector3.zero;
+        }
+
         private Vector3 GetPointRelativeToPlayer(float forwardOffset, float lateralOffset)
         {
+            return GetPointRelativeToPlayer(forwardOffset, lateralOffset, GetPlayerForward());
+        }
+
+        private Vector3 GetPointRelativeToPlayer(float forwardOffset, float lateralOffset, Vector3 referenceForward)
+        {
             Vector3 playerPos = playerController.transform.position;
-            Vector3 playerForward = GetPlayerForward();
+            Vector3 playerForward = referenceForward;
+            playerForward.y = 0f;
+            if (playerForward.sqrMagnitude < 0.0001f)
+                playerForward = GetPlayerForward();
+            if (playerForward.sqrMagnitude < 0.0001f)
+                playerForward = Vector3.forward;
+            playerForward.Normalize();
             Vector3 playerRight = Vector3.Cross(Vector3.up, playerForward);
             Vector3 point = playerPos + playerForward * forwardOffset + playerRight * lateralOffset;
             point.y = transform.position.y;
@@ -924,7 +1002,7 @@ namespace MusicRun
             float bestScore = float.MaxValue;
 
             Vector3 playerPos = playerController.transform.position;
-            Vector3 playerForward = GetPlayerForward();
+            Vector3 playerForward = state == CreatureState.HUNT_INSTRUMENT ? GetHuntReferenceForward() : GetPlayerForward();
 
             for (int i = 0; i < count; i++)
             {
