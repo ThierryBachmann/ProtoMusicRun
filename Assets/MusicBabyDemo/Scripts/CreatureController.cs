@@ -189,10 +189,14 @@ namespace MusicRun
         private bool hasSpawnedThisLevel;
         private bool eatTriggered;
         private bool eatJumpStarted;
+        private bool eatPostConsumeCarryActive;
+        private bool eatPostConsumeCarryWasAirborne;
         private bool huntRecenterActive;
         private bool huntRecenterPointInitialized;
+        private Vector3 eatPostConsumeCarryDirection;
+        private float eatPostConsumeCarrySpeed;
         private float verticalVelocity;
-        private float nextEatAllowedTime;
+        public float nextEatAllowedTime;
 
         private Collider currentTarget;
         private readonly Collider[] instrumentScanBuffer = new Collider[64];
@@ -247,6 +251,7 @@ namespace MusicRun
             currentTarget = null;
             eatTriggered = false;
             eatJumpStarted = false;
+            ResetEatPostConsumeCarry();
             huntRecenterActive = false;
             huntRecenterPointInitialized = false;
             verticalVelocity = groundedStickVelocity;
@@ -280,6 +285,7 @@ namespace MusicRun
             currentTarget = null;
             desiredSpeed = 0f;
             currentSpeed = 0f;
+            ResetEatPostConsumeCarry();
             huntRecenterActive = false;
             huntRecenterPointInitialized = false;
             verticalVelocity = groundedStickVelocity;
@@ -377,6 +383,52 @@ namespace MusicRun
                     break;
             }
         }
+        private void ChangeState(CreatureState nextState, bool force = false)
+        {
+            if (!force && state == nextState)
+                return;
+
+            //CreatureState previous = state;
+            stateTime = 0f;
+            previousGapError = 0f;
+            if (nextState == CreatureState.HUNT_INSTRUMENT)// && (previous == CreatureState.OVERTAKE || previous == CreatureState.EAT))
+            {
+                ResetEatPostConsumeCarry();
+                huntRecenterActive = false;
+                huntRecenterPointInitialized = false;
+                nextEatAllowedTime = Time.time + Mathf.Max(0f, huntMinDelayBetweenEat);
+                Debug.Log($"Creature entered HUNT_INSTRUMENT state, next eat allowed at {nextEatAllowedTime:F2}");
+            }
+
+            if (nextState == CreatureState.OVERTAKE)
+            {
+                lastOvertakeTime = Time.time;
+                overtakeSideSign = UnityEngine.Random.value < 0.5f ? -1 : 1;
+                currentTarget = null;
+                ResetEatPostConsumeCarry();
+                huntRecenterActive = false;
+                huntRecenterPointInitialized = false;
+            }
+            else if (nextState == CreatureState.EAT)
+            {
+                eatTriggered = false;
+                eatJumpStarted = false;
+                ResetEatPostConsumeCarry();
+                huntRecenterActive = false;
+                huntRecenterPointInitialized = false;
+            }
+            else if (nextState == CreatureState.FOLLOW)
+            {
+                currentTarget = null;
+                ResetEatPostConsumeCarry();
+                huntRecenterActive = false;
+                huntRecenterPointInitialized = false;
+            }
+
+            if (debugLogs)
+                Debug.Log($"Creature state: {state} -> {nextState}");
+            state = nextState;
+        }
 
         private void TickFollow()
         {
@@ -410,6 +462,7 @@ namespace MusicRun
 
         private void TickHuntInstrument()
         {
+
             if (GetPlayerSpeed() >= huntToFollowPlayerSpeedThreshold)
             {
                 ChangeState(CreatureState.FOLLOW);
@@ -466,6 +519,7 @@ namespace MusicRun
                 return;
             }
 
+            // Goto the target and eat if close enough.
             Vector3 targetPos = currentTarget.transform.position;
             desiredMovePoint = targetPos;
             float baselineTargetHuntSpeed = Mathf.Clamp(GetPlayerSpeed() + 4f, 0f, maxSpeedHunt);
@@ -473,16 +527,31 @@ namespace MusicRun
 
             Vector3 toTarget = targetPos - transform.position;
             toTarget.y = 0f;
+
+            // if the creature is close enough to the target, trigger eat state. 
             if (toTarget.magnitude <= huntReachDistance)
             {
-                if (Time.time >= nextEatAllowedTime)
-                    ChangeState(CreatureState.EAT);
+                ChangeState(CreatureState.EAT);
                 return;
             }
         }
 
         private void TickEat()
         {
+            if (eatPostConsumeCarryActive)
+            {
+                if (HasEatPostConsumeCarryLanded())
+                {
+                    ResetEatPostConsumeCarry();
+                    ChangeState(CreatureState.HUNT_INSTRUMENT);
+                    return;
+                }
+
+                desiredMovePoint = transform.position + eatPostConsumeCarryDirection * 100f;
+                desiredSpeed = eatPostConsumeCarrySpeed;
+                return;
+            }
+
             if (currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
             {
                 ChangeState(CreatureState.HUNT_INSTRUMENT);
@@ -495,15 +564,62 @@ namespace MusicRun
 
             if (TryConsumeCurrentTargetOnCollision())
             {
-                ChangeState(CreatureState.HUNT_INSTRUMENT);
+                BeginEatPostConsumeCarry();
                 return;
             }
 
             if (stateTime >= eatDuration)
             {
-                TryConsumeCurrentTargetByDistanceFallback();
+                if (TryConsumeCurrentTargetByDistanceFallback())
+                {
+                    BeginEatPostConsumeCarry();
+                    return;
+                }
                 ChangeState(CreatureState.HUNT_INSTRUMENT);
             }
+        }
+
+        private void BeginEatPostConsumeCarry()
+        {
+            Vector3 carryDirection = transform.forward;
+            carryDirection.y = 0f;
+            if (carryDirection.sqrMagnitude < 0.0001f)
+            {
+                carryDirection = desiredMovePoint - transform.position;
+                carryDirection.y = 0f;
+            }
+            if (carryDirection.sqrMagnitude < 0.0001f)
+                carryDirection = GetPlayerForward();
+
+            eatPostConsumeCarryDirection = carryDirection.normalized;
+            eatPostConsumeCarrySpeed = Mathf.Max(0f, currentSpeed);
+            if (eatPostConsumeCarrySpeed < 0.01f)
+                eatPostConsumeCarrySpeed = Mathf.Max(0f, desiredSpeed);
+
+            currentSpeed = eatPostConsumeCarrySpeed;
+            eatPostConsumeCarryActive = true;
+            eatPostConsumeCarryWasAirborne = characterController != null && !characterController.isGrounded;
+        }
+
+        private bool HasEatPostConsumeCarryLanded()
+        {
+            if (!eatPostConsumeCarryActive)
+                return false;
+            if (characterController == null || !characterController.enabled)
+                return true;
+
+            if (!eatPostConsumeCarryWasAirborne && !characterController.isGrounded)
+                eatPostConsumeCarryWasAirborne = true;
+
+            return eatPostConsumeCarryWasAirborne && characterController.isGrounded && verticalVelocity <= 0f;
+        }
+
+        private void ResetEatPostConsumeCarry()
+        {
+            eatPostConsumeCarryActive = false;
+            eatPostConsumeCarryWasAirborne = false;
+            eatPostConsumeCarryDirection = Vector3.zero;
+            eatPostConsumeCarrySpeed = 0f;
         }
 
         private void SetFollowMotion(float desiredOffset, float speedLimit, float additiveBoost = 0f)
@@ -812,10 +928,10 @@ namespace MusicRun
             return true;
         }
 
-        private void TryConsumeCurrentTargetByDistanceFallback()
+        private bool TryConsumeCurrentTargetByDistanceFallback()
         {
             if (eatTriggered || currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
-                return;
+                return false;
 
             Vector3 delta = currentTarget.bounds.center - transform.position;
             float maxDistance = eatContactDistance;
@@ -824,10 +940,11 @@ namespace MusicRun
             maxDistance += currentTarget.bounds.extents.magnitude * 0.5f;
 
             if (delta.sqrMagnitude > maxDistance * maxDistance)
-                return;
+                return false;
 
             ConsumeCurrentTarget();
             eatTriggered = true;
+            return true;
         }
 
         private bool IsCurrentTargetCollider(Collider other)
@@ -862,7 +979,7 @@ namespace MusicRun
 
             ConsumeCurrentTarget();
             eatTriggered = true;
-            ChangeState(CreatureState.HUNT_INSTRUMENT);
+            BeginEatPostConsumeCarry();
         }
 
         private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -874,7 +991,7 @@ namespace MusicRun
             {
                 ConsumeCurrentTarget();
                 eatTriggered = true;
-                ChangeState(CreatureState.HUNT_INSTRUMENT);
+                BeginEatPostConsumeCarry();
                 return;
             }
 
@@ -994,52 +1111,6 @@ namespace MusicRun
 
             for (int i = 0; i < toRemove.Count; i++)
                 knockedVegetationCooldowns.Remove(toRemove[i]);
-        }
-
-        private void ChangeState(CreatureState nextState, bool force = false)
-        {
-            if (!force && state == nextState)
-                return;
-
-            //CreatureState previous = state;
-            stateTime = 0f;
-            previousGapError = 0f;
-            if (nextState == CreatureState.HUNT_INSTRUMENT)// && (previous == CreatureState.OVERTAKE || previous == CreatureState.EAT))
-            {
-                nextEatAllowedTime = Time.time + Mathf.Max(0f, huntMinDelayBetweenEat);
-                Debug.Log($"Creature entered HUNT_INSTRUMENT state, next eat allowed at {nextEatAllowedTime:F2}");
-            }
-
-            if (nextState == CreatureState.OVERTAKE)
-            {
-                lastOvertakeTime = Time.time;
-                overtakeSideSign = UnityEngine.Random.value < 0.5f ? -1 : 1;
-                currentTarget = null;
-                huntRecenterActive = false;
-                huntRecenterPointInitialized = false;
-            }
-            else if (nextState == CreatureState.EAT)
-            {
-                eatTriggered = false;
-                eatJumpStarted = false;
-                huntRecenterActive = false;
-                huntRecenterPointInitialized = false;
-            }
-            else if (nextState == CreatureState.FOLLOW)
-            {
-                currentTarget = null;
-                huntRecenterActive = false;
-                huntRecenterPointInitialized = false;
-            }
-            else if (nextState == CreatureState.HUNT_INSTRUMENT)
-            {
-                huntRecenterActive = false;
-                huntRecenterPointInitialized = false;
-            }
-
-            if (debugLogs)
-                Debug.Log($"Creature state: {state} -> {nextState}");
-            state = nextState;
         }
 
         private float GetPlayerSpeed()

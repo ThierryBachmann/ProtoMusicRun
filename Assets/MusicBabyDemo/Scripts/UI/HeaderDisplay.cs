@@ -77,11 +77,14 @@ namespace MusicRun
 
             if (gameManager.infoDebug)
             {
+                CreatureController cc = gameManager.creatureController;
                 //infoText.text = $"Debug index level:{gameManager.currentLevelIndex} chunkCreatedCount:{gameManager.terrainGenerator.chunkCreatedCount} timeCreateChunk:{gameManager.terrainGenerator.timeAverageCreate:F2} ms";
                 infoText.text =
                     $"level: {gameManager.levelIndex} FPS: {gameManager.FramePerSecond}\n" +
-                    $"player: {gameManager.playerController.CurrentPlayerChunk} speed:{player.Speed:F1} angle:{player.targetAngle:F0}/{player.currentAngle:F0}\n" +
-                    $"creature: {gameManager.creatureController.State} speed: {gameManager.creatureController.currentSpeed:F1} dist:{gameManager.creatureController.GetDistanceToPlayer():F1} offset:{gameManager.creatureController.GetPlayerOffsetAlongForward():F1} time:{gameManager.creatureController.stateTime:F1}\n"
+                    $"player: {player.CurrentPlayerChunk} speed:{player.Speed:F1} angle:{player.targetAngle:F0}/{player.currentAngle:F0}\n" +
+                    $"creature: {cc.State} speed: {cc.currentSpeed:F1} " + 
+                    $"dist:{cc.GetDistanceToPlayer():F1} offset:{cc.GetPlayerOffsetAlongForward():F1} " +
+                    $"time:{cc.stateTime:F1} eat:{(cc.nextEatAllowedTime -Time.time):F1}\n"
                     //$"music: {gameManager.midiManager.countLoop}/{gameManager.terrainGenerator.CurrentLevel?.LoopsToGoal} {gameManager.midiManager.Progress:F0}%\n" +
                     //$"chunk:{gameManager.terrainGenerator.chunkCreatedCount} " +
                     ;
@@ -115,7 +118,7 @@ namespace MusicRun
                 itemInstrument.SetValue("");
             }
 
-            //    Color targetColor = scoreText.color; // couleur par défaut
+            //    Color targetColor = scoreText.color; // couleur par dï¿½faut
             //    if (goalHandler.goalReached)
             //        targetColor = Utilities.ColorGreen;
             //    else
