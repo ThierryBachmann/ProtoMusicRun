@@ -436,10 +436,10 @@ public class HippoVisual : MonoBehaviour
             new Vector3(0.06f, 0.22f, 0.06f),
             MaterialSlot.Body);
 
-        legFL = CreateLeg("Leg_FL", new Vector3(-0.78f, 0.46f, 1.0f));
-        legFR = CreateLeg("Leg_FR", new Vector3(0.78f, 0.46f, 1.0f));
-        legBL = CreateLeg("Leg_BL", new Vector3(-0.78f, 0.46f, -1.0f));
-        legBR = CreateLeg("Leg_BR", new Vector3(0.78f, 0.46f, -1.0f));
+        legFL = CreateLeg("Leg_FL", new Vector3(-0.78f, 0.52f, 1.0f));
+        legFR = CreateLeg("Leg_FR", new Vector3(0.78f, 0.52f, 1.0f));
+        legBL = CreateLeg("Leg_BL", new Vector3(-0.78f, 0.52f, -1.0f));
+        legBR = CreateLeg("Leg_BR", new Vector3(0.78f, 0.52f, -1.0f));
     }
 
     private void UpdateAnimation()
@@ -678,18 +678,18 @@ public class HippoVisual : MonoBehaviour
             "Upper",
             PrimitiveType.Sphere,
             legRoot,
-            new Vector3(0f, -0.26f, 0f),
+            new Vector3(0f, -0.28f, 0f),
             Vector3.zero,
-            new Vector3(0.44f, 0.72f, 0.44f),
+            new Vector3(0.46f, 0.88f, 0.46f),
             MaterialSlot.Body);
 
         Transform foot = CreatePart(
             "Foot",
             PrimitiveType.Sphere,
             legRoot,
-            new Vector3(0f, -0.6f, 0.08f),
+            new Vector3(0f, -0.68f, 0.08f),
             Vector3.zero,
-            new Vector3(0.56f, 0.18f, 0.66f),
+            new Vector3(0.58f, 0.20f, 0.70f),
             MaterialSlot.Body);
 
         RemoveCollider(upper.gameObject);
