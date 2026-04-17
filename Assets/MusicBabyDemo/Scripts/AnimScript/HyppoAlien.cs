@@ -19,16 +19,19 @@ public class HippoVisual : MonoBehaviour
 
     [Header("Materials")]
     public Material bodyMaterial;
+    public Material scleraMaterial;
     public Material eyeMaterial;
+    public Material pupilMaterial;
     public Material mouthMaterial;
 
     public Color fallbackBodyColor = new Color(0.56f, 0.58f, 0.63f);
+    public Color fallbackScleraColor = new Color(0.92f, 0.94f, 0.97f);
     public Color fallbackEyeColor = new Color(0.08f, 0.08f, 0.08f);
     public Color fallbackMouthColor = new Color(0.55f, 0.22f, 0.24f);
 
     [Header("Idle")]
     public float idleBreathSpeed = 1.6f;
-    public float idleBreathAmount = 0.02f;
+    public float idleBreathAmount = 0.03f;
     public float idleHeadNodAngle = 1.5f;
     public float idleHeadNodSpeed = 1.3f;
     public float idleTailSwingFactor = 0.25f;
@@ -40,20 +43,26 @@ public class HippoVisual : MonoBehaviour
     public float bodyBobAmount = 0.05f;
     public float headSwingAngle = 3f;
     public float tailSwingAngle = 14f;
-
+ 
     [Header("Eyes")]
-    public float eyeLookSideAngle = 18f;
+    public float eyeLookSideAngle = 35f;
     public float eyeLookSpeed = 2.2f;
     [Tooltip("Horizontal offset of eye pivots from head center.")]
-    public float eyePivotSideOffset = 0.44f;
+    public float eyePivotSideOffset = 0.45f;
     [Tooltip("Vertical offset of eye pivots from head center.")]
-    public float eyePivotHeightOffset = 0.30f;
+    public float eyePivotHeightOffset = 0.24f;
     [Tooltip("Forward offset of eye pivots from head center. Increase to pull eyes out of the head.")]
-    public float eyePivotForwardOffset = 0.82f;
+    public float eyePivotForwardOffset = 0.62f;
     [Tooltip("Uniform eye sphere scale.")]
     public float eyeScale = 0.22f;
-    [Tooltip("Forward offset of each eyeball from its pivot (socket center) to make left/right look movement visible.")]
-    public float eyeBallForwardOffset = 0.11f;
+    [Tooltip("Forward offset of each eyeball from its pivot (socket center).")]
+    public float eyeBallForwardOffset = 0.08f;
+    [Tooltip("Pupil size ratio relative to eye size (0.5 = half-eye diameter).")]
+    public float pupilScale = 0.48f;
+    [Tooltip("Pupil center forward offset in eye local space (0=center, 0.5=eye surface).")]
+    public float pupilForwardOffset = 0.27f;
+    [Tooltip("Horizontal pupil travel in eye local space when looking left/right.")]
+    public float pupilLookSideOffset = 0.08f;
 
     [Header("Eat")]
     public float eatAnimDuration = 0.75f;
@@ -94,6 +103,8 @@ public class HippoVisual : MonoBehaviour
     private Transform eyePivotR;
     private Transform eyeL;
     private Transform eyeR;
+    private Transform pupilL;
+    private Transform pupilR;
 
     private Vector3 bodyBaseLocalPos;
     private Vector3 bodyBaseLocalScale;
@@ -105,31 +116,44 @@ public class HippoVisual : MonoBehaviour
     private Quaternion eyePivotRBaseLocalRot;
     private Vector3 eyeBaseScale;
     private Vector3 eyeBaseLocalPos;
+    private Vector3 pupilBaseScale;
+    private Vector3 pupilBaseLocalPos;
 
     private HippoAnimState previousState;
     private float stateTimer;
+    private bool materialsDirty = true;
+
+    private Material fallbackBodyMat;
+    private Material fallbackScleraMat;
+    private Material fallbackPupilMat;
+    private Material fallbackMouthMat;
 
     private enum MaterialSlot
     {
         Body,
         Eye,
+        EyeSclera,
+        EyePupil,
         Mouth
     }
 
     private void Start()
     {
+        materialsDirty = true;
         BuildIfNeeded(false);
         SyncPreviousState();
     }
 
     private void OnEnable()
     {
+        materialsDirty = true;
         BuildIfNeeded(false);
         SyncPreviousState();
     }
 
     private void OnValidate()
     {
+        materialsDirty = true;
         BuildIfNeeded(false);
     }
 
@@ -170,10 +194,38 @@ public class HippoVisual : MonoBehaviour
         }
     }
 
+    [ContextMenu("Rebuild Visual")]
     public void Rebuild()
     {
         BuildIfNeeded(true);
         SyncPreviousState();
+    }
+
+    [ContextMenu("Apply All Preset")]
+    public void ApplyAllPreset()
+    {
+        eyeLookSideAngle = 35f;
+        eyeLookSpeed = 2.2f;
+        eyePivotSideOffset = 0.44f;
+        eyePivotHeightOffset = 0.25f;
+        eyePivotForwardOffset = 0.64f;
+        eyeScale = 0.22f;
+        eyeBallForwardOffset = 0.08f;
+        pupilScale = 0.48f;
+        pupilForwardOffset = 0.27f;
+        pupilLookSideOffset = 0.08f;
+
+        BuildIfNeeded(false);
+        ApplyEyePlacement();
+
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            UnityEditor.EditorUtility.SetDirty(this);
+            if (root != null)
+                UnityEditor.EditorUtility.SetDirty(root.gameObject);
+        }
+#endif
     }
 
     private void SyncPreviousState()
@@ -202,19 +254,126 @@ public class HippoVisual : MonoBehaviour
                     CacheBases();
                 }
 
+                if (eyeL == null || eyeR == null || pupilL == null || pupilR == null)
+                {
+                    BuildIfNeeded(true);
+                    return;
+                }
+
+                if (!HasUpdatedLegGeometry())
+                {
+                    BuildIfNeeded(true);
+                    return;
+                }
+
+                if (materialsDirty)
+                {
+                    ApplyCurrentMaterialsToRig();
+                    materialsDirty = false;
+                }
+
                 ApplyEyePlacement();
                 return;
             }
 
             if (root != null)
+            {
+                if (materialsDirty)
+                {
+                    ApplyCurrentMaterialsToRig();
+                    materialsDirty = false;
+                }
                 return;
+            }
         }
 
         ClearExisting();
         BuildVisual();
         RecoverReferences();
         CacheBases();
+        ApplyCurrentMaterialsToRig();
+        materialsDirty = false;
         ApplyEyePlacement();
+    }
+
+    private bool HasUpdatedLegGeometry()
+    {
+        return HasLegParts(legFL) &&
+               HasLegParts(legFR) &&
+               HasLegParts(legBL) &&
+               HasLegParts(legBR);
+    }
+
+    private static bool HasLegParts(Transform legRoot)
+    {
+        return legRoot != null &&
+               legRoot.Find("Upper") != null &&
+               legRoot.Find("Ankle") != null &&
+               legRoot.Find("Foot") != null;
+    }
+
+    private void ApplyCurrentMaterialsToRig()
+    {
+        if (body != null)
+            ApplyMaterial(body.gameObject, MaterialSlot.Body);
+
+        if (head != null)
+            ApplyMaterial(head.gameObject, MaterialSlot.Body);
+
+        if (tail != null)
+            ApplyMaterial(tail.gameObject, MaterialSlot.Body);
+
+        if (upperJaw != null)
+            ApplyMaterial(upperJaw.gameObject, MaterialSlot.Mouth);
+
+        if (lowerJaw != null)
+            ApplyMaterial(lowerJaw.gameObject, MaterialSlot.Mouth);
+
+        if (eyeL != null)
+            ApplyMaterial(eyeL.gameObject, MaterialSlot.EyeSclera);
+
+        if (eyeR != null)
+            ApplyMaterial(eyeR.gameObject, MaterialSlot.EyeSclera);
+
+        if (pupilL != null)
+            ApplyMaterial(pupilL.gameObject, MaterialSlot.EyePupil);
+
+        if (pupilR != null)
+            ApplyMaterial(pupilR.gameObject, MaterialSlot.EyePupil);
+
+        if (headPivot != null)
+        {
+            Transform earL = headPivot.Find("Ear_L");
+            if (earL != null)
+                ApplyMaterial(earL.gameObject, MaterialSlot.Body);
+
+            Transform earR = headPivot.Find("Ear_R");
+            if (earR != null)
+                ApplyMaterial(earR.gameObject, MaterialSlot.Body);
+        }
+
+        ApplyLegMaterials(legFL);
+        ApplyLegMaterials(legFR);
+        ApplyLegMaterials(legBL);
+        ApplyLegMaterials(legBR);
+    }
+
+    private void ApplyLegMaterials(Transform legRoot)
+    {
+        if (legRoot == null)
+            return;
+
+        Transform upper = legRoot.Find("Upper");
+        if (upper != null)
+            ApplyMaterial(upper.gameObject, MaterialSlot.Body);
+
+        Transform ankle = legRoot.Find("Ankle");
+        if (ankle != null)
+            ApplyMaterial(ankle.gameObject, MaterialSlot.Body);
+
+        Transform foot = legRoot.Find("Foot");
+        if (foot != null)
+            ApplyMaterial(foot.gameObject, MaterialSlot.Body);
     }
 
     private void RecoverReferences()
@@ -251,6 +410,12 @@ public class HippoVisual : MonoBehaviour
 
             if (eyePivotR != null)
                 eyeR = eyePivotR.Find("Eye_R");
+
+            if (eyeL != null)
+                pupilL = eyeL.Find("Pupil_L");
+
+            if (eyeR != null)
+                pupilR = eyeR.Find("Pupil_R");
         }
     }
 
@@ -289,8 +454,21 @@ public class HippoVisual : MonoBehaviour
         if (eyeR != null && eyeL == null)
             eyeBaseLocalPos = eyeR.localPosition;
 
+        if (pupilL != null)
+        {
+            pupilBaseScale = pupilL.localScale;
+            pupilBaseLocalPos = pupilL.localPosition;
+        }
+        else if (pupilR != null)
+        {
+            pupilBaseScale = pupilR.localScale;
+            pupilBaseLocalPos = pupilR.localPosition;
+        }
+
         SetEyeScaleImmediate(eyeBaseScale);
         SetEyeLocalPositionImmediate(eyeBaseLocalPos);
+        SetPupilScaleImmediate(pupilBaseScale);
+        SetPupilLocalPositionImmediate(pupilBaseLocalPos);
     }
 
     private void ClearExisting()
@@ -325,6 +503,8 @@ public class HippoVisual : MonoBehaviour
         eyePivotR = null;
         eyeL = null;
         eyeR = null;
+        pupilL = null;
+        pupilR = null;
     }
 
     private void BuildVisual()
@@ -398,7 +578,7 @@ public class HippoVisual : MonoBehaviour
             new Vector3(0f, 0f, eyeBallForwardOffset),
             Vector3.zero,
             new Vector3(eyeScale, eyeScale, eyeScale),
-            MaterialSlot.Eye);
+            MaterialSlot.EyeSclera);
 
         eyeR = CreatePart(
             "Eye_R",
@@ -407,7 +587,28 @@ public class HippoVisual : MonoBehaviour
             new Vector3(0f, 0f, eyeBallForwardOffset),
             Vector3.zero,
             new Vector3(eyeScale, eyeScale, eyeScale),
-            MaterialSlot.Eye);
+            MaterialSlot.EyeSclera);
+
+        pupilL = CreatePart(
+            "Pupil_L",
+            PrimitiveType.Sphere,
+            eyeL,
+            new Vector3(0f, 0f, pupilForwardOffset),
+            Vector3.zero,
+            new Vector3(pupilScale, pupilScale, pupilScale),
+            MaterialSlot.EyePupil);
+
+        pupilR = CreatePart(
+            "Pupil_R",
+            PrimitiveType.Sphere,
+            eyeR,
+            new Vector3(0f, 0f, pupilForwardOffset),
+            Vector3.zero,
+            new Vector3(pupilScale, pupilScale, pupilScale),
+            MaterialSlot.EyePupil);
+
+        RemoveCollider(pupilL.gameObject);
+        RemoveCollider(pupilR.gameObject);
 
         CreatePart(
             "Ear_L",
@@ -436,10 +637,10 @@ public class HippoVisual : MonoBehaviour
             new Vector3(0.06f, 0.22f, 0.06f),
             MaterialSlot.Body);
 
-        legFL = CreateLeg("Leg_FL", new Vector3(-0.78f, 0.52f, 1.0f));
-        legFR = CreateLeg("Leg_FR", new Vector3(0.78f, 0.52f, 1.0f));
-        legBL = CreateLeg("Leg_BL", new Vector3(-0.78f, 0.52f, -1.0f));
-        legBR = CreateLeg("Leg_BR", new Vector3(0.78f, 0.52f, -1.0f));
+        legFL = CreateLeg("Leg_FL", new Vector3(-0.76f, 0.58f, 1.0f));
+        legFR = CreateLeg("Leg_FR", new Vector3(0.76f, 0.58f, 1.0f));
+        legBL = CreateLeg("Leg_BL", new Vector3(-0.76f, 0.58f, -1.0f));
+        legBR = CreateLeg("Leg_BR", new Vector3(0.76f, 0.58f, -1.0f));
     }
 
     private void UpdateAnimation()
@@ -611,15 +812,29 @@ public class HippoVisual : MonoBehaviour
     {
         if (state == HippoAnimState.Chase)
         {
-            float look = Mathf.Sin(t * eyeLookSpeed) * eyeLookSideAngle;
+            float lookPhase = Mathf.Sin(t * eyeLookSpeed);
 
-            eyePivotL.localRotation = eyePivotLBaseLocalRot * Quaternion.Euler(0f, look, 0f);
-            eyePivotR.localRotation = eyePivotRBaseLocalRot * Quaternion.Euler(0f, look, 0f);
+            float clampedLookAngle = Mathf.Clamp(eyeLookSideAngle, 0f, 75f);
+            float eyeRadius = 0.5f;
+            float appliedPupilScale = pupilBaseScale.sqrMagnitude > 0.000001f ? pupilBaseScale.x : Mathf.Clamp(pupilScale, 0.05f, 0.85f);
+            float pupilRadius = Mathf.Max(0.005f, appliedPupilScale * 0.5f);
+            float maxTravelOnSclera = Mathf.Max(0f, (eyeRadius - pupilRadius) * 0.95f);
+            float minTravel = Mathf.Clamp(pupilLookSideOffset, 0f, maxTravelOnSclera);
+            float angleFactor = Mathf.Sin(clampedLookAngle * Mathf.Deg2Rad);
+            float sideAmplitude = Mathf.Lerp(minTravel, maxTravelOnSclera, angleFactor);
+            float pupilSide = lookPhase * sideAmplitude;
+            Vector3 pupilPos = pupilBaseLocalPos + new Vector3(pupilSide, 0f, 0f);
+            SetPupilLocalPositionImmediate(pupilPos);
+
+            // Keep pivots neutral: visible eye motion comes from pupil translation.
+            eyePivotL.localRotation = eyePivotLBaseLocalRot;
+            eyePivotR.localRotation = eyePivotRBaseLocalRot;
         }
         else
         {
             eyePivotL.localRotation = eyePivotLBaseLocalRot;
             eyePivotR.localRotation = eyePivotRBaseLocalRot;
+            SetPupilLocalPositionImmediate(pupilBaseLocalPos);
         }
     }
 
@@ -641,6 +856,24 @@ public class HippoVisual : MonoBehaviour
             eyeR.localPosition = localPos;
     }
 
+    private void SetPupilScaleImmediate(Vector3 scale)
+    {
+        if (pupilL != null)
+            pupilL.localScale = scale;
+
+        if (pupilR != null)
+            pupilR.localScale = scale;
+    }
+
+    private void SetPupilLocalPositionImmediate(Vector3 localPos)
+    {
+        if (pupilL != null)
+            pupilL.localPosition = localPos;
+
+        if (pupilR != null)
+            pupilR.localPosition = localPos;
+    }
+
     private void ApplyEyePlacement()
     {
         float side = Mathf.Abs(eyePivotSideOffset);
@@ -660,6 +893,17 @@ public class HippoVisual : MonoBehaviour
         float eyeballForward = Mathf.Max(0f, eyeBallForwardOffset);
         eyeBaseLocalPos = new Vector3(0f, 0f, eyeballForward);
         SetEyeLocalPositionImmediate(eyeBaseLocalPos);
+
+        // Pupil values are expressed in eye local space (normalized to a unit sphere).
+        float uniformPupilScale = Mathf.Clamp(pupilScale, 0.05f, 0.85f);
+        pupilBaseScale = new Vector3(uniformPupilScale, uniformPupilScale, uniformPupilScale);
+        SetPupilScaleImmediate(pupilBaseScale);
+
+        float pupilRadius = uniformPupilScale * 0.5f;
+        float maxPupilForward = Mathf.Max(0f, 0.5f - pupilRadius + 0.02f);
+        float pupilForward = Mathf.Clamp(pupilForwardOffset, 0f, maxPupilForward);
+        pupilBaseLocalPos = new Vector3(0f, 0f, pupilForward);
+        SetPupilLocalPositionImmediate(pupilBaseLocalPos);
     }
 
     private float DeltaTimeSafe()
@@ -678,21 +922,31 @@ public class HippoVisual : MonoBehaviour
             "Upper",
             PrimitiveType.Sphere,
             legRoot,
-            new Vector3(0f, -0.28f, 0f),
+            new Vector3(0f, -0.18f, 0f),
             Vector3.zero,
-            new Vector3(0.46f, 0.88f, 0.46f),
+            new Vector3(0.52f, 1.16f, 0.52f),
+            MaterialSlot.Body);
+
+        Transform ankle = CreatePart(
+            "Ankle",
+            PrimitiveType.Sphere,
+            legRoot,
+            new Vector3(0f, -0.72f, 0.06f),
+            Vector3.zero,
+            new Vector3(0.42f, 0.36f, 0.42f),
             MaterialSlot.Body);
 
         Transform foot = CreatePart(
             "Foot",
             PrimitiveType.Sphere,
             legRoot,
-            new Vector3(0f, -0.68f, 0.08f),
+            new Vector3(0f, -0.92f, 0.14f),
             Vector3.zero,
-            new Vector3(0.58f, 0.20f, 0.70f),
+            new Vector3(0.72f, 0.34f, 0.84f),
             MaterialSlot.Body);
 
         RemoveCollider(upper.gameObject);
+        RemoveCollider(ankle.gameObject);
         RemoveCollider(foot.gameObject);
 
         return legRoot;
@@ -739,8 +993,20 @@ public class HippoVisual : MonoBehaviour
                 assigned = bodyMaterial != null ? bodyMaterial : CreateFallbackMaterial("HippoBody_Fallback", fallbackBodyColor);
                 break;
 
+            case MaterialSlot.EyeSclera:
+                assigned = scleraMaterial != null ? scleraMaterial : CreateFallbackMaterial("HippoSclera_Fallback", fallbackScleraColor);
+                break;
+
+            case MaterialSlot.EyePupil:
+                assigned = pupilMaterial != null
+                    ? pupilMaterial
+                    : CreateFallbackMaterial("HippoPupil_Fallback", fallbackEyeColor);
+                break;
+
             case MaterialSlot.Eye:
-                assigned = eyeMaterial != null ? eyeMaterial : CreateFallbackMaterial("HippoEye_Fallback", fallbackEyeColor);
+                assigned = eyeMaterial != null
+                    ? eyeMaterial
+                    : (pupilMaterial != null ? pupilMaterial : CreateFallbackMaterial("HippoEye_Fallback", fallbackEyeColor));
                 break;
 
             case MaterialSlot.Mouth:
@@ -753,13 +1019,34 @@ public class HippoVisual : MonoBehaviour
 
     private Material CreateFallbackMaterial(string matName, Color color)
     {
+        // Force URP-compatible fallbacks to avoid pink/magenta materials in URP projects.
         Shader shader = Shader.Find("Universal Render Pipeline/Lit");
         if (shader == null)
-            shader = Shader.Find("Standard");
+            shader = Shader.Find("Universal Render Pipeline/Simple Lit");
+
+        if (shader == null)
+        {
+            Debug.LogWarning(
+                $"[{nameof(HippoVisual)}] URP fallback shaders not found. " +
+                "Falling back to a generic unlit shader.");
+            shader = Shader.Find("Unlit/Color");
+        }
+
+        if (shader == null)
+            shader = Shader.Find("Sprites/Default");
+
+        if (shader == null)
+            shader = Shader.Find("Hidden/InternalErrorShader");
 
         Material mat = new Material(shader);
         mat.name = matName;
-        mat.color = color;
+
+        if (mat.HasProperty("_BaseColor"))
+            mat.SetColor("_BaseColor", color);
+
+        if (mat.HasProperty("_Color"))
+            mat.SetColor("_Color", color);
+
         return mat;
     }
 
