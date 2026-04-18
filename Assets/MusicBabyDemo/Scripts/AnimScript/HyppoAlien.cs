@@ -1,19 +1,8 @@
 using UnityEngine;
 
 [ExecuteAlways]
-public class HippoVisual : MonoBehaviour
+public class HippoVisual : CreatureVisualBase
 {
-    public enum HippoAnimState
-    {
-        Idle,
-        Chase,
-        Eat,
-        Stunned
-    }
-
-    [Header("External State")]
-    public HippoAnimState state = HippoAnimState.Idle;
-
     [Header("Build")]
     [Min(0.01f)] public float overallScale = 1f;
 
@@ -43,6 +32,14 @@ public class HippoVisual : MonoBehaviour
     public float bodyBobAmount = 0.05f;
     public float headSwingAngle = 3f;
     public float tailSwingAngle = 14f;
+
+    [Header("Chase Displacement Coupling")]
+    [Tooltip("When enabled, chase gait phase advances from real horizontal displacement instead of Time.time.")]
+    public bool driveChasePhaseFromDisplacement = true;
+    [Tooltip("Ignore tiny displacements to avoid micro-jitter in gait progression.")]
+    public float chaseMinDisplacement = 0.0005f;
+    [Tooltip("Ignore a single-frame displacement above this threshold (teleport/recovery safety).")]
+    public float chaseMaxDisplacementPerFrame = 1.25f;
  
     [Header("Eyes")]
     public float eyeLookSideAngle = 35f;
@@ -119,14 +116,16 @@ public class HippoVisual : MonoBehaviour
     private Vector3 pupilBaseScale;
     private Vector3 pupilBaseLocalPos;
 
-    private HippoAnimState previousState;
-    private float stateTimer;
-    private bool materialsDirty = true;
-
     private Material fallbackBodyMat;
     private Material fallbackScleraMat;
     private Material fallbackPupilMat;
     private Material fallbackMouthMat;
+    private float chaseGaitPhase;
+    private Vector3 chaseLastWorldPosition;
+    private bool chaseHasLastWorldPosition;
+    private float chaseLegLengthEstimate = 0.8f;
+    private float chaseCycleDistance = 1f;
+    private float chaseCachedLegAngle = float.NaN;
 
     private enum MaterialSlot
     {
@@ -137,68 +136,15 @@ public class HippoVisual : MonoBehaviour
         Mouth
     }
 
-    private void Start()
+    public override void SetControllerState(MusicRun.CreatureState controllerState)
     {
-        materialsDirty = true;
-        BuildIfNeeded(false);
-        SyncPreviousState();
-    }
-
-    private void OnEnable()
-    {
-        materialsDirty = true;
-        BuildIfNeeded(false);
-        SyncPreviousState();
-    }
-
-    private void OnValidate()
-    {
-        materialsDirty = true;
-        BuildIfNeeded(false);
-    }
-
-    private void Update()
-    {
-        BuildIfNeeded(false);
-
-        if (Application.isPlaying)
-        {
-            if (previousState != state)
-            {
-                OnStateChanged(previousState, state);
-                previousState = state;
-            }
-
-            stateTimer += Time.deltaTime;
-        }
-
-        UpdateAnimation();
-    }
-
-    public void SetState(HippoAnimState newState)
-    {
-        if (state == newState)
-            return;
-
-        HippoAnimState old = state;
-        state = newState;
-
-        if (Application.isPlaying)
-        {
-            OnStateChanged(old, newState);
-            previousState = newState;
-        }
-        else
-        {
-            previousState = newState;
-        }
+        SetState(MapControllerState(controllerState));
     }
 
     [ContextMenu("Rebuild Visual")]
     public void Rebuild()
     {
-        BuildIfNeeded(true);
-        SyncPreviousState();
+        RebuildVisual();
     }
 
     [ContextMenu("Apply All Preset")]
@@ -228,18 +174,15 @@ public class HippoVisual : MonoBehaviour
 #endif
     }
 
-    private void SyncPreviousState()
+    protected override void OnStateChanged(CreatureVisualState oldState, CreatureVisualState newState)
     {
-        previousState = state;
-        stateTimer = 0f;
+        base.OnStateChanged(oldState, newState);
+
+        if (newState == CreatureVisualState.Chase || oldState == CreatureVisualState.Chase)
+            ResetChaseDisplacementSampling();
     }
 
-    private void OnStateChanged(HippoAnimState oldState, HippoAnimState newState)
-    {
-        stateTimer = 0f;
-    }
-
-    private void BuildIfNeeded(bool force)
+    protected override void BuildIfNeeded(bool force)
     {
         Transform existing = transform.Find(RootName);
 
@@ -469,6 +412,8 @@ public class HippoVisual : MonoBehaviour
         SetEyeLocalPositionImmediate(eyeBaseLocalPos);
         SetPupilScaleImmediate(pupilBaseScale);
         SetPupilLocalPositionImmediate(pupilBaseLocalPos);
+        RecomputeChaseCalibration();
+        ResetChaseDisplacementSampling();
     }
 
     private void ClearExisting()
@@ -505,6 +450,11 @@ public class HippoVisual : MonoBehaviour
         eyeR = null;
         pupilL = null;
         pupilR = null;
+        chaseHasLastWorldPosition = false;
+        chaseGaitPhase = 0f;
+        chaseLegLengthEstimate = 0.8f;
+        chaseCycleDistance = 1f;
+        chaseCachedLegAngle = float.NaN;
     }
 
     private void BuildVisual()
@@ -643,7 +593,7 @@ public class HippoVisual : MonoBehaviour
         legBR = CreateLeg("Leg_BR", new Vector3(0.76f, 0.58f, -1.0f));
     }
 
-    private void UpdateAnimation()
+    protected override void UpdateAnimation()
     {
         if (!IsRigReady())
             return;
@@ -655,19 +605,19 @@ public class HippoVisual : MonoBehaviour
 
         switch (state)
         {
-            case HippoAnimState.Idle:
+            case CreatureVisualState.Idle:
                 AnimateIdle(t);
                 break;
 
-            case HippoAnimState.Chase:
+            case CreatureVisualState.Chase:
                 AnimateChase(t);
                 break;
 
-            case HippoAnimState.Eat:
+            case CreatureVisualState.Eat:
                 AnimateEat();
                 break;
 
-            case HippoAnimState.Stunned:
+            case CreatureVisualState.Stunned:
                 AnimateStunned(t);
                 break;
         }
@@ -728,29 +678,129 @@ public class HippoVisual : MonoBehaviour
     {
         if (animateWalk)
         {
-            float phase = t * walkCycleSpeed;
+            float phase = ResolveChasePhase(t);
+            float appliedLegAngle = legAngle;
+            float appliedBodyBob = bodyBobAmount;
+            float appliedHeadSwing = headSwingAngle;
+            float appliedTailSwing = tailSwingAngle;
 
-            float fl = Mathf.Sin(phase) * legAngle;
-            float fr = Mathf.Sin(phase + Mathf.PI) * legAngle;
-            float bl = Mathf.Sin(phase + Mathf.PI) * legAngle;
-            float br = Mathf.Sin(phase) * legAngle;
+            float fl = Mathf.Sin(phase) * appliedLegAngle;
+            float fr = Mathf.Sin(phase + Mathf.PI) * appliedLegAngle;
+            float bl = Mathf.Sin(phase + Mathf.PI) * appliedLegAngle;
+            float br = Mathf.Sin(phase) * appliedLegAngle;
 
             legFL.localRotation = Quaternion.Euler(fl, 0f, 0f);
             legFR.localRotation = Quaternion.Euler(fr, 0f, 0f);
             legBL.localRotation = Quaternion.Euler(bl, 0f, 0f);
             legBR.localRotation = Quaternion.Euler(br, 0f, 0f);
 
-            float bob = Mathf.Abs(Mathf.Sin(phase * 1.2f)) * bodyBobAmount;
+            float bob = Mathf.Abs(Mathf.Sin(phase * 1.2f)) * appliedBodyBob;
             body.localPosition = bodyBaseLocalPos + new Vector3(0f, bob, 0f);
 
-            float headSwing = Mathf.Sin(phase) * headSwingAngle;
+            float headSwing = Mathf.Sin(phase) * appliedHeadSwing;
             headPivot.localRotation = headBaseLocalRot * Quaternion.Euler(headSwing, 0f, 0f);
 
-            float tailSwing = Mathf.Sin(phase + 0.8f) * tailSwingAngle;
+            float tailSwing = Mathf.Sin(phase + 0.8f) * appliedTailSwing;
             tail.localRotation = tailBaseLocalRot * Quaternion.Euler(0f, tailSwing, 0f);
         }
 
         jawPivot.localRotation = jawBaseLocalRot * Quaternion.Euler(mouthOpenAngle * 0.12f, 0f, 0f);
+    }
+
+    private float ResolveChasePhase(float t)
+    {
+        if (!driveChasePhaseFromDisplacement || !Application.isPlaying)
+            return t * walkCycleSpeed;
+
+        EnsureChaseCalibration();
+
+        Vector3 currentPosition = transform.position;
+        if (!chaseHasLastWorldPosition)
+        {
+            chaseLastWorldPosition = currentPosition;
+            chaseHasLastWorldPosition = true;
+            return chaseGaitPhase;
+        }
+
+        Vector3 delta = currentPosition - chaseLastWorldPosition;
+        chaseLastWorldPosition = currentPosition;
+        delta.y = 0f;
+        float distance = delta.magnitude;
+
+        float minDistance = Mathf.Max(0f, chaseMinDisplacement);
+        if (distance <= minDistance)
+            return chaseGaitPhase;
+
+        float maxDistance = Mathf.Max(minDistance + 0.001f, chaseMaxDisplacementPerFrame);
+        if (distance > maxDistance)
+            return chaseGaitPhase;
+
+        float cycleDistance = Mathf.Max(0.01f, chaseCycleDistance);
+        float phaseAdvance = (distance / cycleDistance) * Mathf.PI * 2f;
+        chaseGaitPhase = Mathf.Repeat(chaseGaitPhase + phaseAdvance, Mathf.PI * 2f);
+        return chaseGaitPhase;
+    }
+
+    private void EnsureChaseCalibration()
+    {
+        if (float.IsNaN(chaseCachedLegAngle) || float.IsInfinity(chaseCachedLegAngle) ||
+            Mathf.Abs(chaseCachedLegAngle - legAngle) > 0.001f ||
+            chaseCycleDistance <= 0.001f)
+        {
+            RecomputeChaseCalibration();
+        }
+    }
+
+    private void RecomputeChaseCalibration()
+    {
+        chaseLegLengthEstimate = EstimateAverageLegLength();
+        float clampedLegAngle = Mathf.Clamp(legAngle, 0.01f, 85f);
+        float stepDistance = 2f * chaseLegLengthEstimate * Mathf.Sin(clampedLegAngle * Mathf.Deg2Rad);
+        chaseCycleDistance = Mathf.Max(0.01f, stepDistance * 2f);
+        chaseCachedLegAngle = legAngle;
+    }
+
+    private float EstimateAverageLegLength()
+    {
+        float total = 0f;
+        int count = 0;
+
+        TryAccumulateLegLength(legFL, ref total, ref count);
+        TryAccumulateLegLength(legFR, ref total, ref count);
+        TryAccumulateLegLength(legBL, ref total, ref count);
+        TryAccumulateLegLength(legBR, ref total, ref count);
+
+        if (count <= 0)
+            return Mathf.Max(0.2f, overallScale * 0.8f);
+
+        return total / count;
+    }
+
+    private static void TryAccumulateLegLength(Transform legRoot, ref float totalLength, ref int count)
+    {
+        if (legRoot == null)
+            return;
+
+        Transform upper = legRoot.Find("Upper");
+        Transform ankle = legRoot.Find("Ankle");
+        Transform foot = legRoot.Find("Foot");
+        if (upper == null || ankle == null || foot == null)
+            return;
+
+        float segmentA = Vector3.Distance(upper.position, ankle.position);
+        float segmentB = Vector3.Distance(ankle.position, foot.position);
+        float candidate = segmentA + segmentB;
+        if (candidate <= 0.001f)
+            return;
+
+        totalLength += candidate;
+        count++;
+    }
+
+    private void ResetChaseDisplacementSampling()
+    {
+        chaseHasLastWorldPosition = false;
+        chaseLastWorldPosition = transform.position;
     }
 
     private void AnimateEat()
@@ -810,7 +860,7 @@ public class HippoVisual : MonoBehaviour
 
     private void UpdateEyes(float t)
     {
-        if (state == HippoAnimState.Chase)
+        if (state == CreatureVisualState.Chase)
         {
             float lookPhase = Mathf.Sin(t * eyeLookSpeed);
 
@@ -904,11 +954,6 @@ public class HippoVisual : MonoBehaviour
         float pupilForward = Mathf.Clamp(pupilForwardOffset, 0f, maxPupilForward);
         pupilBaseLocalPos = new Vector3(0f, 0f, pupilForward);
         SetPupilLocalPositionImmediate(pupilBaseLocalPos);
-    }
-
-    private float DeltaTimeSafe()
-    {
-        return Application.isPlaying ? Time.deltaTime : 0.016f;
     }
 
     private Transform CreateLeg(string name, Vector3 localPos)

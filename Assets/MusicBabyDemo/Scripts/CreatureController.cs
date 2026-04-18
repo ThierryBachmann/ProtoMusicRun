@@ -347,6 +347,7 @@ namespace MusicRun
         private TerrainGenerator terrainGenerator;
         private BonusManager bonusManager;
         private CharacterController characterController;
+        private CreatureVisualBase creatureVisual;
 
         private CreatureState state = CreatureState.FOLLOW;
         [Tooltip("Elapsed time in current creature state (debug display).")]
@@ -430,6 +431,7 @@ namespace MusicRun
             stateTime += Time.deltaTime;
             UpdateStateMachine();
             ApplyMovement(Time.deltaTime);
+            PushCreatureVisualRuntimeContext();
         }
 
         /// <summary>
@@ -659,6 +661,8 @@ namespace MusicRun
             if (debugLogs)
                 Debug.Log($"Creature state: {state} -> {nextState}");
             state = nextState;
+            PushCreatureVisualState();
+            PushCreatureVisualRuntimeContext();
         }
 
         private void TickFollow()
@@ -1823,8 +1827,38 @@ namespace MusicRun
                 terrainGenerator = gameManager.terrainGenerator;
             if (bonusManager == null)
                 bonusManager = gameManager.bonusManager;
+            bool visualJustResolved = false;
+            if (creatureVisual == null)
+            {
+                creatureVisual = GetComponentInChildren<CreatureVisualBase>(true);
+                visualJustResolved = creatureVisual != null;
+            }
+            if (visualJustResolved)
+            {
+                PushCreatureVisualState();
+                PushCreatureVisualRuntimeContext();
+            }
 
             return playerController != null && characterController != null;
+        }
+
+        private void PushCreatureVisualState()
+        {
+            if (creatureVisual == null)
+                return;
+
+            creatureVisual.SetControllerState(state);
+        }
+
+        private void PushCreatureVisualRuntimeContext()
+        {
+            if (creatureVisual == null)
+                return;
+
+            bool grounded = characterController != null && characterController.isGrounded;
+            Vector3 groundNormal = groundUpInitialized ? smoothedGroundUp : Vector3.up;
+            creatureVisual.SetMotionContext(currentSpeed, grounded, groundNormal);
+            creatureVisual.SetTargetContext(currentTarget != null);
         }
 
         private void ConfigureCharacterControllerShape(bool force = false)
