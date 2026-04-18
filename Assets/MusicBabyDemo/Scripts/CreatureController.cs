@@ -1,3 +1,116 @@
+/*
+Voici une synthèse fonctionnelle (non technique) de la créature.
+
+**Objectif Gameplay**
+- La créature doit maintenir une pression constante sur le joueur.
+- Le joueur doit pouvoir l’influencer (vitesse, trajectoire), sans la contrôler directement.
+- Le ressenti recherché est une “grosse bête” avec inertie et autonomie limitée.
+
+**Modes De Comportement**
+- `FOLLOW` : la créature accompagne le joueur.
+- `OVERTAKE` : la créature repasse devant le joueur.
+- `HUNT` : la créature se place devant le joueur et cherche des instruments.
+- `EAT` : la créature saute pour percuter et détruire un instrument.
+- Le mode `RETURN` n’existe plus.
+
+**Règles De Transition**
+- `FOLLOW -> OVERTAKE` quand la vitesse du joueur descend sous un seuil configurable.
+- `OVERTAKE -> HUNT` quand la créature a repris sa position de chasse devant le joueur.
+- `HUNT -> FOLLOW` quand la vitesse du joueur dépasse un seuil configurable (valeur de référence: 3).
+- `HUNT -> EAT` seulement si une cible instrument valide est disponible et que le délai minimal entre deux `EAT` est écoulé.
+- `EAT -> HUNT` après l’attaque et retour au sol.
+- Les changements d’état ne doivent pas “ping-pong” sans délai.
+
+**Déplacement Attendu**
+- Déplacement principal au sol, en suivant le relief du terrain.
+- En `EAT`, saut vers la cible instrument.
+- À l’atterrissage après `EAT`, conservation de l’élan puis retour progressif à la trajectoire de chasse.
+- Pas de rotation brusque ou demi-tour instantané non naturel.
+
+**La créature évolue sur un terrain vallonné.
+- Elle doit s’incliner selon la pente du sol pour améliorer le contact visuel avec le terrain.
+- Le comportement doit rester stable (pas de jitter, pas de rotation brutale, pas de régression gameplay).
+
+** La créature ne doit jamais tomber dans le vide à cause du streaming terrain quand elle s’éloigne trop du joueur.**
+Elle doit rester menaçante, lisible, et revenir naturellement dans une zone sûre.
+
+**Ciblage Et Priorités**
+- En `HUNT`, priorité à rester devant le joueur dans son axe.
+- Si l’angle entre direction joueur et direction créature dépasse un seuil configurable, la créature arrête temporairement la recherche de nouvelles cibles et se recentre.
+- La recherche de nouvelles cibles reprend quand l’angle revient sous un seuil de sortie (hystérésis).
+- Quand une cible instrument est verrouillée, la créature s’engage vers cette cible (pas d’oscillation rapide entre deux intentions).
+
+**Interactions Monde**
+- Collision réussie en `EAT` avec un instrument: instrument détruit et bonus/score déclenché.
+- Collision avec végétation: la créature peut renverser des éléments pour dégager le terrain au bénéfice du joueur.
+
+**Contraintes De Ressenti**
+- La créature ne doit pas s’éloigner excessivement du joueur en `HUNT`.
+- Elle doit rester menaçante mais lisible.
+- Le joueur doit sentir qu’il influence la bête, sans avoir l’impression de la piloter totalement.
+
+**Paramètres De Gameplay À Exposer**
+- Seuil vitesse joueur pour `FOLLOW -> OVERTAKE`.
+- Seuil vitesse joueur pour `HUNT -> FOLLOW`.
+- Délai minimal entre deux `EAT`.
+- Angle d’activation du recentrage.
+- Distance/position cible devant le joueur en `HUNT`.
+- Intensité de rattrapage pour rester sous pression.
+
+Demandes techniques incontournables :
+
+1. **Machine d’état unique et centralisée**  
+Toutes les transitions passent par une seule méthode (`ChangeState`), avec garde-fous (cooldown, conditions d’entrée/sortie), sinon on recrée vite des effets de bord.
+
+2. **Mouvement unifié**  
+Utiliser une seule logique de déplacement (idéalement `CharacterController`) pour le sol, la gravité, le saut `EAT` et l’atterrissage. Éviter le mélange `CharacterController` + physique dynamique sur le même acteur.
+
+3. **Détection de collisions fiable et idempotente**  
+Collision instrument traitée une seule fois par cible (pas de double destruction/score), avec configuration claire des layers/tags et de la matrice de collision.
+
+4. **Ciblage stable (anti-oscillation)**  
+Quand une cible est lockée, priorité à cette cible jusqu’à perte/consommation. Le recentrage et la recherche ne doivent pas se battre entre eux.
+
+5. **Cooldown `HUNT` strict**  
+Délai minimum entre deux `EAT`, géré dans la logique `HUNT` (pas dispersé), appliqué à chaque entrée en `HUNT`.
+
+6. **Inertie crédible à l’atterrissage**  
+Après `EAT`, conservation de l’élan puis retour progressif vers la trajectoire de chasse, sans rotation brutale.
+
+7. **Références et perfs**  
+Aucun `Find`/allocation en boucle `Update`; cache des références et calculs stables pour éviter jitter et coûts inutiles.
+
+8. **Paramétrage designer-safe**  
+Paramètres exposés, nommés clairement, avec `Tooltip` + bornes (`Min/Range`) pour éviter des réglages incohérents.
+
+9. **Aligner l’orientation globale de la créature sur la normale du sol sous elle.**
+Échantillonner le sol via SphereCast (fallback Raycast) sous la créature.
+Lisser la normale (up) pour éviter les tremblements.
+Construire la rotation avec la direction de mouvement projetée sur le plan du sol.
+Limiter l’inclinaison maximale et réduire l’effet en l’air.
+Conserver la logique de déplacement/états existante (CharacterController, FSM).
+Correction de l’effet de “survol” via réglage automatique de la forme du CharacterController (height, radius, center) avec ConfigureCharacterControllerShape().
+Objectif: faire correspondre collision et visuel sans retoucher chaque scène manuellement.
+Limites connues: Cette option n’est pas du foot IK: elle améliore fortement le rendu, mais ne garantit pas un contact parfait des 4 pieds dans tous les cas extrêmes.
+
+9. **CreatureController` pilote la logique de gameplay (déplacement, ciblage, transitions).**
+
+10. **La classe de base `Creature` porte la machine d’état commune (`FOLLOW`, `OVERTAKE`, `HUNT`, `EAT`).**
+
+11. **`HippoAlien` hérite de `Creature` et applique le comportement visuel/animation selon l’état courant.**
+
+12. **Source de vérité unique: l’état n’est pas modifié directement ailleurs que via l’interface prévue entre `CreatureController` et `Creature`.**
+
+13. **Si distance créature-joueur > leashEnterDistance, activation du mode leash.**
+En leash, forcer la logique de retour vers le joueur (FOLLOW), annuler la cible courante, augmenter la vitesse de rattrapage (leashCatchupSpeedBoost) avec plafond (leashMaxSpeed).
+Sortie du leash seulement quand distance < leashExitDistance (hystérésis pour éviter les oscillations).
+No-ground failsafe
+Sonder le terrain sous la créature (SphereCast puis Raycast).
+Si absence de sol pendant plus de noGroundMaxDuration, déclencher une récupération d’urgence.
+Repositionner la créature derrière le joueur (noGroundRecoveryBehindPlayerDistance) avec un offset vertical (noGroundRecoveryHeightOffset), réinitialiser son état de mouvement, repasser en FOLLOW.
+Appliquer un cooldown (noGroundRecoveryCooldown) pour éviter les téléportations répétées.
+
+*/
 using UnityEngine;
 using System.Text;
 using System.Collections.Generic;
@@ -125,6 +238,61 @@ namespace MusicRun
         [Tooltip("Small negative velocity to keep controller grounded.")]
         public float groundedStickVelocity = -1f;
 
+        [Header("Ground Alignment")]
+        [Tooltip("Rotate creature to follow the ground slope under it.")]
+        public bool alignToGroundSlope = true;
+        [Tooltip("Layers used to probe the ground slope. When set to Nothing, TerrainCurrent is used if available.")]
+        public LayerMask groundAlignmentLayerMask = 0;
+        [Tooltip("Vertical offset of ground probe start above creature position.")]
+        public float groundProbeStartHeight = 2.5f;
+        [Tooltip("Maximum distance used to probe ground below creature.")]
+        public float groundProbeDistance = 6f;
+        [Tooltip("Smoothing speed applied to ground alignment (higher is snappier).")]
+        public float groundAlignSmoothing = 12f;
+        [Tooltip("Maximum slope tilt angle applied to the creature (degrees).")]
+        public float maxGroundTiltAngle = 35f;
+        [Tooltip("How much slope alignment is kept while airborne (0 = upright, 1 = full).")]
+        [Range(0f, 1f)]
+        public float airborneGroundAlignWeight = 0.2f;
+
+        [Header("Character Controller Grounding")]
+        [Tooltip("When enabled, applies tuned CharacterController shape values to keep the creature visually grounded.")]
+        public bool autoConfigureCharacterControllerShape = true;
+        [Tooltip("CharacterController height used by the creature.")]
+        public float characterControllerHeight = 2f;
+        [Tooltip("CharacterController radius used by the creature.")]
+        public float characterControllerRadius = 0.5f;
+        [Tooltip("CharacterController center in local space. Increase Y if the creature appears to float.")]
+        public Vector3 characterControllerCenter = new Vector3(0f, 0.82f, 0f);
+
+        [Header("Distance Safety")]
+        [Tooltip("Enable a leash to keep creature near player and avoid leaving streamed terrain.")]
+        public bool enableDistanceLeash = true;
+        [Tooltip("Creature enters leash mode when horizontal distance to player exceeds this value.")]
+        public float leashEnterDistance = 42f;
+        [Tooltip("Creature exits leash mode when distance comes back below this value.")]
+        public float leashExitDistance = 30f;
+        [Tooltip("Extra speed added over player speed while leash mode is active.")]
+        public float leashCatchupSpeedBoost = 8f;
+        [Tooltip("Maximum speed cap used while leash mode is active.")]
+        public float leashMaxSpeed = 30f;
+
+        [Header("No Ground Failsafe")]
+        [Tooltip("Enable emergency recovery when no terrain is detected below creature for too long.")]
+        public bool enableNoGroundFailsafe = true;
+        [Tooltip("Delay without ground before triggering emergency reposition.")]
+        public float noGroundMaxDuration = 0.45f;
+        [Tooltip("Vertical offset of ground probe start for no-ground detection.")]
+        public float noGroundProbeStartHeight = 3.0f;
+        [Tooltip("Probe distance used to detect terrain below creature for no-ground detection.")]
+        public float noGroundProbeDistance = 20f;
+        [Tooltip("Reposition distance behind player when no-ground failsafe triggers.")]
+        public float noGroundRecoveryBehindPlayerDistance = 8f;
+        [Tooltip("Reposition height offset applied during no-ground recovery.")]
+        public float noGroundRecoveryHeightOffset = 1.5f;
+        [Tooltip("Cooldown after a no-ground recovery to avoid repeated immediate teleports.")]
+        public float noGroundRecoveryCooldown = 1.0f;
+
         [Header("Vegetation Knockdown")]
         [Tooltip("Enable creature collisions that can knock down vegetation.")]
         public bool enableVegetationKnockdown = true;
@@ -218,14 +386,32 @@ namespace MusicRun
 
         private Vector3 desiredMovePoint;
         private Vector3 huntRecenterPoint;
+        private Vector3 smoothedGroundUp = Vector3.up;
         private float desiredSpeed;
         private float nextTargetScanLogTime;
+        private bool groundUpInitialized;
+        private bool characterControllerShapeConfigured;
+        private bool leashActive;
+        private float noGroundTimer;
+        private float nextNoGroundRecoveryAllowedTime;
 
         private void Awake()
         {
             ResolveReferences();
             CacheVisibilityComponents();
             PrepareForLevel();
+        }
+
+        private void OnValidate()
+        {
+            characterControllerShapeConfigured = false;
+            if (Application.isPlaying)
+                return;
+
+            if (characterController == null)
+                characterController = GetComponent<CharacterController>();
+
+            ConfigureCharacterControllerShape(force: true);
         }
 
         private void Update()
@@ -271,6 +457,10 @@ namespace MusicRun
             verticalVelocity = groundedStickVelocity;
             nextEatAllowedTime = 0f;
             knockedVegetationCooldowns.Clear();
+            leashActive = false;
+            noGroundTimer = 0f;
+            nextNoGroundRecoveryAllowedTime = 0f;
+            ResetGroundAlignment();
             ChangeState(CreatureState.FOLLOW, force: true);
             SetCreatureVisible(false);
         }
@@ -306,6 +496,10 @@ namespace MusicRun
             ResetHuntPerceivedPlayerForward();
             verticalVelocity = groundedStickVelocity;
             nextEatAllowedTime = 0f;
+            leashActive = false;
+            noGroundTimer = 0f;
+            nextNoGroundRecoveryAllowedTime = 0f;
+            ResetGroundAlignment();
         }
 
         private void UpdateSpawn(float dt)
@@ -353,9 +547,13 @@ namespace MusicRun
             isSpawned = true;
             spawnPending = false;
             hasSpawnedThisLevel = true;
+            ResetGroundAlignment();
             desiredMovePoint = transform.position;
             verticalVelocity = groundedStickVelocity;
             nextEatAllowedTime = 0f;
+            leashActive = false;
+            noGroundTimer = 0f;
+            nextNoGroundRecoveryAllowedTime = 0f;
             ChangeState(CreatureState.FOLLOW, force: true);
             SetCreatureVisible(true);
 
@@ -399,7 +597,7 @@ namespace MusicRun
                     TickFollow();
                     break;
             }
-
+            ApplyDistanceLeashOverride();
         }
         private void ChangeState(CreatureState nextState, bool force = false)
         {
@@ -702,6 +900,40 @@ namespace MusicRun
             huntPostEatRecoveryElapsed = 0f;
         }
 
+        private void ApplyDistanceLeashOverride()
+        {
+            if (!enableDistanceLeash || playerController == null)
+            {
+                leashActive = false;
+                return;
+            }
+
+            float enterDistance = Mathf.Max(1f, leashEnterDistance);
+            float exitDistance = Mathf.Clamp(leashExitDistance, 0f, enterDistance);
+            float distanceToPlayer = GetDistanceToPlayer();
+
+            if (!leashActive)
+                leashActive = distanceToPlayer > enterDistance;
+            else if (distanceToPlayer <= exitDistance)
+                leashActive = false;
+
+            if (!leashActive)
+                return;
+
+            if (state != CreatureState.FOLLOW)
+                ChangeState(CreatureState.FOLLOW);
+
+            currentTarget = null;
+
+            Vector3 playerPos = playerController.transform.position;
+            desiredMovePoint = playerPos;
+            desiredMovePoint.y = transform.position.y;
+
+            float leashSpeedLimit = Mathf.Max(maxSpeedFollow, leashMaxSpeed);
+            float catchupTarget = GetPlayerSpeed() + Mathf.Max(0f, leashCatchupSpeedBoost);
+            desiredSpeed = Mathf.Clamp(Mathf.Max(desiredSpeed, catchupTarget), 0f, leashSpeedLimit);
+        }
+
         private void SetFollowMotion(float desiredOffset, float speedLimit, float additiveBoost = 0f)
         {
             desiredMovePoint = GetPointRelativeToPlayer(desiredOffset, 0f);
@@ -864,6 +1096,8 @@ namespace MusicRun
         {
             if (characterController == null || !characterController.enabled)
                 return;
+            if (TryHandleNoGroundFailsafe(dt))
+                return;
 
             Vector3 toTarget = desiredMovePoint - transform.position;
             toTarget.y = 0f;
@@ -928,11 +1162,232 @@ namespace MusicRun
 
             Vector3 lookDir = horizontalVelocity;
             lookDir.y = 0f;
-            if (lookDir.sqrMagnitude > 0.0001f)
+            if (lookDir.sqrMagnitude < 0.0001f)
             {
-                Quaternion look = Quaternion.LookRotation(lookDir.normalized, Vector3.up);
+                lookDir = moveDir;
+                lookDir.y = 0f;
+            }
+
+            Vector3 desiredUp = GetDesiredUpVector(dt);
+            Vector3 projectedLookDir = Vector3.ProjectOnPlane(lookDir, desiredUp);
+            if (projectedLookDir.sqrMagnitude > 0.0001f)
+            {
+                Quaternion look = Quaternion.LookRotation(projectedLookDir.normalized, desiredUp);
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, look, turnRateDegPerSec * dt);
             }
+        }
+
+        private void ResetGroundAlignment()
+        {
+            groundUpInitialized = false;
+            smoothedGroundUp = Vector3.up;
+        }
+
+        private Vector3 GetDesiredUpVector(float dt)
+        {
+            Vector3 targetUp = Vector3.up;
+            if (alignToGroundSlope && TrySampleGroundNormal(out Vector3 sampledGroundNormal))
+            {
+                float alignWeight = characterController != null && !characterController.isGrounded
+                    ? Mathf.Clamp01(airborneGroundAlignWeight)
+                    : 1f;
+                targetUp = Vector3.Slerp(Vector3.up, sampledGroundNormal, alignWeight);
+            }
+
+            if (!groundUpInitialized)
+            {
+                smoothedGroundUp = targetUp;
+                groundUpInitialized = true;
+                return smoothedGroundUp;
+            }
+
+            float smoothing = Mathf.Max(0f, groundAlignSmoothing);
+            if (smoothing <= 0f)
+            {
+                smoothedGroundUp = targetUp;
+                return smoothedGroundUp;
+            }
+
+            float t = 1f - Mathf.Exp(-smoothing * Mathf.Max(0f, dt));
+            smoothedGroundUp = Vector3.Slerp(smoothedGroundUp, targetUp, t);
+            if (smoothedGroundUp.sqrMagnitude < 0.0001f)
+                smoothedGroundUp = Vector3.up;
+            else
+                smoothedGroundUp.Normalize();
+
+            return smoothedGroundUp;
+        }
+
+        private bool TrySampleGroundNormal(out Vector3 sampledNormal)
+        {
+            sampledNormal = Vector3.up;
+            int probeLayerMask = GetGroundAlignmentLayerMask();
+            if (probeLayerMask == 0)
+                return false;
+
+            float startHeight = Mathf.Max(0.1f, groundProbeStartHeight);
+            float probeDistance = Mathf.Max(0.2f, groundProbeDistance);
+            float sphereRadius = 0.2f;
+            if (characterController != null)
+                sphereRadius = Mathf.Max(0.1f, characterController.radius * 0.8f);
+
+            Vector3 rayOrigin = transform.position + Vector3.up * startHeight;
+            bool hasHit = Physics.SphereCast(
+                rayOrigin,
+                sphereRadius,
+                Vector3.down,
+                out RaycastHit hit,
+                probeDistance,
+                probeLayerMask,
+                QueryTriggerInteraction.Ignore);
+
+            if (!hasHit)
+            {
+                hasHit = Physics.Raycast(
+                    rayOrigin,
+                    Vector3.down,
+                    out hit,
+                    probeDistance,
+                    probeLayerMask,
+                    QueryTriggerInteraction.Ignore);
+            }
+
+            if (!hasHit)
+                return false;
+
+            Vector3 normal = hit.normal;
+            if (normal.sqrMagnitude < 0.0001f)
+                return false;
+            normal.Normalize();
+
+            float clampedMaxTilt = Mathf.Clamp(maxGroundTiltAngle, 0f, 89.9f);
+            if (clampedMaxTilt < 89.9f)
+            {
+                float angleToUp = Vector3.Angle(Vector3.up, normal);
+                if (angleToUp > clampedMaxTilt && angleToUp > 0.001f)
+                {
+                    float blend = clampedMaxTilt / angleToUp;
+                    normal = Vector3.Slerp(Vector3.up, normal, blend);
+                    normal.Normalize();
+                }
+            }
+
+            sampledNormal = normal;
+            return true;
+        }
+
+        private int GetGroundAlignmentLayerMask()
+        {
+            int configuredMask = groundAlignmentLayerMask.value;
+            if (configuredMask != 0)
+                return configuredMask;
+
+            int terrainMask = global::TerrainLayer.TerrainCurrentBit;
+            if (terrainMask != 0)
+                return terrainMask;
+
+            return Physics.DefaultRaycastLayers;
+        }
+
+        private bool TryHandleNoGroundFailsafe(float dt)
+        {
+            if (!enableNoGroundFailsafe || playerController == null)
+            {
+                noGroundTimer = 0f;
+                return false;
+            }
+
+            if (HasGroundBelow(out _) || (characterController != null && characterController.isGrounded))
+            {
+                noGroundTimer = 0f;
+                return false;
+            }
+
+            noGroundTimer += Mathf.Max(0f, dt);
+            if (noGroundTimer < Mathf.Max(0.05f, noGroundMaxDuration))
+                return false;
+
+            if (Time.time < nextNoGroundRecoveryAllowedTime)
+                return false;
+
+            RecoverCreatureNearPlayer("No ground detected under creature");
+            return true;
+        }
+
+        private bool HasGroundBelow(out RaycastHit hit)
+        {
+            hit = default(RaycastHit);
+            int probeLayerMask = GetGroundAlignmentLayerMask();
+            if (probeLayerMask == 0)
+                return false;
+
+            float startHeight = Mathf.Max(0.1f, noGroundProbeStartHeight);
+            float probeDistance = Mathf.Max(0.5f, noGroundProbeDistance);
+            float sphereRadius = 0.2f;
+            if (characterController != null)
+                sphereRadius = Mathf.Max(0.1f, characterController.radius * 0.8f);
+
+            Vector3 rayOrigin = transform.position + Vector3.up * startHeight;
+            bool hasHit = Physics.SphereCast(
+                rayOrigin,
+                sphereRadius,
+                Vector3.down,
+                out hit,
+                probeDistance,
+                probeLayerMask,
+                QueryTriggerInteraction.Ignore);
+
+            if (!hasHit)
+            {
+                hasHit = Physics.Raycast(
+                    rayOrigin,
+                    Vector3.down,
+                    out hit,
+                    probeDistance,
+                    probeLayerMask,
+                    QueryTriggerInteraction.Ignore);
+            }
+
+            return hasHit;
+        }
+
+        private void RecoverCreatureNearPlayer(string reason)
+        {
+            if (playerController == null)
+                return;
+
+            Vector3 playerForward = GetPlayerForward();
+            float behindDistance = Mathf.Max(0f, noGroundRecoveryBehindPlayerDistance);
+            Vector3 recoverPos = playerController.transform.position - playerForward * behindDistance;
+            recoverPos.y += noGroundRecoveryHeightOffset;
+            Quaternion recoverRot = Quaternion.LookRotation(playerForward, Vector3.up);
+
+            bool restoreController = characterController != null && characterController.enabled;
+            if (restoreController)
+                characterController.enabled = false;
+            transform.SetPositionAndRotation(recoverPos, recoverRot);
+            if (restoreController)
+                characterController.enabled = true;
+
+            currentTarget = null;
+            desiredMovePoint = recoverPos;
+            desiredSpeed = 0f;
+            currentSpeed = 0f;
+            verticalVelocity = groundedStickVelocity;
+            leashActive = false;
+            noGroundTimer = 0f;
+            nextNoGroundRecoveryAllowedTime = Time.time + Mathf.Max(0f, noGroundRecoveryCooldown);
+
+            ResetEatPostConsumeCarry();
+            ResetHuntPostEatRecovery();
+            huntRecenterActive = false;
+            huntRecenterPointInitialized = false;
+            ResetHuntPerceivedPlayerForward();
+            ResetGroundAlignment();
+            ChangeState(CreatureState.FOLLOW, force: true);
+
+            if (debugLogs)
+                Debug.LogWarning($"Creature recovered near player ({reason}) at {recoverPos}");
         }
 
         private float ComputeEatJumpUpVelocity()
@@ -1360,6 +1815,7 @@ namespace MusicRun
                 characterController = GetComponent<CharacterController>();
             if (characterController == null)
                 characterController = gameObject.AddComponent<CharacterController>();
+            ConfigureCharacterControllerShape();
 
             if (playerController == null)
                 playerController = gameManager.playerController;
@@ -1369,6 +1825,35 @@ namespace MusicRun
                 bonusManager = gameManager.bonusManager;
 
             return playerController != null && characterController != null;
+        }
+
+        private void ConfigureCharacterControllerShape(bool force = false)
+        {
+            if (characterController == null)
+                return;
+            if (!autoConfigureCharacterControllerShape)
+                return;
+            if (!force && characterControllerShapeConfigured)
+                return;
+
+            float configuredRadius = Mathf.Max(0.05f, characterControllerRadius);
+            float configuredHeight = Mathf.Max(configuredRadius * 2f + 0.01f, characterControllerHeight);
+            Vector3 configuredCenter = characterControllerCenter;
+
+            bool restoreEnabled = characterController.enabled;
+            if (restoreEnabled)
+                characterController.enabled = false;
+
+            characterController.radius = configuredRadius;
+            characterController.height = configuredHeight;
+            characterController.center = configuredCenter;
+            if (characterController.stepOffset > configuredHeight)
+                characterController.stepOffset = configuredHeight * 0.5f;
+
+            if (restoreEnabled)
+                characterController.enabled = true;
+
+            characterControllerShapeConfigured = true;
         }
 
         private void OnDrawGizmos()
