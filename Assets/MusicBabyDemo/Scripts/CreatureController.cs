@@ -110,6 +110,12 @@ Si absence de sol pendant plus de noGroundMaxDuration, déclencher une récupér
 Repositionner la créature derrière le joueur (noGroundRecoveryBehindPlayerDistance) avec un offset vertical (noGroundRecoveryHeightOffset), réinitialiser son état de mouvement, repasser en FOLLOW.
 Appliquer un cooldown (noGroundRecoveryCooldown) pour éviter les téléportations répétées.
 
+14. **Contrainte animation liee a l'avancement reel.**
+En Chase, la phase d'animation des jambes est pilotee par la distance horizontale reellement parcourue (pas par Time.time).
+Si la creature ne se deplace pas entre deux updates, l'angle des jambes ne doit pas avancer.
+La distance d'un cycle d'animation est calibree depuis la geometrie des jambes et l'angle max (`legAngle`).
+Les grands deltas de position (teleport/recovery) sont ignores pour eviter des sauts visuels dans la marche.
+
 */
 using UnityEngine;
 using System.Text;

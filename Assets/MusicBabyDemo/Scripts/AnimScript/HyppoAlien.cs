@@ -587,10 +587,10 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(0.06f, 0.22f, 0.06f),
             MaterialSlot.Body);
 
-        legFL = CreateLeg("Leg_FL", new Vector3(-0.76f, 0.58f, 1.0f));
-        legFR = CreateLeg("Leg_FR", new Vector3(0.76f, 0.58f, 1.0f));
-        legBL = CreateLeg("Leg_BL", new Vector3(-0.76f, 0.58f, -1.0f));
-        legBR = CreateLeg("Leg_BR", new Vector3(0.76f, 0.58f, -1.0f));
+        legFL = CreateLeg("Leg_FL", new Vector3(-0.76f, 0.78f, 1.0f));
+        legFR = CreateLeg("Leg_FR", new Vector3(0.76f, 0.78f, 1.0f));
+        legBL = CreateLeg("Leg_BL", new Vector3(-0.76f, 0.78f, -1.0f));
+        legBR = CreateLeg("Leg_BR", new Vector3(0.76f, 0.78f, -1.0f));
     }
 
     protected override void UpdateAnimation()
@@ -967,27 +967,27 @@ public class HippoVisual : CreatureVisualBase
             "Upper",
             PrimitiveType.Sphere,
             legRoot,
-            new Vector3(0f, -0.18f, 0f),
+            new Vector3(0f, -0.24f, 0f),
             Vector3.zero,
-            new Vector3(0.52f, 1.16f, 0.52f),
+            new Vector3(0.60f, 1.30f, 0.60f),
             MaterialSlot.Body);
 
         Transform ankle = CreatePart(
             "Ankle",
             PrimitiveType.Sphere,
             legRoot,
-            new Vector3(0f, -0.72f, 0.06f),
+            new Vector3(0f, -0.88f, 0.08f),
             Vector3.zero,
-            new Vector3(0.42f, 0.36f, 0.42f),
+            new Vector3(0.50f, 0.40f, 0.50f),
             MaterialSlot.Body);
 
         Transform foot = CreatePart(
             "Foot",
             PrimitiveType.Sphere,
             legRoot,
-            new Vector3(0f, -0.92f, 0.14f),
+            new Vector3(0f, -1.16f, 0.18f),
             Vector3.zero,
-            new Vector3(0.72f, 0.34f, 0.84f),
+            new Vector3(0.84f, 0.38f, 0.98f),
             MaterialSlot.Body);
 
         RemoveCollider(upper.gameObject);
