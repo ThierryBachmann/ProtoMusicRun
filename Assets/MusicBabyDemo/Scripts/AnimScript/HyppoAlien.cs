@@ -40,6 +40,16 @@ public class HippoVisual : CreatureVisualBase
     public float chaseMinDisplacement = 0.0005f;
     [Tooltip("Ignore a single-frame displacement above this threshold (teleport/recovery safety).")]
     public float chaseMaxDisplacementPerFrame = 1.25f;
+
+    [Header("Wait Player")]
+    public float waitBodyBobAmount = 0.035f;
+    public float waitBodyBobSpeed = 2.4f;
+    public float waitHeadYawAngle = 7f;
+    public float waitHeadYawSpeed = 1.8f;
+    public float waitLegStompAngle = 6f;
+    public float waitLegStompSpeed = 5f;
+    public float waitTailSwingAngle = 11f;
+    public float waitMouthOpenBase = 8f;
  
     [Header("Eyes")]
     public float eyeLookSideAngle = 35f;
@@ -613,6 +623,10 @@ public class HippoVisual : CreatureVisualBase
                 AnimateChase(t);
                 break;
 
+            case CreatureVisualState.Wait:
+                AnimateWaitPlayer(t);
+                break;
+
             case CreatureVisualState.Eat:
                 AnimateEat();
                 break;
@@ -850,6 +864,29 @@ public class HippoVisual : CreatureVisualBase
         body.localScale = bodyScale;
     }
 
+    private void AnimateWaitPlayer(float t)
+    {
+        float bob = Mathf.Abs(Mathf.Sin(t * waitBodyBobSpeed)) * waitBodyBobAmount;
+        body.localPosition = bodyBaseLocalPos + new Vector3(0f, bob, 0f);
+
+        float yaw = Mathf.Sin(t * waitHeadYawSpeed) * waitHeadYawAngle;
+        float nod = Mathf.Sin(t * (waitHeadYawSpeed * 0.6f + 0.35f)) * (waitHeadYawAngle * 0.25f);
+        headPivot.localRotation = headBaseLocalRot * Quaternion.Euler(nod, yaw, 0f);
+
+        float stomp = Mathf.Sin(t * waitLegStompSpeed) * waitLegStompAngle;
+        legFL.localRotation = Quaternion.Euler(stomp, 0f, 0f);
+        legFR.localRotation = Quaternion.Euler(-stomp, 0f, 0f);
+        legBL.localRotation = Quaternion.Euler(-stomp * 0.6f, 0f, 0f);
+        legBR.localRotation = Quaternion.Euler(stomp * 0.6f, 0f, 0f);
+
+        float tailSwing = Mathf.Sin(t * (waitHeadYawSpeed + 0.55f)) * waitTailSwingAngle;
+        tail.localRotation = tailBaseLocalRot * Quaternion.Euler(0f, tailSwing, 0f);
+
+        float mouthPulse = 0.5f + 0.5f * Mathf.Sin(t * 3.8f);
+        float mouthOpen = waitMouthOpenBase + mouthPulse * (mouthOpenAngle * 0.18f);
+        jawPivot.localRotation = jawBaseLocalRot * Quaternion.Euler(mouthOpen, 0f, 0f);
+    }
+
     private void AnimateStunned(float t)
     {
         float shake = Mathf.Sin(t * stunnedShakeSpeed) * stunnedShakeAngle;
@@ -860,7 +897,7 @@ public class HippoVisual : CreatureVisualBase
 
     private void UpdateEyes(float t)
     {
-        if (state == CreatureVisualState.Chase)
+        if (state == CreatureVisualState.Chase || state == CreatureVisualState.Wait)
         {
             float lookPhase = Mathf.Sin(t * eyeLookSpeed);
 

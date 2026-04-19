@@ -5,7 +5,8 @@ public enum CreatureVisualState
     Idle = 0,
     Chase = 1,
     Eat = 2,
-    Stunned = 3
+    Stunned = 3,
+    Wait = 4
 }
 
 public abstract class CreatureVisualBase : MonoBehaviour
@@ -107,11 +108,16 @@ public abstract class CreatureVisualBase : MonoBehaviour
     {
         switch (controllerState)
         {
-            case MusicRun.CreatureState.EAT:
+            case MusicRun.CreatureState.EAT_ATTACK:
+            case MusicRun.CreatureState.EAT_RECOVERY:
                 return CreatureVisualState.Eat;
+            case MusicRun.CreatureState.WAIT_PLAYER:
+                return CreatureVisualState.Wait;
             case MusicRun.CreatureState.FOLLOW:
             case MusicRun.CreatureState.OVERTAKE:
-            case MusicRun.CreatureState.HUNT_INSTRUMENT:
+            case MusicRun.CreatureState.HUNT:
+            case MusicRun.CreatureState.RECENTER:
+            case MusicRun.CreatureState.LEASH_RETURN:
                 return CreatureVisualState.Chase;
             default:
                 return CreatureVisualState.Idle;

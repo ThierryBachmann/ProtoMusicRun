@@ -1908,7 +1908,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 136073483}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.00004993617, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.07485693, y: 0, z: 0, w: 0.9971943}
   m_LocalPosition: {x: 0, y: 1.02, z: 2.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2797,7 +2797,7 @@ MonoBehaviour:
     bonusScorePrefab:
     - {fileID: 1043371857810829490, guid: 5444d575fd8670c47a94591d554daafd, type: 3}
     - {fileID: 1043371857810829490, guid: f629d4fa0ab4a6a44a4af22b37f4aeb2, type: 3}
-    bonusInstrumentDensity: 3.97
+    bonusInstrumentDensity: 0.8
     bonusInstrumentPrefab:
     - {fileID: 1043371857810829490, guid: 438b8e3b8f642534b9fe11fc28046452, type: 3}
   - enabled: 1
@@ -10211,30 +10211,35 @@ MonoBehaviour:
   spawnOncePerRun: 1
   spawnStartOverride: {fileID: 0}
   spawnHeightOffset: 0
-  desiredFollowDistance: 12
-  maxSpeedFollow: 16
-  followToOvertakePlayerSpeedThreshold: 3
-  overtakeLeadDistance: 12
+  desiredFollowDistance: 8
+  maxSpeedFollow: 10
+  followToOvertakePlayerSpeedThreshold: 5.5
+  overtakeLeadDistance: 6
   overtakeLateralOffset: 5
   maxSpeedOvertake: 20
   overtakeCooldown: 5
   overtakeNoTargetTimeout: 10
-  huntSearchRadius: 12
+  huntSearchRadius: 8
   huntReachDistance: 2
-  maxSpeedHunt: 5
-  huntMaxLeadDistance: 8
+  maxSpeedHunt: 10
+  huntMaxLeadDistance: 6
   huntRecenterHeadingAngleThreshold: 30
+  recenterExitStableDuration: 0.2
   huntRecenterPointSmoothing: 15
-  huntToFollowPlayerSpeedThreshold: 10
+  huntToFollowPlayerSpeedThreshold: 6.5
   huntMinDelayBetweenEat: 3
-  huntPostEatRecoveryDuration: 1
   huntPlayerHeadingReactionTime: 1
+  waitPlayerExitLeadRatio: 0.7
+  waitPlayerDesiredLeadRatio: 0.45
   instrumentScanLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
   eatDuration: 0.6
   eatJumpHeight: 1.8
   eatContactDistance: 0.35
+  eatPostConsumeCarryDeceleration: 14
+  eatRecoveryExitSpeed: 3
+  eatRecoveryMaxDuration: 1.5
   kp: 0.9
   kd: 0.25
   accelMax: 20
@@ -10282,7 +10287,7 @@ MonoBehaviour:
   targetWeightDistance: 1
   targetWeightAngle: 0.35
   targetWeightBehindPlayer: 0.5
-  debugLogs: 0
+  debugLogs: 1
   drawDebugGizmos: 1
   debugTargetScanLogs: 0
   debugTargetScanLogInterval: 1
@@ -10768,7 +10773,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.27552116
+  m_Size: 0.2122512
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11534,7 +11539,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1192789700}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071056, y: -0.0013237401, z: -0.0013237401, w: 0.7071056}
+  m_LocalRotation: {x: 0.70700663, y: -0.011903247, z: -0.011903247, w: 0.70700663}
   m_LocalPosition: {x: 0, y: 1, z: -1.9}
   m_LocalScale: {x: 0.06, y: 0.22, z: 0.06}
   m_ConstrainProportionsScale: 0
@@ -15588,7 +15593,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1110690591945518153, guid: b00e0603e3a52584bb9492f9dcf632cd, type: 3}
       propertyPath: legAngle
-      value: 45
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1298898419627806282, guid: b00e0603e3a52584bb9492f9dcf632cd, type: 3}
       propertyPath: m_LocalPosition.x
@@ -15910,7 +15915,7 @@ Transform:
   m_GameObject: {fileID: 1616655333}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.986099, z: 0}
+  m_LocalPosition: {x: 0, y: 0.95985097, z: 0}
   m_LocalScale: {x: 2.8, y: 1.5, z: 3.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
