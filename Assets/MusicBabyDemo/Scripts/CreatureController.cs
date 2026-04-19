@@ -116,6 +116,12 @@ Si la creature ne se deplace pas entre deux updates, l'angle des jambes ne doit 
 La distance d'un cycle d'animation est calibree depuis la geometrie des jambes et l'angle max (`legAngle`).
 Les grands deltas de position (teleport/recovery) sont ignores pour eviter des sauts visuels dans la marche.
 
+15. **Separation stricte des consignes OVERTAKE vs HUNT (root cause anti-oscillation).**
+En `HUNT`, si `currentTarget == null` et `huntRecenterActive == false`, la creature vise uniquement un point devant le joueur:
+`GetPointRelativeToPlayer(huntMaxLeadDistance, 0f, huntForward)`.
+La consigne laterale `overtakeSideSign * overtakeLateralOffset` est reservee a `OVERTAKE` et ne doit pas etre reutilisee en `HUNT`.
+Objectif: eviter l'alternance rapide gauche/droite du `desiredMovePoint` quand la creature n'a pas de cible.
+
 */
 using UnityEngine;
 using System.Text;
