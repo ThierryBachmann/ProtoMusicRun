@@ -1731,6 +1731,14 @@ MonoBehaviour:
   driveChasePhaseFromDisplacement: 1
   chaseMinDisplacement: 0.0005
   chaseMaxDisplacementPerFrame: 1.25
+  waitBodyBobAmount: 0.035
+  waitBodyBobSpeed: 2.4
+  waitHeadYawAngle: 7
+  waitHeadYawSpeed: 1.8
+  waitLegStompAngle: 6
+  waitLegStompSpeed: 5
+  waitTailSwingAngle: 11
+  waitMouthOpenBase: 8
   eyeLookSideAngle: 35
   eyeLookSpeed: 2.2
   eyePivotSideOffset: 0.44

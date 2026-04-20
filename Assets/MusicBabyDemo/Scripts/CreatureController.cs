@@ -114,129 +114,143 @@ namespace MusicRun
     [RequireComponent(typeof(CharacterController))]
     public class CreatureController : MonoBehaviour
     {
-        [Header("Spawn")] // Spawning parameters
+        [Header("Spawn")]
         [Tooltip("Enable delayed apparition of the creature after level start.")]
         public bool enableDelayedSpawn = true;
         [Tooltip("Delay in seconds before the creature appears after level start.")]
+        [Range(0f, 30f)]
         public float spawnDelay = 2f;
         [Tooltip("Spawn creature only once per run.")]
         public bool spawnOncePerRun = true;
         [Tooltip("Optional explicit spawn point. When empty, terrainGenerator.currentStart is used.")]
         public Transform spawnStartOverride;
         [Tooltip("Vertical offset applied when spawning the creature.")]
+        [Range(0f, 10f)]
         public float spawnHeightOffset = 1.5f;
 
-        [Header("Follow")]
+        [Header("FOLLOW Mode")]
         [Tooltip("Desired distance behind the player.")]
+        [Range(0f, 60f)]
         public float desiredFollowDistance = 12f;
         [Tooltip("Speed cap in FOLLOW.")]
+        [Range(0f, 80f)]
         public float maxSpeedFollow = 16f;
-
         [Tooltip("Player speed threshold for FOLLOW -> OVERTAKE transition.")]
         [FormerlySerializedAs("PlayerSpeedThresholdForOvertake")]
+        [Range(0f, 30f)]
         public float followToOvertakePlayerSpeedThreshold = 3f;
 
-
-        [Header("Overtake")] // OVERTAKE state parameters
-
+        [Header("OVERTAKE Mode")]
         [Tooltip("Forward distance aimed during overtake maneuver.")]
+        [Range(0f, 60f)]
         public float overtakeLeadDistance = 12f;
-
         [Tooltip("Lateral side offset used during overtake.")]
+        [Range(0f, 20f)]
         public float overtakeLateralOffset = 2.5f;
-
         [Tooltip("Speed cap in OVERTAKE.")]
+        [Range(0f, 80f)]
         public float maxSpeedOvertake = 20f;
-
         [Tooltip("Cooldown between overtake attempts.")]
+        [Range(0f, 30f)]
         public float overtakeCooldown = 5f;
-
         [Tooltip("Maximum duration in overtake state before giving up.")]
+        [Range(0f, 30f)]
         public float overtakeNoTargetTimeout = 10f;
 
-        [Header("Hunt")] // HUNT state parameters
-
+        [Header("HUNT Mode")]
         [Tooltip("Search radius to find nearby instruments.")]
+        [Range(1f, 120f)]
         public float huntSearchRadius = 28f;
-
-        [Tooltip("Distance threshold to switch from HUNT to EAT.")]
+        [Tooltip("Distance threshold to switch from HUNT to EAT_ATTACK.")]
+        [Range(1f, 10f)]
         public float huntReachDistance = 1.6f;
-
         [Tooltip("Speed cap in HUNT and EAT approach.")]
+        [Range(0f, 80f)]
         public float maxSpeedHunt = 22f;
-
         [Tooltip("Maximum forward lead allowed in HUNT before speed is reduced to keep pressure on player.")]
+        [Range(0.1f, 50f)]
         public float huntMaxLeadDistance = 10f;
-
-        [Tooltip("Enter recenter mode when angle between player and creature headings exceeds this value (degrees). Exit at half this angle.")]
-        public float huntRecenterHeadingAngleThreshold = 30f;
-
-        [Tooltip("Time during which heading must remain aligned before leaving RECENTER.")]
-        public float recenterExitStableDuration = 0.2f;
-
-        [Tooltip("Smoothing applied to recenter target updates (higher is snappier, lower is smoother).")]
-        public float huntRecenterPointSmoothing = 10f;
-
         [Tooltip("Player speed threshold for HUNT/RECENTER/WAIT_PLAYER -> FOLLOW transition.")]
         [FormerlySerializedAs("huntExitToFollowPlayerSpeed")]
+        [Range(0f, 30f)]
         public float huntToFollowPlayerSpeedThreshold = 3.5f;
-
         [Tooltip("Minimum delay before EAT can start after entering HUNT (from OVERTAKE or EAT).")]
+        [Range(0f, 10f)]
         public float huntMinDelayBetweenEat = 1.0f;
-
         [Tooltip("Reaction time used to update perceived player heading in HUNT (higher = slower creature response).")]
+        [Range(0.01f, 5f)]
         public float huntPlayerHeadingReactionTime = 0.55f;
+        [Tooltip("Physics layers included when scanning for instrument colliders.")]
+        public LayerMask instrumentScanLayerMask = ~0;
 
+        [Header("RECENTER Mode")]
+        [Tooltip("Enter recenter mode when angle between player and creature headings exceeds this value (degrees). Exit at half this angle.")]
+        [Range(0f, 180f)]
+        public float huntRecenterHeadingAngleThreshold = 30f;
+        [Tooltip("Time during which heading must remain aligned before leaving RECENTER.")]
+        [Range(0f, 5f)]
+        public float recenterExitStableDuration = 0.2f;
+        [Tooltip("Smoothing applied to recenter target updates (higher is snappier, lower is smoother).")]
+        [Range(0f, 50f)]
+        public float huntRecenterPointSmoothing = 10f;
+
+        [Header("WAIT_PLAYER Mode")]
         [Tooltip("Lead ratio used to exit WAIT_PLAYER and return to HUNT (0.7 means leave wait when lead <= 70% of huntMaxLeadDistance).")]
         [Range(0.1f, 1f)]
         public float waitPlayerExitLeadRatio = 0.7f;
-
         [Tooltip("Desired lead ratio while in WAIT_PLAYER (lower values make the creature wait more aggressively).")]
         [Range(0.1f, 1f)]
         public float waitPlayerDesiredLeadRatio = 0.45f;
 
-        [Tooltip("Physics layers included when scanning for instrument colliders.")]
-        public LayerMask instrumentScanLayerMask = ~0;
-
-        [Header("Eat")] // EAT state parameters
-
-        [Tooltip("Duration of the EAT state.")]
+        [Header("EAT_ATTACK Mode")]
+        [Tooltip("Duration of EAT_ATTACK state before fallback to recovery.")]
+        [Range(0f, 5f)]
         public float eatDuration = 0.6f;
-
-        [Tooltip("Vertical height of the creature jump while eating an instrument.")]
+        [Tooltip("Vertical height of the creature jump while attacking an instrument.")]
+        [Range(0.01f, 20f)]
         public float eatJumpHeight = 1.8f;
-
         [Tooltip("Extra distance used as a fallback for collision detection at end of jump.")]
+        [Range(0f, 5f)]
         public float eatContactDistance = 0.35f;
 
+        [Header("EAT_RECOVERY Mode")]
         [Tooltip("Deceleration applied during post-eat inertial carry.")]
+        [Range(0f, 80f)]
         public float eatPostConsumeCarryDeceleration = 14f;
-
-        [Tooltip("Horizontal speed threshold to leave EAT after landing and finishing carry.")]
+        [Tooltip("Horizontal speed threshold to leave EAT_RECOVERY after landing.")]
+        [Range(0f, 30f)]
         public float eatRecoveryExitSpeed = 3f;
-
         [Tooltip("Safety timeout for post-eat carry (seconds).")]
+        [Range(0.1f, 10f)]
         public float eatRecoveryMaxDuration = 1.5f;
 
-        [Header("Movement")] // General movement parameters
-
+        [Header("Movement")]
         [Tooltip("Proportional gain for follow speed controller.")]
+        [Range(0f, 5f)]
         public float kp = 0.9f;
         [Tooltip("Derivative gain for follow speed controller.")]
+        [Range(0f, 5f)]
         public float kd = 0.25f;
         [Tooltip("Maximum acceleration.")]
+        [Range(0f, 100f)]
         public float accelMax = 20f;
         [Tooltip("Maximum deceleration.")]
+        [Range(0f, 100f)]
         public float brakeMax = 24f;
         [Tooltip("Distance above which catch-up boost is added.")]
+        [Range(0f, 200f)]
         public float catchupBoostDistance = 20f;
         [Tooltip("Extra speed boost when far from player.")]
+        [Range(0f, 40f)]
         public float catchupBoost = 3f;
         [Tooltip("Maximum turning speed in degrees per second.")]
+        [Range(0f, 1080f)]
         public float turnRateDegPerSec = 360f;
         [Tooltip("Gravity applied to creature when airborne.")]
+        [Range(0.01f, 100f)]
         public float gravity = 18f;
         [Tooltip("Small negative velocity to keep controller grounded.")]
+        [Range(-10f, 0f)]
         public float groundedStickVelocity = -1f;
 
         [Header("Ground Alignment")]
@@ -245,53 +259,69 @@ namespace MusicRun
         [Tooltip("Layers used to probe the ground slope. When set to Nothing, TerrainCurrent is used if available.")]
         public LayerMask groundAlignmentLayerMask = 0;
         [Tooltip("Vertical offset of ground probe start above creature position.")]
+        [Range(0.1f, 20f)]
         public float groundProbeStartHeight = 2.5f;
         [Tooltip("Maximum distance used to probe ground below creature.")]
+        [Range(0.2f, 50f)]
         public float groundProbeDistance = 6f;
         [Tooltip("Smoothing speed applied to ground alignment (higher is snappier).")]
+        [Range(0f, 50f)]
         public float groundAlignSmoothing = 12f;
         [Tooltip("Maximum slope tilt angle applied to the creature (degrees).")]
+        [Range(0f, 89.9f)]
         public float maxGroundTiltAngle = 35f;
         [Tooltip("How much slope alignment is kept while airborne (0 = upright, 1 = full).")]
         [Range(0f, 1f)]
         public float airborneGroundAlignWeight = 0.2f;
 
-        [Header("Character Controller Grounding")]
+        [Header("Character Controller")]
         [Tooltip("When enabled, applies tuned CharacterController shape values to keep the creature visually grounded.")]
         public bool autoConfigureCharacterControllerShape = true;
         [Tooltip("CharacterController height used by the creature.")]
+        [Range(0.2f, 10f)]
         public float characterControllerHeight = 2f;
         [Tooltip("CharacterController radius used by the creature.")]
+        [Range(0.05f, 5f)]
         public float characterControllerRadius = 0.5f;
         [Tooltip("CharacterController center in local space. Increase Y if the creature appears to float.")]
         public Vector3 characterControllerCenter = new Vector3(0f, 0.82f, 0f);
 
-        [Header("Distance Safety")]
-        [Tooltip("Enable a leash to keep creature near player and avoid leaving streamed terrain.")]
+        [Header("LEASH_RETURN Mode")]
+        [Tooltip("Enable LEASH_RETURN to keep creature near player and avoid leaving streamed terrain.")]
         public bool enableDistanceLeash = true;
-        [Tooltip("Creature enters leash mode when horizontal distance to player exceeds this value.")]
+        [Tooltip("Creature enters LEASH_RETURN when horizontal distance to player exceeds this value.")]
+        [Range(1f, 300f)]
         public float leashEnterDistance = 42f;
-        [Tooltip("Creature exits leash mode when distance comes back below this value.")]
+        [Tooltip("Creature exits LEASH_RETURN when distance comes back below this value.")]
+        [Range(0f, 300f)]
         public float leashExitDistance = 30f;
         [Tooltip("Extra speed added over player speed while leash mode is active.")]
+        [Range(0f, 60f)]
         public float leashCatchupSpeedBoost = 8f;
         [Tooltip("Maximum speed cap used while leash mode is active.")]
+        [Range(0f, 120f)]
         public float leashMaxSpeed = 30f;
 
         [Header("No Ground Failsafe")]
         [Tooltip("Enable emergency recovery when no terrain is detected below creature for too long.")]
         public bool enableNoGroundFailsafe = true;
         [Tooltip("Delay without ground before triggering emergency reposition.")]
+        [Range(0.05f, 5f)]
         public float noGroundMaxDuration = 0.45f;
         [Tooltip("Vertical offset of ground probe start for no-ground detection.")]
+        [Range(0.1f, 20f)]
         public float noGroundProbeStartHeight = 3.0f;
         [Tooltip("Probe distance used to detect terrain below creature for no-ground detection.")]
+        [Range(0.5f, 200f)]
         public float noGroundProbeDistance = 20f;
         [Tooltip("Reposition distance behind player when no-ground failsafe triggers.")]
+        [Range(0f, 100f)]
         public float noGroundRecoveryBehindPlayerDistance = 8f;
         [Tooltip("Reposition height offset applied during no-ground recovery.")]
+        [Range(0f, 20f)]
         public float noGroundRecoveryHeightOffset = 1.5f;
         [Tooltip("Cooldown after a no-ground recovery to avoid repeated immediate teleports.")]
+        [Range(0f, 10f)]
         public float noGroundRecoveryCooldown = 1.0f;
 
         [Header("Vegetation Knockdown")]
@@ -300,24 +330,33 @@ namespace MusicRun
         [Tooltip("Tags that can be knocked down by the creature.")]
         public string[] vegetationKnockTags = { "TreeScalable", "Grass" };
         [Tooltip("Impulse applied to vegetation in movement direction.")]
+        [Range(0f, 100f)]
         public float vegetationKnockForce = 6f;
         [Tooltip("Vertical impulse applied when knocking vegetation.")]
+        [Range(0f, 50f)]
         public float vegetationKnockUpwardForce = 2f;
         [Tooltip("Torque applied to topple vegetation.")]
+        [Range(0f, 100f)]
         public float vegetationKnockTorque = 4f;
         [Tooltip("Mass assigned to generated rigidbody when needed.")]
+        [Range(0.1f, 200f)]
         public float vegetationRigidbodyMass = 10f;
         [Tooltip("Cooldown to avoid repeated knockdown on same object.")]
+        [Range(0.05f, 10f)]
         public float vegetationKnockCooldown = 0.5f;
         [Tooltip("Destroy knocked vegetation after delay. <= 0 keeps it in scene.")]
+        [Range(0f, 60f)]
         public float vegetationDestroyDelay = 8f;
 
         [Header("Target Score")]
         [Tooltip("Weight of distance in instrument target scoring.")]
+        [Range(0f, 5f)]
         public float targetWeightDistance = 1f;
         [Tooltip("Weight of angle to player forward in target scoring.")]
+        [Range(0f, 5f)]
         public float targetWeightAngle = 0.35f;
         [Tooltip("Penalty weight when target is behind player.")]
+        [Range(0f, 10f)]
         public float targetWeightBehindPlayer = 0.5f;
 
         [Header("Debug")]
@@ -328,6 +367,7 @@ namespace MusicRun
         [Tooltip("Enable detailed logs for hunt scan candidates.")]
         public bool debugTargetScanLogs = false;
         [Tooltip("Interval between detailed hunt scan logs.")]
+        [Range(0.1f, 10f)]
         public float debugTargetScanLogInterval = 1f;
 
         /// <summary>
@@ -410,6 +450,13 @@ namespace MusicRun
             characterControllerShapeConfigured = false;
             if (Application.isPlaying)
                 return;
+
+            if (leashExitDistance > leashEnterDistance)
+                leashExitDistance = leashEnterDistance;
+
+            float minControllerHeight = characterControllerRadius * 2f + 0.01f;
+            if (characterControllerHeight < minControllerHeight)
+                characterControllerHeight = minControllerHeight;
 
             if (characterController == null)
                 characterController = GetComponent<CharacterController>();
@@ -520,7 +567,7 @@ namespace MusicRun
                 return;
 
             spawnTimer += dt;
-            if (!enableDelayedSpawn || spawnTimer >= Mathf.Max(0f, spawnDelay))
+            if (!enableDelayedSpawn || spawnTimer >= spawnDelay)
                 TrySpawnNow();
         }
 
@@ -668,7 +715,7 @@ namespace MusicRun
                     InitializeHuntPerceivedPlayerForward();
                     if (previous == CreatureState.OVERTAKE || previous == CreatureState.EAT_ATTACK || previous == CreatureState.EAT_RECOVERY)
                     {
-                        nextEatAllowedTime = Time.time + Mathf.Max(0f, huntMinDelayBetweenEat);
+                        nextEatAllowedTime = Time.time + huntMinDelayBetweenEat;
                         if (debugLogs)
                             Debug.Log($"Creature entered HUNT state, next eat allowed at {nextEatAllowedTime:F2}");
                     }
@@ -714,7 +761,7 @@ namespace MusicRun
                         if (fallbackForward.sqrMagnitude < 0.0001f)
                             fallbackForward = Vector3.forward;
                         fallbackForward.Normalize();
-                        eatAttackTargetSnapshotPoint = transform.position + fallbackForward * Mathf.Max(1f, huntReachDistance);
+                        eatAttackTargetSnapshotPoint = transform.position + fallbackForward * huntReachDistance;
                     }
                     currentTarget = eatAttackTargetSnapshot;
                     break;
@@ -811,9 +858,9 @@ namespace MusicRun
             bool hasLockedTarget = currentTarget != null;
             Vector3 huntForward = GetHuntReferenceForward();
             float headingAngle = GetHeadingAngleToForward(huntForward);
-            float recenterEnterThreshold = Mathf.Max(0f, huntRecenterHeadingAngleThreshold);
+            float recenterEnterThreshold = huntRecenterHeadingAngleThreshold;
             float recenterExitThreshold = recenterEnterThreshold * 0.5f;
-            float waitEnterLeadDistance = Mathf.Max(0.1f, huntMaxLeadDistance);
+            float waitEnterLeadDistance = huntMaxLeadDistance;
             float leadDistance = GetPlayerOffsetAlongForward();
 
             if (!hasLockedTarget && headingAngle > recenterEnterThreshold)
@@ -839,14 +886,14 @@ namespace MusicRun
             if (!hasLockedTarget)
             {
                 desiredMovePoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f, huntForward);
-                float baselineHuntSpeed = Mathf.Clamp(GetPlayerSpeed() + 2f, 0f, maxSpeedHunt);
+                float baselineHuntSpeed = GetPlayerSpeed() + 2f;
                 desiredSpeed = ComputeHuntSpeedWithLeadLimit(baselineHuntSpeed);
                 return;
             }
 
             Vector3 targetPos = currentTarget.bounds.center;
             desiredMovePoint = targetPos;
-            float baselineTargetHuntSpeed = Mathf.Clamp(GetPlayerSpeed() + 4f, 0f, maxSpeedHunt);
+            float baselineTargetHuntSpeed = GetPlayerSpeed() + 4f;
             desiredSpeed = baselineTargetHuntSpeed;
 
             Vector3 toTarget = targetPos - transform.position;
@@ -875,20 +922,20 @@ namespace MusicRun
 
             Vector3 rawRecenterPoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f, huntRecenterLockedForward);
             desiredMovePoint = GetSmoothedHuntRecenterPoint(rawRecenterPoint);
-            float baselineRecenterSpeed = Mathf.Clamp(GetPlayerSpeed() + 3f, 0f, maxSpeedHunt);
+            float baselineRecenterSpeed = GetPlayerSpeed() + 3f;
             desiredSpeed = ComputeHuntSpeedWithLeadLimit(baselineRecenterSpeed);
 
-            float recenterExitHeadingAngle = Mathf.Max(0f, huntRecenterHeadingAngleThreshold) * 0.5f;
+            float recenterExitHeadingAngle = huntRecenterHeadingAngleThreshold * 0.5f;
             float headingAngle = GetHeadingAngleToForward(huntRecenterLockedForward);
             bool aligned = headingAngle <= recenterExitHeadingAngle;
             if (aligned)
-                recenterAlignedStableTimer += Mathf.Max(0f, Time.deltaTime);
+                recenterAlignedStableTimer += Time.deltaTime;
             else
                 recenterAlignedStableTimer = 0f;
 
-            float stableDuration = Mathf.Max(0f, recenterExitStableDuration);
+            float stableDuration = recenterExitStableDuration;
             float leadDistance = GetPlayerOffsetAlongForward();
-            if (recenterAlignedStableTimer >= stableDuration && leadDistance <= Mathf.Max(0.1f, huntMaxLeadDistance))
+            if (recenterAlignedStableTimer >= stableDuration && leadDistance <= huntMaxLeadDistance)
             {
                 ChangeState(CreatureState.HUNT);
                 return;
@@ -907,15 +954,15 @@ namespace MusicRun
 
             Vector3 huntForward = GetHuntReferenceForward();
             float headingAngle = GetHeadingAngleToForward(huntForward);
-            float recenterEnterThreshold = Mathf.Max(0f, huntRecenterHeadingAngleThreshold);
+            float recenterEnterThreshold = huntRecenterHeadingAngleThreshold;
             if (headingAngle > recenterEnterThreshold)
             {
                 ChangeState(CreatureState.RECENTER);
                 return;
             }
 
-            float enterLeadDistance = Mathf.Max(0.1f, huntMaxLeadDistance);
-            float exitLeadDistance = enterLeadDistance * Mathf.Clamp(waitPlayerExitLeadRatio, 0.1f, 1f);
+            float enterLeadDistance = huntMaxLeadDistance;
+            float exitLeadDistance = enterLeadDistance * waitPlayerExitLeadRatio;
             float leadDistance = GetPlayerOffsetAlongForward();
             if (leadDistance <= exitLeadDistance)
             {
@@ -923,7 +970,7 @@ namespace MusicRun
                 return;
             }
 
-            float desiredLeadDistance = enterLeadDistance * Mathf.Clamp(waitPlayerDesiredLeadRatio, 0.1f, 1f);
+            float desiredLeadDistance = enterLeadDistance * waitPlayerDesiredLeadRatio;
             desiredMovePoint = GetPointRelativeToPlayer(desiredLeadDistance, 0f, huntForward);
             desiredSpeed = ComputeGapSpeed(desiredLeadDistance, maxSpeedHunt);
         }
@@ -936,7 +983,7 @@ namespace MusicRun
 
             Vector3 targetCenter = eatAttackTargetSnapshot != null ? eatAttackTargetSnapshot.bounds.center : eatAttackTargetSnapshotPoint;
             desiredMovePoint = targetCenter;
-            desiredSpeed = Mathf.Clamp(GetPlayerSpeed() + 5f, 0f, maxSpeedHunt);
+            desiredSpeed = GetPlayerSpeed() + 5f;
 
             if (TryConsumeCurrentTargetOnCollision())
             {
@@ -960,7 +1007,7 @@ namespace MusicRun
             if (!eatPostConsumeCarryActive)
                 BeginEatPostConsumeCarry();
 
-            eatPostConsumeCarryElapsed += Mathf.Max(0f, Time.deltaTime);
+            eatPostConsumeCarryElapsed += Time.deltaTime;
             if (IsEatPostConsumeCarryCompleted())
             {
                 ResetEatPostConsumeCarry();
@@ -969,8 +1016,10 @@ namespace MusicRun
             }
 
             desiredMovePoint = transform.position + eatPostConsumeCarryDirection * 100f;
-            float carryDecel = Mathf.Max(0f, eatPostConsumeCarryDeceleration);
-            desiredSpeed = Mathf.Max(0f, eatPostConsumeCarrySpeed - carryDecel * eatPostConsumeCarryElapsed);
+            float carryDecel = eatPostConsumeCarryDeceleration;
+            desiredSpeed = eatPostConsumeCarrySpeed - carryDecel * eatPostConsumeCarryElapsed;
+            if (desiredSpeed < 0f)
+                desiredSpeed = 0f;
         }
 
         private void TickLeashReturn()
@@ -988,9 +1037,9 @@ namespace MusicRun
             desiredMovePoint = playerPos;
             desiredMovePoint.y = transform.position.y;
 
-            float leashSpeedLimit = Mathf.Max(maxSpeedFollow, leashMaxSpeed);
-            float catchupTarget = GetPlayerSpeed() + Mathf.Max(0f, leashCatchupSpeedBoost);
-            desiredSpeed = Mathf.Clamp(catchupTarget, 0f, leashSpeedLimit);
+            float leashSpeedLimit = leashMaxSpeed;
+            float catchupTarget = GetPlayerSpeed() + leashCatchupSpeedBoost;
+            desiredSpeed = catchupTarget > leashSpeedLimit ? leashSpeedLimit : catchupTarget;
         }
 
         private void BeginEatPostConsumeCarry()
@@ -1006,9 +1055,11 @@ namespace MusicRun
                 carryDirection = GetPlayerForward();
 
             eatPostConsumeCarryDirection = carryDirection.normalized;
-            eatPostConsumeCarrySpeed = Mathf.Max(0f, currentSpeed);
+            eatPostConsumeCarrySpeed = currentSpeed;
             if (eatPostConsumeCarrySpeed < 0.01f)
-                eatPostConsumeCarrySpeed = Mathf.Max(0f, desiredSpeed);
+                eatPostConsumeCarrySpeed = desiredSpeed;
+            if (eatPostConsumeCarrySpeed < 0f)
+                eatPostConsumeCarrySpeed = 0f;
 
             currentSpeed = eatPostConsumeCarrySpeed;
             eatPostConsumeCarryActive = true;
@@ -1021,7 +1072,7 @@ namespace MusicRun
             if (!eatPostConsumeCarryActive)
                 return false;
 
-            float maxDuration = Mathf.Max(0.1f, eatRecoveryMaxDuration);
+            float maxDuration = eatRecoveryMaxDuration;
             if (eatPostConsumeCarryElapsed >= maxDuration)
                 return true;
 
@@ -1035,7 +1086,7 @@ namespace MusicRun
             if (!landed)
                 return false;
 
-            float exitSpeed = Mathf.Max(0f, eatRecoveryExitSpeed);
+            float exitSpeed = eatRecoveryExitSpeed;
             return currentSpeed <= exitSpeed;
         }
 
@@ -1059,8 +1110,8 @@ namespace MusicRun
                 return;
             }
 
-            float enterDistance = Mathf.Max(1f, leashEnterDistance);
-            float exitDistance = Mathf.Clamp(leashExitDistance, 0f, enterDistance);
+            float enterDistance = leashEnterDistance;
+            float exitDistance = leashExitDistance;
             float distanceToPlayer = GetDistanceToPlayer();
 
             if (!leashActive)
@@ -1087,9 +1138,9 @@ namespace MusicRun
 
         private float ComputeHuntSpeedWithLeadLimit(float baselineSpeed)
         {
-            float desiredLead = Mathf.Max(0f, huntMaxLeadDistance);
+            float desiredLead = huntMaxLeadDistance;
             float gapLimitedSpeed = ComputeGapSpeed(desiredLead, maxSpeedHunt);
-            return Mathf.Min(baselineSpeed, gapLimitedSpeed);
+            return baselineSpeed < gapLimitedSpeed ? baselineSpeed : gapLimitedSpeed;
         }
 
         private float GetHeadingAngleToForward(Vector3 referenceForward)
@@ -1115,7 +1166,7 @@ namespace MusicRun
                 return huntRecenterPoint;
             }
 
-            float smoothing = Mathf.Max(0f, huntRecenterPointSmoothing);
+            float smoothing = huntRecenterPointSmoothing;
             if (smoothing <= 0f)
             {
                 huntRecenterPoint = rawPoint;
@@ -1148,8 +1199,8 @@ namespace MusicRun
             if (Vector3.Dot(huntPerceivedPlayerForward, actualForward) < 0f)
                 actualForward = -actualForward;
 
-            float reactionTime = Mathf.Max(0.01f, huntPlayerHeadingReactionTime);
-            float blend = 1f - Mathf.Exp(-Mathf.Max(0f, dt) / reactionTime);
+            float reactionTime = huntPlayerHeadingReactionTime;
+            float blend = 1f - Mathf.Exp(-dt / reactionTime);
             huntPerceivedPlayerForward = Vector3.Slerp(huntPerceivedPlayerForward, actualForward, blend);
             huntPerceivedPlayerForward.y = 0f;
             if (huntPerceivedPlayerForward.sqrMagnitude < 0.0001f)
@@ -1218,7 +1269,9 @@ namespace MusicRun
         private float ComputeGapSpeed(float desiredOffset, float speedLimit, float additiveBoost = 0f)
 
         {
-            float dt = Mathf.Max(0.0001f, Time.deltaTime);
+            float dt = Time.deltaTime;
+            if (dt < 0.0001f)
+                dt = 0.0001f;
             float currentOffset = GetPlayerOffsetAlongForward();
             float error = desiredOffset - currentOffset;
             float errorRate = (error - previousGapError) / dt;
@@ -1227,8 +1280,11 @@ namespace MusicRun
             float target = GetPlayerSpeed() + kp * error - kd * errorRate + additiveBoost;
             if (GetDistanceToPlayer() > catchupBoostDistance)
                 target += catchupBoost;
-
-            return Mathf.Clamp(target, 0f, speedLimit);
+            if (target < 0f)
+                return 0f;
+            if (target > speedLimit)
+                return speedLimit;
+            return target;
         }
 
         private void ApplyMovement(float dt)
@@ -1297,7 +1353,7 @@ namespace MusicRun
             if (alignToGroundSlope && TrySampleGroundNormal(out Vector3 sampledGroundNormal))
             {
                 float alignWeight = characterController != null && !characterController.isGrounded
-                    ? Mathf.Clamp01(airborneGroundAlignWeight)
+                    ? airborneGroundAlignWeight
                     : 1f;
                 targetUp = Vector3.Slerp(Vector3.up, sampledGroundNormal, alignWeight);
             }
@@ -1309,14 +1365,14 @@ namespace MusicRun
                 return smoothedGroundUp;
             }
 
-            float smoothing = Mathf.Max(0f, groundAlignSmoothing);
+            float smoothing = groundAlignSmoothing;
             if (smoothing <= 0f)
             {
                 smoothedGroundUp = targetUp;
                 return smoothedGroundUp;
             }
 
-            float t = 1f - Mathf.Exp(-smoothing * Mathf.Max(0f, dt));
+            float t = 1f - Mathf.Exp(-smoothing * dt);
             smoothedGroundUp = Vector3.Slerp(smoothedGroundUp, targetUp, t);
             if (smoothedGroundUp.sqrMagnitude < 0.0001f)
                 smoothedGroundUp = Vector3.up;
@@ -1333,11 +1389,15 @@ namespace MusicRun
             if (probeLayerMask == 0)
                 return false;
 
-            float startHeight = Mathf.Max(0.1f, groundProbeStartHeight);
-            float probeDistance = Mathf.Max(0.2f, groundProbeDistance);
+            float startHeight = groundProbeStartHeight;
+            float probeDistance = groundProbeDistance;
             float sphereRadius = 0.2f;
             if (characterController != null)
-                sphereRadius = Mathf.Max(0.1f, characterController.radius * 0.8f);
+            {
+                sphereRadius = characterController.radius * 0.8f;
+                if (sphereRadius < 0.1f)
+                    sphereRadius = 0.1f;
+            }
 
             Vector3 rayOrigin = transform.position + Vector3.up * startHeight;
             bool hasHit = Physics.SphereCast(
@@ -1368,7 +1428,7 @@ namespace MusicRun
                 return false;
             normal.Normalize();
 
-            float clampedMaxTilt = Mathf.Clamp(maxGroundTiltAngle, 0f, 89.9f);
+            float clampedMaxTilt = maxGroundTiltAngle;
             if (clampedMaxTilt < 89.9f)
             {
                 float angleToUp = Vector3.Angle(Vector3.up, normal);
@@ -1411,8 +1471,8 @@ namespace MusicRun
                 return false;
             }
 
-            noGroundTimer += Mathf.Max(0f, dt);
-            if (noGroundTimer < Mathf.Max(0.05f, noGroundMaxDuration))
+            noGroundTimer += dt;
+            if (noGroundTimer < noGroundMaxDuration)
                 return false;
 
             if (Time.time < nextNoGroundRecoveryAllowedTime)
@@ -1429,11 +1489,15 @@ namespace MusicRun
             if (probeLayerMask == 0)
                 return false;
 
-            float startHeight = Mathf.Max(0.1f, noGroundProbeStartHeight);
-            float probeDistance = Mathf.Max(0.5f, noGroundProbeDistance);
+            float startHeight = noGroundProbeStartHeight;
+            float probeDistance = noGroundProbeDistance;
             float sphereRadius = 0.2f;
             if (characterController != null)
-                sphereRadius = Mathf.Max(0.1f, characterController.radius * 0.8f);
+            {
+                sphereRadius = characterController.radius * 0.8f;
+                if (sphereRadius < 0.1f)
+                    sphereRadius = 0.1f;
+            }
 
             Vector3 rayOrigin = transform.position + Vector3.up * startHeight;
             bool hasHit = Physics.SphereCast(
@@ -1465,7 +1529,7 @@ namespace MusicRun
                 return;
 
             Vector3 playerForward = GetPlayerForward();
-            float behindDistance = Mathf.Max(0f, noGroundRecoveryBehindPlayerDistance);
+            float behindDistance = noGroundRecoveryBehindPlayerDistance;
             Vector3 recoverPos = playerController.transform.position - playerForward * behindDistance;
             recoverPos.y += noGroundRecoveryHeightOffset;
             Quaternion recoverRot = Quaternion.LookRotation(playerForward, Vector3.up);
@@ -1484,7 +1548,7 @@ namespace MusicRun
             verticalVelocity = groundedStickVelocity;
             leashActive = false;
             noGroundTimer = 0f;
-            nextNoGroundRecoveryAllowedTime = Time.time + Mathf.Max(0f, noGroundRecoveryCooldown);
+            nextNoGroundRecoveryAllowedTime = Time.time + noGroundRecoveryCooldown;
 
             ResetEatPostConsumeCarry();
             eatAttackTargetSnapshot = null;
@@ -1500,8 +1564,8 @@ namespace MusicRun
 
         private float ComputeEatJumpUpVelocity()
         {
-            float clampedHeight = Mathf.Max(0.01f, eatJumpHeight);
-            float clampedGravity = Mathf.Max(0.01f, gravity);
+            float clampedHeight = eatJumpHeight;
+            float clampedGravity = gravity;
             return Mathf.Sqrt(2f * clampedGravity * clampedHeight);
         }
 
@@ -1550,7 +1614,7 @@ namespace MusicRun
 
                     Debug.Log(sb.ToString());
                 }
-                nextTargetScanLogTime = Time.time + Mathf.Max(0.1f, debugTargetScanLogInterval);
+                nextTargetScanLogTime = Time.time + debugTargetScanLogInterval;
             }
 
             if (count <= 0)
@@ -1790,7 +1854,7 @@ namespace MusicRun
             if (knockedVegetationCooldowns.TryGetValue(key, out float nextAllowedTime) && Time.time < nextAllowedTime)
                 return;
 
-            knockedVegetationCooldowns[key] = Time.time + Mathf.Max(0.05f, vegetationKnockCooldown);
+            knockedVegetationCooldowns[key] = Time.time + vegetationKnockCooldown;
 
             Collider[] vegetationColliders = vegetationTransform.GetComponentsInChildren<Collider>();
             for (int i = 0; i < vegetationColliders.Length; i++)
@@ -1804,7 +1868,7 @@ namespace MusicRun
             if (rb == null)
                 rb = vegetationTransform.gameObject.AddComponent<Rigidbody>();
 
-            rb.mass = Mathf.Max(0.1f, vegetationRigidbodyMass);
+            rb.mass = vegetationRigidbodyMass;
             rb.useGravity = true;
             rb.isKinematic = false;
 
@@ -1974,8 +2038,8 @@ namespace MusicRun
             if (!force && characterControllerShapeConfigured)
                 return;
 
-            float configuredRadius = Mathf.Max(0.05f, characterControllerRadius);
-            float configuredHeight = Mathf.Max(configuredRadius * 2f + 0.01f, characterControllerHeight);
+            float configuredRadius = characterControllerRadius;
+            float configuredHeight = characterControllerHeight;
             Vector3 configuredCenter = characterControllerCenter;
 
             bool restoreEnabled = characterController.enabled;
