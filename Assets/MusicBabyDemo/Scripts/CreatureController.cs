@@ -40,8 +40,8 @@ State table (guards/actions/transitions)
     hasTarget && distanceToTarget <= huntReachDistance && eat cooldown elapsed -> EAT_ATTACK
 
 - RECENTER
-  entry: lock recenterForward from current hunt forward
-  action: desiredMovePoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f, recenterForward), speed clamped by hunt lead rule
+  entry: lock recenterForward from current player forward
+  action: desiredMovePoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f, recenterForward), relock recenterForward if it diverges from player heading
   transitions: alignedStable(recenterExitStableDuration) && leadDistance <= huntMaxLeadDistance -> HUNT
   exit: clear recenter lock
 
@@ -169,7 +169,7 @@ namespace MusicRun
         public float maxSpeedHunt = 22f;
         [Tooltip("Maximum forward lead allowed in HUNT before speed is reduced to keep pressure on player.")]
         [Range(0.1f, 50f)]
-        public float huntMaxLeadDistance = 10f;
+        public float huntMaxLeadDistance = 16f;
         [Tooltip("Player speed threshold for HUNT/RECENTER/WAIT_PLAYER -> FOLLOW transition.")]
         [FormerlySerializedAs("huntExitToFollowPlayerSpeed")]
         [Range(0f, 30f)]
@@ -245,7 +245,7 @@ namespace MusicRun
         public float catchupBoost = 3f;
         [Tooltip("Maximum turning speed in degrees per second.")]
         [Range(0f, 1080f)]
-        public float turnRateDegPerSec = 360f;
+        public float turnRateDegPerSec = 45f;
         [Tooltip("Gravity applied to creature when airborne.")]
         [Range(0.01f, 100f)]
         public float gravity = 18f;
@@ -432,6 +432,7 @@ namespace MusicRun
         private Vector3 smoothedGroundUp = Vector3.up;
         private float desiredSpeed;
         private float nextTargetScanLogTime;
+        private float nextDesiredPointDistanceLogTime;
         private bool groundUpInitialized;
         private bool characterControllerShapeConfigured;
         private bool leashActive;
@@ -479,6 +480,7 @@ namespace MusicRun
 
             stateTime += Time.deltaTime;
             UpdateStateMachine();
+            LogDesiredPointDistancesPeriodic();
             ApplyMovement(Time.deltaTime);
             PushCreatureVisualRuntimeContext();
         }
@@ -514,6 +516,7 @@ namespace MusicRun
             leashActive = false;
             noGroundTimer = 0f;
             nextNoGroundRecoveryAllowedTime = 0f;
+            nextDesiredPointDistanceLogTime = 0f;
             ResetGroundAlignment();
             ChangeState(CreatureState.FOLLOW, force: true);
             SetCreatureVisible(false);
@@ -556,6 +559,7 @@ namespace MusicRun
             leashActive = false;
             noGroundTimer = 0f;
             nextNoGroundRecoveryAllowedTime = 0f;
+            nextDesiredPointDistanceLogTime = 0f;
             ResetGroundAlignment();
         }
 
@@ -611,11 +615,38 @@ namespace MusicRun
             leashActive = false;
             noGroundTimer = 0f;
             nextNoGroundRecoveryAllowedTime = 0f;
+            nextDesiredPointDistanceLogTime = 0f;
             ChangeState(CreatureState.FOLLOW, force: true);
             SetCreatureVisible(true);
 
             if (debugLogs)
                 Debug.Log($"Creature spawned at {spawnPos} state:{state}");
+        }
+
+        private void LogDesiredPointDistancesPeriodic()
+        {
+            if (!debugLogs || playerController == null)
+                return;
+            if (Time.time < nextDesiredPointDistanceLogTime)
+                return;
+
+            Vector3 creaturePos = transform.position;
+            Vector3 playerPos = playerController.transform.position;
+            Vector3 playerForward = GetPlayerForward(); 
+
+            float desiredToCreature = Vector3.Distance(desiredMovePoint, creaturePos);
+            float desiredToPlayer = Vector3.Distance(desiredMovePoint, playerPos);
+            Vector3 playerToDesired = desiredMovePoint - playerPos;
+            playerToDesired.y = 0f;
+            float aheadSigned = Vector3.Dot(playerToDesired, playerForward);
+
+            Debug.Log(
+                $"DesiredPointDist state:{state} desired:{desiredMovePoint} " +
+                $"toCreature:{desiredToCreature:F2} " +
+                $"toPlayer:{desiredToPlayer:F2} " +
+                $"aheadSigned:{aheadSigned:F2}");
+
+            nextDesiredPointDistanceLogTime = Time.time + 1f;
         }
 
         private Transform GetSpawnStartTransform()
@@ -632,7 +663,9 @@ namespace MusicRun
             if (playerController == null)
                 return;
 
-            desiredMovePoint = transform.position;
+            // Keep previous desiredMovePoint by default. This avoids one-frame
+            // "snap under creature" when a state transitions before setting
+            // a new desired point in the same tick.
             desiredSpeed = 0f;
             ApplyDistanceLeashOverride();
 
@@ -728,7 +761,9 @@ namespace MusicRun
                     eatJumpStarted = false;
                     ResetEatPostConsumeCarry();
                     InitializeHuntPerceivedPlayerForward();
-                    LockRecenterForward(GetHuntReferenceForward());
+                    LockRecenterForward(GetPlayerForward());
+                    desiredMovePoint = GetRecenterDesiredPoint();
+                    desiredSpeed = ComputeHuntSpeedWithLeadLimit(GetPlayerSpeed() + 5f);
                     break;
                 case CreatureState.WAIT_PLAYER:
                     currentTarget = null;
@@ -917,12 +952,11 @@ namespace MusicRun
 
             currentTarget = null;
 
-            if (!huntRecenterForwardLocked || huntRecenterLockedForward.sqrMagnitude < 0.0001f)
-                LockRecenterForward(GetHuntReferenceForward());
+            RefreshRecenterForwardLock();
 
-            Vector3 rawRecenterPoint = GetPointRelativeToPlayer(huntMaxLeadDistance, 0f, huntRecenterLockedForward);
+            Vector3 rawRecenterPoint = GetRecenterDesiredPoint();
             desiredMovePoint = GetSmoothedHuntRecenterPoint(rawRecenterPoint);
-            float baselineRecenterSpeed = GetPlayerSpeed() + 3f;
+            float baselineRecenterSpeed = GetPlayerSpeed() + 5f;
             desiredSpeed = ComputeHuntSpeedWithLeadLimit(baselineRecenterSpeed);
 
             float recenterExitHeadingAngle = huntRecenterHeadingAngleThreshold * 0.5f;
@@ -1178,6 +1212,60 @@ namespace MusicRun
             return huntRecenterPoint;
         }
 
+        private void RefreshRecenterForwardLock()
+        {
+            Vector3 playerForward = GetPlayerForward();
+            if (!huntRecenterForwardLocked || huntRecenterLockedForward.sqrMagnitude < 0.0001f)
+            {
+                LockRecenterForward(playerForward);
+                return;
+            }
+
+            Vector3 recenterForward = huntRecenterLockedForward;
+            recenterForward.y = 0f;
+            if (recenterForward.sqrMagnitude < 0.0001f)
+            {
+                LockRecenterForward(playerForward);
+                return;
+            }
+            recenterForward.Normalize();
+
+            float relockDotThreshold = GetRecenterForwardRelockDotThreshold();
+            float alignmentDot = Vector3.Dot(recenterForward, playerForward);
+            if (alignmentDot < relockDotThreshold)
+            {
+                if (debugLogs)
+                    Debug.Log($"RECENTER relock forward (dot:{alignmentDot:F2} threshold:{relockDotThreshold:F2})");
+                LockRecenterForward(playerForward);
+            }
+        }
+
+        private float GetRecenterForwardRelockDotThreshold()
+        {
+            // Keep recenter target truly ahead of the player:
+            // allow only limited angular drift between locked recenter forward and current player forward.
+            float maxAllowedDriftAngle = huntRecenterHeadingAngleThreshold * 0.5f;
+            if (maxAllowedDriftAngle < 10f)
+                maxAllowedDriftAngle = 10f;
+            if (maxAllowedDriftAngle > 35f)
+                maxAllowedDriftAngle = 35f;
+
+            return Mathf.Cos(maxAllowedDriftAngle * Mathf.Deg2Rad);
+        }
+
+        private Vector3 GetRecenterDesiredPoint()
+        {
+            Vector3 recenterForward = huntRecenterLockedForward;
+            recenterForward.y = 0f;
+            if (recenterForward.sqrMagnitude < 0.0001f)
+                recenterForward = GetPlayerForward();
+            if (recenterForward.sqrMagnitude < 0.0001f)
+                recenterForward = Vector3.forward;
+            recenterForward.Normalize();
+
+            return GetPointRelativeToPlayer(huntMaxLeadDistance, 0f, recenterForward);
+        }
+
         private void UpdateHuntPerceivedPlayerForward(float dt)
         {
             if (playerController == null)
@@ -1252,7 +1340,9 @@ namespace MusicRun
             playerForward.Normalize();
             Vector3 playerRight = Vector3.Cross(Vector3.up, playerForward);
             Vector3 point = playerPos + playerForward * forwardOffset + playerRight * lateralOffset;
-            point.y = transform.position.y;
+            // Keep desired point at player height for clearer debug intent.
+            // Movement stays horizontal anyway (y is ignored in ApplyMovement).
+            point.y = playerPos.y;
             return point;
         }
 
@@ -2098,7 +2188,7 @@ namespace MusicRun
             Gizmos.color = stateColor;
             Gizmos.DrawWireSphere(transform.position, 0.6f);
             Gizmos.DrawLine(transform.position, desiredMovePoint);
-            Gizmos.DrawWireCube(desiredMovePoint, Vector3.one * 0.3f);
+            Gizmos.DrawWireCube(desiredMovePoint, Vector3.one * 0.5f);
 
             if (state == CreatureState.OVERTAKE || state == CreatureState.HUNT || state == CreatureState.RECENTER || state == CreatureState.WAIT_PLAYER)
             {
