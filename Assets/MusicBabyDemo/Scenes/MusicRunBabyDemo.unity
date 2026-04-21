@@ -1908,7 +1908,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 136073483}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.10688774, y: 0, z: 0, w: 0.9942711}
+  m_LocalRotation: {x: 0.10172942, y: 0, z: 0, w: 0.99481213}
   m_LocalPosition: {x: 0, y: 1.02, z: 2.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3252,7 +3252,7 @@ MonoBehaviour:
   knockback: {x: 0, y: 0, z: 0}
   MinSpeed: 1
   MaxSpeed: 10
-  Acceleration: 0.15
+  Acceleration: 0.12
   Speed: 1
   TurnSpeed: 0.25
   MaxAngle: 45
@@ -10222,16 +10222,16 @@ MonoBehaviour:
   huntSearchRadius: 8
   huntReachDistance: 2
   maxSpeedHunt: 10
-  huntMaxLeadDistance: 6
+  huntMaxLeadDistance: 16
   huntToFollowPlayerSpeedThreshold: 6.5
-  huntMinDelayBetweenEat: 3
+  huntMinDelayBetweenEat: 2
   huntPlayerHeadingReactionTime: 1
   instrumentScanLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
   huntRecenterHeadingAngleThreshold: 30
   recenterExitStableDuration: 0.2
-  huntRecenterPointSmoothing: 15
+  huntRecenterPointSmoothing: 13
   waitPlayerExitLeadRatio: 0.7
   waitPlayerDesiredLeadRatio: 0.45
   eatDuration: 0.6
@@ -10246,7 +10246,7 @@ MonoBehaviour:
   brakeMax: 24
   catchupBoostDistance: 20
   catchupBoost: 3
-  turnRateDegPerSec: 360
+  turnRateDegPerSec: 45
   gravity: 10
   groundedStickVelocity: -1
   alignToGroundSlope: 1
@@ -10773,7 +10773,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2023174730}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.26152876
+  m_Size: 0.25909528
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11539,7 +11539,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1192789700}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.705992, y: -0.039690282, z: -0.039690282, w: 0.705992}
+  m_LocalRotation: {x: 0.7057421, y: 0.043909825, z: 0.043909825, w: 0.7057421}
   m_LocalPosition: {x: 0, y: 1, z: -1.9}
   m_LocalScale: {x: 0.06, y: 0.22, z: 0.06}
   m_ConstrainProportionsScale: 0
@@ -15919,7 +15919,7 @@ Transform:
   m_GameObject: {fileID: 1616655333}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.9827102, z: 0}
+  m_LocalPosition: {x: 0, y: 1.0535729, z: 0}
   m_LocalScale: {x: 2.8, y: 1.5, z: 3.5}
   m_ConstrainProportionsScale: 0
   m_Children: []

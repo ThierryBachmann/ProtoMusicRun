@@ -119,34 +119,34 @@ namespace MusicRun
         public bool enableDelayedSpawn = true;
         [Tooltip("Delay in seconds before the creature appears after level start.")]
         [Range(0f, 30f)]
-        public float spawnDelay = 2f;
+        public float spawnDelay = 10f;
         [Tooltip("Spawn creature only once per run.")]
         public bool spawnOncePerRun = true;
         [Tooltip("Optional explicit spawn point. When empty, terrainGenerator.currentStart is used.")]
         public Transform spawnStartOverride;
         [Tooltip("Vertical offset applied when spawning the creature.")]
         [Range(0f, 10f)]
-        public float spawnHeightOffset = 1.5f;
+        public float spawnHeightOffset = 0f;
 
         [Header("FOLLOW Mode")]
         [Tooltip("Desired distance behind the player.")]
         [Range(0f, 60f)]
-        public float desiredFollowDistance = 12f;
+        public float desiredFollowDistance = 8f;
         [Tooltip("Speed cap in FOLLOW.")]
         [Range(0f, 80f)]
-        public float maxSpeedFollow = 16f;
+        public float maxSpeedFollow = 10f;
         [Tooltip("Player speed threshold for FOLLOW -> OVERTAKE transition.")]
         [FormerlySerializedAs("PlayerSpeedThresholdForOvertake")]
         [Range(0f, 30f)]
-        public float followToOvertakePlayerSpeedThreshold = 3f;
+        public float followToOvertakePlayerSpeedThreshold = 5.5f;
 
         [Header("OVERTAKE Mode")]
         [Tooltip("Forward distance aimed during overtake maneuver.")]
         [Range(0f, 60f)]
-        public float overtakeLeadDistance = 12f;
+        public float overtakeLeadDistance = 6f;
         [Tooltip("Lateral side offset used during overtake.")]
         [Range(0f, 20f)]
-        public float overtakeLateralOffset = 2.5f;
+        public float overtakeLateralOffset = 5f;
         [Tooltip("Speed cap in OVERTAKE.")]
         [Range(0f, 80f)]
         public float maxSpeedOvertake = 20f;
@@ -160,26 +160,26 @@ namespace MusicRun
         [Header("HUNT Mode")]
         [Tooltip("Search radius to find nearby instruments.")]
         [Range(1f, 120f)]
-        public float huntSearchRadius = 28f;
+        public float huntSearchRadius = 8f;
         [Tooltip("Distance threshold to switch from HUNT to EAT_ATTACK.")]
         [Range(1f, 10f)]
-        public float huntReachDistance = 1.6f;
+        public float huntReachDistance = 2f;
         [Tooltip("Speed cap in HUNT and EAT approach.")]
         [Range(0f, 80f)]
-        public float maxSpeedHunt = 22f;
+        public float maxSpeedHunt = 10f;
         [Tooltip("Maximum forward lead allowed in HUNT before speed is reduced to keep pressure on player.")]
         [Range(0.1f, 50f)]
         public float huntMaxLeadDistance = 16f;
         [Tooltip("Player speed threshold for HUNT/RECENTER/WAIT_PLAYER -> FOLLOW transition.")]
         [FormerlySerializedAs("huntExitToFollowPlayerSpeed")]
         [Range(0f, 30f)]
-        public float huntToFollowPlayerSpeedThreshold = 3.5f;
+        public float huntToFollowPlayerSpeedThreshold = 6.5f;
         [Tooltip("Minimum delay before EAT can start after entering HUNT (from OVERTAKE or EAT).")]
         [Range(0f, 10f)]
-        public float huntMinDelayBetweenEat = 1.0f;
+        public float huntMinDelayBetweenEat = 2f;
         [Tooltip("Reaction time used to update perceived player heading in HUNT (higher = slower creature response).")]
         [Range(0.01f, 5f)]
-        public float huntPlayerHeadingReactionTime = 0.55f;
+        public float huntPlayerHeadingReactionTime = 1f;
         [Tooltip("Physics layers included when scanning for instrument colliders.")]
         public LayerMask instrumentScanLayerMask = ~0;
 
@@ -192,7 +192,7 @@ namespace MusicRun
         public float recenterExitStableDuration = 0.2f;
         [Tooltip("Smoothing applied to recenter target updates (higher is snappier, lower is smoother).")]
         [Range(0f, 50f)]
-        public float huntRecenterPointSmoothing = 10f;
+        public float huntRecenterPointSmoothing = 13f;
 
         [Header("WAIT_PLAYER Mode")]
         [Tooltip("Lead ratio used to exit WAIT_PLAYER and return to HUNT (0.7 means leave wait when lead <= 70% of huntMaxLeadDistance).")]
@@ -248,7 +248,7 @@ namespace MusicRun
         public float turnRateDegPerSec = 45f;
         [Tooltip("Gravity applied to creature when airborne.")]
         [Range(0.01f, 100f)]
-        public float gravity = 18f;
+        public float gravity = 10f;
         [Tooltip("Small negative velocity to keep controller grounded.")]
         [Range(-10f, 0f)]
         public float groundedStickVelocity = -1f;
@@ -361,7 +361,7 @@ namespace MusicRun
 
         [Header("Debug")]
         [Tooltip("Enable verbose creature state logs.")]
-        public bool debugLogs;
+        public bool debugLogs = true;
         [Tooltip("Draw debug gizmos for creature state and targets.")]
         public bool drawDebugGizmos = true;
         [Tooltip("Enable detailed logs for hunt scan candidates.")]
