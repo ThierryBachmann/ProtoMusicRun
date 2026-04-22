@@ -29,6 +29,21 @@ public class HippoVisual : ProceduralCreatureVisualBase
     [Tooltip("Tail half-length along local Y before pitch rotation (ellipsoid).")]
     [Range(0.05f, 3f)] public float tailLength = 0.22f;
 
+    [Header("STRUCTURE / Mouth")]
+    [Range(-2f, 2f)] public float upperJawHeightOffset = -0.18f;
+    [Range(-2f, 2f)] public float upperJawForwardOffset = 0.82f;
+    [Range(0.1f, 4f)] public float upperJawWidth = 1.7f;
+    [Range(0.1f, 2f)] public float upperJawHeight = 0.48f;
+    [Range(0.1f, 3f)] public float upperJawLength = 1.0f;
+    [Range(-2f, 2f)] public float jawPivotHeightOffset = -0.1f;
+    [Range(-2f, 2f)] public float jawPivotForwardOffset = 0.38f;
+    [Range(-45f, 45f)] public float jawPivotBasePitch = 0f;
+    [Range(-2f, 2f)] public float lowerJawHeightOffset = -0.16f;
+    [Range(-2f, 2f)] public float lowerJawForwardOffset = 0.46f;
+    [Range(0.1f, 4f)] public float lowerJawWidth = 1.65f;
+    [Range(0.1f, 2f)] public float lowerJawHeight = 0.32f;
+    [Range(0.1f, 3f)] public float lowerJawLength = 0.92f;
+
     [Header("STRUCTURE / Eyes Geometry")]
     [Tooltip("Horizontal offset of eyes from head center.")]
     [Range(0f, 2f)] public float eyePivotSideOffset = 0.58f;
@@ -585,22 +600,22 @@ public class HippoVisual : ProceduralCreatureVisualBase
             "UpperJaw",
             PrimitiveType.Sphere,
             headPivot,
-            new Vector3(0f, -0.18f, 0.82f),
+            new Vector3(0f, upperJawHeightOffset, upperJawForwardOffset),
             Vector3.zero,
-            new Vector3(1.7f, 0.48f, 1.0f),
+            new Vector3(upperJawWidth, upperJawHeight, upperJawLength),
             CreatureMaterialSlot.Mouth);
 
         jawPivot = CreateNode("JawPivot", headPivot);
-        jawPivot.localPosition = new Vector3(0f, -0.1f, 0.38f);
-        jawPivot.localRotation = Quaternion.identity;
+        jawPivot.localPosition = new Vector3(0f, jawPivotHeightOffset, jawPivotForwardOffset);
+        jawPivot.localRotation = Quaternion.Euler(jawPivotBasePitch, 0f, 0f);
 
         lowerJaw = CreatePart(
             "LowerJaw",
             PrimitiveType.Sphere,
             jawPivot,
-            new Vector3(0f, -0.16f, 0.46f),
+            new Vector3(0f, lowerJawHeightOffset, lowerJawForwardOffset),
             Vector3.zero,
-            new Vector3(1.65f, 0.32f, 0.92f),
+            new Vector3(lowerJawWidth, lowerJawHeight, lowerJawLength),
             CreatureMaterialSlot.Mouth);
 
         float eyeSide = Mathf.Abs(eyePivotSideOffset);
@@ -1067,7 +1082,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
     }
 
     // Live-apply structural parameters without rebuilding:
-    // overall scale, body/head proportions, ear placement and tail geometry.
+    // overall scale, body/head proportions, mouth, ear placement and tail geometry.
     private void ApplyStructurePlacement()
     {
         if (root != null)
@@ -1091,8 +1106,32 @@ public class HippoVisual : ProceduralCreatureVisualBase
             head.localScale = new Vector3(2.0f, 1.15f, 1.7f) * headLinearScale;
         }
 
+        ApplyMouthStructurePlacement();
         ApplyTailPlacement();
         ApplyEarPlacement();
+    }
+
+    // Live-update mouth structure (upper jaw, lower jaw and pivot/rest orientation).
+    private void ApplyMouthStructurePlacement()
+    {
+        if (upperJaw != null)
+        {
+            upperJaw.localPosition = new Vector3(0f, upperJawHeightOffset, upperJawForwardOffset);
+            upperJaw.localScale = new Vector3(upperJawWidth, upperJawHeight, upperJawLength);
+        }
+
+        if (jawPivot != null)
+        {
+            jawPivot.localPosition = new Vector3(0f, jawPivotHeightOffset, jawPivotForwardOffset);
+            jawBaseLocalRot = Quaternion.Euler(jawPivotBasePitch, 0f, 0f);
+            jawPivot.localRotation = jawBaseLocalRot;
+        }
+
+        if (lowerJaw != null)
+        {
+            lowerJaw.localPosition = new Vector3(0f, lowerJawHeightOffset, lowerJawForwardOffset);
+            lowerJaw.localScale = new Vector3(lowerJawWidth, lowerJawHeight, lowerJawLength);
+        }
     }
 
     // Live-update tail transform from inspector parameters.
