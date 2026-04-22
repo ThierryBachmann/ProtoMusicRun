@@ -30,19 +30,27 @@ public class HippoVisual : ProceduralCreatureVisualBase
     [Range(0.05f, 3f)] public float tailLength = 0.22f;
 
     [Header("STRUCTURE / Mouth")]
+    [Range(0.1f, 4f)] public float jawHeight = 0.8f;
+    [Range(0.2f, 5f)] public float jawHeightUpperToLowerRatio = 1.5f;
+    [Range(0.1f, 6f)] public float jawLength = 1.92f;
+    [Range(0.2f, 5f)] public float jawLengthUpperToLowerRatio = 1.087f;
+    [Range(0.1f, 8f)] public float jawWidth = 3.35f;
+    [Range(0.2f, 5f)] public float jawWidthUpperToLowerRatio = 1.03f;
     [Range(-2f, 2f)] public float upperJawHeightOffset = -0.18f;
     [Range(-2f, 2f)] public float upperJawForwardOffset = 0.82f;
-    [Range(0.1f, 4f)] public float upperJawWidth = 1.7f;
-    [Range(0.1f, 2f)] public float upperJawHeight = 0.48f;
-    [Range(0.1f, 3f)] public float upperJawLength = 1.0f;
     [Range(-2f, 2f)] public float jawPivotHeightOffset = -0.1f;
     [Range(-2f, 2f)] public float jawPivotForwardOffset = 0.38f;
     [Range(-45f, 45f)] public float jawPivotBasePitch = 0f;
     [Range(-2f, 2f)] public float lowerJawHeightOffset = -0.16f;
     [Range(-2f, 2f)] public float lowerJawForwardOffset = 0.46f;
-    [Range(0.1f, 4f)] public float lowerJawWidth = 1.65f;
-    [Range(0.1f, 2f)] public float lowerJawHeight = 0.32f;
-    [Range(0.1f, 3f)] public float lowerJawLength = 0.92f;
+
+    [Header("STRUCTURE / Legs")]
+    [Range(0.1f, 2f)] public float upperLegThickness = 0.60f;
+    [Range(0.2f, 3f)] public float upperLegLength = 1.30f;
+    [Range(-1f, 2f)] public float legAttachHeight = 0.78f;
+    [Range(0.1f, 2f)] public float ankleDiameter = 0.50f;
+    [Range(0.1f, 2f)] public float footHeight = 0.38f;
+    [Range(0.1f, 3f)] public float footWidth = 0.84f;
 
     [Header("STRUCTURE / Eyes Geometry")]
     [Tooltip("Horizontal offset of eyes from head center.")]
@@ -145,6 +153,14 @@ public class HippoVisual : ProceduralCreatureVisualBase
     public bool drawDebug = false;
 
     private const string RootName = "__HippoVisualRoot";
+    private const float LegSideOffset = 0.76f;
+    private const float LegFrontOffset = 1.0f;
+    private const float UpperLegCenterYRatio = -0.24f / 1.30f;
+    private const float AnkleCenterYRatio = -0.88f / 1.30f;
+    private const float FootCenterYRatio = -1.16f / 1.30f;
+    private const float AnkleForwardFromFootWidthRatio = 0.08f / 0.84f;
+    private const float FootForwardFromFootWidthRatio = 0.18f / 0.84f;
+    private const float FootDepthFromFootWidthRatio = 0.98f / 0.84f;
 
     private Transform root;
     private Transform visualRoot;
@@ -596,13 +612,21 @@ public class HippoVisual : ProceduralCreatureVisualBase
             new Vector3(2.0f, 1.15f, 1.7f) * headLinearScale,
             CreatureMaterialSlot.Body);
 
+        ResolveJawDimensions(
+            out float upperJawResolvedWidth,
+            out float lowerJawResolvedWidth,
+            out float upperJawResolvedHeight,
+            out float lowerJawResolvedHeight,
+            out float upperJawResolvedLength,
+            out float lowerJawResolvedLength);
+
         upperJaw = CreatePart(
             "UpperJaw",
             PrimitiveType.Sphere,
             headPivot,
             new Vector3(0f, upperJawHeightOffset, upperJawForwardOffset),
             Vector3.zero,
-            new Vector3(upperJawWidth, upperJawHeight, upperJawLength),
+            new Vector3(upperJawResolvedWidth, upperJawResolvedHeight, upperJawResolvedLength),
             CreatureMaterialSlot.Mouth);
 
         jawPivot = CreateNode("JawPivot", headPivot);
@@ -615,7 +639,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
             jawPivot,
             new Vector3(0f, lowerJawHeightOffset, lowerJawForwardOffset),
             Vector3.zero,
-            new Vector3(lowerJawWidth, lowerJawHeight, lowerJawLength),
+            new Vector3(lowerJawResolvedWidth, lowerJawResolvedHeight, lowerJawResolvedLength),
             CreatureMaterialSlot.Mouth);
 
         float eyeSide = Mathf.Abs(eyePivotSideOffset);
@@ -694,10 +718,10 @@ public class HippoVisual : ProceduralCreatureVisualBase
             GetTailEllipsoidScale(),
             CreatureMaterialSlot.Tail);
 
-        legFL = CreateLeg("Leg_FL", new Vector3(-0.76f, 0.78f, 1.0f));
-        legFR = CreateLeg("Leg_FR", new Vector3(0.76f, 0.78f, 1.0f));
-        legBL = CreateLeg("Leg_BL", new Vector3(-0.76f, 0.78f, -1.0f));
-        legBR = CreateLeg("Leg_BR", new Vector3(0.76f, 0.78f, -1.0f));
+        legFL = CreateLeg("Leg_FL", new Vector3(-LegSideOffset, legAttachHeight, LegFrontOffset));
+        legFR = CreateLeg("Leg_FR", new Vector3(LegSideOffset, legAttachHeight, LegFrontOffset));
+        legBL = CreateLeg("Leg_BL", new Vector3(-LegSideOffset, legAttachHeight, -LegFrontOffset));
+        legBR = CreateLeg("Leg_BR", new Vector3(LegSideOffset, legAttachHeight, -LegFrontOffset));
     }
 
     // Main animation dispatch called every frame.
@@ -1082,7 +1106,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
     }
 
     // Live-apply structural parameters without rebuilding:
-    // overall scale, body/head proportions, mouth, ear placement and tail geometry.
+    // overall scale, body/head proportions, mouth, legs, ear placement and tail geometry.
     private void ApplyStructurePlacement()
     {
         if (root != null)
@@ -1107,6 +1131,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
         }
 
         ApplyMouthStructurePlacement();
+        ApplyLegStructurePlacement();
         ApplyTailPlacement();
         ApplyEarPlacement();
     }
@@ -1114,10 +1139,18 @@ public class HippoVisual : ProceduralCreatureVisualBase
     // Live-update mouth structure (upper jaw, lower jaw and pivot/rest orientation).
     private void ApplyMouthStructurePlacement()
     {
+        ResolveJawDimensions(
+            out float upperJawResolvedWidth,
+            out float lowerJawResolvedWidth,
+            out float upperJawResolvedHeight,
+            out float lowerJawResolvedHeight,
+            out float upperJawResolvedLength,
+            out float lowerJawResolvedLength);
+
         if (upperJaw != null)
         {
             upperJaw.localPosition = new Vector3(0f, upperJawHeightOffset, upperJawForwardOffset);
-            upperJaw.localScale = new Vector3(upperJawWidth, upperJawHeight, upperJawLength);
+            upperJaw.localScale = new Vector3(upperJawResolvedWidth, upperJawResolvedHeight, upperJawResolvedLength);
         }
 
         if (jawPivot != null)
@@ -1130,7 +1163,90 @@ public class HippoVisual : ProceduralCreatureVisualBase
         if (lowerJaw != null)
         {
             lowerJaw.localPosition = new Vector3(0f, lowerJawHeightOffset, lowerJawForwardOffset);
-            lowerJaw.localScale = new Vector3(lowerJawWidth, lowerJawHeight, lowerJawLength);
+            lowerJaw.localScale = new Vector3(lowerJawResolvedWidth, lowerJawResolvedHeight, lowerJawResolvedLength);
+        }
+    }
+
+    private void ResolveJawDimensions(
+        out float upperWidth,
+        out float lowerWidth,
+        out float upperHeight,
+        out float lowerHeight,
+        out float upperLength,
+        out float lowerLength)
+    {
+        SplitUpperLowerByRatio(jawWidth, jawWidthUpperToLowerRatio, out upperWidth, out lowerWidth);
+        SplitUpperLowerByRatio(jawHeight, jawHeightUpperToLowerRatio, out upperHeight, out lowerHeight);
+        SplitUpperLowerByRatio(jawLength, jawLengthUpperToLowerRatio, out upperLength, out lowerLength);
+    }
+
+    private static void SplitUpperLowerByRatio(
+        float combined,
+        float upperToLowerRatio,
+        out float upper,
+        out float lower)
+    {
+        lower = combined / (1f + upperToLowerRatio);
+        upper = combined - lower;
+    }
+
+    // Live-update leg structure (attachment height and upper/ankle/foot dimensions).
+    private void ApplyLegStructurePlacement()
+    {
+        ApplyLegRootPlacement(legFL, -LegSideOffset, LegFrontOffset);
+        ApplyLegRootPlacement(legFR, LegSideOffset, LegFrontOffset);
+        ApplyLegRootPlacement(legBL, -LegSideOffset, -LegFrontOffset);
+        ApplyLegRootPlacement(legBR, LegSideOffset, -LegFrontOffset);
+
+        ApplyLegPartPlacement(legFL);
+        ApplyLegPartPlacement(legFR);
+        ApplyLegPartPlacement(legBL);
+        ApplyLegPartPlacement(legBR);
+
+        if (driveChasePhaseFromDisplacement)
+            RecomputeChaseCalibration();
+    }
+
+    private void ApplyLegRootPlacement(Transform legRoot, float side, float forward)
+    {
+        if (legRoot == null)
+            return;
+
+        legRoot.localPosition = new Vector3(side, legAttachHeight, forward);
+    }
+
+    private void ApplyLegPartPlacement(Transform legRoot)
+    {
+        if (legRoot == null)
+            return;
+
+        Transform upper = legRoot.Find("Upper");
+        Transform ankle = legRoot.Find("Ankle");
+        Transform foot = legRoot.Find("Foot");
+
+        float upperCenterY = upperLegLength * UpperLegCenterYRatio;
+        float ankleCenterY = upperLegLength * AnkleCenterYRatio;
+        float footCenterY = upperLegLength * FootCenterYRatio;
+        float ankleForward = footWidth * AnkleForwardFromFootWidthRatio;
+        float footForward = footWidth * FootForwardFromFootWidthRatio;
+        float footDepth = footWidth * FootDepthFromFootWidthRatio;
+
+        if (upper != null)
+        {
+            upper.localPosition = new Vector3(0f, upperCenterY, 0f);
+            upper.localScale = new Vector3(upperLegThickness, upperLegLength, upperLegThickness);
+        }
+
+        if (ankle != null)
+        {
+            ankle.localPosition = new Vector3(0f, ankleCenterY, ankleForward);
+            ankle.localScale = new Vector3(ankleDiameter, ankleDiameter, ankleDiameter);
+        }
+
+        if (foot != null)
+        {
+            foot.localPosition = new Vector3(0f, footCenterY, footForward);
+            foot.localScale = new Vector3(footWidth, footHeight, footDepth);
         }
     }
 
@@ -1218,27 +1334,27 @@ public class HippoVisual : ProceduralCreatureVisualBase
             "Upper",
             PrimitiveType.Sphere,
             legRoot,
-            new Vector3(0f, -0.24f, 0f),
+            new Vector3(0f, upperLegLength * UpperLegCenterYRatio, 0f),
             Vector3.zero,
-            new Vector3(0.60f, 1.30f, 0.60f),
+            new Vector3(upperLegThickness, upperLegLength, upperLegThickness),
             CreatureMaterialSlot.Body);
 
         Transform ankle = CreatePart(
             "Ankle",
             PrimitiveType.Sphere,
             legRoot,
-            new Vector3(0f, -0.88f, 0.08f),
+            new Vector3(0f, upperLegLength * AnkleCenterYRatio, footWidth * AnkleForwardFromFootWidthRatio),
             Vector3.zero,
-            new Vector3(0.50f, 0.40f, 0.50f),
+            new Vector3(ankleDiameter, ankleDiameter, ankleDiameter),
             CreatureMaterialSlot.Body);
 
         Transform foot = CreatePart(
             "Foot",
             PrimitiveType.Sphere,
             legRoot,
-            new Vector3(0f, -1.16f, 0.18f),
+            new Vector3(0f, upperLegLength * FootCenterYRatio, footWidth * FootForwardFromFootWidthRatio),
             Vector3.zero,
-            new Vector3(0.84f, 0.38f, 0.98f),
+            new Vector3(footWidth, footHeight, footWidth * FootDepthFromFootWidthRatio),
             CreatureMaterialSlot.Body);
 
         RemoveCollider(upper.gameObject);
