@@ -168,6 +168,8 @@ public abstract class ProceduralCreatureVisualBase : CreatureVisualBase
     protected enum CreatureMaterialSlot
     {
         Body,
+        Tail,
+        Ears,
         Eye,
         EyeSclera,
         EyePupil,

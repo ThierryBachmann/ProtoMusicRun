@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [ExecuteAlways]
 public class HippoVisual : ProceduralCreatureVisualBase
@@ -14,6 +15,19 @@ public class HippoVisual : ProceduralCreatureVisualBase
     [Range(0.1f, 3f)] public float earWidthFactor = 1.3f;
     [Tooltip("Extra ear placement to keep ears visible on top/sides of the head.")]
     public Vector3 earPlacementOffset = new Vector3(0.10f, 0.26f, -0.04f);
+
+    [Header("STRUCTURE / Tail")]
+    [Range(-2f, 2f)] public float tailSideOffset = 0f;
+    [Range(-1f, 3f)] public float tailHeightOffset = 1.0f;
+    [Range(-4f, 2f)] public float tailForwardOffset = -1.9f;
+    [Range(0f, 180f)] public float tailPitchDegrees = 90f;
+    [Tooltip("Tail half-width on local X (ellipsoid).")]
+    [FormerlySerializedAs("tailRadius")]
+    [Range(0.01f, 1f)] public float tailRadiusX = 0.06f;
+    [Tooltip("Tail half-width on local Z (ellipsoid).")]
+    [Range(0.01f, 1f)] public float tailRadiusZ = 0.06f;
+    [Tooltip("Tail half-length along local Y before pitch rotation (ellipsoid).")]
+    [Range(0.05f, 3f)] public float tailLength = 0.22f;
 
     [Header("STRUCTURE / Eyes Geometry")]
     [Tooltip("Horizontal offset of eyes from head center.")]
@@ -31,13 +45,17 @@ public class HippoVisual : ProceduralCreatureVisualBase
 
     [Header("Materials")]
     public Material bodyMaterial;
+    public Material earMaterial;
     public Material scleraMaterial;
     public Material eyeMaterial;
     public Material pupilMaterial;
     public Material mouthMaterial;
+    public Material tailMaterial;
 
     [Header("Fallback Colors")]
     public Color fallbackBodyColor = new Color(0.56f, 0.58f, 0.63f);
+    public Color fallbackEarColor = new Color(0.24f, 0.26f, 0.30f);
+    public Color fallbackTailColor = new Color(0.24f, 0.26f, 0.30f);
     public Color fallbackScleraColor = new Color(0.92f, 0.94f, 0.97f);
     public Color fallbackEyeColor = new Color(0.08f, 0.08f, 0.08f);
     public Color fallbackMouthColor = new Color(0.55f, 0.22f, 0.24f);
@@ -146,6 +164,8 @@ public class HippoVisual : ProceduralCreatureVisualBase
     private Vector3 pupilBaseLocalPos;
 
     private Material fallbackBodyMat;
+    private Material fallbackEarMat;
+    private Material fallbackTailMat;
     private Material fallbackScleraMat;
     private Material fallbackEyeMat;
     private Material fallbackPupilMat;
@@ -269,7 +289,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
             ApplyMaterial(head.gameObject, CreatureMaterialSlot.Body);
 
         if (tail != null)
-            ApplyMaterial(tail.gameObject, CreatureMaterialSlot.Body);
+            ApplyMaterial(tail.gameObject, CreatureMaterialSlot.Tail);
 
         if (upperJaw != null)
             ApplyMaterial(upperJaw.gameObject, CreatureMaterialSlot.Mouth);
@@ -290,10 +310,10 @@ public class HippoVisual : ProceduralCreatureVisualBase
             ApplyMaterial(pupilR.gameObject, CreatureMaterialSlot.EyePupil);
 
         if (earL != null)
-            ApplyMaterial(earL.gameObject, CreatureMaterialSlot.Body);
+            ApplyMaterial(earL.gameObject, CreatureMaterialSlot.Ears);
 
         if (earR != null)
-            ApplyMaterial(earR.gameObject, CreatureMaterialSlot.Body);
+            ApplyMaterial(earR.gameObject, CreatureMaterialSlot.Ears);
 
         ApplyLegMaterials(legFL);
         ApplyLegMaterials(legFR);
@@ -325,6 +345,12 @@ public class HippoVisual : ProceduralCreatureVisualBase
         {
             case CreatureMaterialSlot.Body:
                 return bodyMaterial != null ? bodyMaterial : GetOrCreateBodyFallbackMaterial();
+
+            case CreatureMaterialSlot.Tail:
+                return tailMaterial != null ? tailMaterial : GetOrCreateTailFallbackMaterial();
+
+            case CreatureMaterialSlot.Ears:
+                return earMaterial != null ? earMaterial : GetOrCreateEarFallbackMaterial();
 
             case CreatureMaterialSlot.EyeSclera:
                 return scleraMaterial != null ? scleraMaterial : GetOrCreateScleraFallbackMaterial();
@@ -361,6 +387,20 @@ public class HippoVisual : ProceduralCreatureVisualBase
         if (fallbackScleraMat == null)
             fallbackScleraMat = CreateFallbackMaterial("CreatureSclera_Fallback", fallbackScleraColor);
         return fallbackScleraMat;
+    }
+
+    private Material GetOrCreateTailFallbackMaterial()
+    {
+        if (fallbackTailMat == null)
+            fallbackTailMat = CreateFallbackMaterial("CreatureTail_Fallback", fallbackTailColor);
+        return fallbackTailMat;
+    }
+
+    private Material GetOrCreateEarFallbackMaterial()
+    {
+        if (fallbackEarMat == null)
+            fallbackEarMat = CreateFallbackMaterial("CreatureEars_Fallback", fallbackEarColor);
+        return fallbackEarMat;
     }
 
     private Material GetOrCreateEyeFallbackMaterial()
@@ -634,7 +674,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
             earPosL,
             new Vector3(0f, 0f, 18f),
             earScale,
-            CreatureMaterialSlot.Body);
+            CreatureMaterialSlot.Ears);
 
         earR = CreatePart(
             "Ear_R",
@@ -643,16 +683,16 @@ public class HippoVisual : ProceduralCreatureVisualBase
             earPosR,
             new Vector3(0f, 0f, -18f),
             earScale,
-            CreatureMaterialSlot.Body);
+            CreatureMaterialSlot.Ears);
 
         tail = CreatePart(
             "Tail",
-            PrimitiveType.Cylinder,
+            PrimitiveType.Sphere,
             visualRoot,
-            new Vector3(0f, 1.0f, -1.9f),
-            new Vector3(90f, 0f, 0f),
-            new Vector3(0.06f, 0.22f, 0.06f),
-            CreatureMaterialSlot.Body);
+            new Vector3(tailSideOffset, tailHeightOffset, tailForwardOffset),
+            new Vector3(tailPitchDegrees, 0f, 0f),
+            GetTailEllipsoidScale(),
+            CreatureMaterialSlot.Tail);
 
         legFL = CreateLeg("Leg_FL", new Vector3(-0.76f, 0.78f, 1.0f));
         legFR = CreateLeg("Leg_FR", new Vector3(0.76f, 0.78f, 1.0f));
@@ -1042,7 +1082,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
     }
 
     // Live-apply structural parameters without rebuilding:
-    // overall scale, body/head proportions, and ear placement.
+    // overall scale, body/head proportions, ear placement and tail geometry.
     private void ApplyStructurePlacement()
     {
         if (root != null)
@@ -1066,7 +1106,26 @@ public class HippoVisual : ProceduralCreatureVisualBase
             head.localScale = new Vector3(2.0f, 1.15f, 1.7f) * headLinearScale;
         }
 
+        ApplyTailPlacement();
         ApplyEarPlacement();
+    }
+
+    // Live-update tail transform from inspector parameters.
+    private void ApplyTailPlacement()
+    {
+        if (tail == null)
+            return;
+
+        tail.localPosition = new Vector3(tailSideOffset, tailHeightOffset, tailForwardOffset);
+        tailBaseLocalRot = Quaternion.Euler(tailPitchDegrees, 0f, 0f);
+        tail.localRotation = tailBaseLocalRot;
+        tail.localScale = GetTailEllipsoidScale();
+    }
+
+    private Vector3 GetTailEllipsoidScale()
+    {
+        // Sphere primitive has unit diameter; convert half-dimensions to full local scale.
+        return new Vector3(tailRadiusX * 2f, tailLength * 2f, tailRadiusZ * 2f);
     }
 
     // Live-update ear transforms from inspector parameters.
