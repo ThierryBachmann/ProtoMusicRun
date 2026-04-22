@@ -30,19 +30,32 @@ public class HippoVisual : ProceduralCreatureVisualBase
     [Range(0.05f, 3f)] public float tailLength = 0.22f;
 
     [Header("STRUCTURE / Mouth")]
-    [Range(0.1f, 4f)] public float jawHeight = 0.8f;
-    [Range(0.2f, 5f)] public float jawHeightUpperToLowerRatio = 1.5f;
-    [Range(0.1f, 6f)] public float jawLength = 1.92f;
-    [Range(0.2f, 5f)] public float jawLengthUpperToLowerRatio = 1.087f;
-    [Range(0.1f, 8f)] public float jawWidth = 3.35f;
-    [Range(0.2f, 5f)] public float jawWidthUpperToLowerRatio = 1.03f;
-    [Range(-2f, 2f)] public float upperJawHeightOffset = -0.18f;
-    [Range(-2f, 2f)] public float upperJawForwardOffset = 0.82f;
-    [Range(-2f, 2f)] public float jawPivotHeightOffset = -0.1f;
-    [Range(-2f, 2f)] public float jawPivotForwardOffset = 0.38f;
-    [Range(-45f, 45f)] public float jawPivotBasePitch = 0f;
-    [Range(-2f, 2f)] public float lowerJawHeightOffset = -0.16f;
-    [Range(-2f, 2f)] public float lowerJawForwardOffset = 0.46f;
+    [FormerlySerializedAs("jawHeight")]
+    [Range(0.1f, 4f)] public float heightJaw = 0.8f;
+    [FormerlySerializedAs("jawHeightUpperToLowerRatio")]
+    [Range(0.2f, 5f)] public float ratioHeightUpperToLowerJaw = 1.5f;
+    [FormerlySerializedAs("jawLength")]
+    [Range(0.1f, 6f)] public float lengthJaw = 1.92f;
+    [FormerlySerializedAs("jawLengthUpperToLowerRatio")]
+    [Range(0.2f, 5f)] public float ratioLengthUpperToLowerJaw = 1.087f;
+    [FormerlySerializedAs("jawWidth")]
+    [Range(0.1f, 8f)] public float widthJaw = 3.35f;
+    [FormerlySerializedAs("jawWidthUpperToLowerRatio")]
+    [Range(0.2f, 5f)] public float ratioWidthUpperToLowerJaw = 1.03f;
+    [FormerlySerializedAs("jawHeightOffset")]
+    [Range(-4f, 4f)] public float offsetHeightJaw = -0.34f;
+    [FormerlySerializedAs("jawHeightOffsetUpperToLowerRatio")]
+    [Range(0.2f, 5f)] public float ratioOffsetHeightUpperToLowerJaw = 1.125f;
+    [FormerlySerializedAs("jawForwardOffset")]
+    [Range(-4f, 4f)] public float offsetForwardJaw = 1.28f;
+    [FormerlySerializedAs("jawForwardOffsetUpperToLowerRatio")]
+    [Range(0.2f, 5f)] public float ratioOffsetForwardUpperToLowerJaw = 1.783f;
+    [FormerlySerializedAs("jawPivotHeightOffset")]
+    [Range(-2f, 2f)] public float offsetPivotHeightJaw = -0.1f;
+    [FormerlySerializedAs("jawPivotForwardOffset")]
+    [Range(-2f, 2f)] public float offsetPivotForwardJaw = 0.38f;
+    [FormerlySerializedAs("jawPivotBasePitch")]
+    [Range(-45f, 45f)] public float basePitchJaw = 0f;
 
     [Header("STRUCTURE / Legs")]
     [Range(0.1f, 2f)] public float upperLegThickness = 0.60f;
@@ -619,25 +632,30 @@ public class HippoVisual : ProceduralCreatureVisualBase
             out float lowerJawResolvedHeight,
             out float upperJawResolvedLength,
             out float lowerJawResolvedLength);
+        ResolveJawOffsets(
+            out float upperJawResolvedHeightOffset,
+            out float lowerJawResolvedHeightOffset,
+            out float upperJawResolvedForwardOffset,
+            out float lowerJawResolvedForwardOffset);
 
         upperJaw = CreatePart(
             "UpperJaw",
             PrimitiveType.Sphere,
             headPivot,
-            new Vector3(0f, upperJawHeightOffset, upperJawForwardOffset),
+            new Vector3(0f, upperJawResolvedHeightOffset, upperJawResolvedForwardOffset),
             Vector3.zero,
             new Vector3(upperJawResolvedWidth, upperJawResolvedHeight, upperJawResolvedLength),
             CreatureMaterialSlot.Mouth);
 
         jawPivot = CreateNode("JawPivot", headPivot);
-        jawPivot.localPosition = new Vector3(0f, jawPivotHeightOffset, jawPivotForwardOffset);
-        jawPivot.localRotation = Quaternion.Euler(jawPivotBasePitch, 0f, 0f);
+        jawPivot.localPosition = new Vector3(0f, offsetPivotHeightJaw, offsetPivotForwardJaw);
+        jawPivot.localRotation = Quaternion.Euler(basePitchJaw, 0f, 0f);
 
         lowerJaw = CreatePart(
             "LowerJaw",
             PrimitiveType.Sphere,
             jawPivot,
-            new Vector3(0f, lowerJawHeightOffset, lowerJawForwardOffset),
+            new Vector3(0f, lowerJawResolvedHeightOffset, lowerJawResolvedForwardOffset),
             Vector3.zero,
             new Vector3(lowerJawResolvedWidth, lowerJawResolvedHeight, lowerJawResolvedLength),
             CreatureMaterialSlot.Mouth);
@@ -1146,23 +1164,28 @@ public class HippoVisual : ProceduralCreatureVisualBase
             out float lowerJawResolvedHeight,
             out float upperJawResolvedLength,
             out float lowerJawResolvedLength);
+        ResolveJawOffsets(
+            out float upperJawResolvedHeightOffset,
+            out float lowerJawResolvedHeightOffset,
+            out float upperJawResolvedForwardOffset,
+            out float lowerJawResolvedForwardOffset);
 
         if (upperJaw != null)
         {
-            upperJaw.localPosition = new Vector3(0f, upperJawHeightOffset, upperJawForwardOffset);
+            upperJaw.localPosition = new Vector3(0f, upperJawResolvedHeightOffset, upperJawResolvedForwardOffset);
             upperJaw.localScale = new Vector3(upperJawResolvedWidth, upperJawResolvedHeight, upperJawResolvedLength);
         }
 
         if (jawPivot != null)
         {
-            jawPivot.localPosition = new Vector3(0f, jawPivotHeightOffset, jawPivotForwardOffset);
-            jawBaseLocalRot = Quaternion.Euler(jawPivotBasePitch, 0f, 0f);
+            jawPivot.localPosition = new Vector3(0f, offsetPivotHeightJaw, offsetPivotForwardJaw);
+            jawBaseLocalRot = Quaternion.Euler(basePitchJaw, 0f, 0f);
             jawPivot.localRotation = jawBaseLocalRot;
         }
 
         if (lowerJaw != null)
         {
-            lowerJaw.localPosition = new Vector3(0f, lowerJawHeightOffset, lowerJawForwardOffset);
+            lowerJaw.localPosition = new Vector3(0f, lowerJawResolvedHeightOffset, lowerJawResolvedForwardOffset);
             lowerJaw.localScale = new Vector3(lowerJawResolvedWidth, lowerJawResolvedHeight, lowerJawResolvedLength);
         }
     }
@@ -1175,9 +1198,19 @@ public class HippoVisual : ProceduralCreatureVisualBase
         out float upperLength,
         out float lowerLength)
     {
-        SplitUpperLowerByRatio(jawWidth, jawWidthUpperToLowerRatio, out upperWidth, out lowerWidth);
-        SplitUpperLowerByRatio(jawHeight, jawHeightUpperToLowerRatio, out upperHeight, out lowerHeight);
-        SplitUpperLowerByRatio(jawLength, jawLengthUpperToLowerRatio, out upperLength, out lowerLength);
+        SplitUpperLowerByRatio(widthJaw, ratioWidthUpperToLowerJaw, out upperWidth, out lowerWidth);
+        SplitUpperLowerByRatio(heightJaw, ratioHeightUpperToLowerJaw, out upperHeight, out lowerHeight);
+        SplitUpperLowerByRatio(lengthJaw, ratioLengthUpperToLowerJaw, out upperLength, out lowerLength);
+    }
+
+    private void ResolveJawOffsets(
+        out float upperHeightOffset,
+        out float lowerHeightOffset,
+        out float upperForwardOffset,
+        out float lowerForwardOffset)
+    {
+        SplitUpperLowerByRatio(offsetHeightJaw, ratioOffsetHeightUpperToLowerJaw, out upperHeightOffset, out lowerHeightOffset);
+        SplitUpperLowerByRatio(offsetForwardJaw, ratioOffsetForwardUpperToLowerJaw, out upperForwardOffset, out lowerForwardOffset);
     }
 
     private static void SplitUpperLowerByRatio(
