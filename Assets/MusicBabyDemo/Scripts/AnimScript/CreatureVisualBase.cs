@@ -208,6 +208,10 @@ public abstract class ProceduralCreatureVisualBase : CreatureVisualBase
         go.transform.localRotation = Quaternion.Euler(localEulerAngles);
         go.transform.localScale = localScale;
 
+        // Primitives come with a default collider; procedural visuals should stay collider-free
+        // unless an explicit gameplay collider is added separately (for example trigger on root).
+        RemoveCollider(go.GetComponent<Collider>());
+
         ApplyMaterial(go, slot);
         return go.transform;
     }
@@ -258,17 +262,44 @@ public abstract class ProceduralCreatureVisualBase : CreatureVisualBase
 
     protected void RemoveCollider(GameObject go)
     {
-        Collider c = go.GetComponent<Collider>();
-        if (c == null)
+        if (go == null)
+            return;
+
+        RemoveCollider(go.GetComponent<Collider>());
+    }
+
+    protected void RemoveCollider(Collider collider)
+    {
+        if (collider == null)
             return;
 
 #if UNITY_EDITOR
         if (!Application.isPlaying)
-            DestroyImmediate(c);
+            DestroyImmediate(collider);
         else
-            Destroy(c);
+            Destroy(collider);
 #else
-        Destroy(c);
+        Destroy(collider);
 #endif
+    }
+
+    protected void RemoveCollidersInHierarchy(Transform hierarchyRoot, bool includeRoot = true)
+    {
+        if (hierarchyRoot == null)
+            return;
+
+        Collider[] colliders = hierarchyRoot.GetComponentsInChildren<Collider>(true);
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Collider collider = colliders[i];
+            if (collider == null)
+                continue;
+            if (!includeRoot && collider.transform == hierarchyRoot)
+                continue;
+            if (collider is CharacterController)
+                continue;
+
+            RemoveCollider(collider);
+        }
     }
 }

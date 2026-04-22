@@ -79,6 +79,22 @@ public class HippoVisual : ProceduralCreatureVisualBase
     [Tooltip("Pupil center forward offset in eye local space (0=center, 0.5=eye surface).")]
     [Range(0f, 0.9f)] public float pupilForwardOffset = 0.27f;
 
+    [Header("STRUCTURE / Collision")]
+    [Tooltip("Remove physical colliders from generated visual parts. CharacterController remains the unique movement collider.")]
+    public bool removeGeneratedPartColliders = true;
+    [Tooltip("Ensure one trigger SphereCollider on Hippo root, auto-sized from current structure.")]
+    public bool autoStructureTriggerCollider = true;
+    [Tooltip("Optional local offset applied to the auto trigger center.")]
+    public Vector3 triggerCenterOffset = Vector3.zero;
+    [Tooltip("Multiplier applied to computed trigger radius.")]
+    [Range(0.2f, 3f)] public float triggerRadiusScale = 1f;
+    [Tooltip("Extra radius padding added after scaling.")]
+    [Range(0f, 2f)] public float triggerRadiusPadding = 0.05f;
+
+    [Header("STRUCTURE / Attachment")]
+    [Tooltip("Keep visual anchored on parent local X/Z. Prevents apparent floating/sinking when controller tilts on slopes.")]
+    public bool lockLocalXZToParent = true;
+
     [Header("Materials")]
     public Material bodyMaterial;
     public Material earMaterial;
@@ -213,6 +229,9 @@ public class HippoVisual : ProceduralCreatureVisualBase
     private Material fallbackScleraMat;
     private Material fallbackPupilMat;
     private Material fallbackMouthMat;
+    private SphereCollider structureTriggerCollider;
+    private bool generatedPartCollidersPurged;
+    private bool rootColliderCleanupDone;
     private float chaseGaitPhase;
     private Vector3 chaseLastWorldPosition;
     private bool chaseHasLastWorldPosition;
@@ -247,6 +266,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
     // - forced path: rebuild the full procedural rig
     protected override void BuildIfNeeded(bool force)
     {
+        ApplyAttachmentConstraint();
         Transform existing = transform.Find(RootName);
 
         if (!force)
@@ -280,6 +300,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
 
                 ApplyStructurePlacement();
                 ApplyEyePlacement();
+                ConfigureCollisionSetup();
                 return;
             }
 
@@ -293,6 +314,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
 
                 ApplyStructurePlacement();
                 ApplyEyePlacement();
+                ConfigureCollisionSetup();
                 return;
             }
         }
@@ -302,9 +324,22 @@ public class HippoVisual : ProceduralCreatureVisualBase
         RecoverReferences();
         ApplyStructurePlacement();
         ApplyEyePlacement();
+        ConfigureCollisionSetup();
         CacheBases();
         ApplyCurrentMaterialsToRig();
         materialsDirty = false;
+    }
+
+    private void ApplyAttachmentConstraint()
+    {
+        if (!lockLocalXZToParent || transform.parent == null)
+            return;
+
+        Vector3 localPos = transform.localPosition;
+        if (Mathf.Abs(localPos.x) <= 0.0001f && Mathf.Abs(localPos.z) <= 0.0001f)
+            return;
+
+        transform.localPosition = new Vector3(0f, localPos.y, 0f);
     }
 
     private bool HasUpdatedLegGeometry()
@@ -580,6 +615,9 @@ public class HippoVisual : ProceduralCreatureVisualBase
         eyeR = null;
         pupilL = null;
         pupilR = null;
+        structureTriggerCollider = null;
+        generatedPartCollidersPurged = false;
+        rootColliderCleanupDone = false;
         chaseHasLastWorldPosition = false;
         chaseGaitPhase = 0f;
         chaseLegLengthEstimate = 0.8f;
@@ -1152,6 +1190,171 @@ public class HippoVisual : ProceduralCreatureVisualBase
         ApplyLegStructurePlacement();
         ApplyTailPlacement();
         ApplyEarPlacement();
+    }
+
+    // Keep collisions deterministic:
+    // - remove physical colliders from generated visual parts
+    // - keep a single trigger sphere on Hippo root, auto-fitted to structure
+    private void ConfigureCollisionSetup()
+    {
+        if (removeGeneratedPartColliders && !generatedPartCollidersPurged && root != null)
+        {
+            RemoveCollidersInHierarchy(root, includeRoot: false);
+            generatedPartCollidersPurged = true;
+        }
+        else if (!removeGeneratedPartColliders)
+        {
+            generatedPartCollidersPurged = false;
+        }
+
+        if (!autoStructureTriggerCollider)
+        {
+            if (structureTriggerCollider != null)
+                RemoveCollider(structureTriggerCollider);
+
+            structureTriggerCollider = null;
+            rootColliderCleanupDone = false;
+            return;
+        }
+
+        EnsureStructureTriggerCollider();
+        if (!rootColliderCleanupDone)
+        {
+            RemoveExtraRootColliders();
+            rootColliderCleanupDone = true;
+        }
+    }
+
+    private void EnsureStructureTriggerCollider()
+    {
+        if (structureTriggerCollider == null)
+            structureTriggerCollider = GetComponent<SphereCollider>();
+        if (structureTriggerCollider == null)
+            structureTriggerCollider = gameObject.AddComponent<SphereCollider>();
+
+        structureTriggerCollider.isTrigger = true;
+        structureTriggerCollider.enabled = true;
+
+        if (!TryComputeStructureBounds(out Vector3 boundsCenter, out Vector3 boundsExtents))
+            return;
+
+        Vector3 center = boundsCenter + triggerCenterOffset;
+        float baseRadius = Mathf.Max(boundsExtents.x, Mathf.Max(boundsExtents.y, boundsExtents.z));
+        float radius = baseRadius * triggerRadiusScale + triggerRadiusPadding;
+        if (radius < 0.01f)
+            radius = 0.01f;
+
+        structureTriggerCollider.center = center;
+        structureTriggerCollider.radius = radius;
+    }
+
+    private void RemoveExtraRootColliders()
+    {
+        Collider[] rootColliders = GetComponents<Collider>();
+        for (int i = 0; i < rootColliders.Length; i++)
+        {
+            Collider collider = rootColliders[i];
+            if (collider == null)
+                continue;
+            if (collider == structureTriggerCollider)
+                continue;
+            if (collider is CharacterController)
+                continue;
+
+            RemoveCollider(collider);
+        }
+    }
+
+    private bool TryComputeStructureBounds(out Vector3 center, out Vector3 extents)
+    {
+        center = Vector3.zero;
+        extents = Vector3.zero;
+
+        float headLinearScale = Mathf.Pow(headVolumeFactor, 1f / 3f);
+        ResolveJawDimensions(
+            out float upperJawWidth,
+            out float lowerJawWidth,
+            out float upperJawHeight,
+            out float lowerJawHeight,
+            out float upperJawLength,
+            out float lowerJawLength);
+        ResolveJawOffsets(
+            out float upperJawHeightOffset,
+            out float lowerJawHeightOffset,
+            out float upperJawForwardOffset,
+            out float lowerJawForwardOffset);
+
+        Vector3 min = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+        Vector3 max = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
+
+        EncapsulateAabb(ref min, ref max, new Vector3(0f, 0.95f, 0f), new Vector3(2.8f, 1.5f * bodyHeightFactor, 3.5f));
+        EncapsulateAabb(ref min, ref max, new Vector3(0f, 1.02f, 2.05f), new Vector3(2.0f, 1.15f, 1.7f) * headLinearScale);
+
+        Vector3 headPivotPos = new Vector3(0f, 1.02f, 2.05f);
+        EncapsulateAabb(ref min, ref max, headPivotPos + new Vector3(0f, upperJawHeightOffset, upperJawForwardOffset), new Vector3(upperJawWidth, upperJawHeight, upperJawLength));
+        Vector3 jawPivotPos = headPivotPos + new Vector3(0f, offsetPivotHeightJaw, offsetPivotForwardJaw);
+        EncapsulateAabb(ref min, ref max, jawPivotPos + new Vector3(0f, lowerJawHeightOffset, lowerJawForwardOffset), new Vector3(lowerJawWidth, lowerJawHeight, lowerJawLength));
+
+        Vector3 baseEarPosL = new Vector3(-0.56f, 0.30f, -0.08f);
+        Vector3 baseEarPosR = new Vector3(0.56f, 0.30f, -0.08f);
+        Vector3 earPosL = new Vector3(baseEarPosL.x - earPlacementOffset.x, baseEarPosL.y + earPlacementOffset.y, baseEarPosL.z + earPlacementOffset.z);
+        Vector3 earPosR = new Vector3(baseEarPosR.x + earPlacementOffset.x, baseEarPosR.y + earPlacementOffset.y, baseEarPosR.z + earPlacementOffset.z);
+        Vector3 earSize = new Vector3(0.20f * earWidthFactor, 0.28f, 0.12f);
+        EncapsulateAabb(ref min, ref max, headPivotPos + earPosL, earSize);
+        EncapsulateAabb(ref min, ref max, headPivotPos + earPosR, earSize);
+
+        EncapsulateAabb(ref min, ref max, new Vector3(tailSideOffset, tailHeightOffset, tailForwardOffset), GetTailEllipsoidScale());
+
+        float upperCenterY = upperLegLength * UpperLegCenterYRatio;
+        float ankleCenterY = upperLegLength * AnkleCenterYRatio;
+        float footCenterY = upperLegLength * FootCenterYRatio;
+        float ankleForward = footWidth * AnkleForwardFromFootWidthRatio;
+        float footForward = footWidth * FootForwardFromFootWidthRatio;
+        float footDepth = footWidth * FootDepthFromFootWidthRatio;
+
+        Vector3 upperSize = new Vector3(upperLegThickness, upperLegLength, upperLegThickness);
+        Vector3 ankleSize = new Vector3(ankleDiameter, ankleDiameter, ankleDiameter);
+        Vector3 footSize = new Vector3(footWidth, footHeight, footDepth);
+        EncapsulateLeg(ref min, ref max, new Vector3(-LegSideOffset, legAttachHeight, LegFrontOffset), upperCenterY, ankleCenterY, footCenterY, ankleForward, footForward, upperSize, ankleSize, footSize);
+        EncapsulateLeg(ref min, ref max, new Vector3(LegSideOffset, legAttachHeight, LegFrontOffset), upperCenterY, ankleCenterY, footCenterY, ankleForward, footForward, upperSize, ankleSize, footSize);
+        EncapsulateLeg(ref min, ref max, new Vector3(-LegSideOffset, legAttachHeight, -LegFrontOffset), upperCenterY, ankleCenterY, footCenterY, ankleForward, footForward, upperSize, ankleSize, footSize);
+        EncapsulateLeg(ref min, ref max, new Vector3(LegSideOffset, legAttachHeight, -LegFrontOffset), upperCenterY, ankleCenterY, footCenterY, ankleForward, footForward, upperSize, ankleSize, footSize);
+
+        if (float.IsPositiveInfinity(min.x) || float.IsNegativeInfinity(max.x))
+            return false;
+
+        min *= overallScale;
+        max *= overallScale;
+        center = (min + max) * 0.5f;
+        extents = (max - min) * 0.5f;
+        return true;
+    }
+
+    private static void EncapsulateAabb(ref Vector3 min, ref Vector3 max, Vector3 center, Vector3 size)
+    {
+        Vector3 half = size * 0.5f;
+        Vector3 localMin = center - half;
+        Vector3 localMax = center + half;
+        min = Vector3.Min(min, localMin);
+        max = Vector3.Max(max, localMax);
+    }
+
+    private static void EncapsulateLeg(
+        ref Vector3 min,
+        ref Vector3 max,
+        Vector3 legRootPosition,
+        float upperCenterY,
+        float ankleCenterY,
+        float footCenterY,
+        float ankleForward,
+        float footForward,
+        Vector3 upperSize,
+        Vector3 ankleSize,
+        Vector3 footSize)
+    {
+        EncapsulateAabb(ref min, ref max, legRootPosition + new Vector3(0f, upperCenterY, 0f), upperSize);
+        EncapsulateAabb(ref min, ref max, legRootPosition + new Vector3(0f, ankleCenterY, ankleForward), ankleSize);
+        EncapsulateAabb(ref min, ref max, legRootPosition + new Vector3(0f, footCenterY, footForward), footSize);
     }
 
     // Live-update mouth structure (upper jaw, lower jaw and pivot/rest orientation).
