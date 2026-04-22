@@ -154,3 +154,120 @@ public abstract class CreatureVisualBase : MonoBehaviour
     protected abstract void BuildIfNeeded(bool force);
     protected abstract void UpdateAnimation();
 }
+
+/// <summary>
+/// Intermediate base for procedural creatures generated from code.
+/// Step 1 introduces this layer without behavioral changes.
+/// Next steps can move shared construction/material helpers here.
+/// </summary>
+public abstract class ProceduralCreatureVisualBase : CreatureVisualBase
+{
+    // Shared material semantics for procedural creatures.
+    // Keeping this in the intermediate base will make future species (ostrich, elephant, etc.)
+    // reuse the same slot vocabulary.
+    protected enum CreatureMaterialSlot
+    {
+        Body,
+        Eye,
+        EyeSclera,
+        EyePupil,
+        Mouth,
+        Accent1,
+        Accent2
+    }
+
+    // Species-specific material mapping (for example: body/sclera/mouth assignments).
+    protected abstract Material ResolveMaterialForSlot(CreatureMaterialSlot slot);
+
+    // Allows derived classes to customize fallback warning prefixes.
+    protected virtual string FallbackMaterialContextName => GetType().Name;
+
+    // Creates an empty transform node in local space (used as hierarchy pivot/group).
+    protected Transform CreateNode(string name, Transform parent)
+    {
+        GameObject go = new GameObject(name);
+        go.transform.SetParent(parent, false);
+        return go.transform;
+    }
+
+    // Creates a primitive mesh part, parents it, sets local TRS, then assigns material.
+    protected Transform CreatePart(
+        string name,
+        PrimitiveType primitiveType,
+        Transform parent,
+        Vector3 localPosition,
+        Vector3 localEulerAngles,
+        Vector3 localScale,
+        CreatureMaterialSlot slot)
+    {
+        GameObject go = GameObject.CreatePrimitive(primitiveType);
+        go.name = name;
+        go.transform.SetParent(parent, false);
+        go.transform.localPosition = localPosition;
+        go.transform.localRotation = Quaternion.Euler(localEulerAngles);
+        go.transform.localScale = localScale;
+
+        ApplyMaterial(go, slot);
+        return go.transform;
+    }
+
+    protected void ApplyMaterial(GameObject go, CreatureMaterialSlot slot)
+    {
+        Renderer renderer = go.GetComponent<Renderer>();
+        if (renderer == null)
+            return;
+
+        Material assigned = ResolveMaterialForSlot(slot);
+        if (assigned != null)
+            renderer.sharedMaterial = assigned;
+    }
+
+    protected Material CreateFallbackMaterial(string matName, Color color)
+    {
+        // Force URP-compatible fallbacks to avoid pink/magenta materials in URP projects.
+        Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+        if (shader == null)
+            shader = Shader.Find("Universal Render Pipeline/Simple Lit");
+
+        if (shader == null)
+        {
+            Debug.LogWarning(
+                $"[{FallbackMaterialContextName}] URP fallback shaders not found. " +
+                "Falling back to a generic unlit shader.");
+            shader = Shader.Find("Unlit/Color");
+        }
+
+        if (shader == null)
+            shader = Shader.Find("Sprites/Default");
+
+        if (shader == null)
+            shader = Shader.Find("Hidden/InternalErrorShader");
+
+        Material mat = new Material(shader);
+        mat.name = matName;
+
+        if (mat.HasProperty("_BaseColor"))
+            mat.SetColor("_BaseColor", color);
+
+        if (mat.HasProperty("_Color"))
+            mat.SetColor("_Color", color);
+
+        return mat;
+    }
+
+    protected void RemoveCollider(GameObject go)
+    {
+        Collider c = go.GetComponent<Collider>();
+        if (c == null)
+            return;
+
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+            DestroyImmediate(c);
+        else
+            Destroy(c);
+#else
+        Destroy(c);
+#endif
+    }
+}

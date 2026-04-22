@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [ExecuteAlways]
-public class HippoVisual : CreatureVisualBase
+public class HippoVisual : ProceduralCreatureVisualBase
 {
     [Header("STRUCTURE / Global")]
     [Range(0.25f, 5f)] public float overallScale = 1f;
@@ -147,6 +147,7 @@ public class HippoVisual : CreatureVisualBase
 
     private Material fallbackBodyMat;
     private Material fallbackScleraMat;
+    private Material fallbackEyeMat;
     private Material fallbackPupilMat;
     private Material fallbackMouthMat;
     private float chaseGaitPhase;
@@ -155,15 +156,6 @@ public class HippoVisual : CreatureVisualBase
     private float chaseLegLengthEstimate = 0.8f;
     private float chaseCycleDistance = 1f;
     private float chaseCachedLegAngle = float.NaN;
-
-    private enum MaterialSlot
-    {
-        Body,
-        Eye,
-        EyeSclera,
-        EyePupil,
-        Mouth
-    }
 
     [ContextMenu("Rebuild Visual")]
     public void Rebuild()
@@ -187,6 +179,9 @@ public class HippoVisual : CreatureVisualBase
             chaseMaxDisplacementPerFrame = chaseMinDisplacement + 0.001f;
     }
 
+    // Central lifecycle method:
+    // - fast path: reuse existing rig and apply live structure/eye updates
+    // - forced path: rebuild the full procedural rig
     protected override void BuildIfNeeded(bool force)
     {
         Transform existing = transform.Find(RootName);
@@ -268,37 +263,37 @@ public class HippoVisual : CreatureVisualBase
     private void ApplyCurrentMaterialsToRig()
     {
         if (body != null)
-            ApplyMaterial(body.gameObject, MaterialSlot.Body);
+            ApplyMaterial(body.gameObject, CreatureMaterialSlot.Body);
 
         if (head != null)
-            ApplyMaterial(head.gameObject, MaterialSlot.Body);
+            ApplyMaterial(head.gameObject, CreatureMaterialSlot.Body);
 
         if (tail != null)
-            ApplyMaterial(tail.gameObject, MaterialSlot.Body);
+            ApplyMaterial(tail.gameObject, CreatureMaterialSlot.Body);
 
         if (upperJaw != null)
-            ApplyMaterial(upperJaw.gameObject, MaterialSlot.Mouth);
+            ApplyMaterial(upperJaw.gameObject, CreatureMaterialSlot.Mouth);
 
         if (lowerJaw != null)
-            ApplyMaterial(lowerJaw.gameObject, MaterialSlot.Mouth);
+            ApplyMaterial(lowerJaw.gameObject, CreatureMaterialSlot.Mouth);
 
         if (eyeL != null)
-            ApplyMaterial(eyeL.gameObject, MaterialSlot.EyeSclera);
+            ApplyMaterial(eyeL.gameObject, CreatureMaterialSlot.EyeSclera);
 
         if (eyeR != null)
-            ApplyMaterial(eyeR.gameObject, MaterialSlot.EyeSclera);
+            ApplyMaterial(eyeR.gameObject, CreatureMaterialSlot.EyeSclera);
 
         if (pupilL != null)
-            ApplyMaterial(pupilL.gameObject, MaterialSlot.EyePupil);
+            ApplyMaterial(pupilL.gameObject, CreatureMaterialSlot.EyePupil);
 
         if (pupilR != null)
-            ApplyMaterial(pupilR.gameObject, MaterialSlot.EyePupil);
+            ApplyMaterial(pupilR.gameObject, CreatureMaterialSlot.EyePupil);
 
         if (earL != null)
-            ApplyMaterial(earL.gameObject, MaterialSlot.Body);
+            ApplyMaterial(earL.gameObject, CreatureMaterialSlot.Body);
 
         if (earR != null)
-            ApplyMaterial(earR.gameObject, MaterialSlot.Body);
+            ApplyMaterial(earR.gameObject, CreatureMaterialSlot.Body);
 
         ApplyLegMaterials(legFL);
         ApplyLegMaterials(legFR);
@@ -313,17 +308,83 @@ public class HippoVisual : CreatureVisualBase
 
         Transform upper = legRoot.Find("Upper");
         if (upper != null)
-            ApplyMaterial(upper.gameObject, MaterialSlot.Body);
+            ApplyMaterial(upper.gameObject, CreatureMaterialSlot.Body);
 
         Transform ankle = legRoot.Find("Ankle");
         if (ankle != null)
-            ApplyMaterial(ankle.gameObject, MaterialSlot.Body);
+            ApplyMaterial(ankle.gameObject, CreatureMaterialSlot.Body);
 
         Transform foot = legRoot.Find("Foot");
         if (foot != null)
-            ApplyMaterial(foot.gameObject, MaterialSlot.Body);
+            ApplyMaterial(foot.gameObject, CreatureMaterialSlot.Body);
     }
 
+    protected override Material ResolveMaterialForSlot(CreatureMaterialSlot slot)
+    {
+        switch (slot)
+        {
+            case CreatureMaterialSlot.Body:
+                return bodyMaterial != null ? bodyMaterial : GetOrCreateBodyFallbackMaterial();
+
+            case CreatureMaterialSlot.EyeSclera:
+                return scleraMaterial != null ? scleraMaterial : GetOrCreateScleraFallbackMaterial();
+
+            case CreatureMaterialSlot.EyePupil:
+                return pupilMaterial != null ? pupilMaterial : GetOrCreatePupilFallbackMaterial();
+
+            case CreatureMaterialSlot.Eye:
+                if (eyeMaterial != null)
+                    return eyeMaterial;
+                if (pupilMaterial != null)
+                    return pupilMaterial;
+                return GetOrCreateEyeFallbackMaterial();
+
+            case CreatureMaterialSlot.Mouth:
+                return mouthMaterial != null ? mouthMaterial : GetOrCreateMouthFallbackMaterial();
+
+            default:
+                return bodyMaterial != null ? bodyMaterial : GetOrCreateBodyFallbackMaterial();
+        }
+    }
+
+    protected override string FallbackMaterialContextName => nameof(HippoVisual);
+
+    private Material GetOrCreateBodyFallbackMaterial()
+    {
+        if (fallbackBodyMat == null)
+            fallbackBodyMat = CreateFallbackMaterial("CreatureBody_Fallback", fallbackBodyColor);
+        return fallbackBodyMat;
+    }
+
+    private Material GetOrCreateScleraFallbackMaterial()
+    {
+        if (fallbackScleraMat == null)
+            fallbackScleraMat = CreateFallbackMaterial("CreatureSclera_Fallback", fallbackScleraColor);
+        return fallbackScleraMat;
+    }
+
+    private Material GetOrCreateEyeFallbackMaterial()
+    {
+        if (fallbackEyeMat == null)
+            fallbackEyeMat = CreateFallbackMaterial("CreatureEye_Fallback", fallbackEyeColor);
+        return fallbackEyeMat;
+    }
+
+    private Material GetOrCreatePupilFallbackMaterial()
+    {
+        if (fallbackPupilMat == null)
+            fallbackPupilMat = CreateFallbackMaterial("CreaturePupil_Fallback", fallbackEyeColor);
+        return fallbackPupilMat;
+    }
+
+    private Material GetOrCreateMouthFallbackMaterial()
+    {
+        if (fallbackMouthMat == null)
+            fallbackMouthMat = CreateFallbackMaterial("CreatureMouth_Fallback", fallbackMouthColor);
+        return fallbackMouthMat;
+    }
+
+    // Rebind cached Transform references from an already-built visual hierarchy.
     private void RecoverReferences()
     {
         root = transform.Find(RootName);
@@ -363,6 +424,7 @@ public class HippoVisual : CreatureVisualBase
         }
     }
 
+    // Cache neutral poses/scales used by animation resets and additive animation.
     private void CacheBases()
     {
         if (body != null)
@@ -456,6 +518,8 @@ public class HippoVisual : CreatureVisualBase
         chaseCachedLegAngle = float.NaN;
     }
 
+    // One-shot procedural construction of the full hippo hierarchy.
+    // Geometry creation happens here; per-frame/live parameter application is separated.
     private void BuildVisual()
     {
         root = CreateNode(RootName, transform);
@@ -477,7 +541,7 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(0f, 0.95f, 0f),
             Vector3.zero,
             new Vector3(2.8f, 1.5f * bodyHeightFactor, 3.5f),
-            MaterialSlot.Body);
+            CreatureMaterialSlot.Body);
 
         headPivot = CreateNode("HeadPivot", visualRoot);
         headPivot.localPosition = new Vector3(0f, 1.02f, 2.05f);
@@ -490,7 +554,7 @@ public class HippoVisual : CreatureVisualBase
             Vector3.zero,
             Vector3.zero,
             new Vector3(2.0f, 1.15f, 1.7f) * headLinearScale,
-            MaterialSlot.Body);
+            CreatureMaterialSlot.Body);
 
         upperJaw = CreatePart(
             "UpperJaw",
@@ -499,7 +563,7 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(0f, -0.18f, 0.82f),
             Vector3.zero,
             new Vector3(1.7f, 0.48f, 1.0f),
-            MaterialSlot.Mouth);
+            CreatureMaterialSlot.Mouth);
 
         jawPivot = CreateNode("JawPivot", headPivot);
         jawPivot.localPosition = new Vector3(0f, -0.1f, 0.38f);
@@ -512,7 +576,7 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(0f, -0.16f, 0.46f),
             Vector3.zero,
             new Vector3(1.65f, 0.32f, 0.92f),
-            MaterialSlot.Mouth);
+            CreatureMaterialSlot.Mouth);
 
         float eyeSide = Mathf.Abs(eyePivotSideOffset);
         float eyeHeight = eyePivotHeightOffset;
@@ -525,7 +589,7 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(-eyeSide, eyeHeight, eyeForward),
             Vector3.zero,
             new Vector3(eyeScale, eyeScale, eyeScale),
-            MaterialSlot.EyeSclera);
+            CreatureMaterialSlot.EyeSclera);
 
         eyeR = CreatePart(
             "Eye_R",
@@ -534,7 +598,7 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(eyeSide, eyeHeight, eyeForward),
             Vector3.zero,
             new Vector3(eyeScale, eyeScale, eyeScale),
-            MaterialSlot.EyeSclera);
+            CreatureMaterialSlot.EyeSclera);
 
         pupilL = CreatePart(
             "Pupil_L",
@@ -543,7 +607,7 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(0f, 0f, pupilForwardOffset),
             Vector3.zero,
             new Vector3(pupilScale, pupilScale, pupilScale),
-            MaterialSlot.EyePupil);
+            CreatureMaterialSlot.EyePupil);
 
         pupilR = CreatePart(
             "Pupil_R",
@@ -552,7 +616,7 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(0f, 0f, pupilForwardOffset),
             Vector3.zero,
             new Vector3(pupilScale, pupilScale, pupilScale),
-            MaterialSlot.EyePupil);
+            CreatureMaterialSlot.EyePupil);
 
         RemoveCollider(pupilL.gameObject);
         RemoveCollider(pupilR.gameObject);
@@ -570,7 +634,7 @@ public class HippoVisual : CreatureVisualBase
             earPosL,
             new Vector3(0f, 0f, 18f),
             earScale,
-            MaterialSlot.Body);
+            CreatureMaterialSlot.Body);
 
         earR = CreatePart(
             "Ear_R",
@@ -579,7 +643,7 @@ public class HippoVisual : CreatureVisualBase
             earPosR,
             new Vector3(0f, 0f, -18f),
             earScale,
-            MaterialSlot.Body);
+            CreatureMaterialSlot.Body);
 
         tail = CreatePart(
             "Tail",
@@ -588,7 +652,7 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(0f, 1.0f, -1.9f),
             new Vector3(90f, 0f, 0f),
             new Vector3(0.06f, 0.22f, 0.06f),
-            MaterialSlot.Body);
+            CreatureMaterialSlot.Body);
 
         legFL = CreateLeg("Leg_FL", new Vector3(-0.76f, 0.78f, 1.0f));
         legFR = CreateLeg("Leg_FR", new Vector3(0.76f, 0.78f, 1.0f));
@@ -596,6 +660,8 @@ public class HippoVisual : CreatureVisualBase
         legBR = CreateLeg("Leg_BR", new Vector3(0.76f, 0.78f, -1.0f));
     }
 
+    // Main animation dispatch called every frame.
+    // Each state applies its pose on top of the cached neutral bases.
     protected override void UpdateAnimation()
     {
         if (!IsRigReady())
@@ -719,6 +785,8 @@ public class HippoVisual : CreatureVisualBase
         jawPivot.localRotation = jawBaseLocalRot * Quaternion.Euler(mouthOpenAngle * 0.12f, 0f, 0f);
     }
 
+    // Computes chase gait phase.
+    // Can be time-driven or displacement-driven (distance traveled in world space).
     private float ResolveChasePhase(float t)
     {
         if (!driveChasePhaseFromDisplacement || !Application.isPlaying)
@@ -973,6 +1041,8 @@ public class HippoVisual : CreatureVisualBase
             pupilR.localPosition = localPos;
     }
 
+    // Live-apply structural parameters without rebuilding:
+    // overall scale, body/head proportions, and ear placement.
     private void ApplyStructurePlacement()
     {
         if (root != null)
@@ -999,6 +1069,7 @@ public class HippoVisual : CreatureVisualBase
         ApplyEarPlacement();
     }
 
+    // Live-update ear transforms from inspector parameters.
     private void ApplyEarPlacement()
     {
         if (headPivot != null)
@@ -1030,6 +1101,8 @@ public class HippoVisual : CreatureVisualBase
         }
     }
 
+    // Live-update eyes and pupils from inspector parameters.
+    // This is intentionally separate from full rig rebuild for fast iteration.
     private void ApplyEyePlacement()
     {
         float side = Mathf.Abs(eyePivotSideOffset);
@@ -1065,7 +1138,7 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(0f, -0.24f, 0f),
             Vector3.zero,
             new Vector3(0.60f, 1.30f, 0.60f),
-            MaterialSlot.Body);
+            CreatureMaterialSlot.Body);
 
         Transform ankle = CreatePart(
             "Ankle",
@@ -1074,7 +1147,7 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(0f, -0.88f, 0.08f),
             Vector3.zero,
             new Vector3(0.50f, 0.40f, 0.50f),
-            MaterialSlot.Body);
+            CreatureMaterialSlot.Body);
 
         Transform foot = CreatePart(
             "Foot",
@@ -1083,127 +1156,13 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(0f, -1.16f, 0.18f),
             Vector3.zero,
             new Vector3(0.84f, 0.38f, 0.98f),
-            MaterialSlot.Body);
+            CreatureMaterialSlot.Body);
 
         RemoveCollider(upper.gameObject);
         RemoveCollider(ankle.gameObject);
         RemoveCollider(foot.gameObject);
 
         return legRoot;
-    }
-
-    private Transform CreateNode(string name, Transform parent)
-    {
-        GameObject go = new GameObject(name);
-        go.transform.SetParent(parent, false);
-        return go.transform;
-    }
-
-    private Transform CreatePart(
-        string name,
-        PrimitiveType primitiveType,
-        Transform parent,
-        Vector3 localPosition,
-        Vector3 localEulerAngles,
-        Vector3 localScale,
-        MaterialSlot slot)
-    {
-        GameObject go = GameObject.CreatePrimitive(primitiveType);
-        go.name = name;
-        go.transform.SetParent(parent, false);
-        go.transform.localPosition = localPosition;
-        go.transform.localRotation = Quaternion.Euler(localEulerAngles);
-        go.transform.localScale = localScale;
-
-        ApplyMaterial(go, slot);
-        return go.transform;
-    }
-
-    private void ApplyMaterial(GameObject go, MaterialSlot slot)
-    {
-        Renderer renderer = go.GetComponent<Renderer>();
-        if (renderer == null)
-            return;
-
-        Material assigned = null;
-
-        switch (slot)
-        {
-            case MaterialSlot.Body:
-                assigned = bodyMaterial != null ? bodyMaterial : CreateFallbackMaterial("HippoBody_Fallback", fallbackBodyColor);
-                break;
-
-            case MaterialSlot.EyeSclera:
-                assigned = scleraMaterial != null ? scleraMaterial : CreateFallbackMaterial("HippoSclera_Fallback", fallbackScleraColor);
-                break;
-
-            case MaterialSlot.EyePupil:
-                assigned = pupilMaterial != null
-                    ? pupilMaterial
-                    : CreateFallbackMaterial("HippoPupil_Fallback", fallbackEyeColor);
-                break;
-
-            case MaterialSlot.Eye:
-                assigned = eyeMaterial != null
-                    ? eyeMaterial
-                    : (pupilMaterial != null ? pupilMaterial : CreateFallbackMaterial("HippoEye_Fallback", fallbackEyeColor));
-                break;
-
-            case MaterialSlot.Mouth:
-                assigned = mouthMaterial != null ? mouthMaterial : CreateFallbackMaterial("HippoMouth_Fallback", fallbackMouthColor);
-                break;
-        }
-
-        renderer.sharedMaterial = assigned;
-    }
-
-    private Material CreateFallbackMaterial(string matName, Color color)
-    {
-        // Force URP-compatible fallbacks to avoid pink/magenta materials in URP projects.
-        Shader shader = Shader.Find("Universal Render Pipeline/Lit");
-        if (shader == null)
-            shader = Shader.Find("Universal Render Pipeline/Simple Lit");
-
-        if (shader == null)
-        {
-            Debug.LogWarning(
-                $"[{nameof(HippoVisual)}] URP fallback shaders not found. " +
-                "Falling back to a generic unlit shader.");
-            shader = Shader.Find("Unlit/Color");
-        }
-
-        if (shader == null)
-            shader = Shader.Find("Sprites/Default");
-
-        if (shader == null)
-            shader = Shader.Find("Hidden/InternalErrorShader");
-
-        Material mat = new Material(shader);
-        mat.name = matName;
-
-        if (mat.HasProperty("_BaseColor"))
-            mat.SetColor("_BaseColor", color);
-
-        if (mat.HasProperty("_Color"))
-            mat.SetColor("_Color", color);
-
-        return mat;
-    }
-
-    private void RemoveCollider(GameObject go)
-    {
-        Collider c = go.GetComponent<Collider>();
-        if (c == null)
-            return;
-
-#if UNITY_EDITOR
-        if (!Application.isPlaying)
-            DestroyImmediate(c);
-        else
-            Destroy(c);
-#else
-        Destroy(c);
-#endif
     }
 
     private void OnDrawGizmosSelected()
