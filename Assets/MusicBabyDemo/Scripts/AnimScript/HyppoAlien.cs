@@ -25,18 +25,18 @@ public class HippoVisual : CreatureVisualBase
     [Tooltip("Uniform eye sphere scale.")]
     [Range(0.01f, 2f)] public float eyeScale = 0.82f;
     [Tooltip("Pupil size ratio relative to eye size (0.5 = half-eye diameter).")]
-    [Range(0.05f, 0.5f)] public float pupilScale = 0.48f;
+    [Range(0.05f, 1.0f)] public float pupilScale = 0.48f;
     [Tooltip("Pupil center forward offset in eye local space (0=center, 0.5=eye surface).")]
-    [Range(0f, 0.27f)] public float pupilForwardOffset = 0.27f;
+    [Range(0f, 0.9f)] public float pupilForwardOffset = 0.27f;
 
-    [Header("STRUCTURE / Materials")]
+    [Header("Materials")]
     public Material bodyMaterial;
     public Material scleraMaterial;
     public Material eyeMaterial;
     public Material pupilMaterial;
     public Material mouthMaterial;
 
-    [Header("STRUCTURE / Fallback Colors")]
+    [Header("Fallback Colors")]
     public Color fallbackBodyColor = new Color(0.56f, 0.58f, 0.63f);
     public Color fallbackScleraColor = new Color(0.92f, 0.94f, 0.97f);
     public Color fallbackEyeColor = new Color(0.08f, 0.08f, 0.08f);
@@ -121,6 +121,8 @@ public class HippoVisual : CreatureVisualBase
     private Transform upperJaw;
     private Transform jawPivot;
     private Transform lowerJaw;
+    private Transform earL;
+    private Transform earR;
     private Transform tail;
     private Transform legFL;
     private Transform legFR;
@@ -218,6 +220,7 @@ public class HippoVisual : CreatureVisualBase
                     materialsDirty = false;
                 }
 
+                ApplyStructurePlacement();
                 ApplyEyePlacement();
                 return;
             }
@@ -229,6 +232,9 @@ public class HippoVisual : CreatureVisualBase
                     ApplyCurrentMaterialsToRig();
                     materialsDirty = false;
                 }
+
+                ApplyStructurePlacement();
+                ApplyEyePlacement();
                 return;
             }
         }
@@ -236,10 +242,11 @@ public class HippoVisual : CreatureVisualBase
         ClearExisting();
         BuildVisual();
         RecoverReferences();
+        ApplyStructurePlacement();
+        ApplyEyePlacement();
         CacheBases();
         ApplyCurrentMaterialsToRig();
         materialsDirty = false;
-        ApplyEyePlacement();
     }
 
     private bool HasUpdatedLegGeometry()
@@ -287,16 +294,11 @@ public class HippoVisual : CreatureVisualBase
         if (pupilR != null)
             ApplyMaterial(pupilR.gameObject, MaterialSlot.EyePupil);
 
-        if (headPivot != null)
-        {
-            Transform earL = headPivot.Find("Ear_L");
-            if (earL != null)
-                ApplyMaterial(earL.gameObject, MaterialSlot.Body);
+        if (earL != null)
+            ApplyMaterial(earL.gameObject, MaterialSlot.Body);
 
-            Transform earR = headPivot.Find("Ear_R");
-            if (earR != null)
-                ApplyMaterial(earR.gameObject, MaterialSlot.Body);
-        }
+        if (earR != null)
+            ApplyMaterial(earR.gameObject, MaterialSlot.Body);
 
         ApplyLegMaterials(legFL);
         ApplyLegMaterials(legFR);
@@ -345,6 +347,8 @@ public class HippoVisual : CreatureVisualBase
             head = headPivot.Find("Head");
             upperJaw = headPivot.Find("UpperJaw");
             jawPivot = headPivot.Find("JawPivot");
+            earL = headPivot.Find("Ear_L");
+            earR = headPivot.Find("Ear_R");
             eyeL = headPivot.Find("Eye_L");
             eyeR = headPivot.Find("Eye_R");
 
@@ -434,6 +438,8 @@ public class HippoVisual : CreatureVisualBase
         upperJaw = null;
         jawPivot = null;
         lowerJaw = null;
+        earL = null;
+        earR = null;
         tail = null;
         legFL = null;
         legFR = null;
@@ -557,7 +563,7 @@ public class HippoVisual : CreatureVisualBase
         Vector3 earPosR = new Vector3(baseEarPosR.x + earPlacementOffset.x, baseEarPosR.y + earPlacementOffset.y, baseEarPosR.z + earPlacementOffset.z);
         Vector3 earScale = new Vector3(0.20f * earWidthFactor, 0.28f, 0.12f);
 
-        CreatePart(
+        earL = CreatePart(
             "Ear_L",
             PrimitiveType.Sphere,
             headPivot,
@@ -566,7 +572,7 @@ public class HippoVisual : CreatureVisualBase
             earScale,
             MaterialSlot.Body);
 
-        CreatePart(
+        earR = CreatePart(
             "Ear_R",
             PrimitiveType.Sphere,
             headPivot,
@@ -965,6 +971,63 @@ public class HippoVisual : CreatureVisualBase
 
         if (pupilR != null)
             pupilR.localPosition = localPos;
+    }
+
+    private void ApplyStructurePlacement()
+    {
+        if (root != null)
+            root.localScale = Vector3.one * overallScale;
+
+        if (body != null)
+        {
+            bodyBaseLocalPos = new Vector3(0f, 0.95f, 0f);
+            bodyBaseLocalScale = new Vector3(2.8f, 1.5f * bodyHeightFactor, 3.5f);
+            body.localPosition = bodyBaseLocalPos;
+            body.localScale = bodyBaseLocalScale;
+        }
+
+        if (headPivot != null)
+            headPivot.localPosition = new Vector3(0f, 1.02f, 2.05f);
+
+        if (head != null)
+        {
+            float headLinearScale = Mathf.Pow(headVolumeFactor, 1f / 3f);
+            head.localPosition = Vector3.zero;
+            head.localScale = new Vector3(2.0f, 1.15f, 1.7f) * headLinearScale;
+        }
+
+        ApplyEarPlacement();
+    }
+
+    private void ApplyEarPlacement()
+    {
+        if (headPivot != null)
+        {
+            if (earL == null)
+                earL = headPivot.Find("Ear_L");
+            if (earR == null)
+                earR = headPivot.Find("Ear_R");
+        }
+
+        Vector3 baseEarPosL = new Vector3(-0.56f, 0.30f, -0.08f);
+        Vector3 baseEarPosR = new Vector3(0.56f, 0.30f, -0.08f);
+        Vector3 earPosL = new Vector3(baseEarPosL.x - earPlacementOffset.x, baseEarPosL.y + earPlacementOffset.y, baseEarPosL.z + earPlacementOffset.z);
+        Vector3 earPosR = new Vector3(baseEarPosR.x + earPlacementOffset.x, baseEarPosR.y + earPlacementOffset.y, baseEarPosR.z + earPlacementOffset.z);
+        Vector3 earScale = new Vector3(0.20f * earWidthFactor, 0.28f, 0.12f);
+
+        if (earL != null)
+        {
+            earL.localPosition = earPosL;
+            earL.localRotation = Quaternion.Euler(0f, 0f, 18f);
+            earL.localScale = earScale;
+        }
+
+        if (earR != null)
+        {
+            earR.localPosition = earPosR;
+            earR.localRotation = Quaternion.Euler(0f, 0f, -18f);
+            earR.localScale = earScale;
+        }
     }
 
     private void ApplyEyePlacement()
