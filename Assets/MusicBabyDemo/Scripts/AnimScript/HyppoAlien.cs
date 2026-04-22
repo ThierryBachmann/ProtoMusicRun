@@ -47,7 +47,6 @@ public class HippoVisual : ProceduralCreatureVisualBase
     public Material bodyMaterial;
     public Material earMaterial;
     public Material scleraMaterial;
-    public Material eyeMaterial;
     public Material pupilMaterial;
     public Material mouthMaterial;
     public Material tailMaterial;
@@ -57,7 +56,8 @@ public class HippoVisual : ProceduralCreatureVisualBase
     public Color fallbackEarColor = new Color(0.24f, 0.26f, 0.30f);
     public Color fallbackTailColor = new Color(0.24f, 0.26f, 0.30f);
     public Color fallbackScleraColor = new Color(0.92f, 0.94f, 0.97f);
-    public Color fallbackEyeColor = new Color(0.08f, 0.08f, 0.08f);
+    [FormerlySerializedAs("fallbackEyeColor")]
+    public Color fallbackPupilColor = new Color(0.08f, 0.08f, 0.08f);
     public Color fallbackMouthColor = new Color(0.55f, 0.22f, 0.24f);
 
     [Header("ANIMATION / Shared")]
@@ -167,7 +167,6 @@ public class HippoVisual : ProceduralCreatureVisualBase
     private Material fallbackEarMat;
     private Material fallbackTailMat;
     private Material fallbackScleraMat;
-    private Material fallbackEyeMat;
     private Material fallbackPupilMat;
     private Material fallbackMouthMat;
     private float chaseGaitPhase;
@@ -358,13 +357,6 @@ public class HippoVisual : ProceduralCreatureVisualBase
             case CreatureMaterialSlot.EyePupil:
                 return pupilMaterial != null ? pupilMaterial : GetOrCreatePupilFallbackMaterial();
 
-            case CreatureMaterialSlot.Eye:
-                if (eyeMaterial != null)
-                    return eyeMaterial;
-                if (pupilMaterial != null)
-                    return pupilMaterial;
-                return GetOrCreateEyeFallbackMaterial();
-
             case CreatureMaterialSlot.Mouth:
                 return mouthMaterial != null ? mouthMaterial : GetOrCreateMouthFallbackMaterial();
 
@@ -403,17 +395,10 @@ public class HippoVisual : ProceduralCreatureVisualBase
         return fallbackEarMat;
     }
 
-    private Material GetOrCreateEyeFallbackMaterial()
-    {
-        if (fallbackEyeMat == null)
-            fallbackEyeMat = CreateFallbackMaterial("CreatureEye_Fallback", fallbackEyeColor);
-        return fallbackEyeMat;
-    }
-
     private Material GetOrCreatePupilFallbackMaterial()
     {
         if (fallbackPupilMat == null)
-            fallbackPupilMat = CreateFallbackMaterial("CreaturePupil_Fallback", fallbackEyeColor);
+            fallbackPupilMat = CreateFallbackMaterial("CreaturePupil_Fallback", fallbackPupilColor);
         return fallbackPupilMat;
     }
 

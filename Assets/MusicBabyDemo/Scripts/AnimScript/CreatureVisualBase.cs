@@ -170,7 +170,6 @@ public abstract class ProceduralCreatureVisualBase : CreatureVisualBase
         Body,
         Tail,
         Ears,
-        Eye,
         EyeSclera,
         EyePupil,
         Mouth,
