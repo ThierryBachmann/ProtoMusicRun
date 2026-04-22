@@ -3,15 +3,21 @@ using UnityEngine;
 public enum CreatureVisualState
 {
     Idle = 0,
-    Chase = 1,
-    Eat = 2,
-    Stunned = 3,
-    Wait = 4
+    Follow = 1,
+    Overtake = 2,
+    Hunt = 3,
+    Recenter = 4,
+    WaitPlayer = 5,
+    EatAttack = 6,
+    EatRecovery = 7,
+    LeashReturn = 8,
+    Stunned = 9,
 }
 
 public abstract class CreatureVisualBase : MonoBehaviour
 {
     [Header("External State")]
+    [Tooltip("Visual state used by the animation graph (1:1 mapped from controller state when available).")]
     public CreatureVisualState state = CreatureVisualState.Idle;
 
     [Header("Runtime Context (Debug)")]
@@ -108,17 +114,22 @@ public abstract class CreatureVisualBase : MonoBehaviour
     {
         switch (controllerState)
         {
-            case MusicRun.CreatureState.EAT_ATTACK:
-            case MusicRun.CreatureState.EAT_RECOVERY:
-                return CreatureVisualState.Eat;
-            case MusicRun.CreatureState.WAIT_PLAYER:
-                return CreatureVisualState.Wait;
             case MusicRun.CreatureState.FOLLOW:
+                return CreatureVisualState.Follow;
             case MusicRun.CreatureState.OVERTAKE:
+                return CreatureVisualState.Overtake;
             case MusicRun.CreatureState.HUNT:
+                return CreatureVisualState.Hunt;
             case MusicRun.CreatureState.RECENTER:
+                return CreatureVisualState.Recenter;
+            case MusicRun.CreatureState.WAIT_PLAYER:
+                return CreatureVisualState.WaitPlayer;
+            case MusicRun.CreatureState.EAT_ATTACK:
+                return CreatureVisualState.EatAttack;
+            case MusicRun.CreatureState.EAT_RECOVERY:
+                return CreatureVisualState.EatRecovery;
             case MusicRun.CreatureState.LEASH_RETURN:
-                return CreatureVisualState.Chase;
+                return CreatureVisualState.LeashReturn;
             default:
                 return CreatureVisualState.Idle;
         }

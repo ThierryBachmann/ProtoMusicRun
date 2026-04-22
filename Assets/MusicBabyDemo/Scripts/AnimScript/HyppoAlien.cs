@@ -3,90 +3,110 @@ using UnityEngine;
 [ExecuteAlways]
 public class HippoVisual : CreatureVisualBase
 {
-    [Header("Build")]
-    [Min(0.01f)] public float overallScale = 1f;
+    [Header("STRUCTURE / Global")]
+    [Range(0.25f, 5f)] public float overallScale = 1f;
 
-    [Header("Materials")]
+    [Header("STRUCTURE / Body & Head")]
+    [Range(0.1f, 3f)] public float bodyHeightFactor = 1.3f;
+    [Range(0.1f, 3f)] public float headVolumeFactor = 1.2f;
+
+    [Header("STRUCTURE / Ears")]
+    [Range(0.1f, 3f)] public float earWidthFactor = 1.3f;
+    [Tooltip("Extra ear placement to keep ears visible on top/sides of the head.")]
+    public Vector3 earPlacementOffset = new Vector3(0.10f, 0.26f, -0.04f);
+
+    [Header("STRUCTURE / Eyes Geometry")]
+    [Tooltip("Horizontal offset of eyes from head center.")]
+    [Range(0f, 2f)] public float eyePivotSideOffset = 0.58f;
+    [Tooltip("Vertical offset of eyes from head center.")]
+    [Range(-1f, 2f)] public float eyePivotHeightOffset = 0.24f;
+    [Tooltip("Forward offset of eyes from head center. Increase to pull eyes out of the head.")]
+    [Range(-1f, 2f)] public float eyePivotForwardOffset = 0.92f;
+    [Tooltip("Uniform eye sphere scale.")]
+    [Range(0.01f, 2f)] public float eyeScale = 0.82f;
+    [Tooltip("Pupil size ratio relative to eye size (0.5 = half-eye diameter).")]
+    [Range(0.05f, 0.5f)] public float pupilScale = 0.48f;
+    [Tooltip("Pupil center forward offset in eye local space (0=center, 0.5=eye surface).")]
+    [Range(0f, 0.27f)] public float pupilForwardOffset = 0.27f;
+
+    [Header("STRUCTURE / Materials")]
     public Material bodyMaterial;
     public Material scleraMaterial;
     public Material eyeMaterial;
     public Material pupilMaterial;
     public Material mouthMaterial;
 
+    [Header("STRUCTURE / Fallback Colors")]
     public Color fallbackBodyColor = new Color(0.56f, 0.58f, 0.63f);
     public Color fallbackScleraColor = new Color(0.92f, 0.94f, 0.97f);
     public Color fallbackEyeColor = new Color(0.08f, 0.08f, 0.08f);
     public Color fallbackMouthColor = new Color(0.55f, 0.22f, 0.24f);
 
-    [Header("Idle")]
+    [Header("ANIMATION / Shared")]
+    [Range(0f, 90f)] public float mouthOpenAngle = 35f;
+
+    [Header("ANIMATION / Idle")]
     public float idleBreathSpeed = 1.6f;
     public float idleBreathAmount = 0.03f;
     public float idleHeadNodAngle = 1.5f;
     public float idleHeadNodSpeed = 1.3f;
     public float idleTailSwingFactor = 0.25f;
 
-    [Header("Chase")]
+    [Header("ANIMATION / Chase")]
     public bool animateWalk = true;
-    public float walkCycleSpeed = 4.2f;
-    public float legAngle = 16f;
-    public float bodyBobAmount = 0.05f;
-    public float headSwingAngle = 3f;
-    public float tailSwingAngle = 14f;
+    [Range(0f, 20f)] public float walkCycleSpeed = 4.2f;
+    [Range(0.01f, 85f)] public float legAngle = 16f;
+    [Range(0f, 1f)] public float bodyBobAmount = 0.05f;
+    [Range(0f, 45f)] public float headSwingAngle = 3f;
+    [Range(0f, 60f)] public float tailSwingAngle = 14f;
 
-    [Header("Chase Displacement Coupling")]
+    [Header("ANIMATION / Chase Phase Coupling")]
     [Tooltip("When enabled, chase gait phase advances from real horizontal displacement instead of Time.time.")]
     public bool driveChasePhaseFromDisplacement = true;
     [Tooltip("Ignore tiny displacements to avoid micro-jitter in gait progression.")]
-    public float chaseMinDisplacement = 0.0005f;
+    [Range(0f, 1f)] public float chaseMinDisplacement = 0.0005f;
     [Tooltip("Ignore a single-frame displacement above this threshold (teleport/recovery safety).")]
-    public float chaseMaxDisplacementPerFrame = 1.25f;
+    [Range(0.001f, 5f)] public float chaseMaxDisplacementPerFrame = 1.25f;
 
-    [Header("Wait Player")]
-    public float waitBodyBobAmount = 0.035f;
-    public float waitBodyBobSpeed = 2.4f;
-    public float waitHeadYawAngle = 7f;
-    public float waitHeadYawSpeed = 1.8f;
-    public float waitLegStompAngle = 6f;
-    public float waitLegStompSpeed = 5f;
-    public float waitTailSwingAngle = 11f;
-    public float waitMouthOpenBase = 8f;
- 
-    [Header("Eyes")]
-    public float eyeLookSideAngle = 35f;
-    public float eyeLookSpeed = 2.2f;
-    [Tooltip("Horizontal offset of eye pivots from head center.")]
-    public float eyePivotSideOffset = 0.45f;
-    [Tooltip("Vertical offset of eye pivots from head center.")]
-    public float eyePivotHeightOffset = 0.24f;
-    [Tooltip("Forward offset of eye pivots from head center. Increase to pull eyes out of the head.")]
-    public float eyePivotForwardOffset = 0.62f;
-    [Tooltip("Uniform eye sphere scale.")]
-    public float eyeScale = 0.22f;
-    [Tooltip("Forward offset of each eyeball from its pivot (socket center).")]
-    public float eyeBallForwardOffset = 0.08f;
-    [Tooltip("Pupil size ratio relative to eye size (0.5 = half-eye diameter).")]
-    public float pupilScale = 0.48f;
-    [Tooltip("Pupil center forward offset in eye local space (0=center, 0.5=eye surface).")]
-    public float pupilForwardOffset = 0.27f;
+    [Header("ANIMATION / Wait Player")]
+    [Range(0f, 1f)] public float waitBodyBobAmount = 0.035f;
+    [Range(0f, 20f)] public float waitBodyBobSpeed = 2.4f;
+    [Range(0f, 45f)] public float waitHeadYawAngle = 7f;
+    [Range(0f, 20f)] public float waitHeadYawSpeed = 1.8f;
+    [Range(0f, 60f)] public float waitLegStompAngle = 6f;
+    [Range(0f, 20f)] public float waitLegStompSpeed = 5f;
+    [Range(0f, 60f)] public float waitTailSwingAngle = 11f;
+    [Range(0f, 60f)] public float waitMouthOpenBase = 8f;
+
+    [Header("ANIMATION / Eyes")]
+    [Range(0f, 75f)] public float eyeLookSideAngle = 35f;
+    [Range(0f, 20f)] public float eyeLookSpeed = 2.2f;
     [Tooltip("Horizontal pupil travel in eye local space when looking left/right.")]
-    public float pupilLookSideOffset = 0.08f;
+    [Range(0f, 0.23f)] public float pupilLookSideOffset = 0.08f;
 
-    [Header("Eat")]
-    public float eatAnimDuration = 0.75f;
-    public float eatJumpHeight = 0.45f;
-    public float eatForwardStretch = 0.18f;
-    public float eatLegFoldAngle = 50f;
-    public float mouthOpenAngle = 30f;
+    [Header("ANIMATION / Eat")]
+    [Range(0.01f, 5f)] public float eatAnimDuration = 0.75f;
+    [Range(0f, 5f)] public float eatJumpHeight = 0.45f;
+    [Range(0f, 2f)] public float eatForwardStretch = 0.18f;
+    [Range(0f, 90f)] public float eatLegFoldAngle = 50f;
+    [Tooltip("Global hippo pitch during EAT_ATTACK (positive tilts up).")]
+    [Range(-90f, 90f)] public float eatAttackGlobalPitch = 20f;
+    [Tooltip("Global hippo pitch during EAT_RECOVERY (negative tilts down).")]
+    [Range(-90f, 90f)] public float eatRecoveryGlobalPitch = -20f;
+    [Tooltip("Blend duration to transition global pitch from EAT_ATTACK to EAT_RECOVERY.")]
+    [Range(0f, 2f)] public float eatRecoveryPitchBlendDuration = 0.25f;
+    [Tooltip("Leg pitch used in landing/recovery pose (0 means vertical legs).")]
+    [Range(0f, 90f)] public float eatRecoveryLegForwardAngle = 45f;
 
-    [Header("Eat Body Squash & Stretch")]
-    public float eatStretchY = 1.12f;
-    public float eatSquashXZ = 0.92f;
-    public float landSquashY = 0.90f;
-    public float landStretchXZ = 1.06f;
+    [Header("ANIMATION / Eat Squash & Stretch")]
+    [Range(0.5f, 2f)] public float eatStretchY = 1.12f;
+    [Range(0.5f, 1.5f)] public float eatSquashXZ = 0.92f;
+    [Range(0.5f, 1.5f)] public float landSquashY = 0.90f;
+    [Range(0.5f, 2f)] public float landStretchXZ = 1.06f;
 
-    [Header("Stunned")]
-    public float stunnedShakeAngle = 10f;
-    public float stunnedShakeSpeed = 20f;
+    [Header("ANIMATION / Stunned")]
+    [Range(0f, 90f)] public float stunnedShakeAngle = 10f;
+    [Range(0f, 60f)] public float stunnedShakeSpeed = 20f;
 
     [Header("Debug")]
     public bool drawDebug = false;
@@ -106,8 +126,6 @@ public class HippoVisual : CreatureVisualBase
     private Transform legFR;
     private Transform legBL;
     private Transform legBR;
-    private Transform eyePivotL;
-    private Transform eyePivotR;
     private Transform eyeL;
     private Transform eyeR;
     private Transform pupilL;
@@ -119,10 +137,9 @@ public class HippoVisual : CreatureVisualBase
     private Quaternion tailBaseLocalRot;
     private Quaternion jawBaseLocalRot;
     private Quaternion visualBaseLocalRot;
-    private Quaternion eyePivotLBaseLocalRot;
-    private Quaternion eyePivotRBaseLocalRot;
     private Vector3 eyeBaseScale;
-    private Vector3 eyeBaseLocalPos;
+    private Vector3 eyeLBaseLocalPos;
+    private Vector3 eyeRBaseLocalPos;
     private Vector3 pupilBaseScale;
     private Vector3 pupilBaseLocalPos;
 
@@ -146,50 +163,26 @@ public class HippoVisual : CreatureVisualBase
         Mouth
     }
 
-    public override void SetControllerState(MusicRun.CreatureState controllerState)
-    {
-        SetState(MapControllerState(controllerState));
-    }
-
     [ContextMenu("Rebuild Visual")]
     public void Rebuild()
     {
         RebuildVisual();
     }
 
-    [ContextMenu("Apply All Preset")]
-    public void ApplyAllPreset()
-    {
-        eyeLookSideAngle = 35f;
-        eyeLookSpeed = 2.2f;
-        eyePivotSideOffset = 0.44f;
-        eyePivotHeightOffset = 0.25f;
-        eyePivotForwardOffset = 0.64f;
-        eyeScale = 0.22f;
-        eyeBallForwardOffset = 0.08f;
-        pupilScale = 0.48f;
-        pupilForwardOffset = 0.27f;
-        pupilLookSideOffset = 0.08f;
-
-        BuildIfNeeded(false);
-        ApplyEyePlacement();
-
-#if UNITY_EDITOR
-        if (!Application.isPlaying)
-        {
-            UnityEditor.EditorUtility.SetDirty(this);
-            if (root != null)
-                UnityEditor.EditorUtility.SetDirty(root.gameObject);
-        }
-#endif
-    }
-
     protected override void OnStateChanged(CreatureVisualState oldState, CreatureVisualState newState)
     {
         base.OnStateChanged(oldState, newState);
 
-        if (newState == CreatureVisualState.Chase || oldState == CreatureVisualState.Chase)
+        if (IsChaseLikeState(newState) || IsChaseLikeState(oldState))
             ResetChaseDisplacementSampling();
+    }
+
+    protected override void OnValidate()
+    {
+        base.OnValidate();
+
+        if (chaseMaxDisplacementPerFrame <= chaseMinDisplacement)
+            chaseMaxDisplacementPerFrame = chaseMinDisplacement + 0.001f;
     }
 
     protected override void BuildIfNeeded(bool force)
@@ -352,17 +345,11 @@ public class HippoVisual : CreatureVisualBase
             head = headPivot.Find("Head");
             upperJaw = headPivot.Find("UpperJaw");
             jawPivot = headPivot.Find("JawPivot");
-            eyePivotL = headPivot.Find("EyePivot_L");
-            eyePivotR = headPivot.Find("EyePivot_R");
+            eyeL = headPivot.Find("Eye_L");
+            eyeR = headPivot.Find("Eye_R");
 
             if (jawPivot != null)
                 lowerJaw = jawPivot.Find("LowerJaw");
-
-            if (eyePivotL != null)
-                eyeL = eyePivotL.Find("Eye_L");
-
-            if (eyePivotR != null)
-                eyeR = eyePivotR.Find("Eye_R");
 
             if (eyeL != null)
                 pupilL = eyeL.Find("Pupil_L");
@@ -392,20 +379,18 @@ public class HippoVisual : CreatureVisualBase
         if (visualRoot != null)
             visualBaseLocalRot = visualRoot.localRotation;
 
-        if (eyePivotL != null)
-            eyePivotLBaseLocalRot = eyePivotL.localRotation;
-
-        if (eyePivotR != null)
-            eyePivotRBaseLocalRot = eyePivotR.localRotation;
-
         if (eyeL != null)
         {
             eyeBaseScale = eyeL.localScale;
-            eyeBaseLocalPos = eyeL.localPosition;
+            eyeLBaseLocalPos = eyeL.localPosition;
         }
 
-        if (eyeR != null && eyeL == null)
-            eyeBaseLocalPos = eyeR.localPosition;
+        if (eyeR != null)
+        {
+            if (eyeL == null)
+                eyeBaseScale = eyeR.localScale;
+            eyeRBaseLocalPos = eyeR.localPosition;
+        }
 
         if (pupilL != null)
         {
@@ -419,7 +404,7 @@ public class HippoVisual : CreatureVisualBase
         }
 
         SetEyeScaleImmediate(eyeBaseScale);
-        SetEyeLocalPositionImmediate(eyeBaseLocalPos);
+        SetEyeLocalPositionsImmediate(eyeLBaseLocalPos, eyeRBaseLocalPos);
         SetPupilScaleImmediate(pupilBaseScale);
         SetPupilLocalPositionImmediate(pupilBaseLocalPos);
         RecomputeChaseCalibration();
@@ -454,8 +439,6 @@ public class HippoVisual : CreatureVisualBase
         legFR = null;
         legBL = null;
         legBR = null;
-        eyePivotL = null;
-        eyePivotR = null;
         eyeL = null;
         eyeR = null;
         pupilL = null;
@@ -479,13 +462,15 @@ public class HippoVisual : CreatureVisualBase
         visualRoot.localRotation = Quaternion.identity;
         visualRoot.localScale = Vector3.one;
 
+        float headLinearScale = Mathf.Pow(headVolumeFactor, 1f / 3f);
+
         body = CreatePart(
             "Body",
             PrimitiveType.Sphere,
             visualRoot,
             new Vector3(0f, 0.95f, 0f),
             Vector3.zero,
-            new Vector3(2.8f, 1.5f, 3.5f),
+            new Vector3(2.8f, 1.5f * bodyHeightFactor, 3.5f),
             MaterialSlot.Body);
 
         headPivot = CreateNode("HeadPivot", visualRoot);
@@ -498,7 +483,7 @@ public class HippoVisual : CreatureVisualBase
             headPivot,
             Vector3.zero,
             Vector3.zero,
-            new Vector3(2.0f, 1.15f, 1.7f),
+            new Vector3(2.0f, 1.15f, 1.7f) * headLinearScale,
             MaterialSlot.Body);
 
         upperJaw = CreatePart(
@@ -523,19 +508,15 @@ public class HippoVisual : CreatureVisualBase
             new Vector3(1.65f, 0.32f, 0.92f),
             MaterialSlot.Mouth);
 
-        eyePivotL = CreateNode("EyePivot_L", headPivot);
-        eyePivotL.localPosition = new Vector3(-eyePivotSideOffset, eyePivotHeightOffset, eyePivotForwardOffset);
-        eyePivotL.localRotation = Quaternion.identity;
-
-        eyePivotR = CreateNode("EyePivot_R", headPivot);
-        eyePivotR.localPosition = new Vector3(eyePivotSideOffset, eyePivotHeightOffset, eyePivotForwardOffset);
-        eyePivotR.localRotation = Quaternion.identity;
+        float eyeSide = Mathf.Abs(eyePivotSideOffset);
+        float eyeHeight = eyePivotHeightOffset;
+        float eyeForward = eyePivotForwardOffset;
 
         eyeL = CreatePart(
             "Eye_L",
             PrimitiveType.Sphere,
-            eyePivotL,
-            new Vector3(0f, 0f, eyeBallForwardOffset),
+            headPivot,
+            new Vector3(-eyeSide, eyeHeight, eyeForward),
             Vector3.zero,
             new Vector3(eyeScale, eyeScale, eyeScale),
             MaterialSlot.EyeSclera);
@@ -543,8 +524,8 @@ public class HippoVisual : CreatureVisualBase
         eyeR = CreatePart(
             "Eye_R",
             PrimitiveType.Sphere,
-            eyePivotR,
-            new Vector3(0f, 0f, eyeBallForwardOffset),
+            headPivot,
+            new Vector3(eyeSide, eyeHeight, eyeForward),
             Vector3.zero,
             new Vector3(eyeScale, eyeScale, eyeScale),
             MaterialSlot.EyeSclera);
@@ -570,22 +551,28 @@ public class HippoVisual : CreatureVisualBase
         RemoveCollider(pupilL.gameObject);
         RemoveCollider(pupilR.gameObject);
 
+        Vector3 baseEarPosL = new Vector3(-0.56f, 0.30f, -0.08f);
+        Vector3 baseEarPosR = new Vector3(0.56f, 0.30f, -0.08f);
+        Vector3 earPosL = new Vector3(baseEarPosL.x - earPlacementOffset.x, baseEarPosL.y + earPlacementOffset.y, baseEarPosL.z + earPlacementOffset.z);
+        Vector3 earPosR = new Vector3(baseEarPosR.x + earPlacementOffset.x, baseEarPosR.y + earPlacementOffset.y, baseEarPosR.z + earPlacementOffset.z);
+        Vector3 earScale = new Vector3(0.20f * earWidthFactor, 0.28f, 0.12f);
+
         CreatePart(
             "Ear_L",
             PrimitiveType.Sphere,
             headPivot,
-            new Vector3(-0.56f, 0.3f, -0.08f),
+            earPosL,
             new Vector3(0f, 0f, 18f),
-            new Vector3(0.20f, 0.28f, 0.12f),
+            earScale,
             MaterialSlot.Body);
 
         CreatePart(
             "Ear_R",
             PrimitiveType.Sphere,
             headPivot,
-            new Vector3(0.56f, 0.3f, -0.08f),
+            earPosR,
             new Vector3(0f, 0f, -18f),
-            new Vector3(0.20f, 0.28f, 0.12f),
+            earScale,
             MaterialSlot.Body);
 
         tail = CreatePart(
@@ -619,16 +606,24 @@ public class HippoVisual : CreatureVisualBase
                 AnimateIdle(t);
                 break;
 
-            case CreatureVisualState.Chase:
+            case CreatureVisualState.Follow:
+            case CreatureVisualState.Overtake:
+            case CreatureVisualState.Hunt:
+            case CreatureVisualState.Recenter:
+            case CreatureVisualState.LeashReturn:
                 AnimateChase(t);
                 break;
 
-            case CreatureVisualState.Wait:
+            case CreatureVisualState.WaitPlayer:
                 AnimateWaitPlayer(t);
                 break;
 
-            case CreatureVisualState.Eat:
-                AnimateEat();
+            case CreatureVisualState.EatAttack:
+                AnimateEatAttackPose();
+                break;
+
+            case CreatureVisualState.EatRecovery:
+                AnimateEatRecoveryPose();
                 break;
 
             case CreatureVisualState.Stunned:
@@ -649,8 +644,8 @@ public class HippoVisual : CreatureVisualBase
                legFR != null &&
                legBL != null &&
                legBR != null &&
-               eyePivotL != null &&
-               eyePivotR != null;
+               eyeL != null &&
+               eyeR != null;
     }
 
     private void ResetTowardBase(float dt)
@@ -667,9 +662,6 @@ public class HippoVisual : CreatureVisualBase
         tail.localRotation = Quaternion.Slerp(tail.localRotation, tailBaseLocalRot, 8f * dt);
         jawPivot.localRotation = Quaternion.Slerp(jawPivot.localRotation, jawBaseLocalRot, 10f * dt);
         visualRoot.localRotation = Quaternion.Slerp(visualRoot.localRotation, visualBaseLocalRot, 8f * dt);
-
-        eyePivotL.localRotation = Quaternion.Slerp(eyePivotL.localRotation, eyePivotLBaseLocalRot, 8f * dt);
-        eyePivotR.localRotation = Quaternion.Slerp(eyePivotR.localRotation, eyePivotRBaseLocalRot, 8f * dt);
 
         SetEyeScaleImmediate(eyeBaseScale);
     }
@@ -741,16 +733,15 @@ public class HippoVisual : CreatureVisualBase
         delta.y = 0f;
         float distance = delta.magnitude;
 
-        float minDistance = Mathf.Max(0f, chaseMinDisplacement);
+        float minDistance = chaseMinDisplacement;
         if (distance <= minDistance)
             return chaseGaitPhase;
 
-        float maxDistance = Mathf.Max(minDistance + 0.001f, chaseMaxDisplacementPerFrame);
+        float maxDistance = chaseMaxDisplacementPerFrame;
         if (distance > maxDistance)
             return chaseGaitPhase;
 
-        float cycleDistance = Mathf.Max(0.01f, chaseCycleDistance);
-        float phaseAdvance = (distance / cycleDistance) * Mathf.PI * 2f;
+        float phaseAdvance = (distance / chaseCycleDistance) * Mathf.PI * 2f;
         chaseGaitPhase = Mathf.Repeat(chaseGaitPhase + phaseAdvance, Mathf.PI * 2f);
         return chaseGaitPhase;
     }
@@ -768,9 +759,8 @@ public class HippoVisual : CreatureVisualBase
     private void RecomputeChaseCalibration()
     {
         chaseLegLengthEstimate = EstimateAverageLegLength();
-        float clampedLegAngle = Mathf.Clamp(legAngle, 0.01f, 85f);
-        float stepDistance = 2f * chaseLegLengthEstimate * Mathf.Sin(clampedLegAngle * Mathf.Deg2Rad);
-        chaseCycleDistance = Mathf.Max(0.01f, stepDistance * 2f);
+        float stepDistance = 2f * chaseLegLengthEstimate * Mathf.Sin(legAngle * Mathf.Deg2Rad);
+        chaseCycleDistance = stepDistance * 2f;
         chaseCachedLegAngle = legAngle;
     }
 
@@ -785,7 +775,7 @@ public class HippoVisual : CreatureVisualBase
         TryAccumulateLegLength(legBR, ref total, ref count);
 
         if (count <= 0)
-            return Mathf.Max(0.2f, overallScale * 0.8f);
+            return 0.2f;
 
         return total / count;
     }
@@ -817,14 +807,15 @@ public class HippoVisual : CreatureVisualBase
         chaseLastWorldPosition = transform.position;
     }
 
-    private void AnimateEat()
+    private void AnimateEatAttackPose()
     {
-        float p = Mathf.Clamp01(stateTimer / Mathf.Max(0.0001f, eatAnimDuration));
+        // Keep body anchored: jump motion is handled by controller movement.
+        body.localPosition = bodyBaseLocalPos;
+        body.localScale = bodyBaseLocalScale;
 
-        float jumpArc = Mathf.Sin(p * Mathf.PI);
-        float forward = jumpArc * eatForwardStretch;
-
-        body.localPosition = bodyBaseLocalPos + new Vector3(0f, jumpArc * eatJumpHeight, forward);
+        // Unity local X rotation is positive when pitching down.
+        // Negate here so inspector convention stays intuitive: + = up, - = down.
+        visualRoot.localRotation = visualBaseLocalRot * Quaternion.Euler(-eatAttackGlobalPitch, 0f, 0f);
 
         Quaternion foldedLeg = Quaternion.Euler(eatLegFoldAngle, 0f, 0f);
         legFL.localRotation = foldedLeg;
@@ -832,36 +823,44 @@ public class HippoVisual : CreatureVisualBase
         legBL.localRotation = foldedLeg;
         legBR.localRotation = foldedLeg;
 
-        float headPitch = Mathf.Lerp(6f, -10f, p);
-        headPivot.localRotation = headBaseLocalRot * Quaternion.Euler(headPitch, 0f, 0f);
-
+        headPivot.localRotation = headBaseLocalRot * Quaternion.Euler(6f, 0f, 0f);
         float mouthPulse = 0.65f + 0.35f * Mathf.Sin(stateTimer * 14f);
         jawPivot.localRotation = jawBaseLocalRot * Quaternion.Euler(mouthOpenAngle * mouthPulse, 0f, 0f);
-
         tail.localRotation = tailBaseLocalRot * Quaternion.Euler(0f, -tailSwingAngle * 0.4f, 0f);
+    }
 
-        Vector3 bodyScale = bodyBaseLocalScale;
+    private void AnimateEatRecoveryPose()
+    {
+        body.localPosition = bodyBaseLocalPos;
+        body.localScale = bodyBaseLocalScale;
 
-        if (p < 0.5f)
+        // Same convention as EAT_ATTACK: + = up, - = down from inspector values.
+        float blendDuration = eatRecoveryPitchBlendDuration;
+        float blendT;
+        if (blendDuration <= 0f)
         {
-            float up = p / 0.5f;
-            float stretch = Mathf.Sin(up * Mathf.PI * 0.5f);
-
-            bodyScale.x *= Mathf.Lerp(1f, eatSquashXZ, stretch);
-            bodyScale.z *= Mathf.Lerp(1f, eatSquashXZ, stretch);
-            bodyScale.y *= Mathf.Lerp(1f, eatStretchY, stretch);
+            blendT = 1f;
         }
         else
         {
-            float down = (p - 0.5f) / 0.5f;
-            float squash = Mathf.Sin(down * Mathf.PI);
-
-            bodyScale.x *= Mathf.Lerp(1f, landStretchXZ, squash);
-            bodyScale.z *= Mathf.Lerp(1f, landStretchXZ, squash);
-            bodyScale.y *= Mathf.Lerp(1f, landSquashY, squash);
+            blendT = stateTimer / blendDuration;
+            if (blendT < 0f)
+                blendT = 0f;
+            else if (blendT > 1f)
+                blendT = 1f;
         }
+        float blendedPitch = Mathf.Lerp(eatAttackGlobalPitch, eatRecoveryGlobalPitch, blendT);
+        visualRoot.localRotation = visualBaseLocalRot * Quaternion.Euler(-blendedPitch, 0f, 0f);
 
-        body.localScale = bodyScale;
+        Quaternion landingLegPose = Quaternion.Euler(-eatRecoveryLegForwardAngle, 0f, 0f);
+        legFL.localRotation = landingLegPose;
+        legFR.localRotation = landingLegPose;
+        legBL.localRotation = landingLegPose;
+        legBR.localRotation = landingLegPose;
+
+        headPivot.localRotation = headBaseLocalRot * Quaternion.Euler(-6f, 0f, 0f);
+        jawPivot.localRotation = jawBaseLocalRot * Quaternion.Euler(mouthOpenAngle * 0.3f, 0f, 0f);
+        tail.localRotation = tailBaseLocalRot * Quaternion.Euler(0f, tailSwingAngle * 0.2f, 0f);
     }
 
     private void AnimateWaitPlayer(float t)
@@ -897,32 +896,39 @@ public class HippoVisual : CreatureVisualBase
 
     private void UpdateEyes(float t)
     {
-        if (state == CreatureVisualState.Chase || state == CreatureVisualState.Wait)
+        if (IsEyesTrackingState(state))
         {
             float lookPhase = Mathf.Sin(t * eyeLookSpeed);
 
-            float clampedLookAngle = Mathf.Clamp(eyeLookSideAngle, 0f, 75f);
             float eyeRadius = 0.5f;
-            float appliedPupilScale = pupilBaseScale.sqrMagnitude > 0.000001f ? pupilBaseScale.x : Mathf.Clamp(pupilScale, 0.05f, 0.85f);
-            float pupilRadius = Mathf.Max(0.005f, appliedPupilScale * 0.5f);
-            float maxTravelOnSclera = Mathf.Max(0f, (eyeRadius - pupilRadius) * 0.95f);
-            float minTravel = Mathf.Clamp(pupilLookSideOffset, 0f, maxTravelOnSclera);
-            float angleFactor = Mathf.Sin(clampedLookAngle * Mathf.Deg2Rad);
+            float appliedPupilScale = pupilBaseScale.sqrMagnitude > 0.000001f ? pupilBaseScale.x : pupilScale;
+            float pupilRadius = appliedPupilScale * 0.5f;
+            float maxTravelOnSclera = (eyeRadius - pupilRadius) * 0.95f;
+            float minTravel = pupilLookSideOffset;
+            float angleFactor = Mathf.Sin(eyeLookSideAngle * Mathf.Deg2Rad);
             float sideAmplitude = Mathf.Lerp(minTravel, maxTravelOnSclera, angleFactor);
             float pupilSide = lookPhase * sideAmplitude;
             Vector3 pupilPos = pupilBaseLocalPos + new Vector3(pupilSide, 0f, 0f);
             SetPupilLocalPositionImmediate(pupilPos);
-
-            // Keep pivots neutral: visible eye motion comes from pupil translation.
-            eyePivotL.localRotation = eyePivotLBaseLocalRot;
-            eyePivotR.localRotation = eyePivotRBaseLocalRot;
         }
         else
         {
-            eyePivotL.localRotation = eyePivotLBaseLocalRot;
-            eyePivotR.localRotation = eyePivotRBaseLocalRot;
             SetPupilLocalPositionImmediate(pupilBaseLocalPos);
         }
+    }
+
+    private static bool IsChaseLikeState(CreatureVisualState visualState)
+    {
+        return visualState == CreatureVisualState.Follow ||
+               visualState == CreatureVisualState.Overtake ||
+               visualState == CreatureVisualState.Hunt ||
+               visualState == CreatureVisualState.Recenter ||
+               visualState == CreatureVisualState.LeashReturn;
+    }
+
+    private static bool IsEyesTrackingState(CreatureVisualState visualState)
+    {
+        return IsChaseLikeState(visualState) || visualState == CreatureVisualState.WaitPlayer;
     }
 
     private void SetEyeScaleImmediate(Vector3 scale)
@@ -934,13 +940,13 @@ public class HippoVisual : CreatureVisualBase
             eyeR.localScale = scale;
     }
 
-    private void SetEyeLocalPositionImmediate(Vector3 localPos)
+    private void SetEyeLocalPositionsImmediate(Vector3 leftLocalPos, Vector3 rightLocalPos)
     {
         if (eyeL != null)
-            eyeL.localPosition = localPos;
+            eyeL.localPosition = leftLocalPos;
 
         if (eyeR != null)
-            eyeR.localPosition = localPos;
+            eyeR.localPosition = rightLocalPos;
     }
 
     private void SetPupilScaleImmediate(Vector3 scale)
@@ -967,29 +973,18 @@ public class HippoVisual : CreatureVisualBase
         float height = eyePivotHeightOffset;
         float forward = eyePivotForwardOffset;
 
-        if (eyePivotL != null)
-            eyePivotL.localPosition = new Vector3(-side, height, forward);
+        eyeLBaseLocalPos = new Vector3(-side, height, forward);
+        eyeRBaseLocalPos = new Vector3(side, height, forward);
+        SetEyeLocalPositionsImmediate(eyeLBaseLocalPos, eyeRBaseLocalPos);
 
-        if (eyePivotR != null)
-            eyePivotR.localPosition = new Vector3(side, height, forward);
-
-        float uniformEyeScale = Mathf.Max(0.01f, eyeScale);
-        eyeBaseScale = new Vector3(uniformEyeScale, uniformEyeScale, uniformEyeScale);
+        eyeBaseScale = new Vector3(eyeScale, eyeScale, eyeScale);
         SetEyeScaleImmediate(eyeBaseScale);
 
-        float eyeballForward = Mathf.Max(0f, eyeBallForwardOffset);
-        eyeBaseLocalPos = new Vector3(0f, 0f, eyeballForward);
-        SetEyeLocalPositionImmediate(eyeBaseLocalPos);
-
         // Pupil values are expressed in eye local space (normalized to a unit sphere).
-        float uniformPupilScale = Mathf.Clamp(pupilScale, 0.05f, 0.85f);
-        pupilBaseScale = new Vector3(uniformPupilScale, uniformPupilScale, uniformPupilScale);
+        pupilBaseScale = new Vector3(pupilScale, pupilScale, pupilScale);
         SetPupilScaleImmediate(pupilBaseScale);
 
-        float pupilRadius = uniformPupilScale * 0.5f;
-        float maxPupilForward = Mathf.Max(0f, 0.5f - pupilRadius + 0.02f);
-        float pupilForward = Mathf.Clamp(pupilForwardOffset, 0f, maxPupilForward);
-        pupilBaseLocalPos = new Vector3(0f, 0f, pupilForward);
+        pupilBaseLocalPos = new Vector3(0f, 0f, pupilForwardOffset);
         SetPupilLocalPositionImmediate(pupilBaseLocalPos);
     }
 
