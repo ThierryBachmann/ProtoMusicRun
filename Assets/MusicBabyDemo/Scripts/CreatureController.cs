@@ -118,7 +118,7 @@ namespace MusicRun
         [Tooltip("Enable delayed apparition of the creature after level start.")]
         public bool enableDelayedSpawn = true;
         [Tooltip("Delay in seconds before the creature appears after level start.")]
-        [Range(0f, 30f)]
+        [Range(0f, 60f)]
         public float spawnDelay = 10f;
         [Tooltip("Spawn creature only once per run.")]
         public bool spawnOncePerRun = true;
@@ -159,27 +159,27 @@ namespace MusicRun
 
         [Header("HUNT Mode")]
         [Tooltip("Search radius to find nearby instruments.")]
-        [Range(1f, 120f)]
-        public float huntSearchRadius = 8f;
+        [Range(1f, 12f)]
+        public float huntSearchRadius = 5.3f;
         [Tooltip("Distance threshold to switch from HUNT to EAT_ATTACK.")]
         [Range(1f, 10f)]
-        public float huntReachDistance = 2f;
+        public float huntReachDistance = 3.6f;
         [Tooltip("Speed cap in HUNT and EAT approach.")]
-        [Range(0f, 80f)]
+        [Range(0f, 15f)]
         public float maxSpeedHunt = 10f;
         [Tooltip("Maximum forward lead allowed in HUNT before speed is reduced to keep pressure on player.")]
-        [Range(0.1f, 50f)]
-        public float huntMaxLeadDistance = 16f;
+        [Range(0.1f, 20f)]
+        public float huntMaxLeadDistance = 7.9f;
         [Tooltip("Player speed threshold for HUNT/RECENTER/WAIT_PLAYER -> FOLLOW transition.")]
         [FormerlySerializedAs("huntExitToFollowPlayerSpeed")]
         [Range(0f, 30f)]
         public float huntToFollowPlayerSpeedThreshold = 6.5f;
         [Tooltip("Minimum delay before EAT can start after entering HUNT (from OVERTAKE or EAT).")]
-        [Range(0f, 10f)]
+        [Range(0f, 60f)]
         public float huntMinDelayBetweenEat = 2f;
         [Tooltip("Reaction time used to update perceived player heading in HUNT (higher = slower creature response).")]
         [Range(0.01f, 5f)]
-        public float huntPlayerHeadingReactionTime = 1f;
+        public float huntPlayerHeadingReactionTime = 1.9f;
         [Tooltip("Physics layers included when scanning for instrument colliders.")]
         public LayerMask instrumentScanLayerMask = ~0;
 
@@ -236,7 +236,7 @@ namespace MusicRun
         public float accelMax = 20f;
         [Tooltip("Maximum deceleration.")]
         [Range(0f, 100f)]
-        public float brakeMax = 24f;
+        public float brakeMax = 16.8f;
         [Tooltip("Distance above which catch-up boost is added.")]
         [Range(0f, 200f)]
         public float catchupBoostDistance = 20f;
@@ -245,10 +245,10 @@ namespace MusicRun
         public float catchupBoost = 3f;
         [Tooltip("Maximum turning speed in degrees per second.")]
         [Range(0f, 1080f)]
-        public float turnRateDegPerSec = 45f;
+        public float turnRateDegPerSec = 139f;
         [Tooltip("Gravity applied to creature when airborne.")]
         [Range(0.01f, 100f)]
-        public float gravity = 10f;
+        public float gravity = 7.2f;
         [Tooltip("Small negative velocity to keep controller grounded.")]
         [Range(-10f, 0f)]
         public float groundedStickVelocity = -1f;
@@ -1388,7 +1388,27 @@ namespace MusicRun
             toTarget.y = 0f;
             float distance = toTarget.magnitude;
 
-            Vector3 moveDir = distance > 0.001f ? toTarget / distance : transform.forward;
+            Vector3 desiredMoveDir = distance > 0.001f ? toTarget / distance : transform.forward;
+            desiredMoveDir.y = 0f;
+            if (desiredMoveDir.sqrMagnitude > 0.0001f)
+                desiredMoveDir.Normalize();
+            else
+                desiredMoveDir = Vector3.forward;
+
+            Vector3 currentForward = transform.forward;
+            currentForward.y = 0f;
+            if (currentForward.sqrMagnitude > 0.0001f)
+                currentForward.Normalize();
+            else
+                currentForward = desiredMoveDir;
+
+            float maxTurnRadians = turnRateDegPerSec * Mathf.Deg2Rad * dt;
+            Vector3 moveDir = Vector3.RotateTowards(currentForward, desiredMoveDir, maxTurnRadians, 0f);
+            moveDir.y = 0f;
+            if (moveDir.sqrMagnitude > 0.0001f)
+                moveDir.Normalize();
+            else
+                moveDir = desiredMoveDir;
 
             float accel = desiredSpeed >= currentSpeed ? accelMax : brakeMax;
             currentSpeed = Mathf.MoveTowards(currentSpeed, desiredSpeed, accel * dt);
@@ -1418,8 +1438,7 @@ namespace MusicRun
             lookDir.y = 0f;
             if (lookDir.sqrMagnitude < 0.0001f)
             {
-                lookDir = moveDir;
-                lookDir.y = 0f;
+                lookDir = currentForward;
             }
 
             Vector3 desiredUp = GetDesiredUpVector(dt);
