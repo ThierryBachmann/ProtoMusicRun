@@ -36,7 +36,7 @@ State table (guards/actions/transitions)
   transitions:
     playerSpeed >= huntToFollowPlayerSpeedThreshold -> FOLLOW
     !hasTarget && headingAngle > huntRecenterHeadingAngleThreshold -> RECENTER
-    !hasTarget && leadDistance > huntMaxLeadDistance && headingAngle aligned -> WAIT_PLAYER
+    !hasTarget && leadDistance > huntMaxLeadDistance * waitPlayerEnterLeadRatio && headingAngle <= huntRecenterHeadingAngleThreshold * waitPlayerEnterHeadingRatio -> WAIT_PLAYER
     hasTarget && distanceToTarget <= huntReachDistance && eat cooldown elapsed -> EAT_ATTACK
 
 - RECENTER
@@ -47,11 +47,11 @@ State table (guards/actions/transitions)
 
 - WAIT_PLAYER
   entry: clear target/recenter lock
-  action: wait point in front of player (ratio on huntMaxLeadDistance), no lateral offset
+  action: rotate to face player ("watch player"), with very short move point and low speed so motion is limited to turning needs
   transitions:
-    playerSpeed >= huntToFollowPlayerSpeedThreshold -> FOLLOW
-    headingAngle > huntRecenterHeadingAngleThreshold -> RECENTER
-    leadDistance <= waitPlayerExitLeadRatio * huntMaxLeadDistance -> HUNT
+    stateTime >= waitPlayerMinDuration && playerSpeed >= huntToFollowPlayerSpeedThreshold -> FOLLOW
+    stateTime >= waitPlayerMinDuration && headingAngle > huntRecenterHeadingAngleThreshold * 2 -> RECENTER
+    stateTime >= waitPlayerMinDuration && leadDistance <= waitPlayerExitLeadRatio * huntMaxLeadDistance -> HUNT
 
 - EAT_ATTACK
   entry: lock target snapshot + reset jump trigger
@@ -89,7 +89,6 @@ Technical constraints
 using UnityEngine;
 using System.Text;
 using System.Collections.Generic;
-using UnityEngine.Serialization;
 
 namespace MusicRun
 {
@@ -136,7 +135,6 @@ namespace MusicRun
         [Range(0f, 80f)]
         public float maxSpeedFollow = 10f;
         [Tooltip("Player speed threshold for FOLLOW -> OVERTAKE transition.")]
-        [FormerlySerializedAs("PlayerSpeedThresholdForOvertake")]
         [Range(0f, 30f)]
         public float followToOvertakePlayerSpeedThreshold = 5.5f;
 
@@ -171,7 +169,6 @@ namespace MusicRun
         [Range(0.1f, 20f)]
         public float huntMaxLeadDistance = 7.9f;
         [Tooltip("Player speed threshold for HUNT/RECENTER/WAIT_PLAYER -> FOLLOW transition.")]
-        [FormerlySerializedAs("huntExitToFollowPlayerSpeed")]
         [Range(0f, 30f)]
         public float huntToFollowPlayerSpeedThreshold = 6.5f;
         [Tooltip("Minimum delay before EAT can start after entering HUNT (from OVERTAKE or EAT).")]
@@ -195,12 +192,18 @@ namespace MusicRun
         public float huntRecenterPointSmoothing = 13f;
 
         [Header("WAIT_PLAYER Mode")]
+        [Tooltip("Lead ratio used to enter WAIT_PLAYER from HUNT (0.85 means enter wait when lead > 85% of huntMaxLeadDistance).")]
+        [Range(0.5f, 1.5f)]
+        public float waitPlayerEnterLeadRatio = 0.85f;
+        [Tooltip("Heading alignment ratio used to enter WAIT_PLAYER from HUNT, relative to huntRecenterHeadingAngleThreshold (higher = easier WAIT entry).")]
+        [Range(0.1f, 1.5f)]
+        public float waitPlayerEnterHeadingRatio = 0.8f;
+        [Tooltip("Minimum duration (seconds) to remain in WAIT_PLAYER before it can return to HUNT.")]
+        [Range(0f, 5f)]
+        public float waitPlayerMinDuration = 1.5f;
         [Tooltip("Lead ratio used to exit WAIT_PLAYER and return to HUNT (0.7 means leave wait when lead <= 70% of huntMaxLeadDistance).")]
         [Range(0.1f, 1f)]
         public float waitPlayerExitLeadRatio = 0.7f;
-        [Tooltip("Desired lead ratio while in WAIT_PLAYER (lower values make the creature wait more aggressively).")]
-        [Range(0.1f, 1f)]
-        public float waitPlayerDesiredLeadRatio = 0.45f;
 
         [Header("EAT_ATTACK Mode")]
         [Tooltip("Duration of EAT_ATTACK state before fallback to recovery.")]
@@ -894,8 +897,8 @@ namespace MusicRun
             Vector3 huntForward = GetHuntReferenceForward();
             float headingAngle = GetHeadingAngleToForward(huntForward);
             float recenterEnterThreshold = huntRecenterHeadingAngleThreshold;
-            float recenterExitThreshold = recenterEnterThreshold * 0.5f;
-            float waitEnterLeadDistance = huntMaxLeadDistance;
+            float waitEnterHeadingThreshold = recenterEnterThreshold * waitPlayerEnterHeadingRatio;
+            float waitEnterLeadDistance = huntMaxLeadDistance * waitPlayerEnterLeadRatio;
             float leadDistance = GetPlayerOffsetAlongForward();
 
             if (!hasLockedTarget && headingAngle > recenterEnterThreshold)
@@ -906,7 +909,7 @@ namespace MusicRun
 
             if (!hasLockedTarget &&
                 leadDistance > waitEnterLeadDistance &&
-                headingAngle <= recenterExitThreshold)
+                headingAngle <= waitEnterHeadingThreshold)
             {
                 ChangeState(CreatureState.WAIT_PLAYER);
                 return;
@@ -978,7 +981,9 @@ namespace MusicRun
 
         private void TickWaitPlayer()
         {
-            if (GetPlayerSpeed() >= huntToFollowPlayerSpeedThreshold)
+            bool minWaitElapsed = stateTime >= waitPlayerMinDuration;
+
+            if (minWaitElapsed && GetPlayerSpeed() >= huntToFollowPlayerSpeedThreshold)
             {
                 ChangeState(CreatureState.FOLLOW);
                 return;
@@ -988,8 +993,8 @@ namespace MusicRun
 
             Vector3 huntForward = GetHuntReferenceForward();
             float headingAngle = GetHeadingAngleToForward(huntForward);
-            float recenterEnterThreshold = huntRecenterHeadingAngleThreshold;
-            if (headingAngle > recenterEnterThreshold)
+            float recenterEnterThreshold = huntRecenterHeadingAngleThreshold * 2f;
+            if (minWaitElapsed && headingAngle > recenterEnterThreshold)
             {
                 ChangeState(CreatureState.RECENTER);
                 return;
@@ -998,15 +1003,31 @@ namespace MusicRun
             float enterLeadDistance = huntMaxLeadDistance;
             float exitLeadDistance = enterLeadDistance * waitPlayerExitLeadRatio;
             float leadDistance = GetPlayerOffsetAlongForward();
-            if (leadDistance <= exitLeadDistance)
+            if (minWaitElapsed && leadDistance <= exitLeadDistance)
             {
                 ChangeState(CreatureState.HUNT);
                 return;
             }
 
-            float desiredLeadDistance = enterLeadDistance * waitPlayerDesiredLeadRatio;
-            desiredMovePoint = GetPointRelativeToPlayer(desiredLeadDistance, 0f, huntForward);
-            desiredSpeed = ComputeGapSpeed(desiredLeadDistance, maxSpeedHunt);
+            Vector3 toPlayer = playerController.transform.position - transform.position;
+            toPlayer.y = 0f;
+            if (toPlayer.sqrMagnitude < 0.0001f)
+            {
+                toPlayer = -transform.forward;
+                toPlayer.y = 0f;
+            }
+            if (toPlayer.sqrMagnitude < 0.0001f)
+                toPlayer = Vector3.back;
+            toPlayer.Normalize();
+
+            // WAIT_PLAYER behavior:
+            // keep displacement very short and only drive enough movement to rotate toward the player.
+            const float waitTurnLookDistance = 0.75f;
+            const float waitTurnMaxSpeed = 1.2f;
+            desiredMovePoint = transform.position + toPlayer * waitTurnLookDistance;
+
+            float headingToPlayer = GetHeadingAngleToForward(toPlayer);
+            desiredSpeed = waitTurnMaxSpeed * (headingToPlayer / 180f);
         }
 
         private void TickEatAttack()

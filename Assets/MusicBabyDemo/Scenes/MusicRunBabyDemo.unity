@@ -987,7 +987,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 85028200}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.35640007, y: 0, z: 0, w: 0.93433344}
+  m_LocalRotation: {x: 0.33635452, y: 0, z: 0, w: 0.94173545}
   m_LocalPosition: {x: 0.76, y: 0.95, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3717,7 +3717,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 311641385}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.013712879, y: 0, z: 0, w: 0.99990606}
+  m_LocalRotation: {x: 0.05696161, y: 0, z: 0, w: 0.9983764}
   m_LocalPosition: {x: 0, y: 1.02, z: 2.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6118,7 +6118,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 536374343}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.65192586, y: -0.05117376, z: -0.044172, w: 0.75526345}
+  m_LocalRotation: {x: 0.6527363, y: 0.03463526, z: 0.02989635, w: 0.7562024}
   m_LocalPosition: {x: 0, y: 0.96, z: -1.86}
   m_LocalScale: {x: 0.276, y: 0.52, z: 0.106}
   m_ConstrainProportionsScale: 0
@@ -9792,7 +9792,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 890017464}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.3564623, y: 0, z: 0, w: 0.9343097}
+  m_LocalRotation: {x: -0.33648282, y: 0, z: 0, w: 0.9416896}
   m_LocalPosition: {x: -0.76, y: 0.95, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -9829,7 +9829,7 @@ Transform:
   m_GameObject: {fileID: 897660802}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.22887565, y: 0, z: 0.27}
+  m_LocalPosition: {x: 0.03075735, y: 0, z: 0.27}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10678,7 +10678,7 @@ MonoBehaviour:
   huntSearchRadius: 5.3
   huntReachDistance: 3.6
   maxSpeedHunt: 10
-  huntMaxLeadDistance: 7.9
+  huntMaxLeadDistance: 12
   huntToFollowPlayerSpeedThreshold: 6.5
   huntMinDelayBetweenEat: 2
   huntPlayerHeadingReactionTime: 1.9
@@ -10688,8 +10688,9 @@ MonoBehaviour:
   huntRecenterHeadingAngleThreshold: 30
   recenterExitStableDuration: 0.2
   huntRecenterPointSmoothing: 13
+  waitPlayerEnterLeadRatio: 0.85
+  waitPlayerEnterHeadingRatio: 0.8
   waitPlayerExitLeadRatio: 0.7
-  waitPlayerDesiredLeadRatio: 0.45
   eatDuration: 0.6
   eatJumpHeight: 1.8
   eatContactDistance: 0.35
@@ -11205,7 +11206,7 @@ Transform:
   m_GameObject: {fileID: 1060174435}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.96135825, z: 0}
+  m_LocalPosition: {x: 0, y: 0.9576774, z: 0}
   m_LocalScale: {x: 2.8, y: 2.085, z: 3.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12911,7 +12912,7 @@ Transform:
   m_GameObject: {fileID: 1245499599}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.22887565, y: 0, z: 0.27}
+  m_LocalPosition: {x: 0.03075735, y: 0, z: 0.27}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15059,7 +15060,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1493697863}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.35640007, y: 0, z: 0, w: 0.93433344}
+  m_LocalRotation: {x: 0.33635452, y: 0, z: 0, w: 0.94173545}
   m_LocalPosition: {x: -0.76, y: 0.95, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -19072,7 +19073,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2074562498}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.3564623, y: 0, z: 0, w: 0.9343097}
+  m_LocalRotation: {x: -0.33648282, y: 0, z: 0, w: 0.9416896}
   m_LocalPosition: {x: 0.76, y: 0.95, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
