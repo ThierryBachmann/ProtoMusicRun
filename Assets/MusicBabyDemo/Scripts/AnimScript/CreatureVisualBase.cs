@@ -25,11 +25,10 @@ public abstract class CreatureVisualBase : MonoBehaviour
     [Tooltip("Play animation continuously in Edit Mode without entering Play mode (uses current State).")]
     public bool previewInEditMode = false;
 
-    [Header("Runtime Context (Debug)")]
-    [SerializeField] protected float runtimeSpeed;
-    [SerializeField] protected bool runtimeGrounded;
-    [SerializeField] protected bool runtimeHasTarget;
-    [SerializeField] protected Vector3 runtimeGroundNormal = Vector3.up;
+    [HideInInspector] [SerializeField] protected float runtimeSpeed;
+    [HideInInspector] [SerializeField] protected bool runtimeGrounded;
+    [HideInInspector] [SerializeField] protected bool runtimeHasTarget;
+    [HideInInspector] [SerializeField] protected Vector3 runtimeGroundNormal = Vector3.up;
 
     protected CreatureVisualState previousState;
     protected float stateTimer;
@@ -252,8 +251,6 @@ public abstract class ProceduralCreatureVisualBase : CreatureVisualBase
         EyeSclera,
         EyePupil,
         Mouth,
-        Accent1,
-        Accent2
     }
 
     // Species-specific material mapping (for example: body/sclera/mouth assignments).
