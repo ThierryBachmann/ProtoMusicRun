@@ -19,18 +19,11 @@ public enum CreatureVisualState
 
 public abstract class CreatureVisualBase : MonoBehaviour
 {
-    [Header("External State")]
-    [Tooltip("Visual state used by the animation graph (1:1 mapped from controller state when available).")]
+    [Header("Animation")]
+    [Tooltip("Current visual state used by animation. Runtime controller updates it in Play mode; in Edit mode, you can set it manually.")]
     public CreatureVisualState state = CreatureVisualState.Idle;
-
-    [Header("Editor Preview")]
-    [Tooltip("Play animation in Edit Mode without entering Play mode.")]
+    [Tooltip("Play animation continuously in Edit Mode without entering Play mode (uses current State).")]
     public bool previewInEditMode = false;
-    [Tooltip("Visual state forced while previewInEditMode is enabled.")]
-    public CreatureVisualState previewState = CreatureVisualState.WaitPlayer;
-    [Tooltip("Time scale used for edit-mode animation preview.")]
-    [Range(0.1f, 3f)]
-    public float previewTimeScale = 1f;
 
     [Header("Runtime Context (Debug)")]
     [SerializeField] protected float runtimeSpeed;
@@ -182,9 +175,6 @@ public abstract class CreatureVisualBase : MonoBehaviour
 
     protected CreatureVisualState GetAnimationState()
     {
-        if (IsEditModePreviewActive())
-            return previewState;
-
         return state;
     }
 
@@ -228,7 +218,7 @@ public abstract class CreatureVisualBase : MonoBehaviour
         if (dt <= 0f || dt > 0.25f)
             dt = 0.016f;
 
-        editPreviewDeltaTime = dt * previewTimeScale;
+        editPreviewDeltaTime = dt;
 
         BuildIfNeeded(false);
         HandleAnimationStateChanges();
