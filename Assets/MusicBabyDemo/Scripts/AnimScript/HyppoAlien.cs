@@ -145,8 +145,14 @@ public class HippoVisual : ProceduralCreatureVisualBase
     [Range(0f, 20f)] public float waitHeadYawSpeed = 1.8f;
     [Range(0f, 60f)] public float waitLegStompAngle = 6f;
     [Range(0f, 20f)] public float waitLegStompSpeed = 5f;
+    [Range(0f, 1f)] public float waitLegStompJitter = 0.35f;
     [Range(0f, 60f)] public float waitTailSwingAngle = 11f;
     [Range(0f, 60f)] public float waitMouthOpenBase = 8f;
+    [Range(0f, 90f)] public float waitMouthTalkAngle = 30f;
+    [Range(0f, 40f)] public float waitMouthTalkSpeed = 11f;
+    [Range(0f, 40f)] public float waitEyeDartSpeed = 14f;
+    [Range(0f, 1f)] public float waitEyeDartSnap = 0.75f;
+    [Range(0.5f, 2f)] public float waitEyeDartSideMultiplier = 1.15f;
 
     [Header("ANIMATION / Eyes")]
     [Range(0f, 75f)] public float eyeLookSideAngle = 35f;
@@ -789,10 +795,11 @@ public class HippoVisual : ProceduralCreatureVisualBase
 
         float t = Application.isPlaying ? Time.time : (float)System.DateTime.Now.TimeOfDay.TotalSeconds;
         float dt = DeltaTimeSafe();
+        CreatureVisualState animationState = GetAnimationState();
 
         ResetTowardBase(dt);
 
-        switch (state)
+        switch (animationState)
         {
             case CreatureVisualState.Idle:
                 AnimateIdle(t);
@@ -823,7 +830,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
                 break;
         }
 
-        UpdateEyes(t);
+        UpdateEyes(t, animationState);
     }
 
     private bool IsRigReady()
@@ -1066,17 +1073,24 @@ public class HippoVisual : ProceduralCreatureVisualBase
         float nod = Mathf.Sin(t * (waitHeadYawSpeed * 0.6f + 0.35f)) * (waitHeadYawAngle * 0.25f);
         headPivot.localRotation = headBaseLocalRot * Quaternion.Euler(nod, yaw, 0f);
 
-        float stomp = Mathf.Sin(t * waitLegStompSpeed) * waitLegStompAngle;
-        legFL.localRotation = Quaternion.Euler(stomp, 0f, 0f);
-        legFR.localRotation = Quaternion.Euler(-stomp, 0f, 0f);
-        legBL.localRotation = Quaternion.Euler(-stomp * 0.6f, 0f, 0f);
-        legBR.localRotation = Quaternion.Euler(stomp * 0.6f, 0f, 0f);
+        // "Trepigner": fast, slightly irregular alternating stomps.
+        float stompPhase = t * waitLegStompSpeed;
+        float frontRaw = Mathf.Sin(stompPhase) + Mathf.Sin(stompPhase * 2.35f + 1.1f) * waitLegStompJitter;
+        float backRaw = Mathf.Sin(stompPhase + Mathf.PI * 0.35f) + Mathf.Sin(stompPhase * 2.1f + 2.2f) * waitLegStompJitter;
+        float frontStomp = Mathf.Clamp(frontRaw, -1f, 1f) * waitLegStompAngle;
+        float backStomp = Mathf.Clamp(backRaw, -1f, 1f) * (waitLegStompAngle * 0.8f);
+
+        legFL.localRotation = Quaternion.Euler(frontStomp, 0f, 0f);
+        legFR.localRotation = Quaternion.Euler(-frontStomp, 0f, 0f);
+        legBL.localRotation = Quaternion.Euler(-backStomp, 0f, 0f);
+        legBR.localRotation = Quaternion.Euler(backStomp, 0f, 0f);
 
         float tailSwing = Mathf.Sin(t * (waitHeadYawSpeed + 0.55f)) * waitTailSwingAngle;
         tail.localRotation = tailBaseLocalRot * Quaternion.Euler(0f, tailSwing, 0f);
 
-        float mouthPulse = 0.5f + 0.5f * Mathf.Sin(t * 3.8f);
-        float mouthOpen = waitMouthOpenBase + mouthPulse * (mouthOpenAngle * 0.18f);
+        // Angry "talking": wide and quick jaw cycles.
+        float mouthPulse = 0.5f + 0.5f * Mathf.Sin(t * waitMouthTalkSpeed);
+        float mouthOpen = waitMouthOpenBase + mouthPulse * waitMouthTalkAngle;
         jawPivot.localRotation = jawBaseLocalRot * Quaternion.Euler(mouthOpen, 0f, 0f);
     }
 
@@ -1088,11 +1102,23 @@ public class HippoVisual : ProceduralCreatureVisualBase
         jawPivot.localRotation = jawBaseLocalRot * Quaternion.Euler(mouthOpenAngle * 0.08f, 0f, 0f);
     }
 
-    private void UpdateEyes(float t)
+    private void UpdateEyes(float t, CreatureVisualState animationState)
     {
-        if (IsEyesTrackingState(state))
+        if (IsEyesTrackingState(animationState))
         {
-            float lookPhase = Mathf.Sin(t * eyeLookSpeed);
+            float lookPhase;
+            float sideMultiplier = 1f;
+            if (animationState == CreatureVisualState.WaitPlayer)
+            {
+                float raw = Mathf.Sin(t * waitEyeDartSpeed);
+                float snapped = raw >= 0f ? 1f : -1f;
+                lookPhase = Mathf.Lerp(raw, snapped, waitEyeDartSnap);
+                sideMultiplier = waitEyeDartSideMultiplier;
+            }
+            else
+            {
+                lookPhase = Mathf.Sin(t * eyeLookSpeed);
+            }
 
             float eyeRadius = 0.5f;
             float appliedPupilScale = pupilBaseScale.sqrMagnitude > 0.000001f ? pupilBaseScale.x : pupilScale;
@@ -1100,7 +1126,9 @@ public class HippoVisual : ProceduralCreatureVisualBase
             float maxTravelOnSclera = (eyeRadius - pupilRadius) * 0.95f;
             float minTravel = pupilLookSideOffset;
             float angleFactor = Mathf.Sin(eyeLookSideAngle * Mathf.Deg2Rad);
-            float sideAmplitude = Mathf.Lerp(minTravel, maxTravelOnSclera, angleFactor);
+            float sideAmplitude = Mathf.Lerp(minTravel, maxTravelOnSclera, angleFactor) * sideMultiplier;
+            if (sideAmplitude > maxTravelOnSclera)
+                sideAmplitude = maxTravelOnSclera;
             float pupilSide = lookPhase * sideAmplitude;
             Vector3 pupilPos = pupilBaseLocalPos + new Vector3(pupilSide, 0f, 0f);
             SetPupilLocalPositionImmediate(pupilPos);

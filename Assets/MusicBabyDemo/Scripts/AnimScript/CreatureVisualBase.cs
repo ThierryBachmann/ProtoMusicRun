@@ -1,4 +1,7 @@
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public enum CreatureVisualState
 {
@@ -20,6 +23,15 @@ public abstract class CreatureVisualBase : MonoBehaviour
     [Tooltip("Visual state used by the animation graph (1:1 mapped from controller state when available).")]
     public CreatureVisualState state = CreatureVisualState.Idle;
 
+    [Header("Editor Preview")]
+    [Tooltip("Play animation in Edit Mode without entering Play mode.")]
+    public bool previewInEditMode = false;
+    [Tooltip("Visual state forced while previewInEditMode is enabled.")]
+    public CreatureVisualState previewState = CreatureVisualState.WaitPlayer;
+    [Tooltip("Time scale used for edit-mode animation preview.")]
+    [Range(0.1f, 3f)]
+    public float previewTimeScale = 1f;
+
     [Header("Runtime Context (Debug)")]
     [SerializeField] protected float runtimeSpeed;
     [SerializeField] protected bool runtimeGrounded;
@@ -29,6 +41,10 @@ public abstract class CreatureVisualBase : MonoBehaviour
     protected CreatureVisualState previousState;
     protected float stateTimer;
     protected bool materialsDirty = true;
+    protected float editPreviewDeltaTime = 0.016f;
+#if UNITY_EDITOR
+    private double editorLastUpdateTime;
+#endif
 
     protected virtual void Start()
     {
@@ -42,6 +58,18 @@ public abstract class CreatureVisualBase : MonoBehaviour
         materialsDirty = true;
         BuildIfNeeded(false);
         SyncPreviousState();
+#if UNITY_EDITOR
+        editorLastUpdateTime = EditorApplication.timeSinceStartup;
+        EditorApplication.update -= OnEditorUpdate;
+        EditorApplication.update += OnEditorUpdate;
+#endif
+    }
+
+    protected virtual void OnDisable()
+    {
+#if UNITY_EDITOR
+        EditorApplication.update -= OnEditorUpdate;
+#endif
     }
 
     protected virtual void OnValidate()
@@ -52,18 +80,13 @@ public abstract class CreatureVisualBase : MonoBehaviour
 
     protected virtual void Update()
     {
+        if (!Application.isPlaying && IsEditModePreviewActive())
+            return;
+
         BuildIfNeeded(false);
-
+        HandleAnimationStateChanges();
         if (Application.isPlaying)
-        {
-            if (previousState != state)
-            {
-                OnStateChanged(previousState, state);
-                previousState = state;
-            }
-
             stateTimer += Time.deltaTime;
-        }
 
         UpdateAnimation();
     }
@@ -83,7 +106,7 @@ public abstract class CreatureVisualBase : MonoBehaviour
         }
         else
         {
-            previousState = newState;
+            previousState = GetAnimationState();
         }
     }
 
@@ -137,7 +160,7 @@ public abstract class CreatureVisualBase : MonoBehaviour
 
     protected void SyncPreviousState()
     {
-        previousState = state;
+        previousState = GetAnimationState();
         stateTimer = 0f;
     }
 
@@ -148,8 +171,74 @@ public abstract class CreatureVisualBase : MonoBehaviour
 
     protected float DeltaTimeSafe()
     {
-        return Application.isPlaying ? Time.deltaTime : 0.016f;
+        if (Application.isPlaying)
+            return Time.deltaTime;
+
+        if (IsEditModePreviewActive())
+            return editPreviewDeltaTime;
+
+        return 0.016f;
     }
+
+    protected CreatureVisualState GetAnimationState()
+    {
+        if (IsEditModePreviewActive())
+            return previewState;
+
+        return state;
+    }
+
+    protected bool IsEditModePreviewActive()
+    {
+#if UNITY_EDITOR
+        return !Application.isPlaying && previewInEditMode;
+#else
+        return false;
+#endif
+    }
+
+    protected void HandleAnimationStateChanges()
+    {
+        CreatureVisualState currentAnimationState = GetAnimationState();
+        if (previousState == currentAnimationState)
+            return;
+
+        OnStateChanged(previousState, currentAnimationState);
+        previousState = currentAnimationState;
+    }
+
+#if UNITY_EDITOR
+    private void OnEditorUpdate()
+    {
+        if (Application.isPlaying)
+            return;
+        if (!isActiveAndEnabled)
+            return;
+
+        if (!IsEditModePreviewActive())
+        {
+            editorLastUpdateTime = EditorApplication.timeSinceStartup;
+            return;
+        }
+
+        double now = EditorApplication.timeSinceStartup;
+        float dt = (float)(now - editorLastUpdateTime);
+        editorLastUpdateTime = now;
+
+        if (dt <= 0f || dt > 0.25f)
+            dt = 0.016f;
+
+        editPreviewDeltaTime = dt * previewTimeScale;
+
+        BuildIfNeeded(false);
+        HandleAnimationStateChanges();
+        stateTimer += editPreviewDeltaTime;
+        UpdateAnimation();
+
+        EditorApplication.QueuePlayerLoopUpdate();
+        SceneView.RepaintAll();
+    }
+#endif
 
     protected abstract void BuildIfNeeded(bool force);
     protected abstract void UpdateAnimation();
