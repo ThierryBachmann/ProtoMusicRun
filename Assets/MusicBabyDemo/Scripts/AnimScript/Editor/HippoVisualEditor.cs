@@ -30,34 +30,34 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "animation",
             "Animation",
-            "Etat visuel courant et preview dans l'editeur. En Play mode, le controller pilote automatiquement l'etat.",
+            "Current visual state and edit-mode preview. In Play mode, the controller drives this automatically.",
             true,
             "state",
             "previewInEditMode"),
         new SectionDefinition(
             "structure_global",
             "STRUCTURE / Global",
-            "Echelle globale de la creature procedurale.",
+            "Global scale for the procedural creature.",
             true,
             "overallScale"),
         new SectionDefinition(
             "structure_body_head",
             "STRUCTURE / Body & Head",
-            "Volume general du corps et de la tete.",
+            "Overall body and head volume proportions.",
             true,
             "bodyHeightFactor",
             "headVolumeFactor"),
         new SectionDefinition(
             "structure_ears",
             "STRUCTURE / Ears",
-            "Largeur et placement des oreilles sur la tete.",
+            "Ear width and placement on the head.",
             false,
             "earWidthFactor",
             "earPlacementOffset"),
         new SectionDefinition(
             "structure_tail",
             "STRUCTURE / Tail",
-            "Position, orientation et forme de la queue (ellipsoide).",
+            "Tail position, orientation, and ellipsoid shape.",
             false,
             "tailSideOffset",
             "tailHeightOffset",
@@ -69,7 +69,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "structure_mouth",
             "STRUCTURE / Mouth",
-            "Parametres couples Upper/Lower jaw: dimensions, offsets, pivot et angle de base.",
+            "Coupled upper/lower jaw parameters: dimensions, offsets, pivot, and base pitch.",
             false,
             "heightJaw",
             "ratioHeightUpperToLowerJaw",
@@ -87,7 +87,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "structure_legs",
             "STRUCTURE / Legs",
-            "Geometrie des pattes: upper, ankle, foot et hauteur d'ancrage.",
+            "Leg geometry: upper, ankle, foot, and body attachment height.",
             false,
             "upperLegThickness",
             "upperLegLength",
@@ -98,7 +98,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "structure_eyes",
             "STRUCTURE / Eyes Geometry",
-            "Position et taille des yeux/pupilles dans la tete.",
+            "Eye and pupil position/size inside the head.",
             false,
             "eyePivotSideOffset",
             "eyePivotHeightOffset",
@@ -109,7 +109,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "structure_collision",
             "STRUCTURE / Collision",
-            "Politique collider: suppression des colliders de parties generees et trigger auto sur la racine.",
+            "Collider policy: remove colliders on generated parts and auto-fit one root trigger sphere.",
             false,
             "removeGeneratedPartColliders",
             "autoStructureTriggerCollider",
@@ -119,13 +119,13 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "structure_attachment",
             "STRUCTURE / Attachment",
-            "Contraintes d'ancrage visuel par rapport au parent (utile sur pentes).",
+            "Visual anchoring constraints relative to parent (useful on slopes).",
             false,
             "lockLocalXZToParent"),
         new SectionDefinition(
             "materials",
             "Materials",
-            "Materiaux explicites par slot visuel.",
+            "Explicit materials by visual slot.",
             false,
             "bodyMaterial",
             "earMaterial",
@@ -136,7 +136,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "fallback_colors",
             "Fallback Colors",
-            "Couleurs utilisees quand aucun materiau n'est assigne pour un slot.",
+            "Colors used when no material is assigned for a slot.",
             false,
             "fallbackBodyColor",
             "fallbackEarColor",
@@ -147,7 +147,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "coupling",
             "COUPLING / Movement-Driven Gait",
-            "Couplage animation/deplacement reel: la phase de foullee avance selon la distance parcourue.",
+            "Animation/movement coupling: gait phase advances from real traveled distance.",
             false,
             "driveChasePhaseFromDisplacement",
             "chaseMinDisplacement",
@@ -155,7 +155,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "anim_idle",
             "ANIMATION / Idle",
-            "Respiration, hochement de tete et balancement de queue au repos.",
+            "Idle breathing, head nod, and tail sway.",
             false,
             "idleBreathSpeed",
             "idleBreathAmount",
@@ -165,7 +165,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "anim_chase",
             "ANIMATION / Chase",
-            "Animation locomotion pour Follow/Overtake/Hunt/Recenter/LeashReturn.",
+            "Locomotion animation for Follow/Overtake/Hunt/Recenter/LeashReturn.",
             false,
             "animateWalk",
             "walkCycleSpeed",
@@ -177,7 +177,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "anim_wait",
             "ANIMATION / Wait Player",
-            "Animation creature impatiente: trepignement, bouche qui 'parle' et yeux agaces.",
+            "Impatient creature behavior: leg stomps, talking mouth, and irritated eyes.",
             false,
             "waitBodyBobAmount",
             "waitBodyBobSpeed",
@@ -199,7 +199,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "anim_eat_attack",
             "ANIMATION / Eat Attack",
-            "Pose et dynamique de bond vers la cible.",
+            "Attack leap pose and timing toward target.",
             false,
             "eatAnimDuration",
             "eatJumpHeight",
@@ -210,7 +210,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "anim_eat_recovery",
             "ANIMATION / Eat Recovery",
-            "Pose d'atterrissage et recuperation d'inertie apres l'attaque.",
+            "Landing pose and post-attack inertia recovery.",
             false,
             "eatRecoveryMouthOpenAngle",
             "eatRecoveryGlobalPitch",
@@ -219,7 +219,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "anim_stunned",
             "ANIMATION / Stunned",
-            "Oscillation et expression de creature sonnee.",
+            "Shake and facial pose when stunned.",
             false,
             "stunnedShakeAngle",
             "stunnedShakeSpeed",
@@ -227,7 +227,7 @@ public class HippoVisualEditor : Editor
         new SectionDefinition(
             "debug",
             "Debug",
-            "Aides de debug visuelles.",
+            "Visual debug helpers.",
             false,
             "drawDebug"),
     };
@@ -251,11 +251,11 @@ public class HippoVisualEditor : Editor
         using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
         {
             EditorGUILayout.LabelField("Hippo Visual", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("Style MPTK: sections pliables, aide contextuelle et actions rapides.", EditorStyles.miniLabel);
+            EditorGUILayout.LabelField("Tune creature structure, part layout, materials, and per-mode animation from one inspector.", EditorStyles.miniLabel);
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                if (GUILayout.Button(new GUIContent("Rebuild Visual", "Reconstruit completement la creature procedurale."), GUILayout.Height(20f)))
+                if (GUILayout.Button(new GUIContent("Rebuild Visual", "Fully rebuilds the procedural creature hierarchy."), GUILayout.Height(20f)))
                     RebuildSelectedVisuals();
 
                 GUILayout.FlexibleSpace();

@@ -50,7 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a961e00736ac0524381a885d7c43c7b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: MusicRun::HippoVisual
-  state: 5
+  state: 7
   previewInEditMode: 1
   runtimeSpeed: 0
   runtimeGrounded: 0
@@ -128,21 +128,21 @@ MonoBehaviour:
   chaseMouthOpenAngle: 35
   waitBodyBobAmount: 0.137
   waitBodyBobSpeed: 2.4
-  waitHeadYawAngle: 27.5
+  waitHeadYawAngle: 16.8
   waitHeadYawSpeed: 1.8
-  waitLegStompAngle: 9.7
-  waitLegStompSpeed: 10.83
-  waitLegStompJitter: 0.693
-  waitTailSwingAngle: 33.4
-  waitMouthOpenBase: 0
-  waitMouthTalkAngle: 7.8
-  waitMouthTalkSpeed: 14.4
-  waitEyeLookSideAngle: 75
+  waitLegStompAngle: 4.1
+  waitLegStompSpeed: 5
+  waitLegStompJitter: 0.115
+  waitTailSwingAngle: 11
+  waitMouthOpenBase: 26.1
+  waitMouthTalkAngle: 12
+  waitMouthTalkSpeed: 11.5
+  waitEyeLookSideAngle: 35
   waitEyeLookSpeed: 2.2
-  waitPupilLookSideOffset: 0.1744
-  waitEyeDartSpeed: 5.6
-  waitEyeDartSnap: 0.123
-  waitEyeDartSideMultiplier: 1.438
+  waitPupilLookSideOffset: 0.08
+  waitEyeDartSpeed: 10.4
+  waitEyeDartSnap: 0.065
+  waitEyeDartSideMultiplier: 1.687
   eatAnimDuration: 0.75
   eatJumpHeight: 0.45
   eatForwardStretch: 0.18
