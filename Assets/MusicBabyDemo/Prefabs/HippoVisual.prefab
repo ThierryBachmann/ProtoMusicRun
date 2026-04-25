@@ -50,10 +50,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a961e00736ac0524381a885d7c43c7b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: MusicRun::HippoVisual
-  state: 0
+  state: 7
   previewInEditMode: 1
-  previewState: 5
-  previewTimeScale: 1
   runtimeSpeed: 0
   runtimeGrounded: 0
   runtimeHasTarget: 0
@@ -113,7 +111,9 @@ MonoBehaviour:
   fallbackScleraColor: {r: 0.92, g: 0.94, b: 0.97, a: 1}
   fallbackPupilColor: {r: 0.08, g: 0.08, b: 0.08, a: 1}
   fallbackMouthColor: {r: 0.55, g: 0.22, b: 0.915, a: 1}
-  mouthOpenAngle: 64.4
+  driveChasePhaseFromDisplacement: 1
+  chaseMinDisplacement: 0.0005
+  chaseMaxDisplacementPerFrame: 1.25
   idleBreathSpeed: 1.6
   idleBreathAmount: 0.03
   idleHeadNodAngle: 1.5
@@ -125,9 +125,7 @@ MonoBehaviour:
   bodyBobAmount: 0.05
   headSwingAngle: 3
   tailSwingAngle: 14
-  driveChasePhaseFromDisplacement: 1
-  chaseMinDisplacement: 0.0005
-  chaseMaxDisplacementPerFrame: 1.25
+  chaseMouthOpenAngle: 35
   waitBodyBobAmount: 0.137
   waitBodyBobSpeed: 2.4
   waitHeadYawAngle: 16.8
@@ -136,29 +134,28 @@ MonoBehaviour:
   waitLegStompSpeed: 5
   waitLegStompJitter: 0.115
   waitTailSwingAngle: 11
-  waitMouthOpenBase: 0
+  waitMouthOpenBase: 26.1
   waitMouthTalkAngle: 12
   waitMouthTalkSpeed: 11.5
+  waitEyeLookSideAngle: 35
+  waitEyeLookSpeed: 2.2
+  waitPupilLookSideOffset: 0.08
   waitEyeDartSpeed: 10.4
   waitEyeDartSnap: 0.065
   waitEyeDartSideMultiplier: 1.687
-  eyeLookSideAngle: 35
-  eyeLookSpeed: 2.2
-  pupilLookSideOffset: 0.08
   eatAnimDuration: 0.75
   eatJumpHeight: 0.45
   eatForwardStretch: 0.18
   eatLegFoldAngle: 50
+  eatAttackMouthOpenAngle: 35
   eatAttackGlobalPitch: 20
-  eatRecoveryGlobalPitch: -20
-  eatRecoveryPitchBlendDuration: 0.25
+  eatRecoveryMouthOpenAngle: 6.2
+  eatRecoveryGlobalPitch: -25.9
+  eatRecoveryPitchBlendDuration: 0.388
   eatRecoveryLegForwardAngle: 45
-  eatStretchY: 1.12
-  eatSquashXZ: 0.92
-  landSquashY: 0.9
-  landStretchXZ: 1.06
   stunnedShakeAngle: 10
   stunnedShakeSpeed: 20
+  stunnedMouthOpenAngle: 35
   drawDebug: 0
 --- !u!114 &2974779550678929248
 MonoBehaviour:
@@ -609,7 +606,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1550184300604313489}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.008624154, y: 0, z: 0, w: 0.9999628}
+  m_LocalRotation: {x: -0.34599322, y: 0, z: 0, w: 0.938237}
   m_LocalPosition: {x: 0.76, y: 0.95, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -732,7 +729,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1973878922370113640}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.035971813, y: -0.13010263, z: -0.0047233095, w: 0.99083656}
+  m_LocalRotation: {x: -0.08330406, y: -0.15599541, z: -0.0130147645, w: 0.9841527}
   m_LocalPosition: {x: 0, y: 1.02, z: 2.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -948,7 +945,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2878650626028959164}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.22410068, y: 0, z: 0, w: 0.97456604}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1164,7 +1161,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3783847477108259196}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.018561604, y: 0, z: 0, w: 0.99982774}
+  m_LocalRotation: {x: -0.4187796, y: 0, z: 0, w: 0.9080879}
   m_LocalPosition: {x: 0.76, y: 0.95, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1765,7 +1762,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5624385889384196623}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.018561604, y: 0, z: 0, w: 0.99982774}
+  m_LocalRotation: {x: -0.34599322, y: 0, z: 0, w: 0.938237}
   m_LocalPosition: {x: -0.76, y: 0.95, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2422,7 +2419,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7475844024651509701}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.008624154, y: 0, z: 0, w: 0.9999628}
+  m_LocalRotation: {x: -0.4187796, y: 0, z: 0, w: 0.9080879}
   m_LocalPosition: {x: -0.76, y: 0.95, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
