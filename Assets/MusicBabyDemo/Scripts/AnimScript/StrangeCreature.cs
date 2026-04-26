@@ -8,15 +8,15 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     [Range(0.25f, 5f)] public float overallScale = 1f;
 
     [Header("STRUCTURE / Body")]
-    [Range(0.1f, 3f)] public float bodyWidthFactor = 1f;
-    [Range(0.1f, 3f)] public float bodyHeightFactor = 1.3f;
-    [Range(0.1f, 3f)] public float bodyLengthFactor = 1f;
-    [Tooltip("Rear part width factor (left/right rear body lobes).")]
-    [Range(0.1f, 3f)] public float rearBodyWidthFactor = 1f;
-    [Tooltip("Rear part height factor (left/right rear body lobes).")]
-    [Range(0.1f, 3f)] public float rearBodyHeightFactor = 1f;
-    [Tooltip("Rear part length factor (left/right rear body lobes).")]
-    [Range(0.1f, 3f)] public float rearBodyLengthFactor = 1f;
+    [Range(0.1f, 3f)] public float bodyWidth = 1f;
+    [Range(0.1f, 3f)] public float bodyHeight = 1.3f;
+    [Range(0.1f, 3f)] public float bodyLength = 1f;
+    [Tooltip("Rear part width (left/right rear body lobes).")]
+    [Range(0.1f, 3f)] public float rearBodyWidth = 1f;
+    [Tooltip("Rear part height (left/right rear body lobes).")]
+    [Range(0.1f, 3f)] public float rearBodyHeight = 1f;
+    [Tooltip("Rear part length (left/right rear body lobes).")]
+    [Range(0.1f, 3f)] public float rearBodyLength = 1f;
     [Tooltip("Rear anchors side separation ratio from body half-width.")]
     [Range(0f, 1.5f)] public float rearBodySeparationRatio = 0.34f;
     [Tooltip("Rear anchors height ratio relative to body half-height. 0 = body center, 1 = top, -1 = bottom.")]
@@ -25,18 +25,18 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     [Range(0f, 1.2f)] public float rearBodyAnchorLengthRatio = 0.72f;
 
     [Header("STRUCTURE / Head")]
-    [Range(0.1f, 3f)] public float headWidthFactor = 1.2f;
-    [Range(0.1f, 3f)] public float headHeightFactor = 1.2f;
-    [Range(0.1f, 3f)] public float headLengthFactor = 1.2f;
+    [Range(0.1f, 3f)] public float headWidth = 1.2f;
+    [Range(0.1f, 3f)] public float headHeight = 1.2f;
+    [Range(0.1f, 3f)] public float headLength = 1.2f;
     [Tooltip("Head anchor height relative to body half-height above body center. 0 = centered on body Y, 1 = top of body.")]
     [Range(-0.5f, 1.5f)] public float headAnchorHeightRatio = 0.072f;
     [Tooltip("Extra forward offset from the body front boundary.")]
     [Range(-1f, 2f)] public float headAnchorForwardOffset = 0.30f;
 
     [Header("STRUCTURE / Ears")]
-    [Range(0.1f, 3f)] public float earWidthFactor = 1.3f;
-    [Range(0.1f, 3f)] public float earHeightFactor = 1f;
-    [Range(0.1f, 3f)] public float earLengthFactor = 1f;
+    [Range(0.1f, 1f)] public float earWidth = 1.3f;
+    [Range(0.1f, 1f)] public float earHeight = 1f;
+    [Range(0.1f, 1f)] public float earLength = 1f;
     [Tooltip("Ear anchor height relative to head half-height. 0 = centered on head Y, 1 = top of head.")]
     [Range(-0.5f, 1.5f)] public float earAnchorHeightRatio = 0.52f;
     [Tooltip("Extra forward offset for both ear anchors in head local space.")]
@@ -44,28 +44,30 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     [Tooltip("Ear spacing ratio from head half-width. Higher value increases distance between ears.")]
     [Range(0f, 2f)] public float earSeparationRatio = 0.47f;
 
-    [Header("STRUCTURE / Tail")]
-    [Tooltip("Tail anchor side offset in body local space.")]
-    [Range(-2f, 2f)] public float tailAnchorSideOffset = 0f;
-    [Tooltip("Tail anchor height relative to body half-height. 0 = centered on body Y.")]
-    [Range(-1.5f, 1.5f)] public float tailAnchorHeightRatio = 0.051f;
-    [Tooltip("Extra forward/backward offset from body back boundary (negative moves backward).")]
-    [Range(-2f, 2f)] public float tailAnchorForwardOffset = -0.15f;
-    [Range(0f, 180f)] public float tailPitchDegrees = 90f;
-    [Tooltip("Tail dimension on local X (1 = isotropic part scale on X).")]
-    [Range(0.01f, 3f)] public float tailRadiusX = 0.12f;
-    [Tooltip("Tail dimension on local Z (1 = isotropic part scale on Z).")]
-    [Range(0.01f, 3f)] public float tailRadiusZ = 0.12f;
-    [Tooltip("Tail dimension on local Y before pitch rotation (1 = isotropic part scale on Y).")]
-    [Range(0.01f, 3f)] public float tailLength = 0.44f;
+
+    [Header("STRUCTURE / Eyes")]
+    [Range(0.1f, 1f)] public float eyeWidth = 1f;
+    [Range(0.1f, 1f)] public float eyeHeight = 1f;
+    [Range(0.1f, 1f)] public float eyeLength = 1f;
+    [Tooltip("Eye spacing ratio from head half-width.")]
+    [Range(0f, 2f)] public float eyeSeparationRatio = 0.483f;
+    [Tooltip("Eye anchor height ratio relative to head half-height. 0 = head center, 1 = top of head.")]
+    [Range(-1f, 1.5f)] public float eyeAnchorHeightRatio = 0.348f;
+    [Tooltip("Extra forward offset from the head front boundary.")]
+    [Range(-1f, 1f)] public float eyeAnchorForwardOffset = -0.10f;
+    [Tooltip("Pupil size ratio relative to eye size (0.5 = half-eye diameter).")]
+    [Range(0.05f, 1.0f)] public float pupilScale = 0.48f;
+    [Tooltip("Pupil center forward offset in eye local space (0=center, 0.5=eye surface).")]
+    [Range(0f, 0.9f)] public float pupilForwardOffset = 0.27f;
+
 
     [Header("STRUCTURE / Mouth")]
     [Tooltip("Lower jaw width (1 = isotropic scale on X).")]
-    [Range(0.1f, 8f)] public float jawWidth = 1.65f;
+    [Range(0.1f, 1f)] public float jawWidth = 1.65f;
     [Tooltip("Lower jaw height (1 = isotropic scale on Y).")]
-    [Range(0.1f, 4f)] public float jawHeight = 0.32f;
+    [Range(0.1f, 1f)] public float jawHeight = 0.32f;
     [Tooltip("Lower jaw length (1 = isotropic scale on Z).")]
-    [Range(0.1f, 6f)] public float jawLength = 0.92f;
+    [Range(0.1f, 3f)] public float jawLength = 0.92f;
     [Range(0.2f, 5f)] public float jawWidthUpperToLowerRatio = 1.03f;
     [Range(0.2f, 5f)] public float jawHeightUpperToLowerRatio = 1.5f;
     [Range(0.2f, 5f)] public float jawLengthUpperToLowerRatio = 1.087f;
@@ -91,20 +93,18 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     [Range(0.1f, 2f)] public float footHeight = 0.38f;
     [Range(0.1f, 3f)] public float footWidth = 0.84f;
 
-    [Header("STRUCTURE / Eyes")]
-    [Range(0.1f, 3f)] public float eyeWidthFactor = 1f;
-    [Range(0.1f, 3f)] public float eyeHeightFactor = 1f;
-    [Range(0.1f, 3f)] public float eyeLengthFactor = 1f;
-    [Tooltip("Eye spacing ratio from head half-width.")]
-    [Range(0f, 2f)] public float eyeSeparationRatio = 0.483f;
-    [Tooltip("Eye anchor height ratio relative to head half-height. 0 = head center, 1 = top of head.")]
-    [Range(-1f, 1.5f)] public float eyeAnchorHeightRatio = 0.348f;
-    [Tooltip("Extra forward offset from the head front boundary.")]
-    [Range(-1f, 1f)] public float eyeAnchorForwardOffset = -0.10f;
-    [Tooltip("Pupil size ratio relative to eye size (0.5 = half-eye diameter).")]
-    [Range(0.05f, 1.0f)] public float pupilScale = 0.48f;
-    [Tooltip("Pupil center forward offset in eye local space (0=center, 0.5=eye surface).")]
-    [Range(0f, 0.9f)] public float pupilForwardOffset = 0.27f;
+    [Header("STRUCTURE / Tail")]
+    [Range(0.01f, 0.5f)] public float tailWidth = 0.12f;
+    [Range(0.01f, 0.5f)] public float tailHeight = 0.12f;
+    [Range(0.01f, 3f)] public float tailLength = 0.44f;
+    [Tooltip("Tail anchor side offset in body local space.")]
+    [Range(-2f, 2f)] public float tailAnchorSideOffset = 0f;
+    [Tooltip("Tail anchor height relative to body half-height. 0 = centered on body Y.")]
+    [Range(-1.5f, 1.5f)] public float tailAnchorHeightRatio = 0.051f;
+    [Tooltip("Extra forward/backward offset from body back boundary (negative moves backward).")]
+    [Range(-2f, 2f)] public float tailAnchorForwardOffset = -0.15f;
+    [Range(0f, 180f)] public float tailPitchDegrees = 90f;
+
 
     [Header("STRUCTURE / Collision")]
     [Tooltip("Remove physical colliders from generated visual parts. CharacterController remains the unique movement collider.")]
@@ -256,6 +256,8 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
     private Vector3 bodyBaseLocalPos;
     private Vector3 bodyBaseLocalScale;
+    private Vector3 rearBodyAnchorLBaseLocalPos;
+    private Vector3 rearBodyAnchorRBaseLocalPos;
     private Quaternion headBaseLocalRot;
     private Quaternion tailBaseLocalRot;
     private Quaternion jawBaseLocalRot;
@@ -437,18 +439,18 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         // Dimensions are absolute per-axis scale values.
         // With Width/Height/Length = 1,1,1 this part is isotropic (sphere/cube depending on detail mode).
         return new Vector3(
-            bodyWidthFactor,
-            bodyHeightFactor,
-            bodyLengthFactor);
+            bodyWidth,
+            bodyHeight,
+            bodyLength);
     }
 
     private Vector3 ResolveRearBodyLocalScale(Vector3 bodyLocalScale)
     {
         // Rear body dimensions are absolute too (same isotropic behavior as other Width/Height/Length groups).
         return new Vector3(
-            rearBodyWidthFactor,
-            rearBodyHeightFactor,
-            rearBodyLengthFactor);
+            rearBodyWidth,
+            rearBodyHeight,
+            rearBodyLength);
     }
 
     private void ResolveRearBodyAnchorLocalPositions(Vector3 bodyLocalPos, Vector3 bodyLocalScale, out Vector3 leftLocalPos, out Vector3 rightLocalPos)
@@ -468,17 +470,14 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private Vector3 ResolveHeadLocalScale()
     {
         return new Vector3(
-            headWidthFactor,
-            headHeightFactor,
-            headLengthFactor);
+            headWidth,
+            headHeight,
+            headLength);
     }
 
     private Vector3 ResolveEarLocalScale()
     {
-        return new Vector3(
-            earWidthFactor,
-            earHeightFactor,
-            earLengthFactor);
+        return new Vector3(earWidth, earHeight, earLength);
     }
 
     private void ResolveEarAnchorLocalPositions(Vector3 headLocalScale, out Vector3 leftLocalPos, out Vector3 rightLocalPos)
@@ -495,10 +494,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
     private Vector3 ResolveEyeLocalScale()
     {
-        return new Vector3(
-            eyeWidthFactor,
-            eyeHeightFactor,
-            eyeLengthFactor);
+        return new Vector3(eyeWidth, eyeHeight, eyeLength);
     }
 
     private void ResolveEyeAnchorLocalPositions(Vector3 headLocalScale, out Vector3 leftLocalPos, out Vector3 rightLocalPos)
@@ -572,20 +568,25 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         return Mathf.Clamp(legPairCount, 0, 6);
     }
 
+    private float ResolveClampedLegAnchorSideAbs(Vector3 bodyLocalScale)
+    {
+        float bodyHalfX = bodyLocalScale.x * 0.5f;
+        if (bodyHalfX <= 0.0001f)
+            return 0f;
+
+        // Keep anchors inside the body footprint on X so the Z distribution remains meaningful.
+        float maxInsideSide = bodyHalfX * 0.95f;
+        return Mathf.Min(Mathf.Abs(legAnchorSideOffset), maxInsideSide);
+    }
+
     private float ResolveLegPairForward(int pairIndex, Vector3 bodyLocalPos, Vector3 bodyLocalScale)
     {
         int pairCount = ResolveLegPairCount();
         if (pairCount <= 1)
             return bodyLocalPos.z;
 
-        // Compute usable Z span from body ellipse at the current side offset.
-        // This keeps anchors inside body silhouette when side offset increases.
-        float bodyHalfX = bodyLocalScale.x * 0.5f;
         float bodyHalfZ = bodyLocalScale.z * 0.5f;
-        float xRatio = bodyHalfX > 0.0001f ? Mathf.Abs(legAnchorSideOffset) / bodyHalfX : 1f;
-        xRatio = Mathf.Clamp01(xRatio);
-        float ellipseZFactor = Mathf.Sqrt(Mathf.Max(0f, 1f - (xRatio * xRatio)));
-        float usableHalfZ = bodyHalfZ * ellipseZFactor * legAnchorLengthRatio;
+        float usableHalfZ = bodyHalfZ * legAnchorLengthRatio;
 
         float t = pairIndex / (float)(pairCount - 1);
         float front = bodyLocalPos.z + usableHalfZ;
@@ -597,7 +598,8 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     {
         float bodyHalfY = bodyLocalScale.y * 0.5f;
         float y = bodyLocalPos.y + (bodyHalfY * legAnchorHeightRatio);
-        float x = sideSign < 0 ? -legAnchorSideOffset : legAnchorSideOffset;
+        float sideAbs = ResolveClampedLegAnchorSideAbs(bodyLocalScale);
+        float x = sideSign < 0 ? -sideAbs : sideAbs;
         float z = ResolveLegPairForward(pairIndex, bodyLocalPos, bodyLocalScale);
         return new Vector3(x, y, z);
     }
@@ -846,6 +848,12 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             bodyBaseLocalPos = body.localPosition;
             bodyBaseLocalScale = body.localScale;
         }
+
+        if (rearBodyAnchorL != null)
+            rearBodyAnchorLBaseLocalPos = rearBodyAnchorL.localPosition;
+
+        if (rearBodyAnchorR != null)
+            rearBodyAnchorRBaseLocalPos = rearBodyAnchorR.localPosition;
 
         if (headPivot != null)
             headBaseLocalRot = headPivot.localRotation;
@@ -1228,7 +1236,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
                 legRoot.localRotation = Quaternion.Slerp(legRoot.localRotation, Quaternion.identity, 8f * dt);
         }
 
-        body.localPosition = Vector3.Lerp(body.localPosition, bodyBaseLocalPos, 8f * dt);
+        SetBodyClusterLocalPosition(Vector3.Lerp(body.localPosition, bodyBaseLocalPos, 8f * dt));
         body.localScale = Vector3.Lerp(body.localScale, bodyBaseLocalScale, 8f * dt);
 
         headPivot.localRotation = Quaternion.Slerp(headPivot.localRotation, headBaseLocalRot, 8f * dt);
@@ -1242,7 +1250,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private void AnimateIdle(float t)
     {
         float breath = Mathf.Sin(t * idleBreathSpeed) * idleBreathAmount;
-        body.localPosition = bodyBaseLocalPos + new Vector3(0f, breath, 0f);
+        SetBodyClusterLocalPosition(bodyBaseLocalPos + new Vector3(0f, breath, 0f));
 
         float headNod = Mathf.Sin(t * idleHeadNodSpeed) * idleHeadNodAngle;
         headPivot.localRotation = headBaseLocalRot * Quaternion.Euler(headNod, 0f, 0f);
@@ -1275,7 +1283,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             }
 
             float bob = Mathf.Abs(Mathf.Sin(phase * 1.2f)) * appliedBodyBob;
-            body.localPosition = bodyBaseLocalPos + new Vector3(0f, bob, 0f);
+            SetBodyClusterLocalPosition(bodyBaseLocalPos + new Vector3(0f, bob, 0f));
 
             float headSwing = Mathf.Sin(phase) * appliedHeadSwing;
             headPivot.localRotation = headBaseLocalRot * Quaternion.Euler(headSwing, 0f, 0f);
@@ -1384,7 +1392,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private void AnimateEatAttackPose(float t)
     {
         // Keep body anchored: jump motion is handled by controller movement.
-        body.localPosition = bodyBaseLocalPos;
+        SetBodyClusterLocalPosition(bodyBaseLocalPos);
         body.localScale = bodyBaseLocalScale;
 
         // Unity local X rotation is positive when pitching down.
@@ -1410,7 +1418,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
     private void AnimateEatRecoveryPose(float t)
     {
-        body.localPosition = bodyBaseLocalPos;
+        SetBodyClusterLocalPosition(bodyBaseLocalPos);
         body.localScale = bodyBaseLocalScale;
 
         // Same convention as EAT_ATTACK: + = up, - = down from inspector values.
@@ -1450,7 +1458,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private void AnimateWaitPlayer(float t)
     {
         float bob = Mathf.Abs(Mathf.Sin(t * waitBodyBobSpeed)) * waitBodyBobAmount;
-        body.localPosition = bodyBaseLocalPos + new Vector3(0f, bob, 0f);
+        SetBodyClusterLocalPosition(bodyBaseLocalPos + new Vector3(0f, bob, 0f));
 
         float yaw = Mathf.Sin(t * waitHeadYawSpeed) * waitHeadYawAngle;
         float nod = Mathf.Sin(t * (waitHeadYawSpeed * 0.6f + 0.35f)) * (waitHeadYawAngle * 0.25f);
@@ -1488,6 +1496,20 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         bool pairEven = (leg.pairIndex & 1) == 0;
         bool isRight = leg.sideSign > 0;
         return pairEven ^ isRight ? 1f : -1f;
+    }
+
+    private void SetBodyClusterLocalPosition(Vector3 bodyLocalPosition)
+    {
+        if (body != null)
+            body.localPosition = bodyLocalPosition;
+
+        Vector3 bodyOffset = bodyLocalPosition - bodyBaseLocalPos;
+
+        if (rearBodyAnchorL != null)
+            rearBodyAnchorL.localPosition = rearBodyAnchorLBaseLocalPos + bodyOffset;
+
+        if (rearBodyAnchorR != null)
+            rearBodyAnchorR.localPosition = rearBodyAnchorRBaseLocalPos + bodyOffset;
     }
 
     private void AnimateStunned(float t)
@@ -1631,6 +1653,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
         if (rearBodyAnchorL != null)
         {
+            rearBodyAnchorLBaseLocalPos = rearAnchorPosL;
             rearBodyAnchorL.localPosition = rearAnchorPosL;
             rearBodyAnchorL.localRotation = Quaternion.identity;
             rearBodyAnchorL.localScale = Vector3.one;
@@ -1638,6 +1661,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
         if (rearBodyAnchorR != null)
         {
+            rearBodyAnchorRBaseLocalPos = rearAnchorPosR;
             rearBodyAnchorR.localPosition = rearAnchorPosR;
             rearBodyAnchorR.localRotation = Quaternion.identity;
             rearBodyAnchorR.localScale = Vector3.one;
@@ -2059,7 +2083,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private Vector3 GetTailEllipsoidScale()
     {
         // Tail dimensions are direct local scales per axis (same convention as other Width/Height/Length groups).
-        return new Vector3(tailRadiusX, tailLength, tailRadiusZ);
+        return new Vector3(tailWidth, tailLength, tailHeight);
     }
 
     // Live-update ear transforms from inspector parameters.
