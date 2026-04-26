@@ -47,19 +47,19 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     [Range(0.05f, 3f)] public float tailLength = 0.22f;
 
     [Header("STRUCTURE / Mouth")]
-    [Range(0.1f, 4f)] public float heightJaw = 0.8f;
-    [Range(0.2f, 5f)] public float ratioHeightUpperToLowerJaw = 1.5f;
-    [Range(0.1f, 6f)] public float lengthJaw = 1.92f;
-    [Range(0.2f, 5f)] public float ratioLengthUpperToLowerJaw = 1.087f;
-    [Range(0.1f, 8f)] public float widthJaw = 3.35f;
-    [Range(0.2f, 5f)] public float ratioWidthUpperToLowerJaw = 1.03f;
-    [Range(-4f, 4f)] public float offsetHeightJaw = -0.34f;
-    [Range(0.2f, 5f)] public float ratioOffsetHeightUpperToLowerJaw = 1.125f;
-    [Range(-4f, 4f)] public float offsetForwardJaw = 1.28f;
-    [Range(0.2f, 5f)] public float ratioOffsetForwardUpperToLowerJaw = 1.783f;
-    [Range(-2f, 2f)] public float offsetPivotHeightJaw = -0.1f;
-    [Range(-2f, 2f)] public float offsetPivotForwardJaw = 0.38f;
-    [Range(-45f, 45f)] public float basePitchJaw = 0f;
+    [Range(0.1f, 8f)] public float jawWidth = 3.35f;
+    [Range(0.1f, 4f)] public float jawHeight = 0.8f;
+    [Range(0.1f, 6f)] public float jawLength = 1.92f;
+    [Range(0.2f, 5f)] public float jawWidthUpperToLowerRatio = 1.03f;
+    [Range(0.2f, 5f)] public float jawHeightUpperToLowerRatio = 1.5f;
+    [Range(0.2f, 5f)] public float jawLengthUpperToLowerRatio = 1.087f;
+    [Tooltip("Vertical separation between upper and lower jaws at rest.")]
+    [Range(-2f, 2f)] public float jawVerticalSeparation = 0f;
+    [Tooltip("Mouth anchor height ratio relative to head half-height.")]
+    [Range(-1.5f, 1.5f)] public float jawAnchorHeightRatio = -0.45f;
+    [Tooltip("Extra forward offset from the head front boundary.")]
+    [Range(-1f, 1f)] public float jawAnchorForwardOffset = -0.20f;
+    [Range(-45f, 45f)] public float jawBasePitch = 0f;
 
     [Header("STRUCTURE / Legs")]
     [Range(0.1f, 2f)] public float upperLegThickness = 0.60f;
@@ -69,15 +69,16 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     [Range(0.1f, 2f)] public float footHeight = 0.38f;
     [Range(0.1f, 3f)] public float footWidth = 0.84f;
 
-    [Header("STRUCTURE / Eyes Geometry")]
-    [Tooltip("Horizontal offset of eyes from head center.")]
-    [Range(0f, 2f)] public float eyePivotSideOffset = 0.58f;
-    [Tooltip("Vertical offset of eyes from head center.")]
-    [Range(-1f, 2f)] public float eyePivotHeightOffset = 0.24f;
-    [Tooltip("Forward offset of eyes from head center. Increase to pull eyes out of the head.")]
-    [Range(-1f, 2f)] public float eyePivotForwardOffset = 0.92f;
-    [Tooltip("Uniform eye sphere scale.")]
-    [Range(0.01f, 2f)] public float eyeScale = 0.82f;
+    [Header("STRUCTURE / Eyes")]
+    [Range(0.1f, 3f)] public float eyeWidthFactor = 1f;
+    [Range(0.1f, 3f)] public float eyeHeightFactor = 1f;
+    [Range(0.1f, 3f)] public float eyeLengthFactor = 1f;
+    [Tooltip("Eye spacing ratio from head half-width.")]
+    [Range(0f, 2f)] public float eyeSeparationRatio = 0.483f;
+    [Tooltip("Eye anchor height ratio relative to head half-height. 0 = head center, 1 = top of head.")]
+    [Range(-1f, 1.5f)] public float eyeAnchorHeightRatio = 0.348f;
+    [Tooltip("Extra forward offset from the head front boundary.")]
+    [Range(-1f, 1f)] public float eyeAnchorForwardOffset = -0.10f;
     [Tooltip("Pupil size ratio relative to eye size (0.5 = half-eye diameter).")]
     [Range(0.05f, 1.0f)] public float pupilScale = 0.48f;
     [Tooltip("Pupil center forward offset in eye local space (0=center, 0.5=eye surface).")]
@@ -201,6 +202,9 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private const float DefaultHeadScaleX = 2.0f;
     private const float DefaultHeadScaleY = 1.15f;
     private const float DefaultHeadScaleZ = 1.7f;
+    private const float DefaultEyeScaleX = 0.82f;
+    private const float DefaultEyeScaleY = 0.82f;
+    private const float DefaultEyeScaleZ = 0.82f;
 
     private Transform root;
     private Transform visualRoot;
@@ -209,6 +213,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private Transform headAnchor;
     private Transform headPivot;
     private Transform head;
+    private Transform mouthAnchor;
     private Transform upperJaw;
     private Transform jawPivot;
     private Transform lowerJaw;
@@ -218,6 +223,8 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private Transform earR;
     private Transform tailAnchor;
     private Transform tail;
+    private Transform eyeAnchorL;
+    private Transform eyeAnchorR;
     private Transform legFL;
     private Transform legFR;
     private Transform legBL;
@@ -370,10 +377,23 @@ public class StrangeCreature : ProceduralCreatureVisualBase
                body != null &&
                headAnchor != null &&
                tailAnchor != null &&
+               eyeAnchorL != null &&
+               eyeAnchorR != null &&
                headPivot != null &&
                headPivot.parent == headAnchor &&
+               mouthAnchor != null &&
                tail != null &&
-               tail.parent == tailAnchor;
+               tail.parent == tailAnchor &&
+               upperJaw != null &&
+               upperJaw.parent == mouthAnchor &&
+               jawPivot != null &&
+               jawPivot.parent == mouthAnchor &&
+               lowerJaw != null &&
+               lowerJaw.parent == jawPivot &&
+               eyeL != null &&
+               eyeR != null &&
+               eyeL.parent == eyeAnchorL &&
+               eyeR.parent == eyeAnchorR;
     }
 
     private static Vector3 ResolveBodyLocalPosition()
@@ -417,6 +437,27 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         rightLocalPos = new Vector3(side, y, z);
     }
 
+    private Vector3 ResolveEyeLocalScale()
+    {
+        return new Vector3(
+            DefaultEyeScaleX * eyeWidthFactor,
+            DefaultEyeScaleY * eyeHeightFactor,
+            DefaultEyeScaleZ * eyeLengthFactor);
+    }
+
+    private void ResolveEyeAnchorLocalPositions(Vector3 headLocalScale, out Vector3 leftLocalPos, out Vector3 rightLocalPos)
+    {
+        float headHalfX = headLocalScale.x * 0.5f;
+        float headHalfY = headLocalScale.y * 0.5f;
+        float headHalfZ = headLocalScale.z * 0.5f;
+        float side = headHalfX * eyeSeparationRatio;
+        float y = headHalfY * eyeAnchorHeightRatio;
+        float z = headHalfZ + eyeAnchorForwardOffset;
+
+        leftLocalPos = new Vector3(-side, y, z);
+        rightLocalPos = new Vector3(side, y, z);
+    }
+
     private Vector3 ResolveHeadAnchorLocalPosition(Vector3 bodyLocalPos, Vector3 bodyLocalScale)
     {
         float bodyHalfY = bodyLocalScale.y * 0.5f;
@@ -426,6 +467,17 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             0f,
             bodyLocalPos.y + (bodyHalfY * headAnchorHeightRatio),
             bodyLocalPos.z + bodyHalfZ + headAnchorForwardOffset);
+    }
+
+    private Vector3 ResolveMouthAnchorLocalPosition(Vector3 headLocalScale)
+    {
+        float headHalfY = headLocalScale.y * 0.5f;
+        float headHalfZ = headLocalScale.z * 0.5f;
+
+        return new Vector3(
+            0f,
+            headHalfY * jawAnchorHeightRatio,
+            headHalfZ + jawAnchorForwardOffset);
     }
 
     private Vector3 ResolveTailAnchorLocalPosition(Vector3 bodyLocalPos, Vector3 bodyLocalScale)
@@ -629,8 +681,17 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         if (headPivot != null)
         {
             head = headPivot.Find("Head");
-            upperJaw = headPivot.Find("UpperJaw");
-            jawPivot = headPivot.Find("JawPivot");
+            mouthAnchor = headPivot.Find("MouthAnchor");
+            if (mouthAnchor != null)
+            {
+                upperJaw = mouthAnchor.Find("UpperJaw");
+                jawPivot = mouthAnchor.Find("JawPivot");
+            }
+            else
+            {
+                upperJaw = headPivot.Find("UpperJaw");
+                jawPivot = headPivot.Find("JawPivot");
+            }
             earAnchorL = headPivot.Find("EarAnchor_L");
             earAnchorR = headPivot.Find("EarAnchor_R");
             if (earAnchorL != null)
@@ -641,8 +702,16 @@ public class StrangeCreature : ProceduralCreatureVisualBase
                 earL = headPivot.Find("Ear_L");
             if (earR == null)
                 earR = headPivot.Find("Ear_R");
-            eyeL = headPivot.Find("Eye_L");
-            eyeR = headPivot.Find("Eye_R");
+            eyeAnchorL = headPivot.Find("EyeAnchor_L");
+            eyeAnchorR = headPivot.Find("EyeAnchor_R");
+            if (eyeAnchorL != null)
+                eyeL = eyeAnchorL.Find("Eye_L");
+            if (eyeAnchorR != null)
+                eyeR = eyeAnchorR.Find("Eye_R");
+            if (eyeL == null)
+                eyeL = headPivot.Find("Eye_L");
+            if (eyeR == null)
+                eyeR = headPivot.Find("Eye_R");
 
             if (jawPivot != null)
                 lowerJaw = jawPivot.Find("LowerJaw");
@@ -730,6 +799,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         headAnchor = null;
         headPivot = null;
         head = null;
+        mouthAnchor = null;
         upperJaw = null;
         jawPivot = null;
         lowerJaw = null;
@@ -739,6 +809,8 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         earR = null;
         tailAnchor = null;
         tail = null;
+        eyeAnchorL = null;
+        eyeAnchorR = null;
         legFL = null;
         legFR = null;
         legBL = null;
@@ -817,54 +889,64 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             out float lowerJawResolvedHeight,
             out float upperJawResolvedLength,
             out float lowerJawResolvedLength);
-        ResolveJawOffsets(
-            out float upperJawResolvedHeightOffset,
-            out float lowerJawResolvedHeightOffset,
-            out float upperJawResolvedForwardOffset,
-            out float lowerJawResolvedForwardOffset);
+        ResolveJawVerticalOffsets(out float upperJawYOffset, out float lowerJawYOffset);
+
+        mouthAnchor = CreateNode("MouthAnchor", headPivot);
+        mouthAnchor.localPosition = ResolveMouthAnchorLocalPosition(headLocalScale);
+        mouthAnchor.localRotation = Quaternion.identity;
+        mouthAnchor.localScale = Vector3.one;
 
         upperJaw = CreatePart(
             "UpperJaw",
             PrimitiveType.Sphere,
-            headPivot,
-            new Vector3(0f, upperJawResolvedHeightOffset, upperJawResolvedForwardOffset),
+            mouthAnchor,
+            new Vector3(0f, upperJawYOffset, 0f),
             Vector3.zero,
             new Vector3(upperJawResolvedWidth, upperJawResolvedHeight, upperJawResolvedLength),
             CreatureMaterialSlot.Mouth);
 
-        jawPivot = CreateNode("JawPivot", headPivot);
-        jawPivot.localPosition = new Vector3(0f, offsetPivotHeightJaw, offsetPivotForwardJaw);
-        jawPivot.localRotation = Quaternion.Euler(basePitchJaw, 0f, 0f);
+        jawPivot = CreateNode("JawPivot", mouthAnchor);
+        jawPivot.localPosition = Vector3.zero;
+        jawPivot.localRotation = Quaternion.Euler(jawBasePitch, 0f, 0f);
 
         lowerJaw = CreatePart(
             "LowerJaw",
             PrimitiveType.Sphere,
             jawPivot,
-            new Vector3(0f, lowerJawResolvedHeightOffset, lowerJawResolvedForwardOffset),
+            new Vector3(0f, lowerJawYOffset, 0f),
             Vector3.zero,
             new Vector3(lowerJawResolvedWidth, lowerJawResolvedHeight, lowerJawResolvedLength),
             CreatureMaterialSlot.Mouth);
 
-        float eyeSide = Mathf.Abs(eyePivotSideOffset);
-        float eyeHeight = eyePivotHeightOffset;
-        float eyeForward = eyePivotForwardOffset;
+        Vector3 eyeLocalScale = ResolveEyeLocalScale();
+        ResolveEyeAnchorLocalPositions(headLocalScale, out Vector3 eyeAnchorPosL, out Vector3 eyeAnchorPosR);
+
+        eyeAnchorL = CreateNode("EyeAnchor_L", headPivot);
+        eyeAnchorL.localPosition = eyeAnchorPosL;
+        eyeAnchorL.localRotation = Quaternion.identity;
+        eyeAnchorL.localScale = Vector3.one;
+
+        eyeAnchorR = CreateNode("EyeAnchor_R", headPivot);
+        eyeAnchorR.localPosition = eyeAnchorPosR;
+        eyeAnchorR.localRotation = Quaternion.identity;
+        eyeAnchorR.localScale = Vector3.one;
 
         eyeL = CreatePart(
             "Eye_L",
             PrimitiveType.Sphere,
-            headPivot,
-            new Vector3(-eyeSide, eyeHeight, eyeForward),
+            eyeAnchorL,
             Vector3.zero,
-            new Vector3(eyeScale, eyeScale, eyeScale),
+            Vector3.zero,
+            eyeLocalScale,
             CreatureMaterialSlot.EyeSclera);
 
         eyeR = CreatePart(
             "Eye_R",
             PrimitiveType.Sphere,
-            headPivot,
-            new Vector3(eyeSide, eyeHeight, eyeForward),
+            eyeAnchorR,
             Vector3.zero,
-            new Vector3(eyeScale, eyeScale, eyeScale),
+            Vector3.zero,
+            eyeLocalScale,
             CreatureMaterialSlot.EyeSclera);
 
         pupilL = CreatePart(
@@ -1464,11 +1546,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             out float lowerJawHeight,
             out float upperJawLength,
             out float lowerJawLength);
-        ResolveJawOffsets(
-            out float upperJawHeightOffset,
-            out float lowerJawHeightOffset,
-            out float upperJawForwardOffset,
-            out float lowerJawForwardOffset);
+        ResolveJawVerticalOffsets(out float upperJawYOffset, out float lowerJawYOffset);
 
         Vector3 min = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
         Vector3 max = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
@@ -1481,14 +1559,19 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         EncapsulateAabb(ref min, ref max, bodyLocalPos, bodyLocalScale);
         EncapsulateAabb(ref min, ref max, headPivotPos, headLocalScale);
 
-        EncapsulateAabb(ref min, ref max, headPivotPos + new Vector3(0f, upperJawHeightOffset, upperJawForwardOffset), new Vector3(upperJawWidth, upperJawHeight, upperJawLength));
-        Vector3 jawPivotPos = headPivotPos + new Vector3(0f, offsetPivotHeightJaw, offsetPivotForwardJaw);
-        EncapsulateAabb(ref min, ref max, jawPivotPos + new Vector3(0f, lowerJawHeightOffset, lowerJawForwardOffset), new Vector3(lowerJawWidth, lowerJawHeight, lowerJawLength));
+        Vector3 mouthAnchorPos = headPivotPos + ResolveMouthAnchorLocalPosition(headLocalScale);
+        EncapsulateAabb(ref min, ref max, mouthAnchorPos + new Vector3(0f, upperJawYOffset, 0f), new Vector3(upperJawWidth, upperJawHeight, upperJawLength));
+        EncapsulateAabb(ref min, ref max, mouthAnchorPos + new Vector3(0f, lowerJawYOffset, 0f), new Vector3(lowerJawWidth, lowerJawHeight, lowerJawLength));
 
         ResolveEarAnchorLocalPositions(headLocalScale, out Vector3 earAnchorPosL, out Vector3 earAnchorPosR);
         Vector3 earSize = ResolveEarLocalScale();
         EncapsulateAabb(ref min, ref max, headPivotPos + earAnchorPosL, earSize);
         EncapsulateAabb(ref min, ref max, headPivotPos + earAnchorPosR, earSize);
+
+        ResolveEyeAnchorLocalPositions(headLocalScale, out Vector3 eyeAnchorPosL, out Vector3 eyeAnchorPosR);
+        Vector3 eyeSize = ResolveEyeLocalScale();
+        EncapsulateAabb(ref min, ref max, headPivotPos + eyeAnchorPosL, eyeSize);
+        EncapsulateAabb(ref min, ref max, headPivotPos + eyeAnchorPosR, eyeSize);
 
         Vector3 tailAnchorPos = ResolveTailAnchorLocalPosition(bodyLocalPos, bodyLocalScale);
         EncapsulateAabb(ref min, ref max, tailAnchorPos, GetTailEllipsoidScale());
@@ -1555,28 +1638,33 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             out float lowerJawResolvedHeight,
             out float upperJawResolvedLength,
             out float lowerJawResolvedLength);
-        ResolveJawOffsets(
-            out float upperJawResolvedHeightOffset,
-            out float lowerJawResolvedHeightOffset,
-            out float upperJawResolvedForwardOffset,
-            out float lowerJawResolvedForwardOffset);
+        ResolveJawVerticalOffsets(out float upperJawYOffset, out float lowerJawYOffset);
+
+        Vector3 headLocalScale = ResolveHeadLocalScale();
 
         if (upperJaw != null)
         {
-            upperJaw.localPosition = new Vector3(0f, upperJawResolvedHeightOffset, upperJawResolvedForwardOffset);
+            upperJaw.localPosition = new Vector3(0f, upperJawYOffset, 0f);
             upperJaw.localScale = new Vector3(upperJawResolvedWidth, upperJawResolvedHeight, upperJawResolvedLength);
+        }
+
+        if (mouthAnchor != null)
+        {
+            mouthAnchor.localPosition = ResolveMouthAnchorLocalPosition(headLocalScale);
+            mouthAnchor.localRotation = Quaternion.identity;
+            mouthAnchor.localScale = Vector3.one;
         }
 
         if (jawPivot != null)
         {
-            jawPivot.localPosition = new Vector3(0f, offsetPivotHeightJaw, offsetPivotForwardJaw);
-            jawBaseLocalRot = Quaternion.Euler(basePitchJaw, 0f, 0f);
+            jawPivot.localPosition = Vector3.zero;
+            jawBaseLocalRot = Quaternion.Euler(jawBasePitch, 0f, 0f);
             jawPivot.localRotation = jawBaseLocalRot;
         }
 
         if (lowerJaw != null)
         {
-            lowerJaw.localPosition = new Vector3(0f, lowerJawResolvedHeightOffset, lowerJawResolvedForwardOffset);
+            lowerJaw.localPosition = new Vector3(0f, lowerJawYOffset, 0f);
             lowerJaw.localScale = new Vector3(lowerJawResolvedWidth, lowerJawResolvedHeight, lowerJawResolvedLength);
         }
     }
@@ -1589,19 +1677,16 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         out float upperLength,
         out float lowerLength)
     {
-        SplitUpperLowerByRatio(widthJaw, ratioWidthUpperToLowerJaw, out upperWidth, out lowerWidth);
-        SplitUpperLowerByRatio(heightJaw, ratioHeightUpperToLowerJaw, out upperHeight, out lowerHeight);
-        SplitUpperLowerByRatio(lengthJaw, ratioLengthUpperToLowerJaw, out upperLength, out lowerLength);
+        SplitUpperLowerByRatio(jawWidth, jawWidthUpperToLowerRatio, out upperWidth, out lowerWidth);
+        SplitUpperLowerByRatio(jawHeight, jawHeightUpperToLowerRatio, out upperHeight, out lowerHeight);
+        SplitUpperLowerByRatio(jawLength, jawLengthUpperToLowerRatio, out upperLength, out lowerLength);
     }
 
-    private void ResolveJawOffsets(
-        out float upperHeightOffset,
-        out float lowerHeightOffset,
-        out float upperForwardOffset,
-        out float lowerForwardOffset)
+    private void ResolveJawVerticalOffsets(out float upperYOffset, out float lowerYOffset)
     {
-        SplitUpperLowerByRatio(offsetHeightJaw, ratioOffsetHeightUpperToLowerJaw, out upperHeightOffset, out lowerHeightOffset);
-        SplitUpperLowerByRatio(offsetForwardJaw, ratioOffsetForwardUpperToLowerJaw, out upperForwardOffset, out lowerForwardOffset);
+        float halfSeparation = jawVerticalSeparation * 0.5f;
+        upperYOffset = halfSeparation;
+        lowerYOffset = -halfSeparation;
     }
 
     private static void SplitUpperLowerByRatio(
@@ -1766,15 +1851,52 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     // This is intentionally separate from full rig rebuild for fast iteration.
     private void ApplyEyePlacement()
     {
-        float side = Mathf.Abs(eyePivotSideOffset);
-        float height = eyePivotHeightOffset;
-        float forward = eyePivotForwardOffset;
+        if (headPivot != null)
+        {
+            if (eyeAnchorL == null)
+                eyeAnchorL = headPivot.Find("EyeAnchor_L");
+            if (eyeAnchorR == null)
+                eyeAnchorR = headPivot.Find("EyeAnchor_R");
 
-        eyeLBaseLocalPos = new Vector3(-side, height, forward);
-        eyeRBaseLocalPos = new Vector3(side, height, forward);
+            if (eyeL == null)
+            {
+                if (eyeAnchorL != null)
+                    eyeL = eyeAnchorL.Find("Eye_L");
+                if (eyeL == null)
+                    eyeL = headPivot.Find("Eye_L");
+            }
+
+            if (eyeR == null)
+            {
+                if (eyeAnchorR != null)
+                    eyeR = eyeAnchorR.Find("Eye_R");
+                if (eyeR == null)
+                    eyeR = headPivot.Find("Eye_R");
+            }
+        }
+
+        Vector3 headLocalScale = ResolveHeadLocalScale();
+        ResolveEyeAnchorLocalPositions(headLocalScale, out Vector3 eyeAnchorPosL, out Vector3 eyeAnchorPosR);
+
+        if (eyeAnchorL != null)
+        {
+            eyeAnchorL.localPosition = eyeAnchorPosL;
+            eyeAnchorL.localRotation = Quaternion.identity;
+            eyeAnchorL.localScale = Vector3.one;
+        }
+
+        if (eyeAnchorR != null)
+        {
+            eyeAnchorR.localPosition = eyeAnchorPosR;
+            eyeAnchorR.localRotation = Quaternion.identity;
+            eyeAnchorR.localScale = Vector3.one;
+        }
+
+        eyeLBaseLocalPos = Vector3.zero;
+        eyeRBaseLocalPos = Vector3.zero;
         SetEyeLocalPositionsImmediate(eyeLBaseLocalPos, eyeRBaseLocalPos);
 
-        eyeBaseScale = new Vector3(eyeScale, eyeScale, eyeScale);
+        eyeBaseScale = ResolveEyeLocalScale();
         SetEyeScaleImmediate(eyeBaseScale);
 
         // Pupil values are expressed in eye local space (normalized to a unit sphere).
