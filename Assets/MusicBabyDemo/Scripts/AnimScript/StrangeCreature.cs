@@ -1,24 +1,43 @@
 using UnityEngine;
 
 [ExecuteAlways]
-public class HippoVisual : ProceduralCreatureVisualBase
+public class StrangeCreature : ProceduralCreatureVisualBase
 {
     [Header("STRUCTURE / Global")]
     [Range(0.25f, 5f)] public float overallScale = 1f;
 
-    [Header("STRUCTURE / Body & Head")]
+    [Header("STRUCTURE / Body")]
+    [Range(0.1f, 3f)] public float bodyWidthFactor = 1f;
     [Range(0.1f, 3f)] public float bodyHeightFactor = 1.3f;
-    [Range(0.1f, 3f)] public float headVolumeFactor = 1.2f;
+    [Range(0.1f, 3f)] public float bodyLengthFactor = 1f;
+
+    [Header("STRUCTURE / Head")]
+    [Range(0.1f, 3f)] public float headWidthFactor = 1.2f;
+    [Range(0.1f, 3f)] public float headHeightFactor = 1.2f;
+    [Range(0.1f, 3f)] public float headLengthFactor = 1.2f;
+    [Tooltip("Head anchor height relative to body half-height above body center. 0 = centered on body Y, 1 = top of body.")]
+    [Range(-0.5f, 1.5f)] public float headAnchorHeightRatio = 0.072f;
+    [Tooltip("Extra forward offset from the body front boundary.")]
+    [Range(-1f, 2f)] public float headAnchorForwardOffset = 0.30f;
 
     [Header("STRUCTURE / Ears")]
     [Range(0.1f, 3f)] public float earWidthFactor = 1.3f;
-    [Tooltip("Extra ear placement to keep ears visible on top/sides of the head.")]
-    public Vector3 earPlacementOffset = new Vector3(0.10f, 0.26f, -0.04f);
+    [Range(0.1f, 3f)] public float earHeightFactor = 1f;
+    [Range(0.1f, 3f)] public float earLengthFactor = 1f;
+    [Tooltip("Ear anchor height relative to head half-height. 0 = centered on head Y, 1 = top of head.")]
+    [Range(-0.5f, 1.5f)] public float earAnchorHeightRatio = 0.52f;
+    [Tooltip("Extra forward offset for both ear anchors in head local space.")]
+    [Range(-1f, 1f)] public float earAnchorForwardOffset = -0.08f;
+    [Tooltip("Ear spacing ratio from head half-width. Higher value increases distance between ears.")]
+    [Range(0f, 2f)] public float earSeparationRatio = 0.47f;
 
     [Header("STRUCTURE / Tail")]
-    [Range(-2f, 2f)] public float tailSideOffset = 0f;
-    [Range(-1f, 3f)] public float tailHeightOffset = 1.0f;
-    [Range(-4f, 2f)] public float tailForwardOffset = -1.9f;
+    [Tooltip("Tail anchor side offset in body local space.")]
+    [Range(-2f, 2f)] public float tailAnchorSideOffset = 0f;
+    [Tooltip("Tail anchor height relative to body half-height. 0 = centered on body Y.")]
+    [Range(-1.5f, 1.5f)] public float tailAnchorHeightRatio = 0.051f;
+    [Tooltip("Extra forward/backward offset from body back boundary (negative moves backward).")]
+    [Range(-2f, 2f)] public float tailAnchorForwardOffset = -0.15f;
     [Range(0f, 180f)] public float tailPitchDegrees = 90f;
     [Tooltip("Tail half-width on local X (ellipsoid).")]
     [Range(0.01f, 1f)] public float tailRadiusX = 0.06f;
@@ -175,17 +194,29 @@ public class HippoVisual : ProceduralCreatureVisualBase
     private const float AnkleForwardFromFootWidthRatio = 0.08f / 0.84f;
     private const float FootForwardFromFootWidthRatio = 0.18f / 0.84f;
     private const float FootDepthFromFootWidthRatio = 0.98f / 0.84f;
+    private static readonly Vector3 DefaultBodyLocalPos = new Vector3(0f, 0.95f, 0f);
+    private const float DefaultBodyScaleX = 2.8f;
+    private const float DefaultBodyScaleY = 1.5f;
+    private const float DefaultBodyScaleZ = 3.5f;
+    private const float DefaultHeadScaleX = 2.0f;
+    private const float DefaultHeadScaleY = 1.15f;
+    private const float DefaultHeadScaleZ = 1.7f;
 
     private Transform root;
     private Transform visualRoot;
+    private Transform bodyPivot;
     private Transform body;
+    private Transform headAnchor;
     private Transform headPivot;
     private Transform head;
     private Transform upperJaw;
     private Transform jawPivot;
     private Transform lowerJaw;
+    private Transform earAnchorL;
+    private Transform earAnchorR;
     private Transform earL;
     private Transform earR;
+    private Transform tailAnchor;
     private Transform tail;
     private Transform legFL;
     private Transform legFR;
@@ -271,6 +302,12 @@ public class HippoVisual : ProceduralCreatureVisualBase
                     return;
                 }
 
+                if (!HasHybridBodyHeadAnchors())
+                {
+                    BuildIfNeeded(true);
+                    return;
+                }
+
                 if (!HasUpdatedLegGeometry())
                 {
                     BuildIfNeeded(true);
@@ -325,6 +362,81 @@ public class HippoVisual : ProceduralCreatureVisualBase
             return;
 
         transform.localPosition = new Vector3(0f, localPos.y, 0f);
+    }
+
+    private bool HasHybridBodyHeadAnchors()
+    {
+        return bodyPivot != null &&
+               body != null &&
+               headAnchor != null &&
+               tailAnchor != null &&
+               headPivot != null &&
+               headPivot.parent == headAnchor &&
+               tail != null &&
+               tail.parent == tailAnchor;
+    }
+
+    private static Vector3 ResolveBodyLocalPosition()
+    {
+        return DefaultBodyLocalPos;
+    }
+
+    private Vector3 ResolveBodyLocalScale()
+    {
+        return new Vector3(
+            DefaultBodyScaleX * bodyWidthFactor,
+            DefaultBodyScaleY * bodyHeightFactor,
+            DefaultBodyScaleZ * bodyLengthFactor);
+    }
+
+    private Vector3 ResolveHeadLocalScale()
+    {
+        return new Vector3(
+            DefaultHeadScaleX * headWidthFactor,
+            DefaultHeadScaleY * headHeightFactor,
+            DefaultHeadScaleZ * headLengthFactor);
+    }
+
+    private Vector3 ResolveEarLocalScale()
+    {
+        return new Vector3(
+            0.20f * earWidthFactor,
+            0.28f * earHeightFactor,
+            0.12f * earLengthFactor);
+    }
+
+    private void ResolveEarAnchorLocalPositions(Vector3 headLocalScale, out Vector3 leftLocalPos, out Vector3 rightLocalPos)
+    {
+        float headHalfX = headLocalScale.x * 0.5f;
+        float headHalfY = headLocalScale.y * 0.5f;
+        float side = headHalfX * earSeparationRatio;
+        float y = headHalfY * earAnchorHeightRatio;
+        float z = earAnchorForwardOffset;
+
+        leftLocalPos = new Vector3(-side, y, z);
+        rightLocalPos = new Vector3(side, y, z);
+    }
+
+    private Vector3 ResolveHeadAnchorLocalPosition(Vector3 bodyLocalPos, Vector3 bodyLocalScale)
+    {
+        float bodyHalfY = bodyLocalScale.y * 0.5f;
+        float bodyHalfZ = bodyLocalScale.z * 0.5f;
+
+        return new Vector3(
+            0f,
+            bodyLocalPos.y + (bodyHalfY * headAnchorHeightRatio),
+            bodyLocalPos.z + bodyHalfZ + headAnchorForwardOffset);
+    }
+
+    private Vector3 ResolveTailAnchorLocalPosition(Vector3 bodyLocalPos, Vector3 bodyLocalScale)
+    {
+        float bodyHalfY = bodyLocalScale.y * 0.5f;
+        float bodyHalfZ = bodyLocalScale.z * 0.5f;
+
+        return new Vector3(
+            bodyLocalPos.x + tailAnchorSideOffset,
+            bodyLocalPos.y + (bodyHalfY * tailAnchorHeightRatio),
+            bodyLocalPos.z - bodyHalfZ + tailAnchorForwardOffset);
     }
 
     private bool HasUpdatedLegGeometry()
@@ -429,7 +541,7 @@ public class HippoVisual : ProceduralCreatureVisualBase
         }
     }
 
-    protected override string FallbackMaterialContextName => nameof(HippoVisual);
+    protected override string FallbackMaterialContextName => nameof(StrangeCreature);
 
     private Material GetOrCreateBodyFallbackMaterial()
     {
@@ -484,9 +596,31 @@ public class HippoVisual : ProceduralCreatureVisualBase
         if (visualRoot == null)
             return;
 
-        body = visualRoot.Find("Body");
-        headPivot = visualRoot.Find("HeadPivot");
-        tail = visualRoot.Find("Tail");
+        bodyPivot = visualRoot.Find("BodyPivot");
+        if (bodyPivot != null)
+        {
+            body = bodyPivot.Find("Body");
+            headAnchor = bodyPivot.Find("HeadAnchor");
+            tailAnchor = bodyPivot.Find("TailAnchor");
+            if (headAnchor != null)
+                headPivot = headAnchor.Find("HeadPivot");
+            if (tailAnchor != null)
+                tail = tailAnchor.Find("Tail");
+        }
+        else
+        {
+            // Backward-compat fallback if old hierarchy is still present before forced rebuild.
+            body = visualRoot.Find("Body");
+            headAnchor = null;
+            tailAnchor = null;
+            headPivot = null;
+        }
+
+        if (headPivot == null)
+            headPivot = visualRoot.Find("HeadPivot");
+
+        if (tail == null)
+            tail = visualRoot.Find("Tail");
         legFL = visualRoot.Find("Leg_FL");
         legFR = visualRoot.Find("Leg_FR");
         legBL = visualRoot.Find("Leg_BL");
@@ -497,8 +631,16 @@ public class HippoVisual : ProceduralCreatureVisualBase
             head = headPivot.Find("Head");
             upperJaw = headPivot.Find("UpperJaw");
             jawPivot = headPivot.Find("JawPivot");
-            earL = headPivot.Find("Ear_L");
-            earR = headPivot.Find("Ear_R");
+            earAnchorL = headPivot.Find("EarAnchor_L");
+            earAnchorR = headPivot.Find("EarAnchor_R");
+            if (earAnchorL != null)
+                earL = earAnchorL.Find("Ear_L");
+            if (earAnchorR != null)
+                earR = earAnchorR.Find("Ear_R");
+            if (earL == null)
+                earL = headPivot.Find("Ear_L");
+            if (earR == null)
+                earR = headPivot.Find("Ear_R");
             eyeL = headPivot.Find("Eye_L");
             eyeR = headPivot.Find("Eye_R");
 
@@ -583,14 +725,19 @@ public class HippoVisual : ProceduralCreatureVisualBase
 
         root = null;
         visualRoot = null;
+        bodyPivot = null;
         body = null;
+        headAnchor = null;
         headPivot = null;
         head = null;
         upperJaw = null;
         jawPivot = null;
         lowerJaw = null;
+        earAnchorL = null;
+        earAnchorR = null;
         earL = null;
         earR = null;
+        tailAnchor = null;
         tail = null;
         legFL = null;
         legFR = null;
@@ -624,19 +771,31 @@ public class HippoVisual : ProceduralCreatureVisualBase
         visualRoot.localRotation = Quaternion.identity;
         visualRoot.localScale = Vector3.one;
 
-        float headLinearScale = Mathf.Pow(headVolumeFactor, 1f / 3f);
+        Vector3 bodyLocalPos = ResolveBodyLocalPosition();
+        Vector3 bodyLocalScale = ResolveBodyLocalScale();
+        Vector3 headLocalScale = ResolveHeadLocalScale();
+
+        bodyPivot = CreateNode("BodyPivot", visualRoot);
+        bodyPivot.localPosition = Vector3.zero;
+        bodyPivot.localRotation = Quaternion.identity;
+        bodyPivot.localScale = Vector3.one;
 
         body = CreatePart(
             "Body",
             PrimitiveType.Sphere,
-            visualRoot,
-            new Vector3(0f, 0.95f, 0f),
+            bodyPivot,
+            bodyLocalPos,
             Vector3.zero,
-            new Vector3(2.8f, 1.5f * bodyHeightFactor, 3.5f),
+            bodyLocalScale,
             CreatureMaterialSlot.Body);
 
-        headPivot = CreateNode("HeadPivot", visualRoot);
-        headPivot.localPosition = new Vector3(0f, 1.02f, 2.05f);
+        headAnchor = CreateNode("HeadAnchor", bodyPivot);
+        headAnchor.localPosition = ResolveHeadAnchorLocalPosition(bodyLocalPos, bodyLocalScale);
+        headAnchor.localRotation = Quaternion.identity;
+        headAnchor.localScale = Vector3.one;
+
+        headPivot = CreateNode("HeadPivot", headAnchor);
+        headPivot.localPosition = Vector3.zero;
         headPivot.localRotation = Quaternion.identity;
 
         head = CreatePart(
@@ -645,8 +804,11 @@ public class HippoVisual : ProceduralCreatureVisualBase
             headPivot,
             Vector3.zero,
             Vector3.zero,
-            new Vector3(2.0f, 1.15f, 1.7f) * headLinearScale,
+            headLocalScale,
             CreatureMaterialSlot.Body);
+
+        ResolveEarAnchorLocalPositions(headLocalScale, out Vector3 earAnchorPosL, out Vector3 earAnchorPosR);
+        Vector3 earScale = ResolveEarLocalScale();
 
         ResolveJawDimensions(
             out float upperJawResolvedWidth,
@@ -726,17 +888,21 @@ public class HippoVisual : ProceduralCreatureVisualBase
         RemoveCollider(pupilL.gameObject);
         RemoveCollider(pupilR.gameObject);
 
-        Vector3 baseEarPosL = new Vector3(-0.56f, 0.30f, -0.08f);
-        Vector3 baseEarPosR = new Vector3(0.56f, 0.30f, -0.08f);
-        Vector3 earPosL = new Vector3(baseEarPosL.x - earPlacementOffset.x, baseEarPosL.y + earPlacementOffset.y, baseEarPosL.z + earPlacementOffset.z);
-        Vector3 earPosR = new Vector3(baseEarPosR.x + earPlacementOffset.x, baseEarPosR.y + earPlacementOffset.y, baseEarPosR.z + earPlacementOffset.z);
-        Vector3 earScale = new Vector3(0.20f * earWidthFactor, 0.28f, 0.12f);
+        earAnchorL = CreateNode("EarAnchor_L", headPivot);
+        earAnchorL.localPosition = earAnchorPosL;
+        earAnchorL.localRotation = Quaternion.identity;
+        earAnchorL.localScale = Vector3.one;
+
+        earAnchorR = CreateNode("EarAnchor_R", headPivot);
+        earAnchorR.localPosition = earAnchorPosR;
+        earAnchorR.localRotation = Quaternion.identity;
+        earAnchorR.localScale = Vector3.one;
 
         earL = CreatePart(
             "Ear_L",
             PrimitiveType.Sphere,
-            headPivot,
-            earPosL,
+            earAnchorL,
+            Vector3.zero,
             new Vector3(0f, 0f, 18f),
             earScale,
             CreatureMaterialSlot.Ears);
@@ -744,8 +910,8 @@ public class HippoVisual : ProceduralCreatureVisualBase
         earR = CreatePart(
             "Ear_R",
             PrimitiveType.Sphere,
-            headPivot,
-            earPosR,
+            earAnchorR,
+            Vector3.zero,
             new Vector3(0f, 0f, -18f),
             earScale,
             CreatureMaterialSlot.Ears);
@@ -754,10 +920,16 @@ public class HippoVisual : ProceduralCreatureVisualBase
             "Tail",
             PrimitiveType.Sphere,
             visualRoot,
-            new Vector3(tailSideOffset, tailHeightOffset, tailForwardOffset),
+            Vector3.zero,
             new Vector3(tailPitchDegrees, 0f, 0f),
             GetTailEllipsoidScale(),
             CreatureMaterialSlot.Tail);
+
+        tailAnchor = CreateNode("TailAnchor", bodyPivot);
+        tailAnchor.localPosition = ResolveTailAnchorLocalPosition(bodyLocalPos, bodyLocalScale);
+        tailAnchor.localRotation = Quaternion.identity;
+        tailAnchor.localScale = Vector3.one;
+        tail.SetParent(tailAnchor, false);
 
         legFL = CreateLeg("Leg_FL", new Vector3(-LegSideOffset, legAttachHeight, LegFrontOffset));
         legFR = CreateLeg("Leg_FR", new Vector3(LegSideOffset, legAttachHeight, LegFrontOffset));
@@ -1162,22 +1334,43 @@ public class HippoVisual : ProceduralCreatureVisualBase
         if (root != null)
             root.localScale = Vector3.one * overallScale;
 
+        if (bodyPivot != null)
+        {
+            bodyPivot.localPosition = Vector3.zero;
+            bodyPivot.localRotation = Quaternion.identity;
+            bodyPivot.localScale = Vector3.one;
+        }
+
+        Vector3 resolvedBodyLocalPos = ResolveBodyLocalPosition();
+        Vector3 resolvedBodyLocalScale = ResolveBodyLocalScale();
+
         if (body != null)
         {
-            bodyBaseLocalPos = new Vector3(0f, 0.95f, 0f);
-            bodyBaseLocalScale = new Vector3(2.8f, 1.5f * bodyHeightFactor, 3.5f);
+            bodyBaseLocalPos = resolvedBodyLocalPos;
+            bodyBaseLocalScale = resolvedBodyLocalScale;
             body.localPosition = bodyBaseLocalPos;
             body.localScale = bodyBaseLocalScale;
         }
 
-        if (headPivot != null)
+        if (headAnchor != null)
+        {
+            headAnchor.localPosition = ResolveHeadAnchorLocalPosition(resolvedBodyLocalPos, resolvedBodyLocalScale);
+            headAnchor.localRotation = Quaternion.identity;
+            headAnchor.localScale = Vector3.one;
+
+            if (headPivot != null)
+                headPivot.localPosition = Vector3.zero;
+        }
+        else if (headPivot != null)
+        {
+            // Legacy fallback position in case an old hierarchy is still present.
             headPivot.localPosition = new Vector3(0f, 1.02f, 2.05f);
+        }
 
         if (head != null)
         {
-            float headLinearScale = Mathf.Pow(headVolumeFactor, 1f / 3f);
             head.localPosition = Vector3.zero;
-            head.localScale = new Vector3(2.0f, 1.15f, 1.7f) * headLinearScale;
+            head.localScale = ResolveHeadLocalScale();
         }
 
         ApplyMouthStructurePlacement();
@@ -1264,7 +1457,6 @@ public class HippoVisual : ProceduralCreatureVisualBase
         center = Vector3.zero;
         extents = Vector3.zero;
 
-        float headLinearScale = Mathf.Pow(headVolumeFactor, 1f / 3f);
         ResolveJawDimensions(
             out float upperJawWidth,
             out float lowerJawWidth,
@@ -1281,23 +1473,25 @@ public class HippoVisual : ProceduralCreatureVisualBase
         Vector3 min = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
         Vector3 max = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
 
-        EncapsulateAabb(ref min, ref max, new Vector3(0f, 0.95f, 0f), new Vector3(2.8f, 1.5f * bodyHeightFactor, 3.5f));
-        EncapsulateAabb(ref min, ref max, new Vector3(0f, 1.02f, 2.05f), new Vector3(2.0f, 1.15f, 1.7f) * headLinearScale);
+        Vector3 bodyLocalPos = ResolveBodyLocalPosition();
+        Vector3 bodyLocalScale = ResolveBodyLocalScale();
+        Vector3 headPivotPos = ResolveHeadAnchorLocalPosition(bodyLocalPos, bodyLocalScale);
+        Vector3 headLocalScale = ResolveHeadLocalScale();
 
-        Vector3 headPivotPos = new Vector3(0f, 1.02f, 2.05f);
+        EncapsulateAabb(ref min, ref max, bodyLocalPos, bodyLocalScale);
+        EncapsulateAabb(ref min, ref max, headPivotPos, headLocalScale);
+
         EncapsulateAabb(ref min, ref max, headPivotPos + new Vector3(0f, upperJawHeightOffset, upperJawForwardOffset), new Vector3(upperJawWidth, upperJawHeight, upperJawLength));
         Vector3 jawPivotPos = headPivotPos + new Vector3(0f, offsetPivotHeightJaw, offsetPivotForwardJaw);
         EncapsulateAabb(ref min, ref max, jawPivotPos + new Vector3(0f, lowerJawHeightOffset, lowerJawForwardOffset), new Vector3(lowerJawWidth, lowerJawHeight, lowerJawLength));
 
-        Vector3 baseEarPosL = new Vector3(-0.56f, 0.30f, -0.08f);
-        Vector3 baseEarPosR = new Vector3(0.56f, 0.30f, -0.08f);
-        Vector3 earPosL = new Vector3(baseEarPosL.x - earPlacementOffset.x, baseEarPosL.y + earPlacementOffset.y, baseEarPosL.z + earPlacementOffset.z);
-        Vector3 earPosR = new Vector3(baseEarPosR.x + earPlacementOffset.x, baseEarPosR.y + earPlacementOffset.y, baseEarPosR.z + earPlacementOffset.z);
-        Vector3 earSize = new Vector3(0.20f * earWidthFactor, 0.28f, 0.12f);
-        EncapsulateAabb(ref min, ref max, headPivotPos + earPosL, earSize);
-        EncapsulateAabb(ref min, ref max, headPivotPos + earPosR, earSize);
+        ResolveEarAnchorLocalPositions(headLocalScale, out Vector3 earAnchorPosL, out Vector3 earAnchorPosR);
+        Vector3 earSize = ResolveEarLocalScale();
+        EncapsulateAabb(ref min, ref max, headPivotPos + earAnchorPosL, earSize);
+        EncapsulateAabb(ref min, ref max, headPivotPos + earAnchorPosR, earSize);
 
-        EncapsulateAabb(ref min, ref max, new Vector3(tailSideOffset, tailHeightOffset, tailForwardOffset), GetTailEllipsoidScale());
+        Vector3 tailAnchorPos = ResolveTailAnchorLocalPosition(bodyLocalPos, bodyLocalScale);
+        EncapsulateAabb(ref min, ref max, tailAnchorPos, GetTailEllipsoidScale());
 
         float upperCenterY = upperLegLength * UpperLegCenterYRatio;
         float ankleCenterY = upperLegLength * AnkleCenterYRatio;
@@ -1483,10 +1677,20 @@ public class HippoVisual : ProceduralCreatureVisualBase
     // Live-update tail transform from inspector parameters.
     private void ApplyTailPlacement()
     {
+        Vector3 bodyLocalPos = ResolveBodyLocalPosition();
+        Vector3 bodyLocalScale = ResolveBodyLocalScale();
+
+        if (tailAnchor != null)
+        {
+            tailAnchor.localPosition = ResolveTailAnchorLocalPosition(bodyLocalPos, bodyLocalScale);
+            tailAnchor.localRotation = Quaternion.identity;
+            tailAnchor.localScale = Vector3.one;
+        }
+
         if (tail == null)
             return;
 
-        tail.localPosition = new Vector3(tailSideOffset, tailHeightOffset, tailForwardOffset);
+        tail.localPosition = Vector3.zero;
         tailBaseLocalRot = Quaternion.Euler(tailPitchDegrees, 0f, 0f);
         tail.localRotation = tailBaseLocalRot;
         tail.localScale = GetTailEllipsoidScale();
@@ -1503,28 +1707,56 @@ public class HippoVisual : ProceduralCreatureVisualBase
     {
         if (headPivot != null)
         {
+            if (earAnchorL == null)
+                earAnchorL = headPivot.Find("EarAnchor_L");
+            if (earAnchorR == null)
+                earAnchorR = headPivot.Find("EarAnchor_R");
+
             if (earL == null)
-                earL = headPivot.Find("Ear_L");
+            {
+                if (earAnchorL != null)
+                    earL = earAnchorL.Find("Ear_L");
+                if (earL == null)
+                    earL = headPivot.Find("Ear_L");
+            }
+
             if (earR == null)
-                earR = headPivot.Find("Ear_R");
+            {
+                if (earAnchorR != null)
+                    earR = earAnchorR.Find("Ear_R");
+                if (earR == null)
+                    earR = headPivot.Find("Ear_R");
+            }
         }
 
-        Vector3 baseEarPosL = new Vector3(-0.56f, 0.30f, -0.08f);
-        Vector3 baseEarPosR = new Vector3(0.56f, 0.30f, -0.08f);
-        Vector3 earPosL = new Vector3(baseEarPosL.x - earPlacementOffset.x, baseEarPosL.y + earPlacementOffset.y, baseEarPosL.z + earPlacementOffset.z);
-        Vector3 earPosR = new Vector3(baseEarPosR.x + earPlacementOffset.x, baseEarPosR.y + earPlacementOffset.y, baseEarPosR.z + earPlacementOffset.z);
-        Vector3 earScale = new Vector3(0.20f * earWidthFactor, 0.28f, 0.12f);
+        Vector3 headLocalScale = ResolveHeadLocalScale();
+        ResolveEarAnchorLocalPositions(headLocalScale, out Vector3 earAnchorPosL, out Vector3 earAnchorPosR);
+        Vector3 earScale = ResolveEarLocalScale();
+
+        if (earAnchorL != null)
+        {
+            earAnchorL.localPosition = earAnchorPosL;
+            earAnchorL.localRotation = Quaternion.identity;
+            earAnchorL.localScale = Vector3.one;
+        }
+
+        if (earAnchorR != null)
+        {
+            earAnchorR.localPosition = earAnchorPosR;
+            earAnchorR.localRotation = Quaternion.identity;
+            earAnchorR.localScale = Vector3.one;
+        }
 
         if (earL != null)
         {
-            earL.localPosition = earPosL;
+            earL.localPosition = Vector3.zero;
             earL.localRotation = Quaternion.Euler(0f, 0f, 18f);
             earL.localScale = earScale;
         }
 
         if (earR != null)
         {
-            earR.localPosition = earPosR;
+            earR.localPosition = Vector3.zero;
             earR.localRotation = Quaternion.Euler(0f, 0f, -18f);
             earR.localScale = earScale;
         }
