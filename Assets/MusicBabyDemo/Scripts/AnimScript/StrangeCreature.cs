@@ -11,6 +11,18 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     [Range(0.1f, 3f)] public float bodyWidthFactor = 1f;
     [Range(0.1f, 3f)] public float bodyHeightFactor = 1.3f;
     [Range(0.1f, 3f)] public float bodyLengthFactor = 1f;
+    [Tooltip("Rear part width factor (left/right rear body lobes).")]
+    [Range(0.1f, 3f)] public float rearBodyWidthFactor = 1f;
+    [Tooltip("Rear part height factor (left/right rear body lobes).")]
+    [Range(0.1f, 3f)] public float rearBodyHeightFactor = 1f;
+    [Tooltip("Rear part length factor (left/right rear body lobes).")]
+    [Range(0.1f, 3f)] public float rearBodyLengthFactor = 1f;
+    [Tooltip("Rear anchors side separation ratio from body half-width.")]
+    [Range(0f, 1.5f)] public float rearBodySeparationRatio = 0.34f;
+    [Tooltip("Rear anchors height ratio relative to body half-height. 0 = body center, 1 = top, -1 = bottom.")]
+    [Range(-1.5f, 1.5f)] public float rearBodyAnchorHeightRatio = -0.05f;
+    [Tooltip("Rear anchors length ratio from body center to back boundary. 0 = center, 1 = back surface.")]
+    [Range(0f, 1.2f)] public float rearBodyAnchorLengthRatio = 0.72f;
 
     [Header("STRUCTURE / Head")]
     [Range(0.1f, 3f)] public float headWidthFactor = 1.2f;
@@ -223,6 +235,10 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private Transform visualRoot;
     private Transform bodyPivot;
     private Transform body;
+    private Transform rearBodyAnchorL;
+    private Transform rearBodyAnchorR;
+    private Transform rearBodyL;
+    private Transform rearBodyR;
     private Transform headAnchor;
     private Transform headPivot;
     private Transform head;
@@ -390,6 +406,12 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     {
         return bodyPivot != null &&
                body != null &&
+               rearBodyAnchorL != null &&
+               rearBodyAnchorR != null &&
+               rearBodyL != null &&
+               rearBodyR != null &&
+               rearBodyL.parent == rearBodyAnchorL &&
+               rearBodyR.parent == rearBodyAnchorR &&
                headAnchor != null &&
                tailAnchor != null &&
                eyeAnchorL != null &&
@@ -422,6 +444,28 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             DefaultBodyScaleX * bodyWidthFactor,
             DefaultBodyScaleY * bodyHeightFactor,
             DefaultBodyScaleZ * bodyLengthFactor);
+    }
+
+    private Vector3 ResolveRearBodyLocalScale(Vector3 bodyLocalScale)
+    {
+        return new Vector3(
+            bodyLocalScale.x * 0.35f * rearBodyWidthFactor,
+            bodyLocalScale.y * 0.55f * rearBodyHeightFactor,
+            bodyLocalScale.z * 0.38f * rearBodyLengthFactor);
+    }
+
+    private void ResolveRearBodyAnchorLocalPositions(Vector3 bodyLocalPos, Vector3 bodyLocalScale, out Vector3 leftLocalPos, out Vector3 rightLocalPos)
+    {
+        float bodyHalfX = bodyLocalScale.x * 0.5f;
+        float bodyHalfY = bodyLocalScale.y * 0.5f;
+        float bodyHalfZ = bodyLocalScale.z * 0.5f;
+
+        float side = bodyHalfX * rearBodySeparationRatio;
+        float y = bodyLocalPos.y + (bodyHalfY * rearBodyAnchorHeightRatio);
+        float z = bodyLocalPos.z - (bodyHalfZ * rearBodyAnchorLengthRatio);
+
+        leftLocalPos = new Vector3(-side, y, z);
+        rightLocalPos = new Vector3(side, y, z);
     }
 
     private Vector3 ResolveHeadLocalScale()
@@ -574,6 +618,12 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         if (body != null)
             ApplyMaterial(body.gameObject, CreatureMaterialSlot.Body);
 
+        if (rearBodyL != null)
+            ApplyMaterial(rearBodyL.gameObject, CreatureMaterialSlot.Body);
+
+        if (rearBodyR != null)
+            ApplyMaterial(rearBodyR.gameObject, CreatureMaterialSlot.Body);
+
         if (head != null)
             ApplyMaterial(head.gameObject, CreatureMaterialSlot.Body);
 
@@ -712,8 +762,14 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         if (bodyPivot != null)
         {
             body = bodyPivot.Find("Body");
+            rearBodyAnchorL = bodyPivot.Find("RearBodyAnchor_L");
+            rearBodyAnchorR = bodyPivot.Find("RearBodyAnchor_R");
             headAnchor = bodyPivot.Find("HeadAnchor");
             tailAnchor = bodyPivot.Find("TailAnchor");
+            if (rearBodyAnchorL != null)
+                rearBodyL = rearBodyAnchorL.Find("RearBody_L");
+            if (rearBodyAnchorR != null)
+                rearBodyR = rearBodyAnchorR.Find("RearBody_R");
             if (headAnchor != null)
                 headPivot = headAnchor.Find("HeadPivot");
             if (tailAnchor != null)
@@ -723,6 +779,10 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         {
             // Backward-compat fallback if old hierarchy is still present before forced rebuild.
             body = visualRoot.Find("Body");
+            rearBodyAnchorL = null;
+            rearBodyAnchorR = null;
+            rearBodyL = null;
+            rearBodyR = null;
             headAnchor = null;
             tailAnchor = null;
             headPivot = null;
@@ -853,6 +913,10 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         visualRoot = null;
         bodyPivot = null;
         body = null;
+        rearBodyAnchorL = null;
+        rearBodyAnchorR = null;
+        rearBodyL = null;
+        rearBodyR = null;
         headAnchor = null;
         headPivot = null;
         head = null;
@@ -913,6 +977,37 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             bodyLocalPos,
             Vector3.zero,
             bodyLocalScale,
+            CreatureMaterialSlot.Body);
+
+        Vector3 rearBodyScale = ResolveRearBodyLocalScale(bodyLocalScale);
+        ResolveRearBodyAnchorLocalPositions(bodyLocalPos, bodyLocalScale, out Vector3 rearBodyAnchorPosL, out Vector3 rearBodyAnchorPosR);
+
+        rearBodyAnchorL = CreateNode("RearBodyAnchor_L", bodyPivot);
+        rearBodyAnchorL.localPosition = rearBodyAnchorPosL;
+        rearBodyAnchorL.localRotation = Quaternion.identity;
+        rearBodyAnchorL.localScale = Vector3.one;
+
+        rearBodyAnchorR = CreateNode("RearBodyAnchor_R", bodyPivot);
+        rearBodyAnchorR.localPosition = rearBodyAnchorPosR;
+        rearBodyAnchorR.localRotation = Quaternion.identity;
+        rearBodyAnchorR.localScale = Vector3.one;
+
+        rearBodyL = CreatePart(
+            "RearBody_L",
+            PrimitiveType.Sphere,
+            rearBodyAnchorL,
+            Vector3.zero,
+            Vector3.zero,
+            rearBodyScale,
+            CreatureMaterialSlot.Body);
+
+        rearBodyR = CreatePart(
+            "RearBody_R",
+            PrimitiveType.Sphere,
+            rearBodyAnchorR,
+            Vector3.zero,
+            Vector3.zero,
+            rearBodyScale,
             CreatureMaterialSlot.Body);
 
         headAnchor = CreateNode("HeadAnchor", bodyPivot);
@@ -1503,6 +1598,8 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             body.localScale = bodyBaseLocalScale;
         }
 
+        ApplyRearBodyPlacement(resolvedBodyLocalPos, resolvedBodyLocalScale);
+
         if (headAnchor != null)
         {
             headAnchor.localPosition = ResolveHeadAnchorLocalPosition(resolvedBodyLocalPos, resolvedBodyLocalScale);
@@ -1528,6 +1625,40 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         ApplyLegStructurePlacement();
         ApplyTailPlacement();
         ApplyEarPlacement();
+    }
+
+    private void ApplyRearBodyPlacement(Vector3 bodyLocalPos, Vector3 bodyLocalScale)
+    {
+        Vector3 rearBodyScale = ResolveRearBodyLocalScale(bodyLocalScale);
+        ResolveRearBodyAnchorLocalPositions(bodyLocalPos, bodyLocalScale, out Vector3 rearAnchorPosL, out Vector3 rearAnchorPosR);
+
+        if (rearBodyAnchorL != null)
+        {
+            rearBodyAnchorL.localPosition = rearAnchorPosL;
+            rearBodyAnchorL.localRotation = Quaternion.identity;
+            rearBodyAnchorL.localScale = Vector3.one;
+        }
+
+        if (rearBodyAnchorR != null)
+        {
+            rearBodyAnchorR.localPosition = rearAnchorPosR;
+            rearBodyAnchorR.localRotation = Quaternion.identity;
+            rearBodyAnchorR.localScale = Vector3.one;
+        }
+
+        if (rearBodyL != null)
+        {
+            rearBodyL.localPosition = Vector3.zero;
+            rearBodyL.localRotation = Quaternion.identity;
+            rearBodyL.localScale = rearBodyScale;
+        }
+
+        if (rearBodyR != null)
+        {
+            rearBodyR.localPosition = Vector3.zero;
+            rearBodyR.localRotation = Quaternion.identity;
+            rearBodyR.localScale = rearBodyScale;
+        }
     }
 
     // Keep collisions deterministic:
@@ -1624,8 +1755,12 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         Vector3 bodyLocalScale = ResolveBodyLocalScale();
         Vector3 headPivotPos = ResolveHeadAnchorLocalPosition(bodyLocalPos, bodyLocalScale);
         Vector3 headLocalScale = ResolveHeadLocalScale();
+        Vector3 rearBodyScale = ResolveRearBodyLocalScale(bodyLocalScale);
+        ResolveRearBodyAnchorLocalPositions(bodyLocalPos, bodyLocalScale, out Vector3 rearAnchorPosL, out Vector3 rearAnchorPosR);
 
         EncapsulateAabb(ref min, ref max, bodyLocalPos, bodyLocalScale);
+        EncapsulateAabb(ref min, ref max, rearAnchorPosL, rearBodyScale);
+        EncapsulateAabb(ref min, ref max, rearAnchorPosR, rearBodyScale);
         EncapsulateAabb(ref min, ref max, headPivotPos, headLocalScale);
 
         Vector3 mouthAnchorPos = headPivotPos + ResolveMouthAnchorLocalPosition(headLocalScale);
