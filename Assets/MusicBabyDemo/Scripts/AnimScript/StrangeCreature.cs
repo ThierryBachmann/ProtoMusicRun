@@ -52,17 +52,20 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     [Tooltip("Extra forward/backward offset from body back boundary (negative moves backward).")]
     [Range(-2f, 2f)] public float tailAnchorForwardOffset = -0.15f;
     [Range(0f, 180f)] public float tailPitchDegrees = 90f;
-    [Tooltip("Tail half-width on local X (ellipsoid).")]
-    [Range(0.01f, 1f)] public float tailRadiusX = 0.06f;
-    [Tooltip("Tail half-width on local Z (ellipsoid).")]
-    [Range(0.01f, 1f)] public float tailRadiusZ = 0.06f;
-    [Tooltip("Tail half-length along local Y before pitch rotation (ellipsoid).")]
-    [Range(0.05f, 3f)] public float tailLength = 0.22f;
+    [Tooltip("Tail dimension on local X (1 = isotropic part scale on X).")]
+    [Range(0.01f, 3f)] public float tailRadiusX = 0.12f;
+    [Tooltip("Tail dimension on local Z (1 = isotropic part scale on Z).")]
+    [Range(0.01f, 3f)] public float tailRadiusZ = 0.12f;
+    [Tooltip("Tail dimension on local Y before pitch rotation (1 = isotropic part scale on Y).")]
+    [Range(0.01f, 3f)] public float tailLength = 0.44f;
 
     [Header("STRUCTURE / Mouth")]
-    [Range(0.1f, 8f)] public float jawWidth = 3.35f;
-    [Range(0.1f, 4f)] public float jawHeight = 0.8f;
-    [Range(0.1f, 6f)] public float jawLength = 1.92f;
+    [Tooltip("Lower jaw width (1 = isotropic scale on X).")]
+    [Range(0.1f, 8f)] public float jawWidth = 1.65f;
+    [Tooltip("Lower jaw height (1 = isotropic scale on Y).")]
+    [Range(0.1f, 4f)] public float jawHeight = 0.32f;
+    [Tooltip("Lower jaw length (1 = isotropic scale on Z).")]
+    [Range(0.1f, 6f)] public float jawLength = 0.92f;
     [Range(0.2f, 5f)] public float jawWidthUpperToLowerRatio = 1.03f;
     [Range(0.2f, 5f)] public float jawHeightUpperToLowerRatio = 1.5f;
     [Range(0.2f, 5f)] public float jawLengthUpperToLowerRatio = 1.087f;
@@ -213,15 +216,6 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private const float FootForwardFromFootWidthRatio = 0.18f / 0.84f;
     private const float FootDepthFromFootWidthRatio = 0.98f / 0.84f;
     private static readonly Vector3 DefaultBodyLocalPos = new Vector3(0f, 0.95f, 0f);
-    private const float DefaultBodyScaleX = 2.8f;
-    private const float DefaultBodyScaleY = 1.5f;
-    private const float DefaultBodyScaleZ = 3.5f;
-    private const float DefaultHeadScaleX = 2.0f;
-    private const float DefaultHeadScaleY = 1.15f;
-    private const float DefaultHeadScaleZ = 1.7f;
-    private const float DefaultEyeScaleX = 0.82f;
-    private const float DefaultEyeScaleY = 0.82f;
-    private const float DefaultEyeScaleZ = 0.82f;
 
     private struct LegRig
     {
@@ -440,18 +434,21 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
     private Vector3 ResolveBodyLocalScale()
     {
+        // Dimensions are absolute per-axis scale values.
+        // With Width/Height/Length = 1,1,1 this part is isotropic (sphere/cube depending on detail mode).
         return new Vector3(
-            DefaultBodyScaleX * bodyWidthFactor,
-            DefaultBodyScaleY * bodyHeightFactor,
-            DefaultBodyScaleZ * bodyLengthFactor);
+            bodyWidthFactor,
+            bodyHeightFactor,
+            bodyLengthFactor);
     }
 
     private Vector3 ResolveRearBodyLocalScale(Vector3 bodyLocalScale)
     {
+        // Rear body dimensions are absolute too (same isotropic behavior as other Width/Height/Length groups).
         return new Vector3(
-            bodyLocalScale.x * 0.35f * rearBodyWidthFactor,
-            bodyLocalScale.y * 0.55f * rearBodyHeightFactor,
-            bodyLocalScale.z * 0.38f * rearBodyLengthFactor);
+            rearBodyWidthFactor,
+            rearBodyHeightFactor,
+            rearBodyLengthFactor);
     }
 
     private void ResolveRearBodyAnchorLocalPositions(Vector3 bodyLocalPos, Vector3 bodyLocalScale, out Vector3 leftLocalPos, out Vector3 rightLocalPos)
@@ -471,17 +468,17 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private Vector3 ResolveHeadLocalScale()
     {
         return new Vector3(
-            DefaultHeadScaleX * headWidthFactor,
-            DefaultHeadScaleY * headHeightFactor,
-            DefaultHeadScaleZ * headLengthFactor);
+            headWidthFactor,
+            headHeightFactor,
+            headLengthFactor);
     }
 
     private Vector3 ResolveEarLocalScale()
     {
         return new Vector3(
-            0.20f * earWidthFactor,
-            0.28f * earHeightFactor,
-            0.12f * earLengthFactor);
+            earWidthFactor,
+            earHeightFactor,
+            earLengthFactor);
     }
 
     private void ResolveEarAnchorLocalPositions(Vector3 headLocalScale, out Vector3 leftLocalPos, out Vector3 rightLocalPos)
@@ -499,9 +496,9 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private Vector3 ResolveEyeLocalScale()
     {
         return new Vector3(
-            DefaultEyeScaleX * eyeWidthFactor,
-            DefaultEyeScaleY * eyeHeightFactor,
-            DefaultEyeScaleZ * eyeLengthFactor);
+            eyeWidthFactor,
+            eyeHeightFactor,
+            eyeLengthFactor);
     }
 
     private void ResolveEyeAnchorLocalPositions(Vector3 headLocalScale, out Vector3 leftLocalPos, out Vector3 rightLocalPos)
@@ -1965,13 +1962,13 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     }
 
     private static void SplitUpperLowerByRatio(
-        float combined,
+        float lowerBaseValue,
         float upperToLowerRatio,
         out float upper,
         out float lower)
     {
-        lower = combined / (1f + upperToLowerRatio);
-        upper = combined - lower;
+        lower = lowerBaseValue;
+        upper = lowerBaseValue * upperToLowerRatio;
     }
 
     // Live-update leg structure (anchor positions + upper/ankle/foot dimensions).
@@ -2061,8 +2058,8 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
     private Vector3 GetTailEllipsoidScale()
     {
-        // Sphere primitive has unit diameter; convert half-dimensions to full local scale.
-        return new Vector3(tailRadiusX * 2f, tailLength * 2f, tailRadiusZ * 2f);
+        // Tail dimensions are direct local scales per axis (same convention as other Width/Height/Length groups).
+        return new Vector3(tailRadiusX, tailLength, tailRadiusZ);
     }
 
     // Live-update ear transforms from inspector parameters.
