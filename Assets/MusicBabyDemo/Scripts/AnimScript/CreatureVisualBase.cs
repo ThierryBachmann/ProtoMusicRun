@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -15,6 +16,16 @@ public enum CreatureVisualState
     EatRecovery = 7,
     LeashReturn = 8,
     Stunned = 9,
+}
+
+public enum CreatureSphereDetailLevel
+{
+    Blocky = -1,
+    VeryLow = 0,
+    Low = 1,
+    Medium = 2,
+    High = 3,
+    VeryHigh = 4,
 }
 
 public abstract class CreatureVisualBase : MonoBehaviour
@@ -240,6 +251,10 @@ public abstract class CreatureVisualBase : MonoBehaviour
 /// </summary>
 public abstract class ProceduralCreatureVisualBase : CreatureVisualBase
 {
+    [Header("STRUCTURE / Geometry")]
+    [Tooltip("Global mesh detail for generated sphere parts. Blocky uses cubes, Very Low gives a low-poly sphere look.")]
+    public CreatureSphereDetailLevel sphereDetailLevel = CreatureSphereDetailLevel.High;
+
     // Shared material semantics for procedural creatures.
     // Keeping this in the intermediate base will make future species (ostrich, elephant, etc.)
     // reuse the same slot vocabulary.
@@ -252,6 +267,9 @@ public abstract class ProceduralCreatureVisualBase : CreatureVisualBase
         EyePupil,
         Mouth,
     }
+
+    private static readonly Dictionary<CreatureSphereDetailLevel, Mesh> SphereMeshCache = new Dictionary<CreatureSphereDetailLevel, Mesh>();
+    private static Mesh blockyCubeMeshCache;
 
     // Species-specific material mapping (for example: body/sclera/mouth assignments).
     protected abstract Material ResolveMaterialForSlot(CreatureMaterialSlot slot);
@@ -277,8 +295,20 @@ public abstract class ProceduralCreatureVisualBase : CreatureVisualBase
         Vector3 localScale,
         CreatureMaterialSlot slot)
     {
-        GameObject go = GameObject.CreatePrimitive(primitiveType);
-        go.name = name;
+        GameObject go;
+        if (primitiveType == PrimitiveType.Sphere)
+        {
+            go = new GameObject(name);
+            MeshFilter meshFilter = go.AddComponent<MeshFilter>();
+            meshFilter.sharedMesh = GetOrCreateSphereMesh(sphereDetailLevel);
+            go.AddComponent<MeshRenderer>();
+        }
+        else
+        {
+            go = GameObject.CreatePrimitive(primitiveType);
+            go.name = name;
+        }
+
         go.transform.SetParent(parent, false);
         go.transform.localPosition = localPosition;
         go.transform.localRotation = Quaternion.Euler(localEulerAngles);
@@ -290,6 +320,203 @@ public abstract class ProceduralCreatureVisualBase : CreatureVisualBase
 
         ApplyMaterial(go, slot);
         return go.transform;
+    }
+
+    private static Mesh GetOrCreateSphereMesh(CreatureSphereDetailLevel detailLevel)
+    {
+        if (detailLevel == CreatureSphereDetailLevel.Blocky)
+            return GetOrCreateBlockyCubeMesh();
+
+        if (SphereMeshCache.TryGetValue(detailLevel, out Mesh cached) && cached != null)
+            return cached;
+
+        GetSphereSegments(detailLevel, out int longitudeSegments, out int latitudeSegments);
+        Mesh generated = BuildUvSphereMesh(longitudeSegments, latitudeSegments);
+        generated.name = "CreatureSphere_" + detailLevel;
+        generated.hideFlags = HideFlags.HideAndDontSave;
+        SphereMeshCache[detailLevel] = generated;
+        return generated;
+    }
+
+    private static Mesh GetOrCreateBlockyCubeMesh()
+    {
+        if (blockyCubeMeshCache != null)
+            return blockyCubeMeshCache;
+
+        // Centered cube with size 1 so procedural scale logic remains unchanged.
+        Vector3[] vertices =
+        {
+            // Front
+            new Vector3(-0.5f, -0.5f, 0.5f),
+            new Vector3(0.5f, -0.5f, 0.5f),
+            new Vector3(0.5f, 0.5f, 0.5f),
+            new Vector3(-0.5f, 0.5f, 0.5f),
+            // Back
+            new Vector3(0.5f, -0.5f, -0.5f),
+            new Vector3(-0.5f, -0.5f, -0.5f),
+            new Vector3(-0.5f, 0.5f, -0.5f),
+            new Vector3(0.5f, 0.5f, -0.5f),
+            // Left
+            new Vector3(-0.5f, -0.5f, -0.5f),
+            new Vector3(-0.5f, -0.5f, 0.5f),
+            new Vector3(-0.5f, 0.5f, 0.5f),
+            new Vector3(-0.5f, 0.5f, -0.5f),
+            // Right
+            new Vector3(0.5f, -0.5f, 0.5f),
+            new Vector3(0.5f, -0.5f, -0.5f),
+            new Vector3(0.5f, 0.5f, -0.5f),
+            new Vector3(0.5f, 0.5f, 0.5f),
+            // Top
+            new Vector3(-0.5f, 0.5f, 0.5f),
+            new Vector3(0.5f, 0.5f, 0.5f),
+            new Vector3(0.5f, 0.5f, -0.5f),
+            new Vector3(-0.5f, 0.5f, -0.5f),
+            // Bottom
+            new Vector3(-0.5f, -0.5f, -0.5f),
+            new Vector3(0.5f, -0.5f, -0.5f),
+            new Vector3(0.5f, -0.5f, 0.5f),
+            new Vector3(-0.5f, -0.5f, 0.5f),
+        };
+
+        Vector3[] normals =
+        {
+            // Front
+            Vector3.forward, Vector3.forward, Vector3.forward, Vector3.forward,
+            // Back
+            Vector3.back, Vector3.back, Vector3.back, Vector3.back,
+            // Left
+            Vector3.left, Vector3.left, Vector3.left, Vector3.left,
+            // Right
+            Vector3.right, Vector3.right, Vector3.right, Vector3.right,
+            // Top
+            Vector3.up, Vector3.up, Vector3.up, Vector3.up,
+            // Bottom
+            Vector3.down, Vector3.down, Vector3.down, Vector3.down,
+        };
+
+        Vector2[] uv =
+        {
+            new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f),
+            new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f),
+            new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f),
+            new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f),
+            new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f),
+            new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f),
+        };
+
+        int[] triangles =
+        {
+            0, 1, 2, 0, 2, 3,       // Front
+            4, 5, 6, 4, 6, 7,       // Back
+            8, 9, 10, 8, 10, 11,    // Left
+            12, 13, 14, 12, 14, 15, // Right
+            16, 17, 18, 16, 18, 19, // Top
+            20, 21, 22, 20, 22, 23, // Bottom
+        };
+
+        Mesh mesh = new Mesh();
+        mesh.name = "CreatureCube_Blocky";
+        mesh.hideFlags = HideFlags.HideAndDontSave;
+        mesh.vertices = vertices;
+        mesh.normals = normals;
+        mesh.uv = uv;
+        mesh.triangles = triangles;
+        mesh.RecalculateBounds();
+        blockyCubeMeshCache = mesh;
+        return blockyCubeMeshCache;
+    }
+
+    private static void GetSphereSegments(CreatureSphereDetailLevel detailLevel, out int longitudeSegments, out int latitudeSegments)
+    {
+        switch (detailLevel)
+        {
+            case CreatureSphereDetailLevel.VeryLow:
+                longitudeSegments = 8;
+                latitudeSegments = 4;
+                break;
+            case CreatureSphereDetailLevel.Low:
+                longitudeSegments = 12;
+                latitudeSegments = 6;
+                break;
+            case CreatureSphereDetailLevel.Medium:
+                longitudeSegments = 20;
+                latitudeSegments = 10;
+                break;
+            case CreatureSphereDetailLevel.High:
+                longitudeSegments = 28;
+                latitudeSegments = 14;
+                break;
+            default:
+                longitudeSegments = 36;
+                latitudeSegments = 18;
+                break;
+        }
+    }
+
+    private static Mesh BuildUvSphereMesh(int longitudeSegments, int latitudeSegments)
+    {
+        int vertexCount = (latitudeSegments + 1) * (longitudeSegments + 1);
+        List<Vector3> vertices = new List<Vector3>(vertexCount);
+        List<Vector3> normals = new List<Vector3>(vertexCount);
+        List<Vector2> uv = new List<Vector2>(vertexCount);
+        List<int> triangles = new List<int>(longitudeSegments * (latitudeSegments - 1) * 6);
+
+        for (int lat = 0; lat <= latitudeSegments; lat++)
+        {
+            float v = lat / (float)latitudeSegments;
+            float theta = Mathf.PI * v;
+            float sinTheta = Mathf.Sin(theta);
+            float cosTheta = Mathf.Cos(theta);
+
+            for (int lon = 0; lon <= longitudeSegments; lon++)
+            {
+                float u = lon / (float)longitudeSegments;
+                float phi = u * Mathf.PI * 2f;
+                float sinPhi = Mathf.Sin(phi);
+                float cosPhi = Mathf.Cos(phi);
+
+                Vector3 normal = new Vector3(sinTheta * cosPhi, cosTheta, sinTheta * sinPhi);
+                vertices.Add(normal * 0.5f);
+                normals.Add(normal);
+                uv.Add(new Vector2(u, 1f - v));
+            }
+        }
+
+        int stride = longitudeSegments + 1;
+        for (int lat = 0; lat < latitudeSegments; lat++)
+        {
+            for (int lon = 0; lon < longitudeSegments; lon++)
+            {
+                int current = lat * stride + lon;
+                int next = current + stride;
+
+                if (lat > 0)
+                {
+                    // Unity expects clockwise winding for front faces.
+                    triangles.Add(current);
+                    triangles.Add(current + 1);
+                    triangles.Add(next);
+                }
+
+                if (lat < latitudeSegments - 1)
+                {
+                    triangles.Add(current + 1);
+                    triangles.Add(next + 1);
+                    triangles.Add(next);
+                }
+            }
+        }
+
+        Mesh mesh = new Mesh();
+        if (vertexCount > 65535)
+            mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+
+        mesh.SetVertices(vertices);
+        mesh.SetNormals(normals);
+        mesh.SetUVs(0, uv);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateBounds();
+        return mesh;
     }
 
     protected void ApplyMaterial(GameObject go, CreatureMaterialSlot slot)

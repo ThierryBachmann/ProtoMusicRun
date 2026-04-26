@@ -41,6 +41,12 @@ public class HippoVisualEditor : Editor
             true,
             "overallScale"),
         new SectionDefinition(
+            "structure_geometry",
+            "STRUCTURE / Geometry",
+            "Global geometry detail for generated parts (including Blocky cube mode and VeryLow low-poly spheres).",
+            true,
+            "sphereDetailLevel"),
+        new SectionDefinition(
             "structure_body_head",
             "STRUCTURE / Body & Head",
             "Overall body and head volume proportions.",

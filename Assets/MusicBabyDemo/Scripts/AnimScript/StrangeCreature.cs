@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteAlways]
@@ -62,9 +63,15 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     [Range(-45f, 45f)] public float jawBasePitch = 0f;
 
     [Header("STRUCTURE / Legs")]
+    [Range(0, 6)] public int legPairCount = 2;
+    [Tooltip("Leg anchors side offset from body center. Left uses -X, right uses +X.")]
+    [Range(0f, 3f)] public float legAnchorSideOffset = 0.76f;
+    [Tooltip("Leg anchor height relative to body half-height. 0 = body center, -1 = under body.")]
+    [Range(-2f, 2f)] public float legAnchorHeightRatio = -0.17f;
+    [Tooltip("Useful body-length ratio used to spread leg pairs (1 = full usable length, 0 = centered/grouped).")]
+    [Range(0f, 1f)] public float legAnchorLengthRatio = 0.85f;
     [Range(0.1f, 2f)] public float upperLegThickness = 0.60f;
     [Range(0.2f, 3f)] public float upperLegLength = 1.30f;
-    [Range(-1f, 2f)] public float legAttachHeight = 0.78f;
     [Range(0.1f, 2f)] public float ankleDiameter = 0.50f;
     [Range(0.1f, 2f)] public float footHeight = 0.38f;
     [Range(0.1f, 3f)] public float footWidth = 0.84f;
@@ -187,8 +194,6 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     public bool drawDebug = false;
 
     private const string RootName = "__HippoVisualRoot";
-    private const float LegSideOffset = 0.76f;
-    private const float LegFrontOffset = 1.0f;
     private const float UpperLegCenterYRatio = -0.24f / 1.30f;
     private const float AnkleCenterYRatio = -0.88f / 1.30f;
     private const float FootCenterYRatio = -1.16f / 1.30f;
@@ -205,6 +210,14 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private const float DefaultEyeScaleX = 0.82f;
     private const float DefaultEyeScaleY = 0.82f;
     private const float DefaultEyeScaleZ = 0.82f;
+
+    private struct LegRig
+    {
+        public Transform anchor;
+        public Transform root;
+        public int pairIndex;
+        public int sideSign;
+    }
 
     private Transform root;
     private Transform visualRoot;
@@ -225,10 +238,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private Transform tail;
     private Transform eyeAnchorL;
     private Transform eyeAnchorR;
-    private Transform legFL;
-    private Transform legFR;
-    private Transform legBL;
-    private Transform legBR;
+    private readonly List<LegRig> legRigs = new List<LegRig>();
     private Transform eyeL;
     private Transform eyeR;
     private Transform pupilL;
@@ -279,6 +289,11 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     protected override void OnValidate()
     {
         base.OnValidate();
+
+        if (legPairCount < 0)
+            legPairCount = 0;
+        else if (legPairCount > 6)
+            legPairCount = 6;
 
         if (chaseMaxDisplacementPerFrame <= chaseMinDisplacement)
             chaseMaxDisplacementPerFrame = chaseMinDisplacement + 0.001f;
@@ -493,10 +508,57 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
     private bool HasUpdatedLegGeometry()
     {
-        return HasLegParts(legFL) &&
-               HasLegParts(legFR) &&
-               HasLegParts(legBL) &&
-               HasLegParts(legBR);
+        int expectedLegCount = ResolveLegPairCount() * 2;
+        if (legRigs.Count != expectedLegCount)
+            return false;
+
+        for (int i = 0; i < legRigs.Count; i++)
+        {
+            LegRig leg = legRigs[i];
+            if (leg.anchor == null || leg.root == null)
+                return false;
+            if (leg.root.parent != leg.anchor)
+                return false;
+            if (!HasLegParts(leg.root))
+                return false;
+        }
+
+        return true;
+    }
+
+    private int ResolveLegPairCount()
+    {
+        return Mathf.Clamp(legPairCount, 0, 6);
+    }
+
+    private float ResolveLegPairForward(int pairIndex, Vector3 bodyLocalPos, Vector3 bodyLocalScale)
+    {
+        int pairCount = ResolveLegPairCount();
+        if (pairCount <= 1)
+            return bodyLocalPos.z;
+
+        // Compute usable Z span from body ellipse at the current side offset.
+        // This keeps anchors inside body silhouette when side offset increases.
+        float bodyHalfX = bodyLocalScale.x * 0.5f;
+        float bodyHalfZ = bodyLocalScale.z * 0.5f;
+        float xRatio = bodyHalfX > 0.0001f ? Mathf.Abs(legAnchorSideOffset) / bodyHalfX : 1f;
+        xRatio = Mathf.Clamp01(xRatio);
+        float ellipseZFactor = Mathf.Sqrt(Mathf.Max(0f, 1f - (xRatio * xRatio)));
+        float usableHalfZ = bodyHalfZ * ellipseZFactor * legAnchorLengthRatio;
+
+        float t = pairIndex / (float)(pairCount - 1);
+        float front = bodyLocalPos.z + usableHalfZ;
+        float back = bodyLocalPos.z - usableHalfZ;
+        return Mathf.Lerp(front, back, t);
+    }
+
+    private Vector3 ResolveLegAnchorLocalPosition(int pairIndex, int sideSign, Vector3 bodyLocalPos, Vector3 bodyLocalScale)
+    {
+        float bodyHalfY = bodyLocalScale.y * 0.5f;
+        float y = bodyLocalPos.y + (bodyHalfY * legAnchorHeightRatio);
+        float x = sideSign < 0 ? -legAnchorSideOffset : legAnchorSideOffset;
+        float z = ResolveLegPairForward(pairIndex, bodyLocalPos, bodyLocalScale);
+        return new Vector3(x, y, z);
     }
 
     private static bool HasLegParts(Transform legRoot)
@@ -542,10 +604,8 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         if (earR != null)
             ApplyMaterial(earR.gameObject, CreatureMaterialSlot.Ears);
 
-        ApplyLegMaterials(legFL);
-        ApplyLegMaterials(legFR);
-        ApplyLegMaterials(legBL);
-        ApplyLegMaterials(legBR);
+        for (int i = 0; i < legRigs.Count; i++)
+            ApplyLegMaterials(legRigs[i].root);
     }
 
     private void ApplyLegMaterials(Transform legRoot)
@@ -673,10 +733,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
         if (tail == null)
             tail = visualRoot.Find("Tail");
-        legFL = visualRoot.Find("Leg_FL");
-        legFR = visualRoot.Find("Leg_FR");
-        legBL = visualRoot.Find("Leg_BL");
-        legBR = visualRoot.Find("Leg_BR");
+        RecoverLegReferences();
 
         if (headPivot != null)
         {
@@ -811,10 +868,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         tail = null;
         eyeAnchorL = null;
         eyeAnchorR = null;
-        legFL = null;
-        legFR = null;
-        legBL = null;
-        legBR = null;
+        legRigs.Clear();
         eyeL = null;
         eyeR = null;
         pupilL = null;
@@ -1013,10 +1067,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         tailAnchor.localScale = Vector3.one;
         tail.SetParent(tailAnchor, false);
 
-        legFL = CreateLeg("Leg_FL", new Vector3(-LegSideOffset, legAttachHeight, LegFrontOffset));
-        legFR = CreateLeg("Leg_FR", new Vector3(LegSideOffset, legAttachHeight, LegFrontOffset));
-        legBL = CreateLeg("Leg_BL", new Vector3(-LegSideOffset, legAttachHeight, -LegFrontOffset));
-        legBR = CreateLeg("Leg_BR", new Vector3(LegSideOffset, legAttachHeight, -LegFrontOffset));
+        BuildLegRig(bodyLocalPos, bodyLocalScale);
     }
 
     // Main animation dispatch called every frame.
@@ -1072,20 +1123,18 @@ public class StrangeCreature : ProceduralCreatureVisualBase
                headPivot != null &&
                jawPivot != null &&
                tail != null &&
-               legFL != null &&
-               legFR != null &&
-               legBL != null &&
-               legBR != null &&
                eyeL != null &&
                eyeR != null;
     }
 
     private void ResetTowardBase(float dt)
     {
-        legFL.localRotation = Quaternion.Slerp(legFL.localRotation, Quaternion.identity, 8f * dt);
-        legFR.localRotation = Quaternion.Slerp(legFR.localRotation, Quaternion.identity, 8f * dt);
-        legBL.localRotation = Quaternion.Slerp(legBL.localRotation, Quaternion.identity, 8f * dt);
-        legBR.localRotation = Quaternion.Slerp(legBR.localRotation, Quaternion.identity, 8f * dt);
+        for (int i = 0; i < legRigs.Count; i++)
+        {
+            Transform legRoot = legRigs[i].root;
+            if (legRoot != null)
+                legRoot.localRotation = Quaternion.Slerp(legRoot.localRotation, Quaternion.identity, 8f * dt);
+        }
 
         body.localPosition = Vector3.Lerp(body.localPosition, bodyBaseLocalPos, 8f * dt);
         body.localScale = Vector3.Lerp(body.localScale, bodyBaseLocalScale, 8f * dt);
@@ -1122,15 +1171,16 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             float appliedHeadSwing = headSwingAngle;
             float appliedTailSwing = tailSwingAngle;
 
-            float fl = Mathf.Sin(phase) * appliedLegAngle;
-            float fr = Mathf.Sin(phase + Mathf.PI) * appliedLegAngle;
-            float bl = Mathf.Sin(phase + Mathf.PI) * appliedLegAngle;
-            float br = Mathf.Sin(phase) * appliedLegAngle;
-
-            legFL.localRotation = Quaternion.Euler(fl, 0f, 0f);
-            legFR.localRotation = Quaternion.Euler(fr, 0f, 0f);
-            legBL.localRotation = Quaternion.Euler(bl, 0f, 0f);
-            legBR.localRotation = Quaternion.Euler(br, 0f, 0f);
+            float gaitSin = Mathf.Sin(phase);
+            for (int i = 0; i < legRigs.Count; i++)
+            {
+                LegRig leg = legRigs[i];
+                if (leg.root == null)
+                    continue;
+                float swingSign = ResolveLegSwingSign(leg);
+                float legPitch = gaitSin * appliedLegAngle * swingSign;
+                leg.root.localRotation = Quaternion.Euler(legPitch, 0f, 0f);
+            }
 
             float bob = Mathf.Abs(Mathf.Sin(phase * 1.2f)) * appliedBodyBob;
             body.localPosition = bodyBaseLocalPos + new Vector3(0f, bob, 0f);
@@ -1203,10 +1253,8 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         float total = 0f;
         int count = 0;
 
-        TryAccumulateLegLength(legFL, ref total, ref count);
-        TryAccumulateLegLength(legFR, ref total, ref count);
-        TryAccumulateLegLength(legBL, ref total, ref count);
-        TryAccumulateLegLength(legBR, ref total, ref count);
+        for (int i = 0; i < legRigs.Count; i++)
+            TryAccumulateLegLength(legRigs[i].root, ref total, ref count);
 
         if (count <= 0)
             return 0.2f;
@@ -1253,10 +1301,14 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
         float phase = ResolveChasePhase(t);
         float eatAttackLegSwing = Mathf.Sin(phase) * (legAngle * 0.25f);
-        legFL.localRotation = Quaternion.Euler(eatLegFoldAngle + eatAttackLegSwing, 0f, 0f);
-        legFR.localRotation = Quaternion.Euler(eatLegFoldAngle - eatAttackLegSwing, 0f, 0f);
-        legBL.localRotation = Quaternion.Euler(eatLegFoldAngle - eatAttackLegSwing, 0f, 0f);
-        legBR.localRotation = Quaternion.Euler(eatLegFoldAngle + eatAttackLegSwing, 0f, 0f);
+        for (int i = 0; i < legRigs.Count; i++)
+        {
+            LegRig leg = legRigs[i];
+            if (leg.root == null)
+                continue;
+            float swingSign = ResolveLegSwingSign(leg);
+            leg.root.localRotation = Quaternion.Euler(eatLegFoldAngle + (eatAttackLegSwing * swingSign), 0f, 0f);
+        }
 
         headPivot.localRotation = headBaseLocalRot * Quaternion.Euler(6f, 0f, 0f);
         float mouthPulse = 0.65f + 0.35f * Mathf.Sin(stateTimer * 14f);
@@ -1289,10 +1341,14 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
         float phase = ResolveChasePhase(t);
         float eatRecoveryLegSwing = Mathf.Sin(phase) * (legAngle * 0.35f);
-        legFL.localRotation = Quaternion.Euler(-eatRecoveryLegForwardAngle + eatRecoveryLegSwing, 0f, 0f);
-        legFR.localRotation = Quaternion.Euler(-eatRecoveryLegForwardAngle - eatRecoveryLegSwing, 0f, 0f);
-        legBL.localRotation = Quaternion.Euler(-eatRecoveryLegForwardAngle - eatRecoveryLegSwing, 0f, 0f);
-        legBR.localRotation = Quaternion.Euler(-eatRecoveryLegForwardAngle + eatRecoveryLegSwing, 0f, 0f);
+        for (int i = 0; i < legRigs.Count; i++)
+        {
+            LegRig leg = legRigs[i];
+            if (leg.root == null)
+                continue;
+            float swingSign = ResolveLegSwingSign(leg);
+            leg.root.localRotation = Quaternion.Euler(-eatRecoveryLegForwardAngle + (eatRecoveryLegSwing * swingSign), 0f, 0f);
+        }
 
         headPivot.localRotation = headBaseLocalRot * Quaternion.Euler(-6f, 0f, 0f);
         jawPivot.localRotation = jawBaseLocalRot * Quaternion.Euler(eatRecoveryMouthOpenAngle * 0.3f, 0f, 0f);
@@ -1310,15 +1366,21 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
         // "Trepigner": fast, slightly irregular alternating stomps.
         float stompPhase = t * waitLegStompSpeed;
-        float frontRaw = Mathf.Sin(stompPhase) + Mathf.Sin(stompPhase * 2.35f + 1.1f) * waitLegStompJitter;
-        float backRaw = Mathf.Sin(stompPhase + Mathf.PI * 0.35f) + Mathf.Sin(stompPhase * 2.1f + 2.2f) * waitLegStompJitter;
-        float frontStomp = Mathf.Clamp(frontRaw, -1f, 1f) * waitLegStompAngle;
-        float backStomp = Mathf.Clamp(backRaw, -1f, 1f) * (waitLegStompAngle * 0.8f);
+        int pairCount = ResolveLegPairCount();
+        for (int i = 0; i < legRigs.Count; i++)
+        {
+            LegRig leg = legRigs[i];
+            if (leg.root == null)
+                continue;
 
-        legFL.localRotation = Quaternion.Euler(frontStomp, 0f, 0f);
-        legFR.localRotation = Quaternion.Euler(-frontStomp, 0f, 0f);
-        legBL.localRotation = Quaternion.Euler(-backStomp, 0f, 0f);
-        legBR.localRotation = Quaternion.Euler(backStomp, 0f, 0f);
+            float pairT = pairCount <= 1 ? 0.5f : leg.pairIndex / (float)(pairCount - 1);
+            float stompAmplitude = waitLegStompAngle * Mathf.Lerp(1f, 0.8f, pairT);
+            float primary = Mathf.Sin(stompPhase + (pairT * Mathf.PI * 0.7f));
+            float jitter = Mathf.Sin(stompPhase * 2.2f + (pairT * 2.9f) + (leg.sideSign > 0 ? 0.9f : 0f)) * waitLegStompJitter;
+            float stomp = Mathf.Clamp(primary + jitter, -1f, 1f) * stompAmplitude;
+            float sideSign = leg.sideSign < 0 ? 1f : -1f;
+            leg.root.localRotation = Quaternion.Euler(stomp * sideSign, 0f, 0f);
+        }
 
         float tailSwing = Mathf.Sin(t * (waitHeadYawSpeed + 0.55f)) * waitTailSwingAngle;
         tail.localRotation = tailBaseLocalRot * Quaternion.Euler(0f, tailSwing, 0f);
@@ -1327,6 +1389,13 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         float mouthPulse = 0.5f + 0.5f * Mathf.Sin(t * waitMouthTalkSpeed);
         float mouthOpen = waitMouthOpenBase + mouthPulse * waitMouthTalkAngle;
         jawPivot.localRotation = jawBaseLocalRot * Quaternion.Euler(mouthOpen, 0f, 0f);
+    }
+
+    private static float ResolveLegSwingSign(LegRig leg)
+    {
+        bool pairEven = (leg.pairIndex & 1) == 0;
+        bool isRight = leg.sideSign > 0;
+        return pairEven ^ isRight ? 1f : -1f;
     }
 
     private void AnimateStunned(float t)
@@ -1586,10 +1655,14 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         Vector3 upperSize = new Vector3(upperLegThickness, upperLegLength, upperLegThickness);
         Vector3 ankleSize = new Vector3(ankleDiameter, ankleDiameter, ankleDiameter);
         Vector3 footSize = new Vector3(footWidth, footHeight, footDepth);
-        EncapsulateLeg(ref min, ref max, new Vector3(-LegSideOffset, legAttachHeight, LegFrontOffset), upperCenterY, ankleCenterY, footCenterY, ankleForward, footForward, upperSize, ankleSize, footSize);
-        EncapsulateLeg(ref min, ref max, new Vector3(LegSideOffset, legAttachHeight, LegFrontOffset), upperCenterY, ankleCenterY, footCenterY, ankleForward, footForward, upperSize, ankleSize, footSize);
-        EncapsulateLeg(ref min, ref max, new Vector3(-LegSideOffset, legAttachHeight, -LegFrontOffset), upperCenterY, ankleCenterY, footCenterY, ankleForward, footForward, upperSize, ankleSize, footSize);
-        EncapsulateLeg(ref min, ref max, new Vector3(LegSideOffset, legAttachHeight, -LegFrontOffset), upperCenterY, ankleCenterY, footCenterY, ankleForward, footForward, upperSize, ankleSize, footSize);
+        int pairCount = ResolveLegPairCount();
+        for (int pairIndex = 0; pairIndex < pairCount; pairIndex++)
+        {
+            Vector3 leftAnchor = ResolveLegAnchorLocalPosition(pairIndex, -1, bodyLocalPos, bodyLocalScale);
+            Vector3 rightAnchor = ResolveLegAnchorLocalPosition(pairIndex, 1, bodyLocalPos, bodyLocalScale);
+            EncapsulateLeg(ref min, ref max, leftAnchor, upperCenterY, ankleCenterY, footCenterY, ankleForward, footForward, upperSize, ankleSize, footSize);
+            EncapsulateLeg(ref min, ref max, rightAnchor, upperCenterY, ankleCenterY, footCenterY, ankleForward, footForward, upperSize, ankleSize, footSize);
+        }
 
         if (float.IsPositiveInfinity(min.x) || float.IsNegativeInfinity(max.x))
             return false;
@@ -1669,6 +1742,73 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         }
     }
 
+    private void RecoverLegReferences()
+    {
+        legRigs.Clear();
+        if (bodyPivot == null)
+            return;
+
+        int maxPairCount = 6;
+        for (int pairIndex = 0; pairIndex < maxPairCount; pairIndex++)
+        {
+            TryRecoverLegRig(pairIndex, -1);
+            TryRecoverLegRig(pairIndex, 1);
+        }
+
+        // Backward-compat fallback (old 4-leg hierarchy without anchors):
+        if (legRigs.Count > 0)
+            return;
+
+        Transform legacyFL = visualRoot != null ? visualRoot.Find("Leg_FL") : null;
+        Transform legacyFR = visualRoot != null ? visualRoot.Find("Leg_FR") : null;
+        Transform legacyBL = visualRoot != null ? visualRoot.Find("Leg_BL") : null;
+        Transform legacyBR = visualRoot != null ? visualRoot.Find("Leg_BR") : null;
+
+        if (legacyFL != null)
+            legRigs.Add(new LegRig { anchor = null, root = legacyFL, pairIndex = 0, sideSign = -1 });
+        if (legacyFR != null)
+            legRigs.Add(new LegRig { anchor = null, root = legacyFR, pairIndex = 0, sideSign = 1 });
+        if (legacyBL != null)
+            legRigs.Add(new LegRig { anchor = null, root = legacyBL, pairIndex = 1, sideSign = -1 });
+        if (legacyBR != null)
+            legRigs.Add(new LegRig { anchor = null, root = legacyBR, pairIndex = 1, sideSign = 1 });
+    }
+
+    private void TryRecoverLegRig(int pairIndex, int sideSign)
+    {
+        string anchorName = GetLegAnchorName(pairIndex, sideSign);
+        Transform anchor = bodyPivot.Find(anchorName);
+        if (anchor == null)
+            return;
+
+        string legName = GetLegName(pairIndex, sideSign);
+        Transform legRoot = anchor.Find(legName);
+        if (legRoot == null)
+        {
+            // Fallback for renamed children: first child named "Leg_*".
+            for (int i = 0; i < anchor.childCount; i++)
+            {
+                Transform child = anchor.GetChild(i);
+                if (child != null && child.name.StartsWith("Leg_"))
+                {
+                    legRoot = child;
+                    break;
+                }
+            }
+        }
+
+        if (legRoot == null)
+            return;
+
+        legRigs.Add(new LegRig
+        {
+            anchor = anchor,
+            root = legRoot,
+            pairIndex = pairIndex,
+            sideSign = sideSign
+        });
+    }
+
     private void ResolveJawDimensions(
         out float upperWidth,
         out float lowerWidth,
@@ -1699,29 +1839,32 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         upper = combined - lower;
     }
 
-    // Live-update leg structure (attachment height and upper/ankle/foot dimensions).
+    // Live-update leg structure (anchor positions + upper/ankle/foot dimensions).
     private void ApplyLegStructurePlacement()
     {
-        ApplyLegRootPlacement(legFL, -LegSideOffset, LegFrontOffset);
-        ApplyLegRootPlacement(legFR, LegSideOffset, LegFrontOffset);
-        ApplyLegRootPlacement(legBL, -LegSideOffset, -LegFrontOffset);
-        ApplyLegRootPlacement(legBR, LegSideOffset, -LegFrontOffset);
+        Vector3 bodyLocalPos = ResolveBodyLocalPosition();
+        Vector3 bodyLocalScale = ResolveBodyLocalScale();
 
-        ApplyLegPartPlacement(legFL);
-        ApplyLegPartPlacement(legFR);
-        ApplyLegPartPlacement(legBL);
-        ApplyLegPartPlacement(legBR);
+        for (int i = 0; i < legRigs.Count; i++)
+        {
+            LegRig leg = legRigs[i];
+
+            if (leg.anchor != null)
+            {
+                leg.anchor.localPosition = ResolveLegAnchorLocalPosition(leg.pairIndex, leg.sideSign, bodyLocalPos, bodyLocalScale);
+                leg.anchor.localRotation = Quaternion.identity;
+                leg.anchor.localScale = Vector3.one;
+            }
+
+            if (leg.root != null)
+            {
+                leg.root.localPosition = Vector3.zero;
+                ApplyLegPartPlacement(leg.root);
+            }
+        }
 
         if (driveChasePhaseFromDisplacement)
             RecomputeChaseCalibration();
-    }
-
-    private void ApplyLegRootPlacement(Transform legRoot, float side, float forward)
-    {
-        if (legRoot == null)
-            return;
-
-        legRoot.localPosition = new Vector3(side, legAttachHeight, forward);
     }
 
     private void ApplyLegPartPlacement(Transform legRoot)
@@ -1907,9 +2050,47 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         SetPupilLocalPositionImmediate(pupilBaseLocalPos);
     }
 
-    private Transform CreateLeg(string name, Vector3 localPos)
+    private void BuildLegRig(Vector3 bodyLocalPos, Vector3 bodyLocalScale)
     {
-        Transform legRoot = CreateNode(name, visualRoot);
+        legRigs.Clear();
+        int pairCount = ResolveLegPairCount();
+        for (int pairIndex = 0; pairIndex < pairCount; pairIndex++)
+        {
+            CreateLegRig(pairIndex, -1, bodyLocalPos, bodyLocalScale);
+            CreateLegRig(pairIndex, 1, bodyLocalPos, bodyLocalScale);
+        }
+    }
+
+    private void CreateLegRig(int pairIndex, int sideSign, Vector3 bodyLocalPos, Vector3 bodyLocalScale)
+    {
+        Transform anchor = CreateNode(GetLegAnchorName(pairIndex, sideSign), bodyPivot);
+        anchor.localPosition = ResolveLegAnchorLocalPosition(pairIndex, sideSign, bodyLocalPos, bodyLocalScale);
+        anchor.localRotation = Quaternion.identity;
+        anchor.localScale = Vector3.one;
+
+        Transform legRoot = CreateLeg(GetLegName(pairIndex, sideSign), anchor, Vector3.zero);
+        legRigs.Add(new LegRig
+        {
+            anchor = anchor,
+            root = legRoot,
+            pairIndex = pairIndex,
+            sideSign = sideSign
+        });
+    }
+
+    private static string GetLegAnchorName(int pairIndex, int sideSign)
+    {
+        return $"LegAnchor_{pairIndex:00}_{(sideSign < 0 ? "L" : "R")}";
+    }
+
+    private static string GetLegName(int pairIndex, int sideSign)
+    {
+        return $"Leg_{pairIndex:00}_{(sideSign < 0 ? "L" : "R")}";
+    }
+
+    private Transform CreateLeg(string name, Transform parent, Vector3 localPos)
+    {
+        Transform legRoot = CreateNode(name, parent);
         legRoot.localPosition = localPos;
         legRoot.localRotation = Quaternion.identity;
         legRoot.localScale = Vector3.one;
