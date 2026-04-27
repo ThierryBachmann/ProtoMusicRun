@@ -23,6 +23,8 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     [Range(-1.5f, 1.5f)] public float rearBodyAnchorHeightRatio = -0.05f;
     [Tooltip("Rear anchors length ratio from body center to back boundary. 0 = center, 1 = back surface.")]
     [Range(0f, 1.2f)] public float rearBodyAnchorLengthRatio = 0.72f;
+    [Tooltip("Metaball-like smoothing between body and rear parts. 0 = tighter/sharper blend, 1 = softer/more melted blend.")]
+    [Range(0f, 1f)] public float rearBodyMergeSmoothness = 0.55f;
 
     [Header("STRUCTURE / Head")]
     [Range(0.1f, 3f)] public float headWidth = 1.2f;
@@ -215,7 +217,6 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private const float AnkleForwardFromFootWidthRatio = 0.08f / 0.84f;
     private const float FootForwardFromFootWidthRatio = 0.18f / 0.84f;
     private const float FootDepthFromFootWidthRatio = 0.98f / 0.84f;
-    private const float FusedBodyFieldSharpness = 2.75f;
     private const string FusedBodyMeshNamePrefix = "StrangeCreatureBodyCluster";
     private static readonly Vector3 DefaultBodyLocalPos = new Vector3(0f, 0.95f, 0f);
 
@@ -273,6 +274,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private Vector3 fusedBodyCachedRearScale;
     private Vector3 fusedBodyCachedRearCenterL;
     private Vector3 fusedBodyCachedRearCenterR;
+    private float fusedBodyCachedFieldSharpness;
     private CreatureSphereDetailLevel fusedBodyCachedDetailLevel;
     private bool fusedBodyMeshCacheValid;
 
@@ -1194,8 +1196,10 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         if (meshFilter == null)
             return;
 
+        float fieldSharpness = ResolveFusedBodyFieldSharpness();
         if (fusedBodyMeshCacheValid &&
             fusedBodyCachedDetailLevel == sphereDetailLevel &&
+            Mathf.Abs(fusedBodyCachedFieldSharpness - fieldSharpness) <= 0.0001f &&
             Approximately(fusedBodyCachedBodyScale, bodyLocalScale) &&
             Approximately(fusedBodyCachedRearScale, rearBodyScale) &&
             Approximately(fusedBodyCachedRearCenterL, rearBodyCenterL) &&
@@ -1215,6 +1219,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         fusedBodyCachedRearScale = rearBodyScale;
         fusedBodyCachedRearCenterL = rearBodyCenterL;
         fusedBodyCachedRearCenterR = rearBodyCenterR;
+        fusedBodyCachedFieldSharpness = ResolveFusedBodyFieldSharpness();
         fusedBodyCachedDetailLevel = sphereDetailLevel;
         fusedBodyMeshCacheValid = true;
     }
@@ -1222,6 +1227,11 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private static bool Approximately(Vector3 a, Vector3 b)
     {
         return (a - b).sqrMagnitude <= 0.0000001f;
+    }
+
+    private float ResolveFusedBodyFieldSharpness()
+    {
+        return Mathf.Lerp(7.5f, 1.35f, rearBodyMergeSmoothness);
     }
 
     private Mesh BuildFusedBodyMesh(Vector3 bodyLocalScale, Vector3 rearBodyScale, Vector3 rearBodyCenterL, Vector3 rearBodyCenterR)
@@ -1236,15 +1246,16 @@ public class StrangeCreature : ProceduralCreatureVisualBase
 
         Vector3 bodyRadii = EnsurePositiveRadii(bodyLocalScale * 0.5f);
         Vector3 rearRadii = EnsurePositiveRadii(rearBodyScale * 0.5f);
-        float fieldThreshold = Mathf.Exp(-FusedBodyFieldSharpness);
+        float fieldSharpness = ResolveFusedBodyFieldSharpness();
+        float fieldThreshold = Mathf.Exp(-fieldSharpness);
 
         for (int i = 0; i < directions.Count; i++)
         {
             Vector3 direction = directions[i];
-            float distance = ResolveFusedBodySurfaceDistance(direction, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR, fieldThreshold);
+            float distance = ResolveFusedBodySurfaceDistance(direction, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR, fieldSharpness, fieldThreshold);
             Vector3 vertex = direction * distance;
             vertices.Add(vertex);
-            normals.Add(ResolveFusedBodyNormal(vertex, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR));
+            normals.Add(ResolveFusedBodyNormal(vertex, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR, fieldSharpness));
             uv.Add(DirectionToUv(direction));
         }
 
@@ -1439,6 +1450,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         Vector3 rearRadii,
         Vector3 rearBodyCenterL,
         Vector3 rearBodyCenterR,
+        float fieldSharpness,
         float fieldThreshold)
     {
         float high = Mathf.Max(
@@ -1446,14 +1458,14 @@ public class StrangeCreature : ProceduralCreatureVisualBase
             Mathf.Max(rearBodyCenterL.magnitude + rearRadii.magnitude, rearBodyCenterR.magnitude + rearRadii.magnitude));
         high = Mathf.Max(high * 1.6f, 0.1f);
 
-        while (EvaluateFusedBodyField(direction * high, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR) > fieldThreshold)
+        while (EvaluateFusedBodyField(direction * high, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR, fieldSharpness) > fieldThreshold)
             high *= 1.5f;
 
         float low = 0f;
         for (int i = 0; i < 18; i++)
         {
             float mid = (low + high) * 0.5f;
-            float field = EvaluateFusedBodyField(direction * mid, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR);
+            float field = EvaluateFusedBodyField(direction * mid, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR, fieldSharpness);
             if (field > fieldThreshold)
                 low = mid;
             else
@@ -1463,29 +1475,29 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         return (low + high) * 0.5f;
     }
 
-    private float EvaluateFusedBodyField(Vector3 point, Vector3 bodyRadii, Vector3 rearRadii, Vector3 rearBodyCenterL, Vector3 rearBodyCenterR)
+    private float EvaluateFusedBodyField(Vector3 point, Vector3 bodyRadii, Vector3 rearRadii, Vector3 rearBodyCenterL, Vector3 rearBodyCenterR, float fieldSharpness)
     {
-        return EvaluateEllipsoidField(point, Vector3.zero, bodyRadii) +
-               EvaluateEllipsoidField(point, rearBodyCenterL, rearRadii) +
-               EvaluateEllipsoidField(point, rearBodyCenterR, rearRadii);
+        return EvaluateEllipsoidField(point, Vector3.zero, bodyRadii, fieldSharpness) +
+               EvaluateEllipsoidField(point, rearBodyCenterL, rearRadii, fieldSharpness) +
+               EvaluateEllipsoidField(point, rearBodyCenterR, rearRadii, fieldSharpness);
     }
 
-    private float EvaluateEllipsoidField(Vector3 point, Vector3 center, Vector3 radii)
+    private static float EvaluateEllipsoidField(Vector3 point, Vector3 center, Vector3 radii, float fieldSharpness)
     {
         Vector3 local = point - center;
         float q =
             (local.x * local.x) / (radii.x * radii.x) +
             (local.y * local.y) / (radii.y * radii.y) +
             (local.z * local.z) / (radii.z * radii.z);
-        return Mathf.Exp(-FusedBodyFieldSharpness * q);
+        return Mathf.Exp(-fieldSharpness * q);
     }
 
-    private Vector3 ResolveFusedBodyNormal(Vector3 point, Vector3 bodyRadii, Vector3 rearRadii, Vector3 rearBodyCenterL, Vector3 rearBodyCenterR)
+    private Vector3 ResolveFusedBodyNormal(Vector3 point, Vector3 bodyRadii, Vector3 rearRadii, Vector3 rearBodyCenterL, Vector3 rearBodyCenterR, float fieldSharpness)
     {
         Vector3 inwardGradient =
-            EvaluateEllipsoidGradient(point, Vector3.zero, bodyRadii) +
-            EvaluateEllipsoidGradient(point, rearBodyCenterL, rearRadii) +
-            EvaluateEllipsoidGradient(point, rearBodyCenterR, rearRadii);
+            EvaluateEllipsoidGradient(point, Vector3.zero, bodyRadii, fieldSharpness) +
+            EvaluateEllipsoidGradient(point, rearBodyCenterL, rearRadii, fieldSharpness) +
+            EvaluateEllipsoidGradient(point, rearBodyCenterR, rearRadii, fieldSharpness);
 
         if (inwardGradient.sqrMagnitude <= 0.000001f)
             return point.sqrMagnitude > 0.000001f ? point.normalized : Vector3.up;
@@ -1493,14 +1505,14 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         return (-inwardGradient).normalized;
     }
 
-    private Vector3 EvaluateEllipsoidGradient(Vector3 point, Vector3 center, Vector3 radii)
+    private static Vector3 EvaluateEllipsoidGradient(Vector3 point, Vector3 center, Vector3 radii, float fieldSharpness)
     {
         Vector3 local = point - center;
-        float field = EvaluateEllipsoidField(point, center, radii);
+        float field = EvaluateEllipsoidField(point, center, radii, fieldSharpness);
         return new Vector3(
-            field * -FusedBodyFieldSharpness * 2f * local.x / (radii.x * radii.x),
-            field * -FusedBodyFieldSharpness * 2f * local.y / (radii.y * radii.y),
-            field * -FusedBodyFieldSharpness * 2f * local.z / (radii.z * radii.z));
+            field * -fieldSharpness * 2f * local.x / (radii.x * radii.x),
+            field * -fieldSharpness * 2f * local.y / (radii.y * radii.y),
+            field * -fieldSharpness * 2f * local.z / (radii.z * radii.z));
     }
 
     // Main animation dispatch called every frame.
