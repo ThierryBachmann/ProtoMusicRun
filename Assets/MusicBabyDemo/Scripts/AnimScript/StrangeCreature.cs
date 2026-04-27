@@ -215,6 +215,8 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private const float AnkleForwardFromFootWidthRatio = 0.08f / 0.84f;
     private const float FootForwardFromFootWidthRatio = 0.18f / 0.84f;
     private const float FootDepthFromFootWidthRatio = 0.98f / 0.84f;
+    private const float FusedBodyFieldSharpness = 2.75f;
+    private const string FusedBodyMeshNamePrefix = "StrangeCreatureBodyCluster";
     private static readonly Vector3 DefaultBodyLocalPos = new Vector3(0f, 0.95f, 0f);
 
     private struct LegRig
@@ -267,6 +269,12 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     private Vector3 eyeRBaseLocalPos;
     private Vector3 pupilBaseScale;
     private Vector3 pupilBaseLocalPos;
+    private Vector3 fusedBodyCachedBodyScale;
+    private Vector3 fusedBodyCachedRearScale;
+    private Vector3 fusedBodyCachedRearCenterL;
+    private Vector3 fusedBodyCachedRearCenterR;
+    private CreatureSphereDetailLevel fusedBodyCachedDetailLevel;
+    private bool fusedBodyMeshCacheValid;
 
     private Material fallbackBodyMat;
     private Material fallbackEarMat;
@@ -402,12 +410,9 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     {
         return bodyPivot != null &&
                body != null &&
+               HasFusedBodyMesh(body) &&
                rearBodyAnchorL != null &&
                rearBodyAnchorR != null &&
-               rearBodyL != null &&
-               rearBodyR != null &&
-               rearBodyL.parent == rearBodyAnchorL &&
-               rearBodyR.parent == rearBodyAnchorR &&
                headAnchor != null &&
                tailAnchor != null &&
                eyeAnchorL != null &&
@@ -427,6 +432,16 @@ public class StrangeCreature : ProceduralCreatureVisualBase
                eyeR != null &&
                eyeL.parent == eyeAnchorL &&
                eyeR.parent == eyeAnchorR;
+    }
+
+    private static bool HasFusedBodyMesh(Transform candidate)
+    {
+        if (candidate == null)
+            return false;
+
+        MeshFilter meshFilter = candidate.GetComponent<MeshFilter>();
+        Mesh mesh = meshFilter != null ? meshFilter.sharedMesh : null;
+        return mesh != null && mesh.name.StartsWith(FusedBodyMeshNamePrefix);
     }
 
     private static Vector3 ResolveBodyLocalPosition()
@@ -616,12 +631,6 @@ public class StrangeCreature : ProceduralCreatureVisualBase
     {
         if (body != null)
             ApplyMaterial(body.gameObject, CreatureMaterialSlot.Body);
-
-        if (rearBodyL != null)
-            ApplyMaterial(rearBodyL.gameObject, CreatureMaterialSlot.Body);
-
-        if (rearBodyR != null)
-            ApplyMaterial(rearBodyR.gameObject, CreatureMaterialSlot.Body);
 
         if (head != null)
             ApplyMaterial(head.gameObject, CreatureMaterialSlot.Body);
@@ -950,6 +959,7 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         chaseLegLengthEstimate = 0.8f;
         chaseCycleDistance = 1f;
         chaseCachedLegAngle = float.NaN;
+        fusedBodyMeshCacheValid = false;
     }
 
     // One-shot procedural construction of the full hippo hierarchy.
@@ -975,17 +985,17 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         bodyPivot.localRotation = Quaternion.identity;
         bodyPivot.localScale = Vector3.one;
 
-        body = CreatePart(
-            "Body",
-            PrimitiveType.Sphere,
-            bodyPivot,
-            bodyLocalPos,
-            Vector3.zero,
-            bodyLocalScale,
-            CreatureMaterialSlot.Body);
-
         Vector3 rearBodyScale = ResolveRearBodyLocalScale(bodyLocalScale);
         ResolveRearBodyAnchorLocalPositions(bodyLocalPos, bodyLocalScale, out Vector3 rearBodyAnchorPosL, out Vector3 rearBodyAnchorPosR);
+
+        body = CreateFusedBodyPart(
+            "Body",
+            bodyPivot,
+            bodyLocalPos,
+            bodyLocalScale,
+            rearBodyScale,
+            rearBodyAnchorPosL - bodyLocalPos,
+            rearBodyAnchorPosR - bodyLocalPos);
 
         rearBodyAnchorL = CreateNode("RearBodyAnchor_L", bodyPivot);
         rearBodyAnchorL.localPosition = rearBodyAnchorPosL;
@@ -996,24 +1006,6 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         rearBodyAnchorR.localPosition = rearBodyAnchorPosR;
         rearBodyAnchorR.localRotation = Quaternion.identity;
         rearBodyAnchorR.localScale = Vector3.one;
-
-        rearBodyL = CreatePart(
-            "RearBody_L",
-            PrimitiveType.Sphere,
-            rearBodyAnchorL,
-            Vector3.zero,
-            Vector3.zero,
-            rearBodyScale,
-            CreatureMaterialSlot.Body);
-
-        rearBodyR = CreatePart(
-            "RearBody_R",
-            PrimitiveType.Sphere,
-            rearBodyAnchorR,
-            Vector3.zero,
-            Vector3.zero,
-            rearBodyScale,
-            CreatureMaterialSlot.Body);
 
         headAnchor = CreateNode("HeadAnchor", bodyPivot);
         headAnchor.localPosition = ResolveHeadAnchorLocalPosition(bodyLocalPos, bodyLocalScale);
@@ -1168,6 +1160,347 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         tail.SetParent(tailAnchor, false);
 
         BuildLegRig(bodyLocalPos, bodyLocalScale);
+    }
+
+    private Transform CreateFusedBodyPart(
+        string name,
+        Transform parent,
+        Vector3 localPosition,
+        Vector3 bodyLocalScale,
+        Vector3 rearBodyScale,
+        Vector3 rearBodyCenterL,
+        Vector3 rearBodyCenterR)
+    {
+        GameObject go = new GameObject(name);
+        go.transform.SetParent(parent, false);
+        go.transform.localPosition = localPosition;
+        go.transform.localRotation = Quaternion.identity;
+        go.transform.localScale = Vector3.one;
+
+        MeshFilter meshFilter = go.AddComponent<MeshFilter>();
+        meshFilter.sharedMesh = BuildFusedBodyMesh(bodyLocalScale, rearBodyScale, rearBodyCenterL, rearBodyCenterR);
+        CacheFusedBodyMeshInputs(bodyLocalScale, rearBodyScale, rearBodyCenterL, rearBodyCenterR);
+        go.AddComponent<MeshRenderer>();
+        ApplyMaterial(go, CreatureMaterialSlot.Body);
+        return go.transform;
+    }
+
+    private void UpdateFusedBodyMesh(Vector3 bodyLocalScale, Vector3 rearBodyScale, Vector3 rearBodyCenterL, Vector3 rearBodyCenterR)
+    {
+        if (body == null)
+            return;
+
+        MeshFilter meshFilter = body.GetComponent<MeshFilter>();
+        if (meshFilter == null)
+            return;
+
+        if (fusedBodyMeshCacheValid &&
+            fusedBodyCachedDetailLevel == sphereDetailLevel &&
+            Approximately(fusedBodyCachedBodyScale, bodyLocalScale) &&
+            Approximately(fusedBodyCachedRearScale, rearBodyScale) &&
+            Approximately(fusedBodyCachedRearCenterL, rearBodyCenterL) &&
+            Approximately(fusedBodyCachedRearCenterR, rearBodyCenterR) &&
+            HasFusedBodyMesh(body))
+        {
+            return;
+        }
+
+        meshFilter.sharedMesh = BuildFusedBodyMesh(bodyLocalScale, rearBodyScale, rearBodyCenterL, rearBodyCenterR);
+        CacheFusedBodyMeshInputs(bodyLocalScale, rearBodyScale, rearBodyCenterL, rearBodyCenterR);
+    }
+
+    private void CacheFusedBodyMeshInputs(Vector3 bodyLocalScale, Vector3 rearBodyScale, Vector3 rearBodyCenterL, Vector3 rearBodyCenterR)
+    {
+        fusedBodyCachedBodyScale = bodyLocalScale;
+        fusedBodyCachedRearScale = rearBodyScale;
+        fusedBodyCachedRearCenterL = rearBodyCenterL;
+        fusedBodyCachedRearCenterR = rearBodyCenterR;
+        fusedBodyCachedDetailLevel = sphereDetailLevel;
+        fusedBodyMeshCacheValid = true;
+    }
+
+    private static bool Approximately(Vector3 a, Vector3 b)
+    {
+        return (a - b).sqrMagnitude <= 0.0000001f;
+    }
+
+    private Mesh BuildFusedBodyMesh(Vector3 bodyLocalScale, Vector3 rearBodyScale, Vector3 rearBodyCenterL, Vector3 rearBodyCenterR)
+    {
+        int subdivisionLevel = ResolveFusedBodyIcoSubdivisionLevel();
+        BuildIcosphereDirectionMesh(subdivisionLevel, out List<Vector3> directions, out List<int> triangles);
+
+        int vertexCount = directions.Count;
+        List<Vector3> vertices = new List<Vector3>(vertexCount);
+        List<Vector3> normals = new List<Vector3>(vertexCount);
+        List<Vector2> uv = new List<Vector2>(vertexCount);
+
+        Vector3 bodyRadii = EnsurePositiveRadii(bodyLocalScale * 0.5f);
+        Vector3 rearRadii = EnsurePositiveRadii(rearBodyScale * 0.5f);
+        float fieldThreshold = Mathf.Exp(-FusedBodyFieldSharpness);
+
+        for (int i = 0; i < directions.Count; i++)
+        {
+            Vector3 direction = directions[i];
+            float distance = ResolveFusedBodySurfaceDistance(direction, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR, fieldThreshold);
+            Vector3 vertex = direction * distance;
+            vertices.Add(vertex);
+            normals.Add(ResolveFusedBodyNormal(vertex, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR));
+            uv.Add(DirectionToUv(direction));
+        }
+
+        Mesh mesh = new Mesh();
+        mesh.name = $"{FusedBodyMeshNamePrefix}_{sphereDetailLevel}_Ico{subdivisionLevel}";
+        mesh.hideFlags = HideFlags.HideAndDontSave;
+
+        if (ShouldUseFlatFusedBodyNormals())
+            ApplyFlatShadedMeshData(mesh, vertices, uv, triangles);
+        else
+        {
+            mesh.SetVertices(vertices);
+            mesh.SetNormals(normals);
+            mesh.SetUVs(0, uv);
+            mesh.SetTriangles(triangles, 0);
+        }
+
+        mesh.RecalculateBounds();
+        return mesh;
+    }
+
+    private static Vector2 DirectionToUv(Vector3 direction)
+    {
+        float u = Mathf.Atan2(direction.z, direction.x) / (Mathf.PI * 2f) + 0.5f;
+        float v = Mathf.Acos(Mathf.Clamp(direction.y, -1f, 1f)) / Mathf.PI;
+        return new Vector2(u, 1f - v);
+    }
+
+    private bool ShouldUseFlatFusedBodyNormals()
+    {
+        return sphereDetailLevel == CreatureSphereDetailLevel.Blocky ||
+               sphereDetailLevel == CreatureSphereDetailLevel.VeryLow;
+    }
+
+    private static void ApplyFlatShadedMeshData(Mesh mesh, List<Vector3> sourceVertices, List<Vector2> sourceUv, List<int> sourceTriangles)
+    {
+        List<Vector3> flatVertices = new List<Vector3>(sourceTriangles.Count);
+        List<Vector3> flatNormals = new List<Vector3>(sourceTriangles.Count);
+        List<Vector2> flatUv = new List<Vector2>(sourceTriangles.Count);
+        List<int> flatTriangles = new List<int>(sourceTriangles.Count);
+
+        for (int i = 0; i < sourceTriangles.Count; i += 3)
+        {
+            Vector3 v0 = sourceVertices[sourceTriangles[i]];
+            Vector3 v1 = sourceVertices[sourceTriangles[i + 1]];
+            Vector3 v2 = sourceVertices[sourceTriangles[i + 2]];
+            Vector3 normal = Vector3.Cross(v1 - v0, v2 - v0);
+            if (normal.sqrMagnitude <= 0.000001f)
+                normal = Vector3.up;
+            else
+                normal.Normalize();
+
+            Vector3 center = (v0 + v1 + v2) / 3f;
+            if (Vector3.Dot(normal, center) < 0f)
+                normal = -normal;
+
+            int baseIndex = flatVertices.Count;
+            flatVertices.Add(v0);
+            flatVertices.Add(v1);
+            flatVertices.Add(v2);
+            flatNormals.Add(normal);
+            flatNormals.Add(normal);
+            flatNormals.Add(normal);
+            flatUv.Add(sourceUv[sourceTriangles[i]]);
+            flatUv.Add(sourceUv[sourceTriangles[i + 1]]);
+            flatUv.Add(sourceUv[sourceTriangles[i + 2]]);
+            flatTriangles.Add(baseIndex);
+            flatTriangles.Add(baseIndex + 1);
+            flatTriangles.Add(baseIndex + 2);
+        }
+
+        mesh.SetVertices(flatVertices);
+        mesh.SetNormals(flatNormals);
+        mesh.SetUVs(0, flatUv);
+        mesh.SetTriangles(flatTriangles, 0);
+    }
+
+    private int ResolveFusedBodyIcoSubdivisionLevel()
+    {
+        switch (sphereDetailLevel)
+        {
+            case CreatureSphereDetailLevel.Blocky:
+                return 0;
+            case CreatureSphereDetailLevel.VeryLow:
+            case CreatureSphereDetailLevel.Low:
+                return 1;
+            case CreatureSphereDetailLevel.Medium:
+                return 2;
+            case CreatureSphereDetailLevel.High:
+                return 3;
+            default:
+                return 4;
+        }
+    }
+
+    private static void BuildIcosphereDirectionMesh(int subdivisionLevel, out List<Vector3> directions, out List<int> triangles)
+    {
+        directions = new List<Vector3>(12);
+        triangles = new List<int>(60);
+
+        float t = (1f + Mathf.Sqrt(5f)) * 0.5f;
+        AddDirection(directions, new Vector3(-1f, t, 0f));
+        AddDirection(directions, new Vector3(1f, t, 0f));
+        AddDirection(directions, new Vector3(-1f, -t, 0f));
+        AddDirection(directions, new Vector3(1f, -t, 0f));
+        AddDirection(directions, new Vector3(0f, -1f, t));
+        AddDirection(directions, new Vector3(0f, 1f, t));
+        AddDirection(directions, new Vector3(0f, -1f, -t));
+        AddDirection(directions, new Vector3(0f, 1f, -t));
+        AddDirection(directions, new Vector3(t, 0f, -1f));
+        AddDirection(directions, new Vector3(t, 0f, 1f));
+        AddDirection(directions, new Vector3(-t, 0f, -1f));
+        AddDirection(directions, new Vector3(-t, 0f, 1f));
+
+        int[] baseTriangles =
+        {
+            0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11,
+            1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8,
+            3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9,
+            4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1
+        };
+        triangles.AddRange(baseTriangles);
+
+        for (int i = 0; i < subdivisionLevel; i++)
+            SubdivideIcosphere(directions, triangles);
+    }
+
+    private static void SubdivideIcosphere(List<Vector3> directions, List<int> triangles)
+    {
+        Dictionary<long, int> midpointCache = new Dictionary<long, int>();
+        List<int> subdivided = new List<int>(triangles.Count * 4);
+
+        for (int i = 0; i < triangles.Count; i += 3)
+        {
+            int a = triangles[i];
+            int b = triangles[i + 1];
+            int c = triangles[i + 2];
+
+            int ab = GetIcosphereMidpointIndex(directions, midpointCache, a, b);
+            int bc = GetIcosphereMidpointIndex(directions, midpointCache, b, c);
+            int ca = GetIcosphereMidpointIndex(directions, midpointCache, c, a);
+
+            AddTriangle(subdivided, a, ab, ca);
+            AddTriangle(subdivided, b, bc, ab);
+            AddTriangle(subdivided, c, ca, bc);
+            AddTriangle(subdivided, ab, bc, ca);
+        }
+
+        triangles.Clear();
+        triangles.AddRange(subdivided);
+    }
+
+    private static int GetIcosphereMidpointIndex(List<Vector3> directions, Dictionary<long, int> midpointCache, int indexA, int indexB)
+    {
+        int min = Mathf.Min(indexA, indexB);
+        int max = Mathf.Max(indexA, indexB);
+        long key = ((long)min << 32) | (uint)max;
+
+        if (midpointCache.TryGetValue(key, out int cachedIndex))
+            return cachedIndex;
+
+        Vector3 midpoint = (directions[indexA] + directions[indexB]) * 0.5f;
+        int newIndex = AddDirection(directions, midpoint);
+        midpointCache[key] = newIndex;
+        return newIndex;
+    }
+
+    private static int AddDirection(List<Vector3> directions, Vector3 direction)
+    {
+        directions.Add(direction.normalized);
+        return directions.Count - 1;
+    }
+
+    private static void AddTriangle(List<int> triangles, int a, int b, int c)
+    {
+        triangles.Add(a);
+        triangles.Add(b);
+        triangles.Add(c);
+    }
+
+    private static Vector3 EnsurePositiveRadii(Vector3 radii)
+    {
+        return new Vector3(
+            Mathf.Max(0.001f, radii.x),
+            Mathf.Max(0.001f, radii.y),
+            Mathf.Max(0.001f, radii.z));
+    }
+
+    private float ResolveFusedBodySurfaceDistance(
+        Vector3 direction,
+        Vector3 bodyRadii,
+        Vector3 rearRadii,
+        Vector3 rearBodyCenterL,
+        Vector3 rearBodyCenterR,
+        float fieldThreshold)
+    {
+        float high = Mathf.Max(
+            bodyRadii.magnitude,
+            Mathf.Max(rearBodyCenterL.magnitude + rearRadii.magnitude, rearBodyCenterR.magnitude + rearRadii.magnitude));
+        high = Mathf.Max(high * 1.6f, 0.1f);
+
+        while (EvaluateFusedBodyField(direction * high, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR) > fieldThreshold)
+            high *= 1.5f;
+
+        float low = 0f;
+        for (int i = 0; i < 18; i++)
+        {
+            float mid = (low + high) * 0.5f;
+            float field = EvaluateFusedBodyField(direction * mid, bodyRadii, rearRadii, rearBodyCenterL, rearBodyCenterR);
+            if (field > fieldThreshold)
+                low = mid;
+            else
+                high = mid;
+        }
+
+        return (low + high) * 0.5f;
+    }
+
+    private float EvaluateFusedBodyField(Vector3 point, Vector3 bodyRadii, Vector3 rearRadii, Vector3 rearBodyCenterL, Vector3 rearBodyCenterR)
+    {
+        return EvaluateEllipsoidField(point, Vector3.zero, bodyRadii) +
+               EvaluateEllipsoidField(point, rearBodyCenterL, rearRadii) +
+               EvaluateEllipsoidField(point, rearBodyCenterR, rearRadii);
+    }
+
+    private float EvaluateEllipsoidField(Vector3 point, Vector3 center, Vector3 radii)
+    {
+        Vector3 local = point - center;
+        float q =
+            (local.x * local.x) / (radii.x * radii.x) +
+            (local.y * local.y) / (radii.y * radii.y) +
+            (local.z * local.z) / (radii.z * radii.z);
+        return Mathf.Exp(-FusedBodyFieldSharpness * q);
+    }
+
+    private Vector3 ResolveFusedBodyNormal(Vector3 point, Vector3 bodyRadii, Vector3 rearRadii, Vector3 rearBodyCenterL, Vector3 rearBodyCenterR)
+    {
+        Vector3 inwardGradient =
+            EvaluateEllipsoidGradient(point, Vector3.zero, bodyRadii) +
+            EvaluateEllipsoidGradient(point, rearBodyCenterL, rearRadii) +
+            EvaluateEllipsoidGradient(point, rearBodyCenterR, rearRadii);
+
+        if (inwardGradient.sqrMagnitude <= 0.000001f)
+            return point.sqrMagnitude > 0.000001f ? point.normalized : Vector3.up;
+
+        return (-inwardGradient).normalized;
+    }
+
+    private Vector3 EvaluateEllipsoidGradient(Vector3 point, Vector3 center, Vector3 radii)
+    {
+        Vector3 local = point - center;
+        float field = EvaluateEllipsoidField(point, center, radii);
+        return new Vector3(
+            field * -FusedBodyFieldSharpness * 2f * local.x / (radii.x * radii.x),
+            field * -FusedBodyFieldSharpness * 2f * local.y / (radii.y * radii.y),
+            field * -FusedBodyFieldSharpness * 2f * local.z / (radii.z * radii.z));
     }
 
     // Main animation dispatch called every frame.
@@ -1612,9 +1945,13 @@ public class StrangeCreature : ProceduralCreatureVisualBase
         if (body != null)
         {
             bodyBaseLocalPos = resolvedBodyLocalPos;
-            bodyBaseLocalScale = resolvedBodyLocalScale;
+            bodyBaseLocalScale = Vector3.one;
             body.localPosition = bodyBaseLocalPos;
             body.localScale = bodyBaseLocalScale;
+
+            Vector3 rearBodyScale = ResolveRearBodyLocalScale(resolvedBodyLocalScale);
+            ResolveRearBodyAnchorLocalPositions(resolvedBodyLocalPos, resolvedBodyLocalScale, out Vector3 rearAnchorPosL, out Vector3 rearAnchorPosR);
+            UpdateFusedBodyMesh(resolvedBodyLocalScale, rearBodyScale, rearAnchorPosL - resolvedBodyLocalPos, rearAnchorPosR - resolvedBodyLocalPos);
         }
 
         ApplyRearBodyPlacement(resolvedBodyLocalPos, resolvedBodyLocalScale);
